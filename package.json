@@ -5,7 +5,7 @@
   "main": "electron/main.js",
   "scripts": {
     "dev": "concurrently \"npm run vue-dev\" \"npm run python-dev\"",
-    "python-dev": ".venv\\Scripts\\activate && python src-tauri\\target\\release\\bundle\\msi\\app.py",
+    "python-dev": ".venv\\Scripts\\activate && python backend\\app.py",
     "vue-dev": "vite",
     "build": "vite build",
     "preview": "vite preview",

@@ -8,6 +8,16 @@
             <option value="seasonally">Seasonally</option>
         </select>
     </div>
+
+    <div class="interval-container">
+        <label for="interval-select" class="interval-label">Export Select Interval:</label>
+        <select id="interval-select" v-model="exportInterval" @change="onExportChange" class="interval-dropdown">
+            <option value="daily">Daily</option>
+            <option value="monthly">Monthly</option>
+            <option value="yearly">Yearly</option>
+            <option value="seasonally">Seasonally</option>
+        </select>
+    </div>
 </template>
 
 <script>
@@ -15,11 +25,16 @@ export default {
     data() {
         return {
             selectedInterval: "daily",
+            exportInterval: "daily",
         };
     },
     methods: {
         onIntervalChange() {
+            this.exportInterval = this.selectedInterval;
             this.$emit("interval-selected", this.selectedInterval);
+        },
+        onExportChange() {
+            this.$emit("export-interval-selected", this.exportInterval);
         },
     },
 };

@@ -1,21 +1,22 @@
 <template>
     <div class="form-container">
         <div class="form-group">
-            <label for="column-select">Select Columns:</label>
+            <label for="column-select">Select Export Columns:</label>
             <select id="column-select" v-model="selectedColumns" multiple @change="onChange" class="dropdown">
-                <option v-for="column in columns.filter(col => col !== 'Statistics')" :key="column" :value="column">{{ column }}</option>
+                <option v-for="column in columns.filter(col => col !== 'Statistics')" :key="column" :value="column">{{
+                    column }}</option>
             </select>
         </div>
 
         <div class="form-group">
-            <label for="id-select">Select IDs:</label>
+            <label for="id-select">Select Export IDs:</label>
             <select id="id-select" v-model="selectedIds" multiple @change="onChange" class="dropdown">
                 <option v-for="id in ids" :key="id" :value="id">{{ id }}</option>
             </select>
         </div>
 
         <div class="form-group">
-            <label for="date-start">Start Date:</label>
+            <label for="date-start">Export Start Date:</label>
             <input type="date" v-if="dateType === 'Time'" v-model="selectedDate.start" @change="onChange"
                 class="input-field" />
             <input type="text" v-else-if="dateType === 'Month'" v-model="selectedDate.start" @change="onChange"
@@ -23,7 +24,7 @@
         </div>
 
         <div class="form-group">
-            <label for="date-end">End Date:</label>
+            <label for="date-end">Export End Date:</label>
             <input type="date" v-if="dateType === 'Time'" v-model="selectedDate.end" @change="onChange"
                 class="input-field" />
             <input type="text" v-else-if="dateType === 'Month'" v-model="selectedDate.end" @change="onChange"
@@ -45,6 +46,18 @@ export default {
             type: String,
             default: null,
         },
+        selectCol: {
+            type: Array,
+        },
+        selectIds: {
+            type: Array,
+        },
+        selectDate: {
+            type: Object,
+        },
+        daType: {
+            type: String,
+        },
     },
     data() {
         return {
@@ -60,18 +73,28 @@ export default {
         };
     },
     watch: {
-        selectedTable(newTable) {
-            this.fetchColumns(newTable);
+        selectCol(newCol) {
+            this.fetchColumns();
+            this.selectedColumns = newCol;
         },
+        selectIds(newIds) {
+            this.selectedIds = newIds;
+        },
+        selectDate(newDate) {
+            this.selectedDate = newDate;
+        },
+        daType(newType) {
+            this.dateType = newType;
+        }
     },
     methods: {
-        async fetchColumns(newTable) {
+        async fetchColumns() {
             const apiBaseUrl = import.meta.env.VITE_APP_API_BASE_URL;
             try {
                 const response = await axios.get(`${apiBaseUrl}/api/get_table_details`, {
                     params: {
                         db_path: this.selectedDb,
-                        table_name: newTable,
+                        table_name: this.selectedTable,
                     },
                 });
                 this.columns = response.data.columns;
@@ -86,7 +109,7 @@ export default {
             }
         },
         onChange() {
-            this.$emit("columns-selected", {
+            this.$emit("export-selected", {
                 selectedColumns: this.selectedColumns,
                 selectedIds: this.selectedIds,
                 selectedDate: this.selectedDate,

@@ -3,7 +3,8 @@
     <DatabaseDropdown @database-selected="onDatabaseSelected" />
     <TableDropdown :selectedDb="selectedDb" @table-selected="onTableSelected" />
     <ColumnDropdown :selectedDb="selectedDb" :selectedTable="selectedTable" @columns-selected="onColumnsSelected" />
-    <IntervalDropdown @interval-selected="onIntervalSelected" />
+    <ExportDropdown :selectedDb="selectedDb" :selectedTable="selectedTable" :selectCol="selectedColumns" :selectIds="selectedIds" :selectDate="selectedDate" :daType="dateType" @export-selected="onExportSelected" />
+    <IntervalDropdown @interval-selected="onIntervalSelected" @export-interval-selected="onExportIntervalSelected" />
     <StatisticsDropdown @statistics-selected="onStatisticsSelected" />
     <AggregationMethod @method-selected="onMethodSelected" />
     <ExportConfig @export-config-changed="onExportConfigChanged" @export-data="exportData" />
@@ -36,6 +37,7 @@ import TableDropdown from './components/TableDropdown.vue';
 import ColumnDropdown from './components/ColumnDropdown.vue';
 import IntervalDropdown from './components/IntervalDropdown.vue';
 import StatisticsDropdown from './components/StatisticsDropdown.vue';
+import ExportDropdown from './components/ExportDropdown.vue';
 import AggregationMethod from './components/AggregationMethod.vue';
 import ExportConfig from './components/ExportConfig.vue';
 import axios from 'axios';
@@ -49,6 +51,7 @@ export default {
     StatisticsDropdown,
     AggregationMethod,
     ExportConfig,
+    ExportDropdown,
   },
   data() {
     return {
@@ -60,12 +63,18 @@ export default {
       selectedInterval: 'daily', // Define selectedInterval
       selectedStatistics: ['None'], // Define selectedStatistics
       aggregationMethod: ['Equal'], // Define aggregationMethods
+      exportColumns: [], // Define exportColumns
+      exportIds: [], // Define exportIds
+      exportDate: {}, // Define exportDate
+      exportInterval: 'daily', // Define exportInterval
       exportConfig: {         // Define exportConfig
         path: '',
         filename: '',
         format: 'csv',
       },
       data: [],
+      dateType: '',
+      exportDateType: '',
     };
   },
   methods: {
@@ -77,12 +86,15 @@ export default {
     },
     onColumnsSelected(data) {
       this.selectedColumns = data.selectedColumns;
+      this.selectedColumns.unshift('Statistics');
+      this.selectedColumns = [...new Set(this.selectedColumns)];
       this.dateRange = data.selectedDate
       this.selectedIds = data.selectedIds;
       this.dateType = data.dateType;
     },
     onIntervalSelected(interval) {
-      this.selectedInterval = interval;
+      this.selectedInterval = interval[0];
+      this.exportInterval = interval[1];
     },
     onMethodSelected(method) {
       this.aggregationMethod = method;
@@ -92,6 +104,15 @@ export default {
     },
     onExportConfigChanged(config) {
       this.exportConfig = config;
+    },
+    onExportSelected(data) {
+      this.exportColumns = data.selectedColumns;
+      this.exportDate = data.selectedDate;
+      this.exportIds = data.selectedIds;
+      this.exportDateType = data.dateType;
+    },
+    onExportIntervalSelected(interval) {
+      this.exportInterval = interval;
     },
     async fetchData() {
       // Implement data fetching logic based on selected options
@@ -117,18 +138,17 @@ export default {
     },
     async exportData() {
       // Add export logic here
-      console.log(this.selectedColumns);
       try {
         const response = await axios.get(`${import.meta.env.VITE_APP_API_BASE_URL}/api/export_data`, {
           params: {
             db_path: this.selectedDb,
             table_name: this.selectedTable,
-            columns: this.selectedColumns.join(","),
-            id: this.selectedIds.join(","),
-            start_date: this.dateRange.start,
-            end_date: this.dateRange.end,
-            date_type: this.dateType,
-            interval: this.selectedInterval,
+            columns: this.exportColumns.join(","),
+            id: this.exportIds.join(","),
+            start_date: this.exportDate.start,
+            end_date: this.exportDate.end,
+            date_type: this.exportDateType,
+            interval: this.exportInterval,
             statistics: this.selectedStatistics.join(","),
             method: this.aggregationMethod.join(","),
             export_path: this.exportConfig.path,

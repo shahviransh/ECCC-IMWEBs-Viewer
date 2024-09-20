@@ -35,9 +35,15 @@ def fetch_data_from_db(
 
     # If start and end dates are provided, filter by date range
     if start_date and end_date and date_type == "Month":
-        query += f" WHERE {date_type} >= {start_date} AND {date_type} <= {end_date}"
+        if "WHERE" in query:
+            query += f" AND {date_type} >= '{start_date}' AND {date_type} <= '{end_date}'"
+        else:
+            query += f" WHERE {date_type} >= '{start_date}' AND {date_type} <= '{end_date}'"
     elif start_date and end_date and date_type == "Time":
-        query += f" WHERE {date_type} >= '{start_date}' AND {date_type} <= '{end_date}'"
+        if "WHERE" in query:
+            query += f" AND Time >= '{start_date}' AND Time <= '{end_date}'"
+        else:
+            query += f" WHERE Time >= '{start_date}' AND Time <= '{end_date}'"
 
     df = pd.read_sql_query(query, conn)
 
@@ -63,27 +69,36 @@ def aggregate_data(df, interval, method):
     """Aggregate data based on the specified interval and method."""
     # Convert the 'date' column to datetime
     df["Time"] = pd.to_datetime(df["Time"])
+    df.set_index('Time', inplace=True)
+    resampled_df = None
+    print(df)
 
     if interval == "daily":
         resampled_df = df
     elif interval == "monthly":
-        resampled_df = df.resample("M", on="Time").agg(method)
+        resampled_df = df.groupby('ID').resample("ME").first()
     elif interval == "seasonal":
         # Custom resampling for seasons
-        df["season"] = df["Time"].apply(lambda x: get_season_from_date(str(x)))
-        resampled_df = df.groupby("season").agg(method)
+        df["Season"] = df["Time"].apply(lambda x: get_season_from_date(str(x)))
+        resampled_df = df.groupby("Season")
     elif interval == "yearly":
-        resampled_df = df.resample("Y", on="Time").agg(method)
+        resampled_df = df.groupby('ID').resample("YE").first()
     else:
         resampled_df = df
+    
+    resampled_df = resampled_df.drop(columns=['ID']) if 'ID' in df.index.names else resampled_df
+    resampled_df.reset_index(inplace=True)
+    print(resampled_df)
+    stats_df = calculate_statistics(resampled_df, method)
 
-    return resampled_df
+    return resampled_df, stats_df
 
 
 # Helper function to calculate statistics
 def calculate_statistics(df, statistics):
     """Calculate specified statistics for numerical data in the DataFrame."""
     stats_df = pd.DataFrame()
+    df = df.select_dtypes(include=['number'])
     if "Average" in statistics:
         stats_df["Average"] = df.mean()
     if "Sum" in statistics:
@@ -94,6 +109,10 @@ def calculate_statistics(df, statistics):
         stats_df["Minimum"] = df.min()
     if "Standard Deviation" in statistics:
         stats_df["Standard Deviation"] = df.std()
+
+    stats_df = stats_df.T
+    stats_df.reset_index(inplace=True)
+    stats_df.rename(columns={"index": "Statistics"}, inplace=True)
 
     return stats_df
 
@@ -244,6 +263,7 @@ def get_data():
     db_path = data.get("db_path")  # Path to the SQLite database
     table_name = data.get("table_name")  # Table name to fetch data from
     columns = data.get("columns", "All")  # Columns to fetch data from
+    columns = columns.replace("Statistics,", "")
     selected_id = data.get("id", [])  # ID to filter data, if provided
     selected_id = selected_id.split(",") if selected_id != [""] else selected_id
     start_date = data.get("start_date")  # Start date for filtering
@@ -269,16 +289,20 @@ def get_data():
         )
         columns = columns.split(",") if columns != "All" else columns
         df = df.get(columns, df) if columns != "All" else df
-
+        
         # Aggregate data based on interval and method
-        if method != ["Equal"]:
-            df = aggregate_data(df, interval, method)
-
+        if "Equal" not in method and date_type == 'Time':
+            df, stats_df = aggregate_data(df, interval, method)
+            df["Statistics"] = 'Data'
+            df = df[["Statistics"] + columns]
+            df = pd.concat([df, stats_df], axis=0)
+            df.fillna({'Time':0}, inplace=True)
         # Calculate statistics if specified
-        if statistics != ["None"]:
+        elif "None" not in statistics:
             stats_df = calculate_statistics(df, statistics)
-            df = pd.concat([df, stats_df], axis=1)
-
+            df["Statistics"] = 'Data'
+            df = df[["Statistics"] + columns]
+            df = pd.concat([df, stats_df], axis=0)
         # Return the processed data as JSON
         return jsonify(df.to_dict(orient="records"))
 
@@ -295,6 +319,7 @@ def export_data():
     db_path = data.get("db_path")
     table_name = data.get("table_name")
     columns = data.get("columns", "All")
+    columns = columns.replace("Statistics,", "")
     selected_id = data.get("id", [])
     selected_id = selected_id.split(",") if selected_id != [""] else selected_id
     start_date = data.get("start_date")
@@ -306,7 +331,6 @@ def export_data():
     statistics = statistics.split(",") if statistics != ["None"] else statistics
     output_dest = data.get("export_path", "dataExport")
     output_dest = os.path.join('..', 'dist', output_dest) if output_dest == "dataExport" else output_dest
-    print(output_dest)
     output_name = data.get(
         "export_filename", f"exported_data_{datetime.now().strftime('%Y%m%d%H%M%S')}"
     )
@@ -323,12 +347,17 @@ def export_data():
         columns = columns.split(",") if columns != "All" else columns
         df = df.get(columns, df) if columns != "All" else df
 
-        if method != "Equal":
-            df = aggregate_data(df, interval, method)
-
-        if statistics != ["None"]:
+        if "Equal" not in method and date_type == 'Time':
+            df, stats_df = aggregate_data(df, interval, method)
+            df["Statistics"] = 'Data'
+            df = df[["Statistics"] + columns]
+            df = pd.concat([df, stats_df], axis=0)
+            df.fillna({'Time':0}, inplace=True)
+        elif "None" not in statistics:
             stats_df = calculate_statistics(df, statistics)
-            df = pd.concat([df, stats_df], axis=1)
+            df["Statistics"] = 'Data'
+            df = df[["Statistics"] + columns]
+            df = pd.concat([df, stats_df], axis=0)
 
         # Save the processed data to file
         file_path = save_to_file(
