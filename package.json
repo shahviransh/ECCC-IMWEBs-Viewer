@@ -1,0 +1,24 @@
+{
+  "name": "eccc-imwebs-viewer-frontend",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "concurrently \"npm run vue-dev\" \".venv\\Scripts\\activate\" \"python app.py\"",
+    "vue-dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "tauri": "tauri"
+  },
+  "dependencies": {
+    "@tauri-apps/api": "^1.6.0",
+    "axios": "^1.7.7",
+    "vue": "^3.3.4"
+  },
+  "devDependencies": {
+    "@tauri-apps/cli": "^1",
+    "@vitejs/plugin-vue": "^5.0.5",
+    "concurrently": "^9.0.1",
+    "vite": "^5.3.1"
+  }
+}
