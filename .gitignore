@@ -10,7 +10,7 @@ Jenette_Creek_Watershed
 .venv
 
 node_modules
-dist
+
 build
 dist-ssr
 *.local

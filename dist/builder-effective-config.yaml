@@ -1,0 +1,11 @@
+directories:
+  output: dist
+  buildResources: build
+appId: com.yourapp.id
+productName: YourApp
+files:
+  - filter:
+      - dist/**/*
+      - node_modules/**/*
+      - electron/**/*
+electronVersion: 32.1.2
