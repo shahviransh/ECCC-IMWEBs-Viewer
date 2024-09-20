@@ -36,14 +36,14 @@ def fetch_data_from_db(
     # If start and end dates are provided, filter by date range
     if start_date and end_date and date_type == "Month":
         if "WHERE" in query:
+            query += f" AND {date_type} >= {start_date} AND {date_type} <= {end_date}"
+        else:
+            query += f" WHERE {date_type} >= {start_date} AND {date_type} <= {end_date}"
+    elif start_date and end_date and date_type in ["Time", "Date"]:
+        if "WHERE" in query:
             query += f" AND {date_type} >= '{start_date}' AND {date_type} <= '{end_date}'"
         else:
             query += f" WHERE {date_type} >= '{start_date}' AND {date_type} <= '{end_date}'"
-    elif start_date and end_date and date_type == "Time":
-        if "WHERE" in query:
-            query += f" AND Time >= '{start_date}' AND Time <= '{end_date}'"
-        else:
-            query += f" WHERE Time >= '{start_date}' AND Time <= '{end_date}'"
 
     df = pd.read_sql_query(query, conn)
 
@@ -68,8 +68,12 @@ def get_season_from_date(date_str):
 def aggregate_data(df, interval, method):
     """Aggregate data based on the specified interval and method."""
     # Convert the 'date' column to datetime
-    df["Time"] = pd.to_datetime(df["Time"])
-    df.set_index('Time', inplace=True)
+    try:
+        df["Time"] = pd.to_datetime(df["Time"])
+        df.set_index('Time', inplace=True)
+    except Exception as e:
+        df["Date"] = pd.to_datetime(df["Date"])
+        df.set_index('Date', inplace=True)
     resampled_df = None
     print(df)
 
@@ -79,7 +83,10 @@ def aggregate_data(df, interval, method):
         resampled_df = df.groupby('ID').resample("ME").first()
     elif interval == "seasonal":
         # Custom resampling for seasons
-        df["Season"] = df["Time"].apply(lambda x: get_season_from_date(str(x)))
+        try:
+            df["Season"] = df["Time"].apply(lambda x: get_season_from_date(str(x)))
+        except Exception as e:
+            df["Season"] = df["Date"].apply(lambda x: get_season_from_date(str(x)))
         resampled_df = df.groupby("Season")
     elif interval == "yearly":
         resampled_df = df.groupby('ID').resample("YE").first()
@@ -213,6 +220,11 @@ def get_table_details():
             start_date = df["Time"].min().strftime("%Y-%m-%d")
             end_date = df["Time"].max().strftime("%Y-%m-%d")
             date_type = "Time"
+        elif "Date" in columns:
+            df["Date"] = pd.to_datetime(df["Date"])
+            start_date = df["Date"].min().strftime("%Y-%m-%d")
+            end_date = df["Date"].max().strftime("%Y-%m-%d")
+            date_type = "Date"
         elif "Month" in columns:
             start_date = str(df["Month"].min())
             end_date = str(df["Month"].max())
@@ -291,12 +303,12 @@ def get_data():
         df = df.get(columns, df) if columns != "All" else df
         
         # Aggregate data based on interval and method
-        if "Equal" not in method and date_type == 'Time':
+        if "Equal" not in method and date_type in ['Time', 'Date']:
             df, stats_df = aggregate_data(df, interval, method)
             df["Statistics"] = 'Data'
             df = df[["Statistics"] + columns]
             df = pd.concat([df, stats_df], axis=0)
-            df.fillna({'Time':0}, inplace=True)
+            df.fillna({date_type:0}, inplace=True)
         # Calculate statistics if specified
         elif "None" not in statistics:
             stats_df = calculate_statistics(df, statistics)
@@ -346,12 +358,12 @@ def export_data():
         columns = columns.split(",") if columns != "All" else columns
         df = df.get(columns, df) if columns != "All" else df
 
-        if "Equal" not in method and date_type == 'Time':
+        if "Equal" not in method and date_type in ['Time', 'Date']:
             df, stats_df = aggregate_data(df, interval, method)
             df["Statistics"] = 'Data'
             df = df[["Statistics"] + columns]
             df = pd.concat([df, stats_df], axis=0)
-            df.fillna({'Time':0}, inplace=True)
+            df.fillna({date_type:0}, inplace=True)
         elif "None" not in statistics:
             stats_df = calculate_statistics(df, statistics)
             df["Statistics"] = 'Data'

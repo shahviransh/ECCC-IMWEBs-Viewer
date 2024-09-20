@@ -3,7 +3,8 @@
         <div class="form-group">
             <label for="column-select">Select Columns:</label>
             <select id="column-select" v-model="selectedColumns" multiple @change="onChange" class="dropdown">
-                <option v-for="column in columns.filter(col => col !== 'Statistics')" :key="column" :value="column">{{ column }}</option>
+                <option v-for="column in columns.filter(col => col !== 'Statistics')" :key="column" :value="column">{{
+                    column }}</option>
             </select>
         </div>
 
@@ -30,6 +31,38 @@
                 placeholder="Enter month" class="input-field" />
         </div>
     </div>
+    <div class="form-container">
+        <div class="form-group">
+            <label for="column-select">Export Select Columns:</label>
+            <select id="column-select" v-model="exportColumns" multiple @change="onChangeExport" class="dropdown">
+                <option v-for="column in columns.filter(col => col !== 'Statistics')" :key="column" :value="column">{{
+                    column }}</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="id-select">Select IDs:</label>
+            <select id="id-select" v-model="exportIds" multiple @change="onChangeExport" class="dropdown">
+                <option v-for="id in ids" :key="id" :value="id">{{ id }}</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="date-start">Start Date:</label>
+            <input type="date" v-if="dateType === 'Time'" v-model="exportDate.start" @change="onChangeExport"
+                class="input-field" />
+            <input type="text" v-else-if="dateType === 'Month'" v-model="exportDate.start" @change="onChangeExport"
+                placeholder="Enter month" class="input-field" />
+        </div>
+
+        <div class="form-group">
+            <label for="date-end">End Date:</label>
+            <input type="date" v-if="dateType === 'Time'" v-model="exportDate.end" @change="onChangeExport"
+                class="input-field" />
+            <input type="text" v-else-if="dateType === 'Month'" v-model="exportDate.end" @change="onChangeExport"
+                placeholder="Enter month" class="input-field" />
+        </div>
+    </div>
 </template>
 
 <script>
@@ -50,13 +83,20 @@ export default {
         return {
             columns: [],
             selectedColumns: [],
+            exportColumns: [],
             ids: [],
             selectedIds: [],
+            exportIds: [],
             selectedDate: {
                 start: null,
                 end: null,
             },
+            exportDate: {
+                start: null,
+                end: null,
+            },
             dateType: null,
+            exportDateType: null,
         };
     },
     watch: {
@@ -81,16 +121,34 @@ export default {
                     end: response.data.end_date,
                 };
                 this.dateType = response.data.date_type;
+                this.exportDate = {
+                    start: response.data.start_date,
+                    end: response.data.end_date,
+                };
+                this.exportDateType = response.data.date_type;
             } catch (error) {
                 console.error("Error fetching columns:", error);
             }
         },
         onChange() {
+            this.exportColumns = [...this.selectedColumns];
+            this.exportIds = [...this.selectedIds];
+            this.exportDate = { ...this.selectedDate };
+            this.exportDateType = this.dateType;
+
             this.$emit("columns-selected", {
                 selectedColumns: this.selectedColumns,
                 selectedIds: this.selectedIds,
                 selectedDate: this.selectedDate,
                 dateType: this.dateType,
+            });
+        },
+        onChangeExport() {
+            this.$emit("export-selected", {
+                selectedColumns: this.exportColumns,
+                selectedIds: this.exportIds,
+                selectedDate: this.exportDate,
+                dateType: this.exportDateType,
             });
         },
     },

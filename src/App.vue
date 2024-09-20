@@ -2,8 +2,7 @@
   <div>
     <DatabaseDropdown @database-selected="onDatabaseSelected" />
     <TableDropdown :selectedDb="selectedDb" @table-selected="onTableSelected" />
-    <ColumnDropdown :selectedDb="selectedDb" :selectedTable="selectedTable" @columns-selected="onColumnsSelected" />
-    <ExportDropdown :selectedDb="selectedDb" :selectedTable="selectedTable" :selectCol="selectedColumns" :selectIds="selectedIds" :selectDate="selectedDate" :daType="dateType" @export-selected="onExportSelected" />
+    <ColumnDropdown :selectedDb="selectedDb" :selectedTable="selectedTable" @columns-selected="onColumnsSelected" @export-selected="onExportSelected" />
     <IntervalDropdown @interval-selected="onIntervalSelected" @export-interval-selected="onExportIntervalSelected" />
     <StatisticsDropdown @statistics-selected="onStatisticsSelected" />
     <AggregationMethod @method-selected="onMethodSelected" />
@@ -37,7 +36,6 @@ import TableDropdown from './components/TableDropdown.vue';
 import ColumnDropdown from './components/ColumnDropdown.vue';
 import IntervalDropdown from './components/IntervalDropdown.vue';
 import StatisticsDropdown from './components/StatisticsDropdown.vue';
-import ExportDropdown from './components/ExportDropdown.vue';
 import AggregationMethod from './components/AggregationMethod.vue';
 import ExportConfig from './components/ExportConfig.vue';
 import axios from 'axios';
@@ -51,7 +49,6 @@ export default {
     StatisticsDropdown,
     AggregationMethod,
     ExportConfig,
-    ExportDropdown,
   },
   data() {
     return {
@@ -93,8 +90,7 @@ export default {
       this.dateType = data.dateType;
     },
     onIntervalSelected(interval) {
-      this.selectedInterval = interval[0];
-      this.exportInterval = interval[1];
+      this.selectedInterval = interval;
     },
     onMethodSelected(method) {
       this.aggregationMethod = method;
