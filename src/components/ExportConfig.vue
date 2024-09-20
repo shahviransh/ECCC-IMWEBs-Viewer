@@ -36,7 +36,7 @@ export default {
     },
     data() {
         return {
-            exportPath: "./dataExport",
+            exportPath: "dataExport",
             exportFilename: "exported_data",
             exportFormat: "csv",
         };

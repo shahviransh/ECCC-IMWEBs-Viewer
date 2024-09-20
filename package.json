@@ -4,7 +4,8 @@
   "version": "0.1.0",
   "type": "module",
   "scripts": {
-    "dev": "concurrently \"npm run vue-dev\" \".venv\\Scripts\\activate\" \"python app.py\"",
+    "dev": "concurrently \"npm run vue-dev\" \"npm run python-dev\"",
+    "python-dev": ".venv\\Scripts\\activate && python src-tauri\\target\\release\\bundle\\msi\\app.py",
     "vue-dev": "vite",
     "build": "vite build",
     "preview": "vite preview",

@@ -11,6 +11,7 @@ Jenette_Creek_Watershed
 
 node_modules
 dist
+build
 dist-ssr
 *.local
 
