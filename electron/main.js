@@ -1,6 +1,5 @@
 const { app, BrowserWindow } = require('electron');
 const path = require('path');
-const fs = require('fs'); // Import fs module
 const { spawn } = require('child_process');
 
 let pythonProcess = null;
@@ -15,21 +14,15 @@ function createWindow() {
     },
   });
 
-  mainWindow.loadURL('http://localhost:1420'); // Pointing to Vue's dev server
-  // // Load the Vue app's index.html from the dist folder
-  // mainWindow.loadFile(path.join('dist', 'index.html'));  // Ensure this path is correct
+  // mainWindow.loadURL('http://localhost:1420'); // Pointing to Vue's dev server
+  // Load the Vue app's index.html from the dist folder
+  mainWindow.loadFile(path.join('dist', 'index.html'));  // Ensure this path is correct
 
   // Open the DevTools.
   mainWindow.webContents.openDevTools();
 }
 
 app.on('ready', () => {
-  // Create the DataExport folder
-  const dataExportPath = path.join('..', 'dist', 'DataExport');
-  if (!fs.existsSync(dataExportPath)) {
-    fs.mkdirSync(dataExportPath, { recursive: true });
-    console.log('DataExport folder created.');
-  }
 
   createWindow();
 

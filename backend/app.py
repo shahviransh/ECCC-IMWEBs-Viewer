@@ -330,7 +330,6 @@ def export_data():
     statistics = data.get("statistics", ["None"])
     statistics = statistics.split(",") if statistics != ["None"] else statistics
     output_dest = data.get("export_path", "dataExport")
-    output_dest = os.path.join('..', 'dist', output_dest) if output_dest == "dataExport" else output_dest
     output_name = data.get(
         "export_filename", f"exported_data_{datetime.now().strftime('%Y%m%d%H%M%S')}"
     )
