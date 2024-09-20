@@ -39,18 +39,6 @@ import StatisticsDropdown from './components/StatisticsDropdown.vue';
 import AggregationMethod from './components/AggregationMethod.vue';
 import ExportConfig from './components/ExportConfig.vue';
 import axios from 'axios';
-import { invoke } from '@tauri-apps/api/tauri';
-
-async function startBackend() {
-  try {
-    const result = await invoke('run_python_backend');
-    console.log('Python backend started:', result);
-  } catch (error) {
-    console.error('Failed to start Python backend:', error);
-  }
-}
-
-startBackend();
 
 export default {
   components: {

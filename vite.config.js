@@ -9,13 +9,19 @@ export default defineConfig(async () => ({
   //
   // 1. prevent vite from obscuring rust errors
   clearScreen: false,
+
   // 2. tauri expects a fixed port, fail if that port is not available
   server: {
     port: 1420,
     strictPort: true,
-    watch: {
-      // 3. tell vite to ignore watching `src-tauri`
-      ignored: ["**/src-tauri/**"],
+  },
+
+  // Add the base and build configuration for Electron
+  base: './',  // Ensure assets are loaded relatively
+  build: {
+    outDir: 'dist',  // Output folder for the build
+    rollupOptions: {
+      input: 'index.html',
     },
   },
 }));
