@@ -1,5 +1,6 @@
 const { app, BrowserWindow } = require('electron');
 const path = require('path');
+const fs = require('fs'); // Import fs module
 const { spawn } = require('child_process');
 
 let pythonProcess = null;
@@ -23,6 +24,13 @@ function createWindow() {
 }
 
 app.on('ready', () => {
+  // Create the DataExport folder
+  const dataExportPath = path.join('..', 'dist', 'DataExport');
+  if (!fs.existsSync(dataExportPath)) {
+    fs.mkdirSync(dataExportPath, { recursive: true });
+    console.log('DataExport folder created.');
+  }
+
   createWindow();
 
   // Start the Python backend

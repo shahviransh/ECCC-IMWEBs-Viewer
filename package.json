@@ -9,7 +9,7 @@
     "vue-dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "electron": "vite & npx electron .",
+    "electron": "npx electron . && vite",
     "electron:build": "vite build && electron-builder"
   },
   "dependencies": {
