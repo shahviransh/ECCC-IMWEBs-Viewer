@@ -1,8 +1,8 @@
 version: 0.1.0
 files:
-  - url: YourApp-Setup-0.1.0.exe
-    sha512: 0GsXMFycgIotWByU5TqN8OT5pAuRgwr/W8QqbxIEKq5UdCF2nU5BWJ2CFaupmnb5+a4zPqnmZPryK3TkUHrZ5g==
-    size: 168401199
-path: YourApp-Setup-0.1.0.exe
-sha512: 0GsXMFycgIotWByU5TqN8OT5pAuRgwr/W8QqbxIEKq5UdCF2nU5BWJ2CFaupmnb5+a4zPqnmZPryK3TkUHrZ5g==
-releaseDate: '2024-09-20T23:05:39.522Z'
+  - url: Backend-Setup-0.1.0.exe
+    sha512: lSEL0Gm50t2AJMtd40D9xPjtdCPpHkfc+1L3kgKxw9xopu1PP/10CBynfmLEZ5Po0Lj79DDHwvHCAGixIBZ/pg==
+    size: 169176408
+path: Backend-Setup-0.1.0.exe
+sha512: lSEL0Gm50t2AJMtd40D9xPjtdCPpHkfc+1L3kgKxw9xopu1PP/10CBynfmLEZ5Po0Lj79DDHwvHCAGixIBZ/pg==
+releaseDate: '2024-09-21T00:14:32.118Z'

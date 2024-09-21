@@ -12,6 +12,7 @@ function createWindow() {
       preload: path.join(__dirname, 'preload.js'),
       nodeIntegration: true,
     },
+    icon: __dirname + '/icon.ico',
   });
 
   // mainWindow.loadURL('http://localhost:1420'); // Pointing to Vue's dev server

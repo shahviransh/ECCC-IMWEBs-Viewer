@@ -1,6 +1,8 @@
 {
   "name": "eccc-imwebs-viewer-frontend",
   "private": true,
+  "description": "A brief description of your app.",
+  "author": "Viransh Shah",
   "version": "0.1.0",
   "main": "electron/main.js",
   "scripts": {
@@ -25,10 +27,13 @@
   },
   "build": {
   "appId": "com.yourapp.id",
-  "productName": "YourApp",
+  "productName": "Backend",
   "directories": {
     "buildResources": "build",
     "output": "dist"
+  },
+  "win": {
+    "icon": "electron/icon.ico"
   },
   "files": [
     "dist/**/*",

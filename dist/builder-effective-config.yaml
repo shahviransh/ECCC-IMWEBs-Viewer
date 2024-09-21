@@ -2,7 +2,9 @@ directories:
   output: dist
   buildResources: build
 appId: com.yourapp.id
-productName: YourApp
+productName: Backend
+win:
+  icon: electron/icon.ico
 files:
   - filter:
       - dist/**/*
