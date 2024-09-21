@@ -37,7 +37,7 @@
   },
   "files": [
     "dist/**/*",
-    "backend/**/*",
+    "backend/dist/app/**/*",
     "node_modules/**/*",
     "electron/**/*"
   ]
