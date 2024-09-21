@@ -28,8 +28,8 @@ app.on('ready', () => {
   createWindow();
 
   // Start the Python backend
-  const backendPath = path.join(__dirname, '..', 'backend', 'app.py');
-  pythonProcess = spawn('python', [backendPath]);
+  const backendExePath = path.join(__dirname, '..', 'backend', 'dist', 'app', 'app.exe');  // Path to the compiled executable
+  pythonProcess = spawn(backendExePath);
 
   pythonProcess.stdout.on('data', (data) => {
     console.log(`Python: ${data}`);
