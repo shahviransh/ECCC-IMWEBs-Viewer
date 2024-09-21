@@ -26,20 +26,20 @@
     "vite": "^5.3.1"
   },
   "build": {
-  "appId": "com.yourapp.id",
-  "productName": "Backend",
-  "directories": {
-    "buildResources": "build",
-    "output": "dist"
-  },
-  "win": {
-    "icon": "electron/icon.ico"
-  },
-  "files": [
-    "dist/**/*",
-    "backend/dist/app/**/*",
-    "node_modules/**/*",
-    "electron/**/*"
-  ]
-}
+    "appId": "com.yourapp.id",
+    "productName": "Backend",
+    "directories": {
+      "buildResources": "build",
+      "output": "dist"
+    },
+    "win": {
+      "icon": "electron/icon.ico"
+    },
+    "files": [
+      "dist/**/*",
+      "backend/dist/app/app.exe",
+      "node_modules/**/*",
+      "electron/**/*"
+    ]
+  }
 }
