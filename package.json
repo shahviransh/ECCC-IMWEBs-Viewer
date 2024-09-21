@@ -37,9 +37,11 @@
     },
     "files": [
       "dist/**/*",
-      "backend/dist/app/app.exe",
       "node_modules/**/*",
       "electron/**/*"
+    ],
+    "extraResources": [
+      "backend/dist/app/**/*"
     ]
   }
 }

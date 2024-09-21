@@ -1,6 +1,6 @@
-const { app, BrowserWindow } = require('electron');
-const path = require('path');
-const { spawn } = require('child_process');
+const { app, BrowserWindow } = require("electron");
+const path = require("path");
+const { spawn } = require("child_process");
 
 let pythonProcess = null;
 
@@ -9,39 +9,50 @@ function createWindow() {
     width: 800,
     height: 600,
     webPreferences: {
-      preload: path.join(__dirname, 'preload.js'),
+      preload: path.join(__dirname, "preload.js"),
       nodeIntegration: true,
     },
-    icon: __dirname + '/icon.ico',
+    icon: __dirname + "/icon.ico",
   });
 
   // mainWindow.loadURL('http://localhost:1420'); // Pointing to Vue's dev server
   // Load the Vue app's index.html from the dist folder
-  mainWindow.loadFile(path.join('dist', 'index.html'));  // Ensure this path is correct
+  mainWindow.loadFile(path.join("dist", "index.html")); // Ensure this path is correct
 
   // Open the DevTools.
   mainWindow.webContents.openDevTools();
 }
 
-app.on('ready', () => {
-
+app.on("ready", () => {
   createWindow();
 
   // Start the Python backend
-  const backendExePath = path.join('backend', 'dist', 'app', 'app.exe');  // Path to the compiled executable
-  pythonProcess = spawn(backendExePath);
+  const backendExePath = path.join(
+    __dirname,
+    "backend",
+    "dist",
+    "app",
+    "app.exe"
+  ); // Path to the compiled executable
+  console.log(backendExePath);
+  try {
+    pythonProcess = spawn(backendExePath);
+    console.log("Python backend started");
+  } catch (error) {
+    console.error("Error starting python backend:", error);
+  }
 
-  pythonProcess.stdout.on('data', (data) => {
+  pythonProcess.stdout.on("data", (data) => {
     console.log(`Python: ${data}`);
   });
 
-  pythonProcess.stderr.on('data', (data) => {
+  pythonProcess.stderr.on("data", (data) => {
     console.error(`Python Error: ${data}`);
   });
 });
 
-app.on('window-all-closed', () => {
-  if (process.platform !== 'darwin') {
+app.on("window-all-closed", () => {
+  if (process.platform !== "darwin") {
     app.quit();
   }
   if (pythonProcess) {
