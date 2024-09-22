@@ -42,10 +42,15 @@
       "backend/**/*"
     ],
     "extraResources": [
+      {
+        "from": "backend/dist/app",
+        "to": "backend",
+        "filter": [
+          "**/*"
+        ]
+      },
       "backend/app.py",
-      "backend/app.exe",
-      "backend/requirements.txt",
-      "backend/Jenette_Creek_Watershed"
+      "backend/requirements.txt"
     ]
   }
 }
