@@ -29,6 +29,7 @@ app.on("ready", () => {
   // Start the Python backend
   const backendExePath = path.join(
     __dirname,
+    '..',
     "backend",
     "dist",
     "app",
