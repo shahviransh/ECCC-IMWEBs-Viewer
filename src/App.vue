@@ -1,5 +1,10 @@
 <template>
   <div>
+    <!-- Existing UI components -->
+    <button @click="shutdownServer">Shutdown Server</button>
+    <div v-if="shutdownMessage">{{ shutdownMessage }}</div>
+  </div>
+  <div>
     <DatabaseDropdown @database-selected="onDatabaseSelected" />
     <TableDropdown :selectedDb="selectedDb" @table-selected="onTableSelected" />
     <ColumnDropdown :selectedDb="selectedDb" :selectedTable="selectedTable" @columns-selected="onColumnsSelected" @export-selected="onExportSelected" />
@@ -52,6 +57,7 @@ export default {
   },
   data() {
     return {
+      shutdownMessage: '',
       selectedDb: '',          // Define selectedDb
       selectedTable: '',       // Define selectedTable
       selectedColumns: [],    // Define selectedColumns
@@ -109,6 +115,14 @@ export default {
     },
     onExportIntervalSelected(interval) {
       this.exportInterval = interval;
+    },
+    async shutdownServer() {
+      try {
+        const response = await axios.post('http://localhost:5000/shutdown');
+        this.shutdownMessage = response.data;
+      } catch (error) {
+        console.error('Error shutting down server:', error);
+      }
     },
     async fetchData() {
       // Implement data fetching logic based on selected options

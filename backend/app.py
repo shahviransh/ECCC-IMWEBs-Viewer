@@ -1,4 +1,5 @@
 from flask import Flask, request, jsonify, send_file
+import signal
 import pandas as pd
 import sqlite3
 import os
@@ -381,6 +382,13 @@ def export_data():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+def shutdown_server():
+    os.kill(os.getpid(), signal.SIGINT)
+
+@app.route('/shutdown', methods=['POST'])
+def shutdown():
+    shutdown_server()
+    return 'Server shutting down...'
 
 if __name__ == "__main__":
     app.run(debug=True)
