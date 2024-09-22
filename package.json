@@ -42,7 +42,10 @@
       "backend/**/*"
     ],
     "extraResources": [
-      "backend/app.py"
+      "backend/app.py",
+      "backend/app.exe",
+      "backend/requirements.txt",
+      "backend/Jenette_Creek_Watershed"
     ]
   }
 }

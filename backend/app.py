@@ -258,8 +258,10 @@ def get_table_details():
 # Helper function to save data to CSV or other formats
 def save_to_file(dataframe, filename, file_format, export_path):
     """Save DataFrame to the specified file format."""
-    file_path = os.path.join(export_path, filename)
-    file_path = os.path.join(PATHFILE, file_path)
+    file_path = os.path.join(PATHFILE, export_path)
+    if not os.path.exists(file_path):
+      os.makedirs(file_path)
+    file_path = os.path.join(file_path, filename)
     if file_format == "csv":
         dataframe.to_csv(file_path, index=False)
     elif file_format == "text":
