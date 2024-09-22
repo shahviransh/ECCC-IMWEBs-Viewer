@@ -38,10 +38,17 @@
     "files": [
       "dist/**/*",
       "node_modules/**/*",
-      "electron/**/*"
+      "electron/**/*",
+      "backend/**/*"
     ],
     "extraResources": [
-      "backend/dist/app/**/*"
+      {
+        "from": "backend/dist/app",
+        "to": "app",
+        "filter": [
+          "**/*"
+        ]
+      }
     ]
   }
 }
