@@ -42,13 +42,7 @@
       "backend/**/*"
     ],
     "extraResources": [
-      {
-        "from": "backend/dist/app",
-        "to": "app",
-        "filter": [
-          "**/*"
-        ]
-      }
+      "backend/app.py"
     ]
   }
 }

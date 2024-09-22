@@ -385,7 +385,7 @@ def export_data():
 def shutdown_server():
     os.kill(os.getpid(), signal.SIGINT)
 
-@app.route('/shutdown', methods=['POST'])
+@app.route('/shutdown', methods=['GET'])
 def shutdown():
     shutdown_server()
     return 'Server shutting down...'

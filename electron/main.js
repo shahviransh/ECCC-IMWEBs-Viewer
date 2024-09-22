@@ -29,19 +29,10 @@ app.on("ready", () => {
   // Start the Python backend
   const backendExePath = path.join(
     __dirname,
-    '..',
-    "backend",
-    "dist",
-    "app",
-    "app.exe"
+    'backend',
+    "app.py"
   ); // Path to the compiled executable
-  console.log(backendExePath);
-  try {
-    pythonProcess = spawn(backendExePath);
-    console.log("Python backend started");
-  } catch (error) {
-    console.error("Error starting python backend:", error);
-  }
+  pythonProcess = spawn("python", [backendExePath]);
 
   pythonProcess.stdout.on("data", (data) => {
     console.log(`Python: ${data}`);

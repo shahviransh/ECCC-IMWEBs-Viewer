@@ -118,7 +118,7 @@ export default {
     },
     async shutdownServer() {
       try {
-        const response = await axios.post('http://localhost:5000/shutdown');
+        const response = await axios.get('http://localhost:5000/shutdown');
         this.shutdownMessage = response.data;
       } catch (error) {
         console.error('Error shutting down server:', error);
