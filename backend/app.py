@@ -67,42 +67,34 @@ def get_season_from_date(date_str):
 
 
 # Helper function to apply time interval aggregation
-def aggregate_data(df, interval, method):
+def aggregate_data(df, interval, method, date_type):
     """Aggregate data based on the specified interval and method."""
     # Convert the 'date' column to datetime
-    try:
-        df["Time"] = pd.to_datetime(df["Time"])
-        df.set_index('Time', inplace=True)
-    except Exception as e:
-        df["Date"] = pd.to_datetime(df["Date"])
-        df.set_index('Date', inplace=True)
+    df[date_type] = pd.to_datetime(df["Time"])
+    df.set_index(date_type, inplace=True)
     resampled_df = None
 
-    if interval == "daily":
-        resampled_df = df
-    elif interval == "monthly":
-        resampled_df = df.groupby('ID').resample("ME").first()
+    if interval == "monthly":
+        resampled_df = df.groupby('ID').resample("MS").first()
     elif interval == "seasonal":
         # Custom resampling for seasons
-        try:
-            df["Season"] = df["Time"].apply(lambda x: get_season_from_date(str(x)))
-        except Exception as e:
-            df["Season"] = df["Date"].apply(lambda x: get_season_from_date(str(x)))
+        df["Season"] = df[date_type].apply(lambda x: get_season_from_date(str(x)))
         resampled_df = df.groupby("Season")
     elif interval == "yearly":
-        resampled_df = df.groupby('ID').resample("YE").first()
+        resampled_df = df.groupby('ID').resample("YS").first()
     else:
         resampled_df = df
     
-    resampled_df = resampled_df.drop(columns=['ID']) if 'ID' in df.index.names else resampled_df
+    resampled_df = resampled_df.drop(columns=['ID']) if 'ID' in resampled_df.index.names else resampled_df
     resampled_df.reset_index(inplace=True)
-    stats_df = calculate_statistics(resampled_df, method)
+    resampled_df[date_type] = resampled_df[date_type].dt.strftime('%Y-%m-%d')
+    stats_df = calculate_statistics(resampled_df, method, date_type)
 
     return resampled_df, stats_df
 
 
 # Helper function to calculate statistics
-def calculate_statistics(df, statistics):
+def calculate_statistics(df, statistics, date_type):
     """Calculate specified statistics for numerical data in the DataFrame."""
     stats_df = pd.DataFrame()
     df = df.select_dtypes(include=['number'])
@@ -254,7 +246,7 @@ def get_table_details():
 # Helper function to save data to CSV or other formats
 def save_to_file(dataframe, filename, file_format, export_path):
     """Save DataFrame to the specified file format."""
-    file_path = os.path.join(PATHFILE, export_path)
+    file_path = os.path.join(PATHFILE, export_path) if export_path == "dataExport" else export_path
     if not os.path.exists(file_path):
       os.makedirs(file_path)
     file_path = os.path.join(file_path, filename)
@@ -302,15 +294,15 @@ def get_data():
         df = df.get(columns, df) if columns != "All" else df
         
         # Aggregate data based on interval and method
-        if "Equal" not in method and date_type in ['Time', 'Date']:
-            df, stats_df = aggregate_data(df, interval, method)
+        if "Equal" not in method and date_type in ['Time', 'Date'] and interval != "daily":
+            df, stats_df = aggregate_data(df, interval, method, date_type)
             df["Statistics"] = 'Data'
             df = df[["Statistics"] + columns]
             df = pd.concat([df, stats_df], axis=0)
             df.fillna({date_type:0}, inplace=True)
         # Calculate statistics if specified
         elif "None" not in statistics:
-            stats_df = calculate_statistics(df, statistics)
+            stats_df = calculate_statistics(df, statistics, date_type)
             df["Statistics"] = 'Data'
             df = df[["Statistics"] + columns]
             df = pd.concat([df, stats_df], axis=0)
@@ -338,6 +330,7 @@ def export_data():
     date_type = data.get("date_type", None)
     interval = data.get("interval", "daily")
     method = data.get("method", ["Equal"])
+    method = method.split(",") if method != ["Equal"] else method
     statistics = data.get("statistics", ["None"])
     statistics = statistics.split(",") if statistics != ["None"] else statistics
     output_dest = data.get("export_path", "dataExport")
@@ -357,14 +350,14 @@ def export_data():
         columns = columns.split(",") if columns != "All" else columns
         df = df.get(columns, df) if columns != "All" else df
 
-        if "Equal" not in method and date_type in ['Time', 'Date']:
-            df, stats_df = aggregate_data(df, interval, method)
+        if "Equal" not in method and date_type in ['Time', 'Date'] and interval != "daily":
+            df, stats_df = aggregate_data(df, interval, method, date_type)
             df["Statistics"] = 'Data'
             df = df[["Statistics"] + columns]
             df = pd.concat([df, stats_df], axis=0)
             df.fillna({date_type:0}, inplace=True)
         elif "None" not in statistics:
-            stats_df = calculate_statistics(df, statistics)
+            stats_df = calculate_statistics(df, statistics, date_type)
             df["Statistics"] = 'Data'
             df = df[["Statistics"] + columns]
             df = pd.concat([df, stats_df], axis=0)
