@@ -1,6 +1,8 @@
 const { app, BrowserWindow } = require("electron");
 const path = require("path");
-const { spawn } = require("child_process");
+const { exec } = require("child_process");
+const os = require("os");
+const axios = require("axios");
 
 let pythonProcess = null;
 
@@ -26,20 +28,24 @@ function createWindow() {
 app.on("ready", () => {
   createWindow();
 
+  // Determine the backend executable based on the operating system
+  let command;
+  const backendPath = path.join(app.getAppPath(), '..', "backend");
+  if (os.platform() === "win32") {
+    command = `start /B "" ${path.join(backendPath, "app.exe")}`; // Use 'start' for Windows
+  } else {
+    command = `./app &`; // Direct execution for Linux/macOS
+    // Change directory to the backend folder before running the command
+    process.chdir(backendPath);
+  }
+
   // Start the Python backend
-  const backendExePath = path.join(
-    app.getAppPath(),
-    'backend',
-    "app.exe"
-  ); // Path to the compiled executable
-  pythonProcess = spawn(backendExePath);
-
-  pythonProcess.stdout.on("data", (data) => {
-    console.log(`Python: ${data}`);
-  });
-
-  pythonProcess.stderr.on("data", (data) => {
-    console.error(`Python Error: ${data}`);
+  pythonProcess = exec(command, function (err, data) {
+    if (err) {
+      console.error(err);
+      return;
+    }
+    console.log(data.toString());
   });
 });
 
@@ -47,7 +53,6 @@ app.on("window-all-closed", () => {
   if (process.platform !== "darwin") {
     app.quit();
   }
-  if (pythonProcess) {
-    pythonProcess.kill();
-  }
+  axios.get("http://localhost:5000/shutdown");
+  pythonProcess.kill();
 });

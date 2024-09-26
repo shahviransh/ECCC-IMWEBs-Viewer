@@ -3,7 +3,7 @@
         <div class="form-group">
             <label for="column-select">Select Columns:</label>
             <select id="column-select" v-model="selectedColumns" multiple @change="onChange" class="dropdown">
-                <option v-for="column in columns.filter(col => col !== 'Statistics')" :key="column" :value="column">{{
+                <option v-for="column in columns" :key="column" :value="column">{{
                     column }}</option>
             </select>
         </div>
@@ -35,7 +35,7 @@
         <div class="form-group">
             <label for="column-select">Export Select Columns:</label>
             <select id="column-select" v-model="exportColumns" multiple @change="onChangeExport" class="dropdown">
-                <option v-for="column in columns.filter(col => col !== 'Statistics')" :key="column" :value="column">{{
+                <option v-for="column in columns" :key="column" :value="column">{{
                     column }}</option>
             </select>
         </div>

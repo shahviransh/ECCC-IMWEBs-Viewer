@@ -17,6 +17,13 @@
                 <option value="text">Text</option>
             </select>
         </div>
+        <div class="export-field">
+            <label for="export-stats">Export Table and/or Stats</label>
+            <select id="export-stats" v-model="selectedOptions" multiple class="export-select" @onchange="onOptionsChange()">
+                <option value="table">Table</option>
+                <option value="stats">Stats</option>
+            </select>
+        </div>
         {{ onExportChange() }}
     </div>
 </template>
@@ -39,6 +46,8 @@ export default {
             exportPath: "dataExport",
             exportFilename: "exported_data",
             exportFormat: "csv",
+            selectedOptions: [],
+            exportOptions: { data: false, stats: false },
         };
     },
     methods: {
@@ -47,7 +56,14 @@ export default {
                 path: this.exportPath,
                 filename: this.exportFilename,
                 format: this.exportFormat,
+                options: this.exportOptions,
             });
+        },
+        onOptionsChange() {
+            this.exportOptions = {
+                data: this.selectedOptions.includes("table"),
+                stats: this.selectedOptions.includes("stats"),
+            };
         },
     },
 };

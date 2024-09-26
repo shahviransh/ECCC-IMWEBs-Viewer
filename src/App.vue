@@ -19,6 +19,7 @@
     <h4>Saved {{exportConfig.filename}} to {{ exportConfig.path }} as a {{ exportConfig.format }}</h4>
   </div>
 
+  <!-- Table Container with Fixed Height and Scrollable Body -->
   <div class="table-container">
     <table class="styled-table">
       <thead>
@@ -27,8 +28,27 @@
         </tr>
       </thead>
       <tbody>
-        <tr v-for="(row, index) in data" :key="index">
+        <tr v-for="(row, index) in visibleData" :key="index">
           <td v-for="column in selectedColumns" :key="column">{{ row[column] }}</td>
+        </tr>
+      </tbody>
+    </table>
+    <!-- Load More Button -->
+    <div v-if="canLoadMore" class="load-more-container">
+      <button class="load-more-button" @click="loadMoreRows">Load More</button>
+    </div>
+  </div>
+  <!-- Stats Container with Fixed Height and Scrollable Body -->
+  <div class="table-container">
+    <table class="styled-table">
+      <thead>
+        <tr>
+          <th v-for="column in statsColumns" :key="column">{{ column }}</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-for="(row, index) in stats" :key="index">
+          <td v-for="column in statsColumns" :key="column">{{ row[column] }}</td>
         </tr>
       </tbody>
     </table>
@@ -66,6 +86,9 @@ export default {
       selectedInterval: 'daily', // Define selectedInterval
       selectedStatistics: ['None'], // Define selectedStatistics
       aggregationMethod: ['Equal'], // Define aggregationMethods
+      stats: [], // Define stats
+      statsColumns: [], // Define statsColumns
+      options: {}, // Define options
       exportColumns: [], // Define exportColumns
       exportIds: [], // Define exportIds
       exportDate: {}, // Define exportDate
@@ -74,7 +97,11 @@ export default {
         path: '',
         filename: '',
         format: 'csv',
+        options: {},
       },
+      visibleData: [], // Data to be displayed
+      rowLimit: 100, // Number of rows to load initially
+      canLoadMore: true, // Controls visibility of the Load More button
       data: [],
       dateType: '',
       exportDateType: '',
@@ -89,7 +116,6 @@ export default {
     },
     onColumnsSelected(data) {
       this.selectedColumns = data.selectedColumns;
-      this.selectedColumns.unshift('Statistics');
       this.selectedColumns = [...new Set(this.selectedColumns)];
       this.dateRange = data.selectedDate
       this.selectedIds = data.selectedIds;
@@ -141,9 +167,28 @@ export default {
             method: this.aggregationMethod.join(","),
           }
         });
-        this.data = response.data;
+        this.data = response.data.data;
+        this.stats = response.data.stats;
+        this.statsColumns = response.data.statsColumns;
+        this.loadInitialRows(); // Load initial rows to visibleData
       } catch (error) {
         console.error('Error fetching data:', error);
+      }
+    },
+    loadInitialRows() {
+      // Load the first 100 rows
+      this.visibleData = this.data.slice(0, this.rowLimit);
+      // Check if there's more data to load
+      this.canLoadMore = this.data.length > this.rowLimit;
+    },
+    loadMoreRows() {
+      const nextRowLimit = this.visibleData.length + this.rowLimit;
+      const nextRows = this.data.slice(this.visibleData.length, nextRowLimit);
+      // Append new rows to the visible data
+      this.visibleData = [...this.visibleData, ...nextRows];
+      // Check if there are more rows to load
+      if (this.visibleData.length >= this.data.length) {
+        this.canLoadMore = false; // Hide "Load More" button if all data is loaded
       }
     },
     async exportData() {
@@ -164,6 +209,7 @@ export default {
             export_path: this.exportConfig.path,
             export_filename: this.exportConfig.filename,
             export_format: this.exportConfig.format,
+            options: this.exportConfig.options,
           }
         });
       } catch (error) {
@@ -178,21 +224,26 @@ export default {
 /* Styling for the table */
 .table-container {
   max-width: 100%;
-  overflow-x: auto;
+  max-height: 300px; /* Set a fixed height for the table container */
+  overflow-y: auto; /* Enable vertical scroll if the content exceeds the height */
+  border: 1px solid #ddd;
+  position: relative;
 }
 
 .styled-table {
   width: 100%;
   border-collapse: collapse;
-  margin: 20px 0;
   font-size: 18px;
   text-align: left;
 }
 
-.styled-table thead tr {
-  background-color: #009879;
-  color: #ffffff;
-  text-align: left;
+/* Keep the header fixed */
+.styled-table thead {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background-color: #009879; /* Header background color */
+  color: #ffffff; /* Header text color */
 }
 
 .styled-table th,
@@ -209,33 +260,13 @@ export default {
   background-color: #f3f3f3;
 }
 
-.styled-table tbody tr:last-of-type {
-  border-bottom: 2px solid #009879;
-}
-
 .styled-table tbody tr:hover {
   background-color: #f1f1f1;
   cursor: pointer;
 }
 
 /* Button styling */
-.fetch-button {
-  background-color: #009879;
-  color: white;
-  padding: 10px 20px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  margin-top: 20px;
-  font-size: 16px;
-  transition: background-color 0.3s ease-in-out;
-}
-
-.fetch-button:hover {
-  background-color: #007f67;
-}
-
-/* Button styling */
+.fetch-button,
 .export-button {
   background-color: #009879;
   color: white;
@@ -248,7 +279,29 @@ export default {
   transition: background-color 0.3s ease-in-out;
 }
 
+.fetch-button:hover,
 .export-button:hover {
+  background-color: #007f67;
+}
+
+/* Load More Button Styling */
+.load-more-container {
+  text-align: center;
+  padding: 10px 0;
+}
+
+.load-more-button {
+  background-color: #009879;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.3s ease-in-out;
+}
+
+.load-more-button:hover {
   background-color: #007f67;
 }
 </style>

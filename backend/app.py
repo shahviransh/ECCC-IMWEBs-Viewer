@@ -48,6 +48,7 @@ def fetch_data_from_db(
             query += f" WHERE {date_type} >= '{start_date}' AND {date_type} <= '{end_date}'"
 
     df = pd.read_sql_query(query, conn)
+    df.round(3, inplace=True)
 
     conn.close()
     return df
@@ -75,19 +76,19 @@ def aggregate_data(df, interval, method, date_type):
     resampled_df = None
 
     if interval == "monthly":
-        resampled_df = df.groupby('ID').resample("MS").first()
+        resampled_df = df.groupby('ID').resample("ME").first()
     elif interval == "seasonal":
         # Custom resampling for seasons
         df["Season"] = df[date_type].apply(lambda x: get_season_from_date(str(x)))
         resampled_df = df.groupby("Season")
     elif interval == "yearly":
-        resampled_df = df.groupby('ID').resample("YS").first()
+        resampled_df = df.groupby('ID').resample("YE").first()
     else:
         resampled_df = df
     
     resampled_df = resampled_df.drop(columns=['ID']) if 'ID' in resampled_df.index.names else resampled_df
     resampled_df.reset_index(inplace=True)
-    resampled_df[date_type] = resampled_df[date_type].dt.strftime('%Y-%m-%d')
+    resampled_df[date_type] = resampled_df[date_type].dt.strftime('%Y-%m') if interval == "monthly" else resampled_df[date_type].dt.strftime('%Y')
     stats_df = calculate_statistics(resampled_df, method, date_type)
 
     return resampled_df, stats_df
@@ -104,8 +105,12 @@ def calculate_statistics(df, statistics, date_type):
         stats_df["Sum"] = df.sum()
     if "Maximum" in statistics:
         stats_df["Maximum"] = df.max()
+        max_date_type = {col: df.loc[df[col].idxmax(), date_type] for col in df.columns}
+        stats_df[f"Maximum {date_type}"] = pd.Series(max_date_type)
     if "Minimum" in statistics:
         stats_df["Minimum"] = df.min()
+        mim_date_type = {col: df.loc[df[col].idxmin(), date_type] for col in df.columns}
+        stats_df[f"Minimum {date_type}"] = pd.Series(mim_date_type)
     if "Standard Deviation" in statistics:
         stats_df["Standard Deviation"] = df.std()
 
@@ -242,18 +247,31 @@ def get_table_details():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-
-# Helper function to save data to CSV or other formats
-def save_to_file(dataframe, filename, file_format, export_path):
-    """Save DataFrame to the specified file format."""
+# Helper function to save data to CSV or text formats
+def save_to_file(dataframe1, dataframe2, filename, file_format, export_path, options):
+    """Save two DataFrames to the specified file format sequentially."""
+    # Set the file path
     file_path = os.path.join(PATHFILE, export_path) if export_path == "dataExport" else export_path
     if not os.path.exists(file_path):
-      os.makedirs(file_path)
+        os.makedirs(file_path)
     file_path = os.path.join(file_path, filename)
+    
+    # Write first dataframe
     if file_format == "csv":
-        dataframe.to_csv(file_path, index=False)
+        with open(file_path, 'w', newline='') as f:
+            if options.data:
+                dataframe1.to_csv(f, index=False)
+            if options.stats:
+                f.write("\n")  # Optional: Add a blank line or custom separator between the tables
+                dataframe2.to_csv(f, index=False)
     elif file_format == "text":
-        dataframe.to_csv(file_path, index=False, sep=" ")
+        with open(file_path, 'w') as f:
+            if options.data:
+                dataframe1.to_csv(f, index=False, sep=" ")
+            if options.stats:
+                f.write("\n")  # Optional: Add a blank line or custom separator between the tables
+                dataframe2.to_csv(f, index=False, sep=" ")
+
     return file_path
 
 
@@ -296,18 +314,12 @@ def get_data():
         # Aggregate data based on interval and method
         if "Equal" not in method and date_type in ['Time', 'Date'] and interval != "daily":
             df, stats_df = aggregate_data(df, interval, method, date_type)
-            df["Statistics"] = 'Data'
-            df = df[["Statistics"] + columns]
-            df = pd.concat([df, stats_df], axis=0)
-            df.fillna({date_type:0}, inplace=True)
         # Calculate statistics if specified
         elif "None" not in statistics:
             stats_df = calculate_statistics(df, statistics, date_type)
-            df["Statistics"] = 'Data'
-            df = df[["Statistics"] + columns]
-            df = pd.concat([df, stats_df], axis=0)
+
         # Return the processed data as JSON
-        return jsonify(df.to_dict(orient="records"))
+        return jsonify({"data": df.to_dict(orient="records"), "stats": stats_df.to_dict(orient="records"), statsColumns: stats_df.columns.tolist()})
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
@@ -338,6 +350,7 @@ def export_data():
         "export_filename", f"exported_data_{datetime.now().strftime('%Y%m%d%H%M%S')}"
     )
     output_type = data.get("export_format", "csv")
+    options = data.get("options", {"data": True, "stats": True})
 
     if not all([db_path, table_name]):
         return jsonify({"error": "Database path and table name are required."}), 400
@@ -352,19 +365,12 @@ def export_data():
 
         if "Equal" not in method and date_type in ['Time', 'Date'] and interval != "daily":
             df, stats_df = aggregate_data(df, interval, method, date_type)
-            df["Statistics"] = 'Data'
-            df = df[["Statistics"] + columns]
-            df = pd.concat([df, stats_df], axis=0)
-            df.fillna({date_type:0}, inplace=True)
         elif "None" not in statistics:
             stats_df = calculate_statistics(df, statistics, date_type)
-            df["Statistics"] = 'Data'
-            df = df[["Statistics"] + columns]
-            df = pd.concat([df, stats_df], axis=0)
 
         # Save the processed data to file
         file_path = save_to_file(
-            df, output_name + "." + output_type, output_type, output_dest
+            df, stats_df, output_name + "." + output_type, output_type, output_dest, options
         )
 
         # Send the file to the client
