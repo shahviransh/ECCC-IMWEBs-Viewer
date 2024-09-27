@@ -26,8 +26,6 @@ function createWindow() {
 }
 
 app.on("ready", () => {
-  createWindow();
-
   // Determine the backend executable based on the operating system
   let command;
   const backendPath = path.join(app.getAppPath(), '..', "backend");
@@ -47,6 +45,8 @@ app.on("ready", () => {
     }
     console.log(data.toString());
   });
+
+  createWindow();  
 });
 
 app.on("window-all-closed", () => {
