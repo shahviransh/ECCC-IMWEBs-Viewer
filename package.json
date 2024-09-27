@@ -50,6 +50,7 @@
         ]
       },
       "backend/app.py",
+      "backend/app.spec",
       "backend/requirements.txt"
     ]
   }

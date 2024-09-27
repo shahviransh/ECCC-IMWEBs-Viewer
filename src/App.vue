@@ -150,6 +150,22 @@ export default {
         console.error('Error shutting down server:', error);
       }
     },
+    loadInitialRows() {
+      // Load the first 100 rows
+      this.visibleData = this.data.slice(0, this.rowLimit);
+      // Check if there's more data to load
+      this.canLoadMore = this.data.length > this.rowLimit;
+    },
+    loadMoreRows() {
+      const nextRowLimit = this.visibleData.length + this.rowLimit;
+      const nextRows = this.data.slice(this.visibleData.length, nextRowLimit);
+      // Append new rows to the visible data
+      this.visibleData = [...this.visibleData, ...nextRows];
+      // Check if there are more rows to load
+      if (this.visibleData.length >= this.data.length) {
+        this.canLoadMore = false; // Hide "Load More" button if all data is loaded
+      }
+    },
     async fetchData() {
       // Implement data fetching logic based on selected options
       try {
@@ -173,22 +189,6 @@ export default {
         this.loadInitialRows(); // Load initial rows to visibleData
       } catch (error) {
         console.error('Error fetching data:', error);
-      }
-    },
-    loadInitialRows() {
-      // Load the first 100 rows
-      this.visibleData = this.data.slice(0, this.rowLimit);
-      // Check if there's more data to load
-      this.canLoadMore = this.data.length > this.rowLimit;
-    },
-    loadMoreRows() {
-      const nextRowLimit = this.visibleData.length + this.rowLimit;
-      const nextRows = this.data.slice(this.visibleData.length, nextRowLimit);
-      // Append new rows to the visible data
-      this.visibleData = [...this.visibleData, ...nextRows];
-      // Check if there are more rows to load
-      if (this.visibleData.length >= this.data.length) {
-        this.canLoadMore = false; // Hide "Load More" button if all data is loaded
       }
     },
     async exportData() {

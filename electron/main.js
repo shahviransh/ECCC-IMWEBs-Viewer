@@ -46,7 +46,8 @@ app.on("ready", () => {
     console.log(data.toString());
   });
 
-  createWindow();  
+  // Wait for the backend to start before creating the window
+  setTimeout(createWindow, 5000);
 });
 
 app.on("window-all-closed", () => {
