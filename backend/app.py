@@ -48,7 +48,7 @@ def fetch_data_from_db(
             query += f" WHERE {date_type} >= '{start_date}' AND {date_type} <= '{end_date}'"
 
     df = pd.read_sql_query(query, conn)
-    df.round(3, inplace=True)
+    df = df.round(3)
 
     conn.close()
     return df
@@ -71,7 +71,7 @@ def get_season_from_date(date_str):
 def aggregate_data(df, interval, method, date_type):
     """Aggregate data based on the specified interval and method."""
     # Convert the 'date' column to datetime
-    df[date_type] = pd.to_datetime(df["Time"])
+    df[date_type] = pd.to_datetime(df[date_type])
     df.set_index(date_type, inplace=True)
     resampled_df = None
 
@@ -98,22 +98,31 @@ def aggregate_data(df, interval, method, date_type):
 def calculate_statistics(df, statistics, date_type):
     """Calculate specified statistics for numerical data in the DataFrame."""
     stats_df = pd.DataFrame()
+
+    # Store the original DataFrame with all columns
+    original_df = df.copy()
+
+    # Select only numerical columns for calculations
     df = df.select_dtypes(include=['number'])
+
     if "Average" in statistics:
         stats_df["Average"] = df.mean()
     if "Sum" in statistics:
         stats_df["Sum"] = df.sum()
     if "Maximum" in statistics:
         stats_df["Maximum"] = df.max()
-        max_date_type = {col: df.loc[df[col].idxmax(), date_type] for col in df.columns}
+        # Use original DataFrame to get the corresponding date_type values for maximums
+        max_date_type = {col: original_df.loc[original_df[col].idxmax(), date_type] for col in df.columns}
         stats_df[f"Maximum {date_type}"] = pd.Series(max_date_type)
     if "Minimum" in statistics:
         stats_df["Minimum"] = df.min()
-        mim_date_type = {col: df.loc[df[col].idxmin(), date_type] for col in df.columns}
-        stats_df[f"Minimum {date_type}"] = pd.Series(mim_date_type)
+        # Use original DataFrame to get the corresponding date_type values for minimums
+        min_date_type = {col: original_df.loc[original_df[col].idxmin(), date_type] for col in df.columns}
+        stats_df[f"Minimum {date_type}"] = pd.Series(min_date_type)
     if "Standard Deviation" in statistics:
         stats_df["Standard Deviation"] = df.std()
 
+    # Transpose and format DataFrame
     stats_df = stats_df.T
     stats_df.reset_index(inplace=True)
     stats_df.rename(columns={"index": "Statistics"}, inplace=True)
@@ -259,16 +268,16 @@ def save_to_file(dataframe1, dataframe2, filename, file_format, export_path, opt
     # Write first dataframe
     if file_format == "csv":
         with open(file_path, 'w', newline='') as f:
-            if options.data:
+            if options['data']:
                 dataframe1.to_csv(f, index=False)
-            if options.stats:
+            if options['stats'] and dataframe2:
                 f.write("\n")  # Optional: Add a blank line or custom separator between the tables
                 dataframe2.to_csv(f, index=False)
     elif file_format == "text":
         with open(file_path, 'w') as f:
-            if options.data:
+            if options['data']:
                 dataframe1.to_csv(f, index=False, sep=" ")
-            if options.stats:
+            if options['stats'] and dataframe2:
                 f.write("\n")  # Optional: Add a blank line or custom separator between the tables
                 dataframe2.to_csv(f, index=False, sep=" ")
 
@@ -299,6 +308,7 @@ def get_data():
     method = method.split(",") if method != ["Equal"] else method
     statistics = data.get("statistics", ["None"])  # List of statistics to calculate
     statistics = statistics.split(",") if statistics != ["None"] else statistics
+    stats_df = None
 
     if not all([db_path, table_name]):
         return jsonify({"error": "Database path and table name are required."}), 400
@@ -318,8 +328,10 @@ def get_data():
         elif "None" not in statistics:
             stats_df = calculate_statistics(df, statistics, date_type)
 
+        return_dict = {"data": df.to_dict(orient="records"), "stats": stats_df.to_dict(orient="records") if stats_df else [], "statsColumns": stats_df.columns.tolist() if stats_df else []}
+
         # Return the processed data as JSON
-        return jsonify({"data": df.to_dict(orient="records"), "stats": stats_df.to_dict(orient="records"), statsColumns: stats_df.columns.tolist()})
+        return jsonify(return_dict)
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
@@ -350,8 +362,12 @@ def export_data():
         "export_filename", f"exported_data_{datetime.now().strftime('%Y%m%d%H%M%S')}"
     )
     output_type = data.get("export_format", "csv")
-    options = data.get("options", {"data": True, "stats": True})
-
+    # Handle options nested structure
+    options = {
+        "data": data.get("options[data]", "true") == "true",
+        "stats": data.get("options[stats]", "true") == "true",
+    }
+    stats_df = None
     if not all([db_path, table_name]):
         return jsonify({"error": "Database path and table name are required."}), 400
 

@@ -11,7 +11,7 @@
     <IntervalDropdown @interval-selected="onIntervalSelected" @export-interval-selected="onExportIntervalSelected" />
     <StatisticsDropdown @statistics-selected="onStatisticsSelected" />
     <AggregationMethod @method-selected="onMethodSelected" />
-    <ExportConfig @export-config-changed="onExportConfigChanged" @export-data="exportData" />
+    <ExportConfig @export-config-changed="onExportConfigChanged" :selectedStatistics="selectedStatistics" :intervalStats="aggregationMethod" />
     <button class="fetch-button" @click="fetchData">Fetch Data</button>
   </div>
   <div>

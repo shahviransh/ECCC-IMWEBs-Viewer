@@ -19,9 +19,9 @@
         </div>
         <div class="export-field">
             <label for="export-stats">Export Table and/or Stats</label>
-            <select id="export-stats" v-model="selectedOptions" multiple class="export-select" @onchange="onOptionsChange()">
+            <select id="export-stats" v-model="selectedOptions" multiple class="export-select" @change="onOptionsChange()">
                 <option value="table">Table</option>
-                <option value="stats">Stats</option>
+                <option v-if="!selectedStatistics.includes('None') != !intervalStats.includes('Equal')" value="stats">Stats</option>
             </select>
         </div>
         {{ onExportChange() }}
@@ -32,14 +32,8 @@
 import axios from "axios";
 export default {
     props: {
-        selectedDb: String,
-        selectedTable: String,
-        selectedColumns: Array,
-        selectedIds: Array,
-        dateRange: Object,
-        selectedInterval: String,
         selectedStatistics: Array,
-        aggregationMethod: Array,
+        intervalStats: Array,
     },
     data() {
         return {

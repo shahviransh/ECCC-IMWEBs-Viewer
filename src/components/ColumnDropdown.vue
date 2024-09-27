@@ -63,6 +63,7 @@
                 placeholder="Enter month" class="input-field" />
         </div>
     </div>
+    {{ onChangeExport() }}
 </template>
 
 <script>
