@@ -6,18 +6,16 @@
                 :clear-on-select="false" :preserve-search="true" placeholder="Select IDs">
             </Multiselect>
         </div>
-
         <div class="form-group">
             <label for="date-start">Start Date:</label>
-            <input type="date" v-if="daType in ['Time', 'Date']" v-model="selectedDate.start" class="input-field" />
-            <input type="text" v-else-if="daType === 'Month'" v-model="selectedDate.start" placeholder="Enter month"
+            <input type="date" v-if="['Time', 'Date'].includes(daType)" v-model="selectedDateStart" class="input-field" />
+            <input type="text" v-else-if="daType === 'Month'" v-model="selectedDateStart" placeholder="Enter month"
                 class="input-field" />
         </div>
-
         <div class="form-group">
             <label for="date-end">End Date:</label>
-            <input type="date" v-if="daType in ['Time', 'Date']" v-model="selectedDate.end" class="input-field" />
-            <input type="text" v-else-if="daType === 'Month'" v-model="selectedDate.end" placeholder="Enter month"
+            <input type="date" v-if="['Time', 'Date'].includes(daType)" v-model="selectedDateEnd" class="input-field" />
+            <input type="text" v-else-if="daType === 'Month'" v-model="selectedDateEnd" placeholder="Enter month"
                 class="input-field" />
         </div>
     </div>
@@ -31,15 +29,15 @@
 
         <div class="form-group">
             <label for="date-start">Start Date:</label>
-            <input type="date" v-if="daType in ['Time', 'Date']" v-model="expDate.start" class="input-field" />
-            <input type="text" v-else-if="daType === 'Month'" v-model="expDate.start" placeholder="Enter month"
+            <input type="date" v-if="['Time', 'Date'].includes(daType)" v-model="expDateStart" class="input-field" />
+            <input type="text" v-else-if="daType === 'Month'" v-model="expDateStart" placeholder="Enter month"
                 class="input-field" />
         </div>
 
         <div class="form-group">
             <label for="date-end">End Date:</label>
-            <input type="date" v-if="daType in ['Time', 'Date']" v-model="expDate.end" class="input-field" />
-            <input type="text" v-else-if="daType === 'Month'" v-model="expDate.end" placeholder="Enter month"
+            <input type="date" v-if="['Time', 'Date'].includes(daType)" v-model="expDateEnd" class="input-field" />
+            <input type="text" v-else-if="daType === 'Month'" v-model="expDateEnd" placeholder="Enter month"
                 class="input-field" />
         </div>
     </div>
@@ -67,12 +65,20 @@ export default {
             }
         },
         // Binding date range (start and end) directly from Vuex
-        selectedDate: {
+        selectedDateStart: {
             get() {
-                return this.dateRange; // Get the date range from Vuex
+                return this.dateRange.start; // Get the date range from Vuex
             },
             set(value) {
-                this.updateSelectedDate(value); // Update Vuex state on change
+                this.updateSelectedDateStart(value); // Update Vuex state on change
+            }
+        },
+        selectedDateEnd: {
+            get() {
+                return this.dateRange.end; // Get the date range from Vuex
+            },
+            set(value) {
+                this.updateSelectedDateEnd(value); // Update Vuex state on change
             }
         },
         daType() {
@@ -86,12 +92,20 @@ export default {
                 this.updateExportIds(value); // Update Vuex state on change
             }
         },
-        expDate: {
+        expDateStart: {
             get() {
-                return this.exportDate; // Get the date range from Vuex
+                return this.exportDate.start; // Get the date range from Vuex
             },
             set(value) {
-                this.updateExportDate(value); // Update Vuex state on change
+                this.updateExportDateStart(value); // Update Vuex state on change
+            }
+        },
+        expDateEnd: {
+            get() {
+                return this.exportDate.end; // Get the date range from Vuex
+            },
+            set(value) {
+                this.updateExportDateEnd(value); // Update Vuex state on change
             }
         },
         expDateType() {
@@ -104,7 +118,7 @@ export default {
         };
     },
     methods: {
-        ...mapActions(['fetchColumns', 'updateSelectedIds', 'updateSelectedDate', 'updateExportIds', 'updateExportDate']),
+        ...mapActions(['fetchColumns', 'updateSelectedIds', 'updateSelectedDateStart', 'updateSelectedDateEnd', 'updateExportIds', 'updateExportDateStart', 'updateExportDateEnd']),
     },
 };
 </script>

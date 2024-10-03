@@ -65,8 +65,13 @@ const store = createStore({
     SET_SELECTED_IDS(state, ids) {
       state.selectedIds = ids;
     },
-    SET_SELECTED_DATE(state, date) {
-      state.selectedDate = date;
+    SET_SELECTED_DATE(state, { start, end }) {
+      if (start) {
+        state.dateRange.start = start;
+      }
+      if (end) {
+        state.dateRange.end = end;
+      }
     },
     SET_EXPORT_COLUMNS(state, columns) {
       state.exportColumns = columns;
@@ -74,8 +79,13 @@ const store = createStore({
     SET_EXPORT_IDS(state, ids) {
       state.exportIds = ids;
     },
-    SET_EXPORT_DATE(state, date) {
-      state.exportDate = date;
+    SET_EXPORT_DATE(state, { start, end }) {
+      if (start) {
+        state.exportDate.start = start;
+      }
+      if (end) {
+        state.exportDate.end = end;
+      }
     },
     SET_DATE_TYPE(state, type) {
       state.dateType = type;
@@ -173,8 +183,11 @@ const store = createStore({
     updateSelectedIds({ commit }, ids) {
       commit("SET_SELECTED_IDS", ids);
     },
-    updateSelectedDate({ commit }, date) {
-      commit("SET_SELECTED_DATE", date);
+    updateSelectedDateStart({ commit }, start) {
+      commit("SET_SELECTED_DATE", { start: start, end: null });
+    },
+    updateSelectedDateEnd({ commit }, end) {
+      commit("SET_SELECTED_DATE", { start: null, end: end });
     },
     updateExportColumns({ commit }, columns) {
       commit("SET_EXPORT_COLUMNS", columns);
@@ -182,8 +195,11 @@ const store = createStore({
     updateExportIds({ commit }, ids) {
       commit("SET_EXPORT_IDS", ids);
     },
-    updateExportDate({ commit }, date) {
-      commit("SET_EXPORT_DATE", date);
+    updateExportDateStart({ commit }, start) {
+      commit("SET_EXPORT_DATE", { start: start, end: null });
+    },
+    updateExportDateEnd({ commit }, end) {
+      commit("SET_EXPORT_DATE", { start: null, end: end });
     },
     updateDateType({ commit }, type) {
       commit("SET_DATE_TYPE", type);
