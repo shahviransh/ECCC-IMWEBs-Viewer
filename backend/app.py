@@ -145,25 +145,29 @@ def list_files():
         for dirpath, dirs, files in os.walk(folder_path):
             # Construct the relative path from the base folder
             rel_dir = os.path.relpath(dirpath, root)
+
+            # # Append directories
             # for fdir in dirs:
-            #     rel_dir = os.path.join(rel_dir, fdir)
-            #     rel_dir = rel_dir[rel_dir.find(base_folder):]
+            #     dir_rel_path = os.path.join(rel_dir, fdir)
+            #     # Ensure the relative path starts with the base folder name
+            #     dir_rel_path = dir_rel_path[dir_rel_path.find(base_folder):]
             #     files_and_folders.append(
             #         {
             #             "type": "folder",
-            #             "name": rel_dir,
+            #             "name": dir_rel_path,
             #         }
-            #     )  # Add base folder to the path
+            #     )
+            # Append files
             for name in files:
                 if name.endswith(".db3"):
+                    file_rel_path = os.path.join(rel_dir, name)
                     # Ensure the relative path starts with the base folder name
-                    rel_dir = os.path.join(rel_dir, name)
-                    rel_dir = rel_dir[rel_dir.find(base_folder):]
+                    file_rel_path = file_rel_path[file_rel_path.find(base_folder):]
                     files_and_folders.append(
                         {
                             "type": "file",
-                            "name": rel_dir,
-                        }  # Add base folder to the path
+                            "name": file_rel_path,
+                        }
                     )
 
         return jsonify(files_and_folders)
@@ -270,14 +274,14 @@ def save_to_file(dataframe1, dataframe2, filename, file_format, export_path, opt
         with open(file_path, 'w', newline='') as f:
             if options['data']:
                 dataframe1.to_csv(f, index=False)
-            if options['stats'] and dataframe2:
+            if options['stats'] and dataframe2 is not None:
                 f.write("\n")  # Optional: Add a blank line or custom separator between the tables
                 dataframe2.to_csv(f, index=False)
     elif file_format == "text":
         with open(file_path, 'w') as f:
             if options['data']:
                 dataframe1.to_csv(f, index=False, sep=" ")
-            if options['stats'] and dataframe2:
+            if options['stats'] and dataframe2 is not None:
                 f.write("\n")  # Optional: Add a blank line or custom separator between the tables
                 dataframe2.to_csv(f, index=False, sep=" ")
 
@@ -320,7 +324,7 @@ def get_data():
         )
         columns = columns.split(",") if columns != "All" else columns
         df = df.get(columns, df) if columns != "All" else df
-        
+
         # Aggregate data based on interval and method
         if "Equal" not in method and date_type in ['Time', 'Date'] and interval != "daily":
             df, stats_df = aggregate_data(df, interval, method, date_type)
@@ -328,7 +332,8 @@ def get_data():
         elif "None" not in statistics:
             stats_df = calculate_statistics(df, statistics, date_type)
 
-        return_dict = {"data": df.to_dict(orient="records"), "stats": stats_df.to_dict(orient="records") if stats_df else [], "statsColumns": stats_df.columns.tolist() if stats_df else []}
+
+        return_dict = {"data": df.to_dict(orient="records"), "stats": stats_df.to_dict(orient="records") if stats_df is not None else [], "statsColumns": stats_df.columns.tolist() if stats_df is not None else []}
 
         # Return the processed data as JSON
         return jsonify(return_dict)
