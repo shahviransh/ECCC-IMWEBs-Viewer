@@ -8,7 +8,7 @@
 </template>
 
 <script>
-import axios from "axios";
+import { mapState, mapActions } from 'vuex'; // Import Vuex helpers
 
 export default {
     props: {
@@ -19,30 +19,21 @@ export default {
     },
     data() {
         return {
-            tables: [],
             selectedTable: null,
         };
     },
+    computed: {
+        ...mapState(['tables']),
+    },
     watch: {
-        // Watch for changes in the selectedDb prop
         selectedDb(newDb) {
             this.fetchTables(newDb);
-        },
+        }
     },
     methods: {
-        async fetchTables(newDb) {
-            const apiBaseUrl = import.meta.env.VITE_APP_API_BASE_URL;
-            try {
-                const response = await axios.get(`${apiBaseUrl}/api/get_tables`, {
-                    params: { db_path: newDb }
-                });
-                this.tables = response.data;
-            } catch (error) {
-                console.error('Error fetching tables:', error);
-            }
-        },
+        ...mapActions(['fetchTables', 'updateSelectedTable']),
         onTableChange() {
-            this.$emit("table-selected", this.selectedTable);
+            this.updateSelectedTable(this.selectedTable);
         },
     },
 };

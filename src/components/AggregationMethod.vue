@@ -1,31 +1,31 @@
 <template>
     <div class="method-container">
         <label for="method-select" class="method-label">Select Method:</label>
-        <select id="method-select" v-model="selectedMethod" multiple @change="onMethodChange" class="method-dropdown">
-            <option value="Equal">Equal</option>
-            <option value="Average">Average</option>
-            <option value="Sum">Sum</option>
-            <option value="Maximum">Maximum</option>
-            <option value="Minimum">Minimum</option>
-        </select>
+        <Multiselect v-model="selectedMethod" :options="options" :multiple="true" :close-on-select="false"
+                :clear-on-select="false" :preserve-search="true" placeholder="Export Select Columns" @input="onMethodChange">
+            </Multiselect>
     </div>
 </template>
 
 <script>
+import { mapState, mapActions } from 'vuex'; // Import Vuex helpers
+import Multiselect from 'vue-multiselect';
 export default {
     data() {
         return {
             selectedMethod: ["Equal"],
+            options: ["Equal", "Average", "Sum", "Maximum", "Minimum"],
         };
     },
     methods: {
+        ...mapActions(["updateSelectedMethod"]),
         onMethodChange() {
-            this.$emit("method-selected", this.selectedMethod);
+            this.updateSelectedMethod(this.selectedMethod);
         },
     },
 };
 </script>
-
+<style src="vue-multiselect/dist/vue-multiselect.css"></style>
 <style scoped>
 .method-container {
     display: flex;

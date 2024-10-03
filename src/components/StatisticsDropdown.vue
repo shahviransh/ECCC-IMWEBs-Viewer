@@ -14,6 +14,8 @@
 </template>
 
 <script>
+import { mapState, mapActions } from 'vuex'; // Import Vuex helpers
+
 export default {
     data() {
         return {
@@ -21,8 +23,9 @@ export default {
         };
     },
     methods: {
+        ...mapActions(["updateSelectedStatistics"]),
         onStatisticsChange() {
-            this.$emit("statistics-selected", this.selectedStatistics);
+            this.updateSelectedStatistics(this.selectedStatistics);
         },
     },
 };

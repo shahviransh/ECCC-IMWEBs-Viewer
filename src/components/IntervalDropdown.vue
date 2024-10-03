@@ -21,6 +21,8 @@
 </template>
 
 <script>
+import { mapState, mapActions } from 'vuex'; // Import Vuex helpers
+
 export default {
     data() {
         return {
@@ -29,12 +31,13 @@ export default {
         };
     },
     methods: {
+        ...mapActions(["updateSelectedInterval", "updateExportInterval"]),
         onIntervalChange() {
             this.exportInterval = this.selectedInterval;
-            this.$emit("interval-selected", this.selectedInterval);
+            this.updateSelectedInterval(this.selectedInterval);
         },
         onExportChange() {
-            this.$emit("export-interval-selected", this.exportInterval);
+            this.updateExportInterval(this.exportInterval);
         },
     },
 };

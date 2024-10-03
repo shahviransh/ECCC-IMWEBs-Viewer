@@ -8,33 +8,24 @@
 </template>
 
 <script>
-import axios from 'axios';
+import { mapState, mapActions } from 'vuex'; // Import Vuex helpers
 
 export default {
     data() {
         return {
-            databases: [],
             selectedDb: null,
         };
+    },
+    computed: {
+        ...mapState(['databases']),
     },
     mounted() {
         this.fetchDatabases();
     },
     methods: {
-        async fetchDatabases() {
-            const apiBaseUrl = import.meta.env.VITE_APP_API_BASE_URL;  // Dynamic base URL from .env
-            try {
-                const response = await axios.get(`${apiBaseUrl}/api/list_files`, {
-                    params: { folder_path: 'Jenette_Creek_Watershed' }
-                });
-                this.databases = response.data;
-            } catch (error) {
-                this.error = "Error retrieving files: " + error;
-                console.error(this.error);
-            }
-        },
+        ...mapActions(['fetchDatabases', 'updateSelectedDb']),
         onDatabaseChange() {
-            this.$emit("database-selected", this.selectedDb);
+            this.updateSelectedDb(this.selectedDb);
         },
     },
 };

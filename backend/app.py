@@ -146,17 +146,17 @@ def list_files():
             # Construct the relative path from the base folder
             rel_dir = os.path.relpath(dirpath, root)
 
-            # # Append directories
-            # for fdir in dirs:
-            #     dir_rel_path = os.path.join(rel_dir, fdir)
-            #     # Ensure the relative path starts with the base folder name
-            #     dir_rel_path = dir_rel_path[dir_rel_path.find(base_folder):]
-            #     files_and_folders.append(
-            #         {
-            #             "type": "folder",
-            #             "name": dir_rel_path,
-            #         }
-            #     )
+            # Append directories
+            for fdir in dirs:
+                dir_rel_path = os.path.join(rel_dir, fdir)
+                # Ensure the relative path starts with the base folder name
+                dir_rel_path = dir_rel_path[dir_rel_path.find(base_folder):]
+                files_and_folders.append(
+                    {
+                        "type": "folder",
+                        "name": dir_rel_path,
+                    }
+                )
             # Append files
             for name in files:
                 if name.endswith(".db3"):

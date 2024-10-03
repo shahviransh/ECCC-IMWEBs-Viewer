@@ -1,22 +1,18 @@
 <template>
   <div>
-    <!-- Existing UI components -->
-    <button @click="shutdownServer">Shutdown Server</button>
-    <div v-if="shutdownMessage">{{ shutdownMessage }}</div>
-  </div>
-  <div>
-    <DatabaseDropdown @database-selected="onDatabaseSelected" />
-    <TableDropdown :selectedDb="selectedDb" @table-selected="onTableSelected" />
-    <ColumnDropdown :selectedDb="selectedDb" :selectedTable="selectedTable" @columns-selected="onColumnsSelected" @export-selected="onExportSelected" />
-    <IntervalDropdown @interval-selected="onIntervalSelected" @export-interval-selected="onExportIntervalSelected" />
-    <StatisticsDropdown @statistics-selected="onStatisticsSelected" />
-    <AggregationMethod @method-selected="onMethodSelected" />
-    <ExportConfig @export-config-changed="onExportConfigChanged" :selectedStatistics="selectedStatistics" :intervalStats="aggregationMethod" />
+    <DatabaseDropdown />
+    <TableDropdown :selectedDb="selectedDb" />
+    <ColumnDropdown :selectedTable="selectedTable" />
+    <Selection />
+    <IntervalDropdown />
+    <StatisticsDropdown />
+    <AggregationMethod />
+    <ExportConfig />
     <button class="fetch-button" @click="fetchData">Fetch Data</button>
   </div>
   <div>
     <button class="export-button" @click="exportData">Export Data</button>
-    <h4>Saved {{exportConfig.filename}} to {{ exportConfig.path }} as a {{ exportConfig.format }}</h4>
+    <h4>Saved {{ exportFilename }} to {{ exportPath }} as a {{ exportFormat }}</h4>
   </div>
 
   <!-- Table Container with Fixed Height and Scrollable Body -->
@@ -59,11 +55,13 @@
 import DatabaseDropdown from './components/DatabaseDropdown.vue';
 import TableDropdown from './components/TableDropdown.vue';
 import ColumnDropdown from './components/ColumnDropdown.vue';
+import Selection from './components/Selection.vue';
 import IntervalDropdown from './components/IntervalDropdown.vue';
 import StatisticsDropdown from './components/StatisticsDropdown.vue';
 import AggregationMethod from './components/AggregationMethod.vue';
 import ExportConfig from './components/ExportConfig.vue';
 import axios from 'axios';
+import { mapState, mapActions } from 'vuex'; // Import Vuex helpers
 
 export default {
   components: {
@@ -74,82 +72,23 @@ export default {
     StatisticsDropdown,
     AggregationMethod,
     ExportConfig,
+    Selection,
   },
   data() {
     return {
-      shutdownMessage: '',
-      selectedDb: '',          // Define selectedDb
-      selectedTable: '',       // Define selectedTable
-      selectedColumns: [],    // Define selectedColumns
-      selectedIds: [],        // Define selectedIds
-      dateRange: {}, // Define dateRange
-      selectedInterval: 'daily', // Define selectedInterval
-      selectedStatistics: ['None'], // Define selectedStatistics
-      aggregationMethod: ['Equal'], // Define aggregationMethods
       stats: [], // Define stats
       statsColumns: [], // Define statsColumns
       options: {}, // Define options
-      exportColumns: [], // Define exportColumns
-      exportIds: [], // Define exportIds
-      exportDate: {}, // Define exportDate
-      exportInterval: 'daily', // Define exportInterval
-      exportConfig: {         // Define exportConfig
-        path: '',
-        filename: '',
-        format: 'csv',
-        options: {},
-      },
       visibleData: [], // Data to be displayed
       rowLimit: 100, // Number of rows to load initially
       canLoadMore: true, // Controls visibility of the Load More button
-      data: [],
-      dateType: '',
-      exportDateType: '',
+      data: []
     };
   },
+  computed: {
+    ...mapState(['selectedDb', 'selectedTable', 'selectedColumns', 'selectedIds', 'dateRange', 'selectedInterval', 'selectedStatistics', 'selectedMethod', 'exportColumns', 'exportIds', 'exportDate', 'exportInterval', 'dateType', 'exportDateType', 'exportPath', 'exportFilename', 'exportFormat', 'exportOptions']),
+  },
   methods: {
-    onDatabaseSelected(database) {
-      this.selectedDb = database;
-    },
-    onTableSelected(table) {
-      this.selectedTable = table;
-    },
-    onColumnsSelected(data) {
-      this.selectedColumns = data.selectedColumns;
-      this.selectedColumns = [...new Set(this.selectedColumns)];
-      this.dateRange = data.selectedDate
-      this.selectedIds = data.selectedIds;
-      this.dateType = data.dateType;
-    },
-    onIntervalSelected(interval) {
-      this.selectedInterval = interval;
-    },
-    onMethodSelected(method) {
-      this.aggregationMethod = method;
-    },
-    onStatisticsSelected(statistics) {
-      this.selectedStatistics = statistics;
-    },
-    onExportConfigChanged(config) {
-      this.exportConfig = config;
-    },
-    onExportSelected(data) {
-      this.exportColumns = data.selectedColumns;
-      this.exportDate = data.selectedDate;
-      this.exportIds = data.selectedIds;
-      this.exportDateType = data.dateType;
-    },
-    onExportIntervalSelected(interval) {
-      this.exportInterval = interval;
-    },
-    async shutdownServer() {
-      try {
-        const response = await axios.get('http://localhost:5000/shutdown');
-        this.shutdownMessage = response.data;
-      } catch (error) {
-        console.error('Error shutting down server:', error);
-      }
-    },
     loadInitialRows() {
       // Load the first 100 rows
       this.visibleData = this.data.slice(0, this.rowLimit);
@@ -180,7 +119,7 @@ export default {
             date_type: this.dateType,
             interval: this.selectedInterval,
             statistics: this.selectedStatistics.join(","),
-            method: this.aggregationMethod.join(","),
+            method: this.selectedMethod.join(","),
           }
         });
         this.data = response.data.data;
@@ -205,11 +144,11 @@ export default {
             date_type: this.exportDateType,
             interval: this.exportInterval,
             statistics: this.selectedStatistics.join(","),
-            method: this.aggregationMethod.join(","),
-            export_path: this.exportConfig.path,
-            export_filename: this.exportConfig.filename,
-            export_format: this.exportConfig.format,
-            options: this.exportConfig.options,
+            method: this.selectedMethod.join(","),
+            export_path: this.exportPath,
+            export_filename: this.exportFilename,
+            export_format: this.exportFormat,
+            options: this.exportOptions,
           }
         });
       } catch (error) {
@@ -224,8 +163,10 @@ export default {
 /* Styling for the table */
 .table-container {
   max-width: 100%;
-  max-height: 300px; /* Set a fixed height for the table container */
-  overflow-y: auto; /* Enable vertical scroll if the content exceeds the height */
+  max-height: 300px;
+  /* Set a fixed height for the table container */
+  overflow-y: auto;
+  /* Enable vertical scroll if the content exceeds the height */
   border: 1px solid #ddd;
   position: relative;
 }
@@ -242,8 +183,10 @@ export default {
   position: sticky;
   top: 0;
   z-index: 2;
-  background-color: #009879; /* Header background color */
-  color: #ffffff; /* Header text color */
+  background-color: #009879;
+  /* Header background color */
+  color: #ffffff;
+  /* Header text color */
 }
 
 .styled-table th,
