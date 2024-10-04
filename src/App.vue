@@ -133,6 +133,7 @@ export default {
     ...mapState(["selectedDb", "selectedTable", "selectedColumns", "selectedIds", "dateRange", "selectedInterval", "selectedStatistics", "selectedMethod", "exportColumns", "exportIds", "exportDate", "exportInterval", "dateType", "exportDateType", "exportPath", "exportFilename", "exportFormat", "exportOptions"]),
   },
   methods: {
+    ...mapActions(["updateSelectedColumns"]),
     selectFolder() {
       // Placeholder for selecting a folder, could be integrated with backend logic
       this.folderPath = "Jenette_Creek_Watershed";
@@ -157,7 +158,7 @@ export default {
           params: {
             db_path: this.selectedDb,
             table_name: this.selectedTable,
-            columns: this.selectedColumns.join(","),
+            columns: this.selectedColumns.filter((column) => column !== 'Season').join(","),
             id: this.selectedIds.join(","),
             start_date: this.dateRange.start,
             end_date: this.dateRange.end,
@@ -167,6 +168,9 @@ export default {
             method: this.selectedMethod.join(","),
           }
         });
+        if (this.selectedInterval === 'seasonally' && !this.selectedMethod.includes('Equal') && !this.selectedColumns.includes('Season')) {
+          this.updateSelectedColumns(this.selectedColumns.concat(['Season']));
+        }
         this.data = response.data.data;
         this.stats = response.data.stats;
         this.statsColumns = response.data.statsColumns;
@@ -181,7 +185,7 @@ export default {
           params: {
             db_path: this.selectedDb,
             table_name: this.selectedTable,
-            columns: this.exportColumns.join(","),
+            columns: this.exportColumns.filter((column) => column !== 'Season').join(","),
             id: this.exportIds.join(","),
             start_date: this.exportDate.start,
             end_date: this.exportDate.end,
@@ -195,6 +199,9 @@ export default {
             options: this.exportOptions,
           }
         });
+        if (this.selectedInterval === 'seasonally' && !this.selectedMethod.includes('Equal') && !this.selectedColumns.includes('Season')) {
+          this.updateSelectedColumns(this.selectedColumns.concat(['Season']));
+        }
       } catch (error) {
         console.error('Error exporting data:', error);
       }
@@ -240,14 +247,17 @@ export default {
   margin: 0;
   padding: 0;
   text-align: center;
-  overflow: hidden; /* Prevent the whole page from scrolling */
+  overflow: hidden;
+  /* Prevent the whole page from scrolling */
 }
 
-body, html {
+body,
+html {
   margin: 0;
   padding: 0;
   height: 85%;
-  overflow: hidden; /* Ensure no scroll at the global level */
+  overflow: hidden;
+  /* Ensure no scroll at the global level */
 }
 
 .top-bar {
@@ -275,14 +285,17 @@ body, html {
 .content {
   display: flex;
   flex-direction: row;
-  height: calc(100vh - 100px); /* Adjust to the viewport, minus top bar and taskbar */
+  height: calc(100vh - 100px);
+  /* Adjust to the viewport, minus top bar and taskbar */
 }
 
 .left-panel {
   display: flex;
   flex-direction: column;
-  width: 25%; /* Takes 1/4 of the horizontal space */
-  height: 85%; /* Ensure full height */
+  width: 25%;
+  /* Takes 1/4 of the horizontal space */
+  height: 85%;
+  /* Ensure full height */
   overflow: hidden;
 }
 
@@ -290,7 +303,8 @@ body, html {
   margin: 0;
   border: 1px solid #ddd;
   padding: 10px;
-  height: 35%; /* Takes 1/4 of the vertical space */
+  height: 35%;
+  /* Takes 1/4 of the vertical space */
   overflow-y: auto;
 }
 
@@ -298,13 +312,16 @@ body, html {
   margin: 0;
   border: 1px solid #ddd;
   padding: 0px;
-  height: 80%; /* Takes the remaining vertical space */
+  height: 80%;
+  /* Takes the remaining vertical space */
   overflow-y: auto;
 }
 
 .settings-panel {
-  width: 50%; /* Takes 2/4 of the horizontal space */
-  height: 85%; /* Ensure full height */
+  width: 50%;
+  /* Takes 2/4 of the horizontal space */
+  height: 85%;
+  /* Ensure full height */
   margin: 10px;
   border: 1px solid #ddd;
   padding: 10px;
@@ -312,23 +329,26 @@ body, html {
 }
 
 .main-view {
-  width: 50%; /* Takes 2/4 of the horizontal space */
-  height: 85%; /* Ensure full height */
+  width: 50%;
+  /* Takes 2/4 of the horizontal space */
+  height: 85%;
+  /* Ensure full height */
   margin: 10px;
   border: 1px solid #ddd;
   padding: 10px;
   overflow-y: auto;
 }
 
-.table-container, .stats-container {
-  max-width: 85%;
+.table-container,
+.stats-container {
+  max-width: 100%;
   max-height: 300px;
   overflow-y: auto;
   border: 1px solid #ddd;
 }
 
 .styled-table {
-  width: 85%;
+  width: 100%;
   border-collapse: collapse;
   font-size: 18px;
   text-align: left;
@@ -356,7 +376,8 @@ body, html {
   background-color: #f1f1f1;
 }
 
-.fetch-button, .export-button {
+.fetch-button,
+.export-button {
   background-color: #009879;
   color: white;
   padding: 10px 20px;
