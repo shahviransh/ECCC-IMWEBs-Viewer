@@ -1,26 +1,26 @@
 <template>
     <div class="statistics-container">
         <label for="statistics-select" class="statistics-label">Select Statistics:</label>
-        <select id="statistics-select" v-model="selectedStatistics" multiple @change="onStatisticsChange"
-            class="statistics-dropdown">
-            <option value="None">None</option>
-            <option value="Average">Average</option>
-            <option value="Sum">Sum</option>
-            <option value="Maximum">Maximum</option>
-            <option value="Minimum">Minimum</option>
-            <option value="Standard Deviation">Standard Deviation</option>
-        </select>
+        <Multiselect v-model="selectedStatistics" :options="option" :multiple="true" :close-on-select="false"
+            :clear-on-select="false" :preserve-search="true"
+            @input="onMethodChange">
+        </Multiselect>
     </div>
 </template>
 
 <script>
 import { mapState, mapActions } from 'vuex'; // Import Vuex helpers
+import Multiselect from 'vue-multiselect';
 
 export default {
     data() {
         return {
             selectedStatistics: ["None"],
+            option: ["None", "Average", "Sum", "Maximum", "Minimum", "Standard Deviation"],
         };
+    },
+    components:{
+        Multiselect,
     },
     methods: {
         ...mapActions(["updateSelectedStatistics"]),

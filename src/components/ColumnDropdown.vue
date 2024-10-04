@@ -2,24 +2,23 @@
     <div class="form-container">
         <div class="form-group">
             <label for="column-select">Select Columns:</label>
-            <Multiselect v-model="selectColumns" :options="columns" :multiple="true" :close-on-select="false"
-                :clear-on-select="false" :preserve-search="true" placeholder="Select Columns">
-            </Multiselect>
+            <select class="dropdown" v-model="selectColumns" multiple>
+                <option v-for="column in columns" :key="column" :value="column">{{ column }}</option>
+            </select>
         </div>
     </div>
     <div class="form-container">
         <div class="form-group">
             <label for="column-select">Export Select Columns:</label>
-            <Multiselect v-model="expColumns" :options="columns" :multiple="true" :close-on-select="false"
-                :clear-on-select="false" :preserve-search="true" placeholder="Export Select Columns">
-            </Multiselect>
+            <select class="dropdown" v-model="expColumns" multiple>
+                <option v-for="column in columns" :key="column" :value="column">{{ column }}</option>
+            </select>
         </div>
     </div>
 </template>
 
 <script>
 import { mapState, mapActions } from 'vuex'; // Import Vuex helpers
-import Multiselect from 'vue-multiselect';
 
 export default {
     props: {
@@ -28,7 +27,6 @@ export default {
             default: null
         }
     },
-    components: { Multiselect },
     computed: {
         // Binding selected columns directly from Vuex
         selectColumns: {

@@ -1,9 +1,10 @@
 <template>
     <div class="method-container">
         <label for="method-select" class="method-label">Select Method:</label>
-        <Multiselect v-model="selectedMethod" :options="options" :multiple="true" :close-on-select="false"
-                :clear-on-select="false" :preserve-search="true" placeholder="Export Select Columns" @input="onMethodChange">
-            </Multiselect>
+        <Multiselect v-model="selectedMethod" :options="option" :multiple="true" :close-on-select="false"
+            :clear-on-select="false" :preserve-search="true"
+            @input="onMethodChange">
+        </Multiselect>
     </div>
 </template>
 
@@ -14,8 +15,11 @@ export default {
     data() {
         return {
             selectedMethod: ["Equal"],
-            options: ["Equal", "Average", "Sum", "Maximum", "Minimum"],
+            option: ["Equal", "Average", "Sum", "Maximum", "Minimum"],
         };
+    },
+    components: {
+        Multiselect,
     },
     methods: {
         ...mapActions(["updateSelectedMethod"]),
