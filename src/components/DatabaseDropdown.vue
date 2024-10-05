@@ -14,6 +14,7 @@ export default {
     data() {
         return {
             selectedDb: null,
+            treeData: [],
         };
     },
     computed: {
@@ -22,11 +23,54 @@ export default {
     mounted() {
         this.fetchDatabases();
     },
+    watch: {
+        databases: function () {
+            if (this.treeData.length === 0) {
+                this.treeData = [...this.listToTree(this.databases)];
+            }
+        }
+    },
     methods: {
         ...mapActions(['fetchDatabases', 'updateSelectedDb']),
         onDatabaseChange() {
             this.updateSelectedDb(this.selectedDb);
         },
+        listToTree(list) {
+            let idCounter = 1; // Initialize ID counter
+
+            const tree = [];
+            const lookup = {};
+
+            list.forEach(item => {
+                const parts = item.name.split('\\');
+                let currentLevel = tree;
+
+                parts.forEach((part, index) => {
+                    let existingNode = currentLevel.find(node => node.label === part);
+
+                    if (!existingNode) {
+                        // Create new node with an id
+                        existingNode = {
+                            id: idCounter++, // Assign an id and increment the counter
+                            name: part,
+                            type: index === parts.length - 1 ? item.type : 'folder',
+                            children: []
+                        };
+                        currentLevel.push(existingNode);
+                    }
+
+                    // Move to the next level (children)
+                    currentLevel = existingNode.children;
+                });
+            });
+
+            return tree;
+        },
+        onSelect(node) {
+            if (node.type === 'file') {
+                alert(`You selected file: ${node.label}`);
+            }
+        }
     },
 };
 </script>

@@ -1,5 +1,4 @@
 import { createRouter, createWebHistory } from "vue-router";
-import App from "../App.vue";
 import Project from "../pages/Project.vue";
 // import Table from "../components/Table.vue";
 // import Graph from "../components/Graph.vue";
@@ -12,7 +11,7 @@ import Project from "../pages/Project.vue";
 const routes = [
   {
     path: "/",
-    component: App,
+    component: Project,
   },
   {
     path: "/project",

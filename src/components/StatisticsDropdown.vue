@@ -3,7 +3,7 @@
         <label for="statistics-select" class="statistics-label">Select Statistics:</label>
         <Multiselect v-model="selectedStatistics" :options="option" :multiple="true" :close-on-select="false"
             :clear-on-select="false" :preserve-search="true"
-            @input="onMethodChange">
+            @input="onStatisticsChange">
         </Multiselect>
     </div>
 </template>
