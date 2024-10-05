@@ -273,7 +273,7 @@ html {
     /* Takes 2/4 of the horizontal space */
     height: 85%;
     /* Ensure full height */
-    margin: 10px;
+    margin: 0px;
     border: 1px solid #ddd;
     padding: 10px;
     overflow-y: auto;
@@ -290,7 +290,7 @@ html {
 .styled-table {
     width: 100%;
     border-collapse: collapse;
-    font-size: 18px;
+    font-size: 16px;
     text-align: left;
 }
 
@@ -298,7 +298,7 @@ html {
     position: sticky;
     top: 0;
     z-index: 2;
-    background-color: #009879;
+    background-color: #9e3203;
     color: #ffffff;
 }
 

@@ -3,7 +3,7 @@
         <label for="method-select" class="method-label">Select Method:</label>
         <Multiselect v-model="selectedMethod" :options="option" :multiple="true" :close-on-select="false"
             :clear-on-select="false" :preserve-search="true"
-            @input="onMethodChange">
+            @update:modelValue="onMethodChange">
         </Multiselect>
     </div>
 </template>

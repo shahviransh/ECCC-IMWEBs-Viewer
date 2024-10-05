@@ -91,7 +91,7 @@ def aggregate_data(df, interval, method, date_type):
     resampled_df[date_type] = resampled_df[date_type].dt.strftime('%Y-%m') if interval == "monthly" else resampled_df[date_type].dt.strftime('%Y')
     stats_df = calculate_statistics(resampled_df, method, date_type)
 
-    return resampled_df, stats_df
+    return resampled_df, stats_df.round(3)
 
 
 # Helper function to calculate statistics
@@ -127,7 +127,7 @@ def calculate_statistics(df, statistics, date_type):
     stats_df.reset_index(inplace=True)
     stats_df.rename(columns={"index": "Statistics"}, inplace=True)
 
-    return stats_df
+    return stats_df.round(3)
 
 @app.route("/api/list_files", methods=["GET"])
 def list_files():
