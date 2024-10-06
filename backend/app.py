@@ -56,15 +56,18 @@ def fetch_data_from_db(
 
 # Example function to map date strings to seasons
 def get_season_from_date(date_str):
-    month = datetime.strptime(date_str, "%Y-%m-%d").month
-    if month in [12, 1, 2]:
-        return "Winter"
-    elif month in [3, 4, 5]:
-        return "Spring"
-    elif month in [6, 7, 8]:
-        return "Summer"
-    elif month in [9, 10, 11]:
-        return "Autumn"
+    try:
+        month = date_str.month
+        if month in [12, 1, 2]:
+            return "Winter"
+        elif month in [3, 4, 5]:
+            return "Spring"
+        elif month in [6, 7, 8]:
+            return "Summer"
+        elif month in [9, 10, 11]:
+            return "Autumn"
+    except ValueError:
+        return "Invalid date"
 
 
 # Helper function to apply time interval aggregation
@@ -77,10 +80,12 @@ def aggregate_data(df, interval, method, date_type):
 
     if interval == "monthly":
         resampled_df = df.groupby('ID').resample("ME").first()
-    elif interval == "seasonal":
+    elif interval == "seasonally":
         # Custom resampling for seasons
-        df["Season"] = df[date_type].apply(lambda x: get_season_from_date(str(x)))
-        resampled_df = df.groupby("Season")
+        df.reset_index(inplace=True)
+        df["Season"] = df[date_type].apply(lambda x: get_season_from_date(x))
+        df.set_index(date_type, inplace=True)
+        resampled_df = df
     elif interval == "yearly":
         resampled_df = df.groupby('ID').resample("YE").first()
     else:
@@ -88,7 +93,11 @@ def aggregate_data(df, interval, method, date_type):
     
     resampled_df = resampled_df.drop(columns=['ID']) if 'ID' in resampled_df.index.names else resampled_df
     resampled_df.reset_index(inplace=True)
-    resampled_df[date_type] = resampled_df[date_type].dt.strftime('%Y-%m') if interval == "monthly" else resampled_df[date_type].dt.strftime('%Y')
+    
+    if interval != "seasonally":
+        resampled_df[date_type] = resampled_df[date_type].dt.strftime('%Y-%m') if interval == "monthly" else resampled_df[date_type].dt.strftime('%Y')
+    else:
+        resampled_df[date_type] = resampled_df[date_type].dt.strftime('%Y-%m-%d')
     stats_df = calculate_statistics(resampled_df, method, date_type)
 
     return resampled_df, stats_df.round(3)

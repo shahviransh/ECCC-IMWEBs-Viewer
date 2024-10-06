@@ -18,26 +18,31 @@ export default {
         };
     },
     computed: {
-        ...mapState(['databases']),
+        ...mapState(['databases', 'tables']),
     },
     mounted() {
         this.fetchDatabases();
     },
     watch: {
-        databases: function () {
+        databases() {
             if (this.treeData.length === 0) {
-                this.treeData = [...this.listToTree(this.databases)];
+                this.treeData = this.listToTree(this.databases);
+            }
+        },
+        tables() {
+            if (this.selectedDb) {
+                this.addTablesToTree();
             }
         }
     },
     methods: {
-        ...mapActions(['fetchDatabases', 'updateSelectedDb']),
+        ...mapActions(['fetchDatabases', 'updateSelectedDb', 'fetchTables']),
         onDatabaseChange() {
             this.updateSelectedDb(this.selectedDb);
+            this.fetchTables(this.selectedDb);
         },
         listToTree(list) {
-            let idCounter = 1; // Initialize ID counter
-
+            let idCounter = 1;
             const tree = [];
             const lookup = {};
 
@@ -46,12 +51,13 @@ export default {
                 let currentLevel = tree;
 
                 parts.forEach((part, index) => {
-                    let existingNode = currentLevel.find(node => node.label === part);
+                    const path = parts.slice(0, index + 1).join('\\');
+                    let existingNode = lookup[path]; // Check if the path already exists
 
                     if (!existingNode) {
                         // Create new node with an id
                         existingNode = {
-                            id: idCounter++, // Assign an id and increment the counter
+                            id: idCounter++,
                             name: part,
                             type: index === parts.length - 1 ? item.type : 'folder',
                             children: []
@@ -61,10 +67,41 @@ export default {
 
                     // Move to the next level (children)
                     currentLevel = existingNode.children;
+                    lookup[path] = existingNode;
                 });
             });
 
             return tree;
+        },
+        addTablesToTree() {
+            // Traverse the tree and find the selected database node
+            const selectedDbNode = this.findNode(this.treeData[0], this.selectedDb);
+
+            if (selectedDbNode && this.tables) {
+                // Clear existing tables from the selectedDbNode's children if they already exist
+                selectedDbNode.children = selectedDbNode.children.filter(child => child.type !== 'table');
+                // Add tables as children of the selected database node
+                this.tables.forEach(table => {
+                    selectedDbNode.children.push({
+                        id: `table-${table}`,
+                        name: table,
+                        type: 'table',
+                        children: [] // Tables don't have further children
+                    });
+                });
+            }
+        },
+        findNode(node, id) {
+            if (id.includes(node.name) && node.type === 'file') {
+                return node;
+            } else if (node.children) {
+                let result = null;
+                for (let i = 0; result === null && i < node.children.length; i++) {
+                    result = this.findNode(node.children[i], id);
+                }
+                return result;
+            }
+            return null;
         },
         onSelect(node) {
             if (node.type === 'file') {
