@@ -183,51 +183,19 @@ export default {
 </script>
 
 <style scoped>
-#app {
-    font-family: Avenir, Helvetica, Arial, sans-serif;
-    color: #2c3e50;
-    margin: 0;
-    padding: 0;
-    text-align: center;
-    overflow: hidden;
-    /* Prevent the whole page from scrolling */
-}
-
 body,
 html {
     margin: 0;
     padding: 0;
-    height: 85%;
+    height: 100%;
     overflow: hidden;
     /* Ensure no scroll at the global level */
-}
-
-.top-bar {
-    background-color: #42b983;
-    padding: 1px;
-    color: #fff;
-}
-
-.taskbar {
-    display: flex;
-    justify-content: space-between;
-    padding: 10px;
-    background-color: #35495e;
-    color: #fff;
-}
-
-.taskbar button {
-    background-color: transparent;
-    color: #fff;
-    border: none;
-    margin: 0 5px;
-    cursor: pointer;
 }
 
 .content {
     display: flex;
     flex-direction: row;
-    height: calc(100vh - 100px);
+    height: calc(100vh - 130px);
     /* Adjust to the viewport, minus top bar and taskbar */
 }
 
@@ -236,7 +204,7 @@ html {
     flex-direction: column;
     width: 25%;
     /* Takes 1/4 of the horizontal space */
-    height: 85%;
+    height: 100%;
     /* Ensure full height */
     overflow: hidden;
 }
@@ -254,7 +222,7 @@ html {
     margin: 0;
     border: 1px solid #ddd;
     padding: 0px;
-    height: 80%;
+    height: 85%;
     /* Takes the remaining vertical space */
     overflow-y: auto;
 }
@@ -262,7 +230,7 @@ html {
 .settings-panel {
     width: 50%;
     /* Takes 2/4 of the horizontal space */
-    height: 85%;
+    height: 100%;
     /* Ensure full height */
     margin: 10px;
     border: 1px solid #ddd;
@@ -273,7 +241,7 @@ html {
 .main-view {
     width: 50%;
     /* Takes 2/4 of the horizontal space */
-    height: 85%;
+    height: 100%;
     /* Ensure full height */
     margin: 0px;
     border: 1px solid #ddd;

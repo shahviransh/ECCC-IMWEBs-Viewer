@@ -64,8 +64,8 @@ export default {
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   color: #2c3e50;
-  margin: 0;
-  padding: 0;
+  margin: -8px;
+  padding: 0px;
   text-align: center;
   overflow: hidden;
   /* Prevent the whole page from scrolling */
@@ -75,13 +75,13 @@ body,
 html {
   margin: 0;
   padding: 0;
-  height: 85%;
+  height: 100%;
   overflow: hidden;
   /* Ensure no scroll at the global level */
 }
 
 .top-bar {
-  background-color: #42b983;
+  background-color: #b85b14;
   padding: 1px;
   color: #fff;
 }
