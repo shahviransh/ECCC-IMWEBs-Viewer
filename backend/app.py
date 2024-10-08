@@ -159,6 +159,8 @@ def calculate_statistics(df, statistics, date_type):
 
     # Select only numerical columns for calculations
     df = df.select_dtypes(include=['number'])
+    # Drop the date_type column if it exists
+    df = df.drop(columns=[date_type], errors='ignore')
 
     if "Average" in statistics:
         stats_df["Average"] = df.mean()
