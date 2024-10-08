@@ -173,6 +173,8 @@ export default {
                 });
                 if (this.selectedInterval === 'seasonally' && !this.selectedMethod.includes('Equal') && !this.selectedColumns.includes('Season')) {
                     this.updateSelectedColumns(this.selectedColumns.concat(['Season']));
+                } else{
+                    this.updateSelectedColumns(this.selectedColumns.filter((column) => column !== 'Season'));
                 }
             } catch (error) {
                 console.error('Error exporting data:', error);

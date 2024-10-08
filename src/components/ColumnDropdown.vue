@@ -35,14 +35,15 @@ export default {
             },
             set(value) {
                 this.updateSelectedColumns(value); // Update Vuex state on change
+                this.updateExportColumns(this.selectedColumns); // Update export columns based on selected columns
             }
         },
         expColumns: {
             get() {
-                return this.exportColumns; // Get the value from Vuex
+                return this.exportColumns;
             },
             set(value) {
-                this.updateExportColumns(value); // Update Vuex state on change
+                this.updateExportColumns(value);
             }
         },
         ...mapState(['columns', 'ids', 'selectedDb', 'selectedColumns', 'exportColumns']),

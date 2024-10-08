@@ -293,7 +293,7 @@ def get_table_details():
 def save_to_file(dataframe1, dataframe2, filename, file_format, export_path, options):
     """Save two DataFrames to the specified file format sequentially."""
     # Set the file path
-    file_path = os.path.join(PATHFILE, export_path) if export_path == "dataExport" else export_path
+    file_path = os.path.join(PATHFILE, export_path) if not os.path.exists(export_path) else export_path
     if not os.path.exists(file_path):
         os.makedirs(file_path)
     file_path = os.path.join(file_path, filename)

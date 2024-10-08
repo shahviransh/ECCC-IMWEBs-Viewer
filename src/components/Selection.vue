@@ -68,7 +68,7 @@ export default {
         // Binding date range (start and end) directly from Vuex
         selectedDateStart: {
             get() {
-                return this.dateRange.start; // Get the date range from Vuex
+                return this.dateRange.start;
             },
             set(value) {
                 this.updateSelectedDateStart(value); 
