@@ -2,7 +2,7 @@
   <div id="app">
     <!-- Top Bar -->
     <header class="top-bar">
-      <h1>IMWEBs Viewer</h1>
+      <h2>IMWEBs Viewer</h2>
     </header>
 
     <!-- Taskbar -->
@@ -23,14 +23,9 @@
 </template>
 
 <script>
-import { RouterLink } from "vue-router";
-import Project from "./pages/Project.vue";
 
 export default {
   name: "App",
-  components: {
-    Project
-  },
   data() {
     return {
       pages: [
@@ -82,7 +77,7 @@ html {
 
 .top-bar {
   background-color: #b85b14;
-  padding: 1px;
+  padding:  1px;
   color: #fff;
 }
 

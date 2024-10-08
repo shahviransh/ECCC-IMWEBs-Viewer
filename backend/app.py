@@ -48,10 +48,51 @@ def fetch_data_from_db(
             query += f" WHERE {date_type} >= '{start_date}' AND {date_type} <= '{end_date}'"
 
     df = pd.read_sql_query(query, conn)
-    df = df.round(3)
+    df = df.map(round_numeric_values)
 
     conn.close()
     return df
+
+def get_columns_and_time_range(db_path, table_name):
+    """Fetch column names and time range from a SQLite database table."""
+    conn = sqlite3.connect(os.path.join(PATHFILE, db_path))
+    query = f"PRAGMA table_info('{table_name}')"
+    cursor = conn.cursor()
+    cursor.execute(query)
+    columns = [row[1] for row in cursor.fetchall()]
+
+    # Initialize variables
+    start_date = end_date = date_type = None
+
+    # Check and query for specific date/time columns
+    if "Time" in columns:
+        df = pd.read_sql_query(f"SELECT Time FROM {table_name}", conn)
+        df["Time"] = pd.to_datetime(df["Time"])
+        start_date = df["Time"].min().strftime("%Y-%m-%d")
+        end_date = df["Time"].max().strftime("%Y-%m-%d")
+        date_type = "Time"
+    elif "Date" in columns:
+        df = pd.read_sql_query(f"SELECT Date FROM {table_name}", conn)
+        df["Date"] = pd.to_datetime(df["Date"])
+        start_date = df["Date"].min().strftime("%Y-%m-%d")
+        end_date = df["Date"].max().strftime("%Y-%m-%d")
+        date_type = "Date"
+    elif "Month" in columns:
+        df = pd.read_sql_query(f"SELECT Month FROM {table_name}", conn)
+        start_date = str(df["Month"].min())
+        end_date = str(df["Month"].max())
+        date_type = "Month"
+
+    # Get list of IDs if an ID column exists, without querying unnecessary data
+    id_column = next((col for col in columns if "ID" in col), None)
+    ids = []
+    if id_column:
+        id_query = f"SELECT DISTINCT {id_column} FROM {table_name}"
+        id_df = pd.read_sql_query(id_query, conn)
+        ids = id_df[id_column].astype(str).tolist()
+    conn.close()
+
+    return columns, start_date, end_date, ids, date_type
 
 
 # Example function to map date strings to seasons
@@ -100,8 +141,13 @@ def aggregate_data(df, interval, method, date_type):
         resampled_df[date_type] = resampled_df[date_type].dt.strftime('%Y-%m-%d')
     stats_df = calculate_statistics(resampled_df, method, date_type)
 
-    return resampled_df, stats_df.round(3)
+    return resampled_df, stats_df.map(round_numeric_values)
 
+# Ensure all numeric values are rounded
+def round_numeric_values(value):
+    if isinstance(value, (float, int)):  # Check if the value is a number
+        return round(value, 3)  # Round to 3 decimal places
+    return value  # Leave non-numeric values unchanged
 
 # Helper function to calculate statistics
 def calculate_statistics(df, statistics, date_type):
@@ -136,7 +182,7 @@ def calculate_statistics(df, statistics, date_type):
     stats_df.reset_index(inplace=True)
     stats_df.rename(columns={"index": "Statistics"}, inplace=True)
 
-    return stats_df.round(3)
+    return stats_df.map(round_numeric_values)
 
 @app.route("/api/list_files", methods=["GET"])
 def list_files():
@@ -223,38 +269,10 @@ def get_table_details():
         return jsonify({"error": "Database path and table name are required."}), 400
 
     try:
-        # Fetch data using the existing helper function
-        df = fetch_data_from_db(db_path, table_name)
-
-        # Get column names
-        columns = df.columns.tolist()
-        date_type = None
-
-        # Get time start and end if there is a date column
-        if "Time" in columns:
-            df["Time"] = pd.to_datetime(df["Time"])
-            start_date = df["Time"].min().strftime("%Y-%m-%d")
-            end_date = df["Time"].max().strftime("%Y-%m-%d")
-            date_type = "Time"
-        elif "Date" in columns:
-            df["Date"] = pd.to_datetime(df["Date"])
-            start_date = df["Date"].min().strftime("%Y-%m-%d")
-            end_date = df["Date"].max().strftime("%Y-%m-%d")
-            date_type = "Date"
-        elif "Month" in columns:
-            start_date = str(df["Month"].min())
-            end_date = str(df["Month"].max())
-            date_type = "Month"
-        else:
-            start_date = None
-            end_date = None
-            date_type = None
-
-        # Get list of IDs if an ID column exists
-        id_column = "".join([col for col in columns if "ID" in col])
-        id_column = id_column if id_column != "" else None
-        ids = df[id_column].unique().tolist() if id_column else []
-        ids = [str(i) for i in ids]
+        # Fetch only the columns names and time start and time end
+        columns, start_date, end_date, ids, date_type = get_columns_and_time_range(
+            db_path, table_name
+        )
 
         return jsonify(
             {

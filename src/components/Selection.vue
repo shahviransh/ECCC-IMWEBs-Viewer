@@ -62,6 +62,7 @@ export default {
             },
             set(value) {
                 this.updateSelectedIds(value); // Update Vuex state on change
+                this.updateExportIds(value);
             }
         },
         // Binding date range (start and end) directly from Vuex
@@ -70,7 +71,8 @@ export default {
                 return this.dateRange.start; // Get the date range from Vuex
             },
             set(value) {
-                this.updateSelectedDateStart(value); // Update Vuex state on change
+                this.updateSelectedDateStart(value); 
+                this.updateExportDateStart(value);
             }
         },
         selectedDateEnd: {
@@ -78,7 +80,8 @@ export default {
                 return this.dateRange.end; // Get the date range from Vuex
             },
             set(value) {
-                this.updateSelectedDateEnd(value); // Update Vuex state on change
+                this.updateSelectedDateEnd(value); 
+                this.updateExportDateEnd(value);
             }
         },
         daType() {
@@ -89,7 +92,7 @@ export default {
                 return this.exportIds; // Get the value from Vuex
             },
             set(value) {
-                this.updateExportIds(value); // Update Vuex state on change
+                this.updateExportIds(value); 
             }
         },
         expDateStart: {
@@ -97,7 +100,7 @@ export default {
                 return this.exportDate.start; // Get the date range from Vuex
             },
             set(value) {
-                this.updateExportDateStart(value); // Update Vuex state on change
+                this.updateExportDateStart(value); 
             }
         },
         expDateEnd: {
@@ -105,7 +108,7 @@ export default {
                 return this.exportDate.end; // Get the date range from Vuex
             },
             set(value) {
-                this.updateExportDateEnd(value); // Update Vuex state on change
+                this.updateExportDateEnd(value); 
             }
         },
         expDateType() {

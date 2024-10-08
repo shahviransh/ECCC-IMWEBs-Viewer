@@ -1,12 +1,12 @@
 import { createRouter, createWebHistory } from "vue-router";
 import Project from "../pages/Project.vue";
-// import Table from "../components/Table.vue";
-// import Graph from "../components/Graph.vue";
-// import Map from "../components/Map.vue";
-// import Calibration from "../components/Calibration.vue";
-// import BMP from "../components/BMP.vue";
-// import Tools from "../components/Tools.vue";
-// import Help from "../components/Help.vue";
+import Table from "../pages/Table.vue";
+import Graph from "../pages/Graph.vue";
+import Map from "../pages/Map.vue";
+import Calibration from "../pages/Calibration.vue";
+import BMP from "../pages/BMP.vue";
+import Tools from "../pages/Tools.vue";
+import Help from "../pages/Help.vue";
 
 const routes = [
   {
@@ -18,41 +18,41 @@ const routes = [
     name: "Project",
     component: Project,
   },
-  // {
-  //   path: "/table",
-  //   name: "Table",
-  //   component: Table,
-  // },
-  // {
-  //   path: "/graph",
-  //   name: "Graph",
-  //   component: Graph,
-  // },
-  // {
-  //   path: "/map",
-  //   name: "Map",
-  //   component: Map,
-  // },
-  // {
-  //   path: "/calibration",
-  //   name: "Calibration",
-  //   component: Calibration,
-  // },
-  // {
-  //   path: "/bmp",
-  //   name: "BMP",
-  //   component: BMP,
-  // },
-  // {
-  //   path: "/tools",
-  //   name: "Tools",
-  //   component: Tools,
-  // },
-  // {
-  //   path: "/help",
-  //   name: "Help",
-  //   component: Help,
-  // },
+  {
+    path: "/table",
+    name: "Table",
+    component: Table,
+  },
+  {
+    path: "/graph",
+    name: "Graph",
+    component: Graph,
+  },
+  {
+    path: "/map",
+    name: "Map",
+    component: Map,
+  },
+  {
+    path: "/calibration",
+    name: "Calibration",
+    component: Calibration,
+  },
+  {
+    path: "/bmp",
+    name: "BMP",
+    component: BMP,
+  },
+  {
+    path: "/tools",
+    name: "Tools",
+    component: Tools,
+  },
+  {
+    path: "/help",
+    name: "Help",
+    component: Help,
+  },
 ];
 
 const router = createRouter({
