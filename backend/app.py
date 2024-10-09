@@ -169,12 +169,14 @@ def calculate_statistics(df, statistics, date_type):
     if "Maximum" in statistics:
         stats_df["Maximum"] = df.max()
         # Use original DataFrame to get the corresponding date_type values for maximums
-        max_date_type = {col: original_df.loc[original_df[col].idxmax(), date_type] for col in df.columns}
+        # Ignore if date_type is not present in the original DataFrame
+        max_date_type = {col: original_df.loc[original_df[col].idxmax(), date_type] for col in df.columns if date_type in original_df.columns}
         stats_df[f"Maximum {date_type}"] = pd.Series(max_date_type)
     if "Minimum" in statistics:
         stats_df["Minimum"] = df.min()
         # Use original DataFrame to get the corresponding date_type values for minimums
-        min_date_type = {col: original_df.loc[original_df[col].idxmin(), date_type] for col in df.columns}
+        # Ignore if date_type is not present in the original DataFrame
+        min_date_type = {col: original_df.loc[original_df[col].idxmin(), date_type] for col in df.columns if date_type in original_df.columns}
         stats_df[f"Minimum {date_type}"] = pd.Series(min_date_type)
     if "Standard Deviation" in statistics:
         stats_df["Standard Deviation"] = df.std()
