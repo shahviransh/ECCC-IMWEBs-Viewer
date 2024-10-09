@@ -4,6 +4,7 @@
   "description": "A brief description of your app.",
   "author": "Viransh Shah",
   "version": "0.1.0",
+  //"main": electron/main.js",
   "scripts": {
     "prestart": "node convert-package.js",
     "dev": "concurrently \"npm run vue-dev\" \"npm run python-dev\"",
@@ -34,5 +35,34 @@
     "electron": "^32.1.2",
     "electron-builder": "^25.0.5",
     "vite": "^5.3.1"
-  }
+  },
+  // "build": {
+  //   "appId": "com.yourapp.id",
+  //   "productName": "Backend",
+  //   "directories": {
+  //     "buildResources": "build",
+  //     "output": "dist"
+  //   },
+  //   "win": {
+  //     "icon": "electron/icon.ico"
+  //   },
+  //   "files": [
+  //     "dist/**/*",
+  //     "node_modules/**/*",
+  //     "electron/**/*",
+  //     "backend/**/*"
+  //   ],
+  //   "extraResources": [
+  //     {
+  //       "from": "backend/dist/app",
+  //       "to": "backend",
+  //       "filter": [
+  //         "**/*"
+  //       ]
+  //     },
+  //     "backend/app.py",
+  //     "backend/app.spec",
+  //     "backend/requirements.txt"
+  //   ]
+  // }
 }

@@ -1,0 +1,40 @@
+{
+  "$schema": "../node_modules/@tauri-apps/cli/config.schema.json",
+  "productName": "eccc-imwebs-viewer-backend",
+  "version": "0.1.0",
+  "identifier": "ca.eccc.imwebs-viewer-backend",
+  "build": {
+    "frontendDist": "../dist",
+    "devUrl": "http://localhost:1420",
+    "beforeDevCommand": "npm run dev",
+    "beforeBuildCommand": "npm run build"
+  },
+  "app": {
+    "windows": [
+      {
+        "title": "eccc-imwebs-viewer-backend",
+        "width": 800,
+        "height": 600,
+        "resizable": true,
+        "fullscreen": false
+      }
+    ],
+    "security": {
+      "csp": null
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": "all",
+    "externalBin": [
+      "../backend/dist/app/apppy"
+    ],
+    "icon": [
+      "icons/icon.ico"
+    ],
+    "resources": [
+      "../backend/dist/app/**/*",
+      "../backend/requirements.txt"
+    ]
+  }
+}

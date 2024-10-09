@@ -18,10 +18,23 @@ export default defineConfig(async () => ({
 
   // Add the base and build configuration for Electron
   base: './',  // Ensure assets are loaded relatively
+  envPrefix: ['VITE_', 'TAURI_ENV_*'],
+  // // For Electron
+  // build: {
+  //   outDir: 'dist',  // Output folder for the build
+  //   rollupOptions: {
+  //     input: 'index.html',
+  //   },
+  // For Tauri
   build: {
-    outDir: 'dist',  // Output folder for the build
-    rollupOptions: {
-      input: 'index.html',
-    },
+    // Tauri uses Chromium on Windows and WebKit on macOS and Linux
+    target:
+      process.env.TAURI_ENV_PLATFORM == 'windows'
+        ? 'chrome105'
+        : 'safari13',
+    // don't minify for debug builds
+    minify: !process.env.TAURI_ENV_DEBUG ? 'esbuild' : false,
+    // produce sourcemaps for debug builds
+    sourcemap: !!process.env.TAURI_ENV_DEBUG,
   },
 }));
