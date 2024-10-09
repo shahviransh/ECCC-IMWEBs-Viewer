@@ -27,13 +27,13 @@
     "active": true,
     "targets": "all",
     "externalBin": [
-      "../backend/dist/app/apppy"
+      "../backend/app/apppy"
     ],
     "icon": [
       "icons/icon.ico"
     ],
     "resources": [
-      "../backend/dist/app/**/*",
+      "../backend/app/**/*",
       "../backend/requirements.txt"
     ]
   }

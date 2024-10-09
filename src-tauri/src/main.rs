@@ -28,7 +28,7 @@ async fn start_server() {
   // Determine the server path using the fetched target triple
   let extension = if cfg!(target_os = "windows") { ".exe" } else { "" };
   let server_path = exe_dir
-    .join(format!("_up_\\backend\\dist\\app\\apppy-{}{}", target_triple, extension));
+    .join(format!("_up_\\backend\\app\\apppy-{}{}", target_triple, extension));
 
   println!("Starting server at {:?}", server_path);
   // Spawn the server as a background process

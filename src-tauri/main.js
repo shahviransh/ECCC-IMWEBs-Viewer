@@ -12,8 +12,8 @@ if (!targetTriple) {
 }
 
 // Rename the binary using the target triple
-const oldPath = `../backend/dist/app/apppy${ext}`;
-const newPath = `../backend/dist/app/apppy-${targetTriple}${ext}`;
+const oldPath = `../backend/app/apppy${ext}`;
+const newPath = `../backend/app/apppy-${targetTriple}${ext}`;
 
 try {
   if (fs.existsSync(oldPath)) {

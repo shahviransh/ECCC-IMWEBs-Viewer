@@ -54,7 +54,7 @@
   //   ],
   //   "extraResources": [
   //     {
-  //       "from": "backend/dist/app",
+  //       "from": "backend/app",
   //       "to": "backend",
   //       "filter": [
   //         "**/*"
