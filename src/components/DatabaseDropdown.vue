@@ -1,21 +1,21 @@
 <template>
-    <div class="dropdown-container">
-        <label for="db-select">Select Database:</label>
-        <select id="db-select" v-model="selectedDb" @change="onDatabaseChange" class="dropdown-select">
-            <option v-for="db in databases" :key="db.name" :value="db.name">{{ db.name }}</option>
-        </select>
-    </div>
+    <folder-tree :treeData="treeData" @select="onSelect" />
 </template>
 
 <script>
 import { mapState, mapActions } from 'vuex'; // Import Vuex helpers
+import FolderTree from './FolderTree.vue';
 
 export default {
     data() {
         return {
             selectedDb: null,
+            selectedTable: null,
             treeData: [],
         };
+    },
+    components: {
+        FolderTree
     },
     computed: {
         ...mapState(['databases', 'tables']),
@@ -36,7 +36,7 @@ export default {
         }
     },
     methods: {
-        ...mapActions(['fetchDatabases', 'updateSelectedDb', 'fetchTables']),
+        ...mapActions(['fetchDatabases', 'updateSelectedDb', 'fetchTables', 'updateSelectedTable']),
         onDatabaseChange() {
             this.updateSelectedDb(this.selectedDb);
             this.fetchTables(this.selectedDb);
@@ -60,6 +60,8 @@ export default {
                             id: idCounter++,
                             name: part,
                             type: index === parts.length - 1 ? item.type : 'folder',
+                            path: path,
+                            expanded: false,
                             children: []
                         };
                         currentLevel.push(existingNode);
@@ -86,6 +88,7 @@ export default {
                         id: `table-${table}`,
                         name: table,
                         type: 'table',
+                        expanded: false,
                         children: [] // Tables don't have further children
                     });
                 });
@@ -105,7 +108,14 @@ export default {
         },
         onSelect(node) {
             if (node.type === 'file') {
-                alert(`You selected file: ${node.label}`);
+                // Handle folder selection
+                this.selectedDb = node.path;
+                this.updateSelectedDb(this.selectedDb);
+                this.fetchTables(this.selectedDb);
+            } else if (node.type === 'table') {
+                // Handle table selection
+                this.selectedTable = node.name;
+                this.updateSelectedTable(this.selectedTable);
             }
         }
     },
@@ -113,28 +123,32 @@ export default {
 </script>
 
 <style scoped>
-.dropdown-container {
-    display: flex;
-    flex-direction: column;
-    margin: 10px;
+.folder-tree {
+    list-style-type: none;
+    padding-left: 20px;
 }
 
-.dropdown-select {
-    width: 100%;
-    /* Adjust this to fit the container */
-    max-width: 300px;
-    /* Maximum width */
-    min-width: 200px;
-    /* Minimum width */
-    padding: 8px;
-    font-size: 16px;
-    border: 1px solid #ccc;
+.node {
+    cursor: pointer;
+    margin: 5px 0;
+    padding: 2px 8px;
     border-radius: 4px;
-    box-sizing: border-box;
-    /* Ensure padding does not affect width */
 }
 
-.dropdown-select option {
-    padding: 8px;
+.folder-node:hover,
+.file-node:hover {
+    background-color: #f0f0f0;
+}
+
+.folder-node::before {
+    content: '▶ ';
+    display: inline-block;
+    width: 1em;
+    transform: rotate(0);
+    transition: transform 0.2s ease-in-out;
+}
+
+.folder-node[expanded="true"]::before {
+    transform: rotate(90deg);
 }
 </style>

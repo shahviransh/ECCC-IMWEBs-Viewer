@@ -5,7 +5,6 @@
             <!-- Component 1: Folder Navigation -->
             <div class="folder-navigation">
                 <DatabaseDropdown />
-                <TableDropdown :selectedDb="selectedDb" />
             </div>
             <!-- Component 2: Column Navigation -->
             <div class="column-navigation">
@@ -68,7 +67,6 @@
 <script>
 import { mapState, mapActions } from "vuex";
 import DatabaseDropdown from "../components/DatabaseDropdown.vue";
-import TableDropdown from "../components/TableDropdown.vue";
 import ColumnDropdown from "../components/ColumnDropdown.vue";
 import Selection from "../components/Selection.vue";
 import IntervalDropdown from "../components/IntervalDropdown.vue";
@@ -81,7 +79,6 @@ export default {
     name: "Project",
     components: {
         DatabaseDropdown,
-        TableDropdown,
         ColumnDropdown,
         Selection,
         IntervalDropdown,
