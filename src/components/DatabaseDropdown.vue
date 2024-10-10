@@ -46,12 +46,15 @@ export default {
             const tree = [];
             const lookup = {};
 
+            const isWindows = navigator.platform.indexOf('Win') > -1;
+            const separator = isWindows ? '\\' : '/';
+
             list.forEach(item => {
-                const parts = item.name.split('\\');
+                const parts = item.name.split(separator);
                 let currentLevel = tree;
 
                 parts.forEach((part, index) => {
-                    const path = parts.slice(0, index + 1).join('\\');
+                    const path = parts.slice(0, index + 1).join(separator);
                     let existingNode = lookup[path]; // Check if the path already exists
 
                     if (!existingNode) {
