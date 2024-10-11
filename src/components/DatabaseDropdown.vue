@@ -98,7 +98,7 @@ export default {
             }
         },
         findNode(node, id) {
-            if (id.includes(node.name) && node.type === 'file') {
+            if (id.includes(node.name) && node.type === 'database') {
                 return node;
             } else if (node.children) {
                 let result = null;
@@ -110,7 +110,7 @@ export default {
             return null;
         },
         onSelect(node) {
-            if (node.type === 'file') {
+            if (node.type === 'database') {
                 // Handle folder selection
                 this.selectedDb = node.path;
                 this.updateSelectedDb(this.selectedDb);

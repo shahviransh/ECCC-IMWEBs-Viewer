@@ -1,10 +1,16 @@
 <template>
     <div class="folder-tree">
-        <ul>
-            <li v-for="node in treeData" :key="node.id">
-                <div :class="['node', { 'folder-node': node.type === 'folder', 'file-node': node.type === 'file' }]"
+        <ul class="list-group">
+            <li v-for="(node, index) in treeData" :key="node.id">
+                <div :class="['node', { 
+                        'folder-node': node.type === 'folder', 
+                        'file-node': node.type === 'file' || node.type === 'database', 
+                        'top-level-node': index === 0,
+                        'expanded': node.expanded }]"
+
                     @click="toggleNode(node)">
                     <span v-if="node.type === 'folder'">{{ node.expanded ? '📂' : '📁' }}</span>
+                    <span v-else-if="node.type === 'database'">🗄️</span>
                     <span v-else>📄</span>
                     {{ node.name }}
                 </div>
@@ -21,13 +27,13 @@ export default {
     name: 'FolderTree',
     props: {
         treeData: {
-            type: Array,
+            type: Object,
             required: true
         }
     },
     methods: {
         toggleNode(node) {
-            if (node.type === 'folder' || node.type === 'file') {
+            if (node.type === 'folder' || node.type === 'database') {
                 // Toggle the expanded state directly
                 node.expanded = !node.expanded;
             }
@@ -42,19 +48,31 @@ export default {
 };
 </script>
 
+
 <style scoped>
 .folder-tree {
     list-style-type: none;
-    padding-left: 20px;
+    padding-left: 10px;
+}
+
+.list-group {
+    padding-left: 5px;
 }
 
 .node {
+    display: flex;
+    align-items: center;
     cursor: pointer;
     margin: 5px 0;
-    padding: 2px 8px;
+    padding: 2px 0px;
     border-radius: 4px;
     user-select: none;
-    /* Prevent text selection */
+}
+
+/* Adjust padding for first-level nodes */
+.top-level-node .node {
+    padding-left: 0;
+    padding-left: 0px;
 }
 
 .folder-node:hover,
@@ -62,15 +80,21 @@ export default {
     background-color: #f0f0f0;
 }
 
+/* Use data attribute for expanded state */
 .folder-node::before {
-    content: '▶ ';
+    content: '▶';
     display: inline-block;
     width: 1em;
-    transform: rotate(0);
+    margin-right: 5px;
     transition: transform 0.2s ease-in-out;
 }
 
-.folder-node[expanded="true"]::before {
+.folder-node.expanded::before { /* Apply rotation when the node is expanded */
     transform: rotate(90deg);
+}
+
+/* Proper alignment of the icons and text */
+.node span:first-child {
+    margin-right: 5px;
 }
 </style>
