@@ -7,7 +7,8 @@
 
         <div class="export-field">
             <label for="export-name" class="export-label">Export Filename:</label>
-            <input type="text" id="export-name" v-model="expFilename" class="export-input" @change="onExportFileChange" />
+            <input type="text" id="export-name" v-model="expFilename" class="export-input"
+                @change="onExportFileChange" />
         </div>
 
         <div class="export-field">
@@ -17,27 +18,32 @@
                 <option value="text">Text</option>
             </select>
         </div>
+    </div>
 
-        <div class="export-field">
-            <label for="export-stats">Export Table and/or Stats</label>
-            <select id="export-stats" v-model="selectedOptions" multiple class="export-select" @change="onOptionsChange">
-                <option value="table">Table</option>
-                <option v-if="!selectedStatistics.includes('None') != !selectedMethod.includes('Equal')" value="stats">Stats</option>
-            </select>
-        </div>
+    <div class="export-field">
+        <label for="export-stats">Export Table and/or Stats</label>
+        <Multiselect v-model="selectedOptions" :options="filteredExportOptions" :multiple="true"
+            :close-on-select="false" :clear-on-select="false" :preserve-search="true"
+            placeholder="Select Export Options" @update:modelValue="onOptionsChange">
+        </Multiselect>
     </div>
 </template>
 
 <script>
 import { mapState, mapActions } from 'vuex'; // Import Vuex helpers
+import Multiselect from 'vue-multiselect';
 
 export default {
     data() {
         return {
             selectedOptions: [],
-            exportOptions: { data: false, stats: false },
+            exportOptions: [
+                "Table",
+                "Stats"
+            ]
         };
     },
+    components: { Multiselect },
     computed: {
         expPath: {
             get() {
@@ -63,35 +69,45 @@ export default {
                 this.updateExportFormat(value);
             },
         },
+        filteredExportOptions() {
+            // Conditionally include "Stats" based on your original condition
+            return this.selectedStatistics.includes('None') === this.selectedMethod.includes('Equal')
+                ? ['Table']
+                : ['Table', 'Stats'];
+        },
         ...mapState(['selectedStatistics', 'selectedMethod', 'exportPath', 'exportFilename', 'exportFormat']),
-    },
-    mounted() {
-        this.onOptionsChange();
     },
     methods: {
         ...mapActions(["updateExportPath", "updateExportFilename", "updateExportFormat", "updateExportOptions"]),
-        onOptionsChange() {
-            this.exportOptions = {
-                data: this.selectedOptions.includes("table"),
-                stats: this.selectedOptions.includes("stats"),
-            };
-            this.updateExportOptions(this.exportOptions);
+        onOptionsChange(value) {
+            this.selectedOptions = value;
+            this.updateExportOptions({
+                table: this.selectedOptions.includes('Table'),
+                stats: this.selectedOptions.includes('Stats')
+            });
         },
     },
 };
 </script>
-
+<style src="vue-multiselect/dist/vue-multiselect.css"></style>
 <style scoped>
+.multiselect__content-wrapper {
+    z-index: 1000;
+    /* or a higher value */
+}
+
 .export-container {
     display: flex;
     flex-direction: column;
     gap: 15px;
     margin-top: 20px;
+    overflow: auto;
 }
 
 .export-field {
     display: flex;
     flex-direction: column;
+    cursor: pointer;
 }
 
 .export-label {

@@ -1,22 +1,25 @@
 <template>
-    <div class="interval-container">
-        <label for="interval-select" class="interval-label">Select Interval:</label>
-        <select id="interval-select" v-model="selectedInterval" @change="onIntervalChange" class="interval-dropdown">
-            <option value="daily">Daily</option>
-            <option value="monthly">Monthly</option>
-            <option value="yearly">Yearly</option>
-            <option value="seasonally">Seasonally</option>
-        </select>
-    </div>
+    <div class="interval-export-container">
+        <div class="interval-container">
+            <label for="interval-select" class="interval-label">Select Interval:</label>
+            <select id="interval-select" v-model="selectedInterval" @change="onIntervalChange"
+                class="interval-dropdown">
+                <option value="daily">Daily</option>
+                <option value="monthly">Monthly</option>
+                <option value="yearly">Yearly</option>
+                <option value="seasonally">Seasonally</option>
+            </select>
+        </div>
 
-    <div class="interval-container">
-        <label for="interval-select" class="interval-label">Export Select Interval:</label>
-        <select id="interval-select" v-model="exportInterval" @change="onExportChange" class="interval-dropdown">
-            <option value="daily">Daily</option>
-            <option value="monthly">Monthly</option>
-            <option value="yearly">Yearly</option>
-            <option value="seasonally">Seasonally</option>
-        </select>
+        <div class="interval-container">
+            <label for="interval-select" class="interval-label">Export Select Interval:</label>
+            <select id="interval-select" v-model="exportInterval" @change="onExportChange" class="interval-dropdown">
+                <option value="daily">Daily</option>
+                <option value="monthly">Monthly</option>
+                <option value="yearly">Yearly</option>
+                <option value="seasonally">Seasonally</option>
+            </select>
+        </div>
     </div>
 </template>
 
@@ -44,17 +47,32 @@ export default {
 </script>
 
 <style scoped>
+.interval-export-container {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    margin: 0px auto;
+    justify-content: center;
+}
+
 .interval-container {
     display: flex;
     flex-direction: column;
-    margin: 10px 0;
+    flex: 1; /* Allow containers to grow/shrink equally */
+    min-width: 100px; /* Ensure a minimum width */
+    gap: 5px;
+    max-width: 200px;
+    margin: 0px 0px;
+    padding: 5px;
+    background-color: #f9f9f9;
+    border-radius: 4px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
 .interval-label {
     font-weight: 600;
     margin-bottom: 5px;
     font-size: 14px;
-    color: #333;
 }
 
 .interval-dropdown {

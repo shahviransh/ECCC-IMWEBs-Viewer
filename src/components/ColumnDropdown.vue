@@ -74,6 +74,7 @@ export default {
     background-color: #f9f9f9;
     border-radius: 8px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    height: 38%; /* Set the total height of the container */
 }
 
 .form-group {
@@ -85,6 +86,7 @@ export default {
 label {
     font-weight: 600;
     margin-bottom: 5px;
+    font-size: 14px;
 }
 
 .dropdown {
@@ -108,11 +110,13 @@ input.input-field {
 .dropdown[multiple] {
     height: auto;
     padding: 5px;
+    min-height: 200px; /* You can adjust the minimum height */
+    overflow-y: auto; /* Allows scrolling */
 }
 
 input[type="date"],
 input[type="text"] {
-    height: 40px;
+    height: 25px;
     box-sizing: border-box;
 }
 

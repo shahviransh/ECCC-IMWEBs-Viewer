@@ -2,6 +2,7 @@ import { createApp } from 'vue';
 import App from './App.vue';
 import store from './store'; // Import the Vuex store
 import router from './router'; // Import the Vue Router
+import './assets/tailwind.css'
 
 createApp(App)
   .use(store) // Register Vuex store

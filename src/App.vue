@@ -25,11 +25,12 @@
     </nav>
 
     <!-- Main Content -->
-    <router-view></router-view>
+    <router-view />
   </div>
 </template>
 
 <script>
+import { mapState, mapActions } from "vuex";
 
 export default {
   name: "App",
@@ -47,10 +48,13 @@ export default {
       ],
       folderPath: "",
       activePage: "Project", // Set default page here
-      theme: "light", // Default theme
     };
   },
+  computed:{
+    ...mapState(["theme"]),
+  },
   methods: {
+    ...mapActions(["updateTheme"]),
     selectFolder() {
       // Placeholder for selecting a folder, could be integrated with backend logic
       this.folderPath = "Jenette_Creek_Watershed";
@@ -60,15 +64,14 @@ export default {
       this.$router.push({ name: page });
     },
     toggleTheme() {
-      this.theme = this.theme === "light" ? "dark" : "light";
-      document.body.className = this.theme; // Update body class for global styling
-      this.$emit("themeChanged", this.theme); // Emit event to notify child components
+      const theme = this.theme === "light" ? "dark" : "light";
+      document.body.className = theme; // Update body class for global styling
+      this.updateTheme(theme);
     },
   },
   mounted() {
     // Set initial theme on load
     document.body.className = this.theme;
-    this.$emit("themeChanged", this.theme); // Emit event to notify child components
   },
 };
 </script>
@@ -80,7 +83,6 @@ export default {
   margin: -8px;
   padding: 0px;
   text-align: center;
-  overflow: hidden;
 }
 
 /* Apply theme variables */

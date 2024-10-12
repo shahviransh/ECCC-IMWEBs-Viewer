@@ -32,6 +32,10 @@ export default {
 </script>
 
 <style scoped>
+.multiselect__content-wrapper {
+    z-index: 1000; /* or a higher value */
+}
+
 .statistics-container {
     display: flex;
     flex-direction: column;

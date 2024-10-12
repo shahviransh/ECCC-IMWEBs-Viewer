@@ -1,64 +1,68 @@
 <template>
     <!-- Main Content -->
-    <div class="content">
-        <div class="left-panel">
-            <!-- Component 1: Folder Navigation -->
-            <div class="folder-navigation">
-                <DatabaseDropdown />
-            </div>
-            <!-- Component 2: Column Navigation -->
-            <div class="column-navigation">
-                <ColumnDropdown :selectedTable="selectedTable" />
-            </div>
+    <div :class="[theme, 'content']">
+
+        <!-- Component 1: Folder Navigation -->
+        <div class="folder-navigation">
+            <DatabaseDropdown />
         </div>
 
-        <!-- Component 3: Selection, Interval, Aggregation, and Export Config -->
-        <div class="settings-panel">
-            <Selection />
-            <IntervalDropdown />
-            <StatisticsDropdown />
-            <AggregationMethod />
-            <ExportConfig />
-            <button class="fetch-button" @click="fetchData">Fetch Data</button>
-            <button class="export-button" @click="exportData">Export Data</button>
-            <h4 v-if="exportFilename">Saved {{ exportFilename }} to {{ exportPath }} as a {{ exportFormat }}</h4>
+        <!-- Component 2: Column Navigation -->
+        <div class="column-navigation">
+            <ColumnDropdown :selectedTable="selectedTable" />
         </div>
+        <div class="right-panel">
+            <!-- Component 3: Selection, Interval, Aggregation, and Export Config -->
+            <div class="settings-panel">
+                <Selection />
+                <IntervalDropdown />
+                <span>
+                    <StatisticsDropdown />
+                    <AggregationMethod />
+                </span>
+                <ExportConfig />
+                <span>
+                    <button @click="fetchData">Fetch Data</button>
+                    <button @click="exportData">Export Data</button>
+                </span>
+            </div>
 
-        <!-- Component 4: Main View (Table and Stats Display) -->
-        <div class="main-view">
-            <!-- Table Container with Scrollable Body -->
-            <div class="table-container">
-                <table class="styled-table">
-                    <thead>
-                        <tr>
-                            <th v-for="column in selectedColumns" :key="column">{{ column }}</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr v-for="(row, index) in visibleData" :key="index">
-                            <td v-for="column in selectedColumns" :key="column">{{ row[column] }}</td>
-                        </tr>
-                    </tbody>
-                </table>
-                <!-- Load More Button -->
-                <div v-if="canLoadMore" class="load-more-container">
-                    <button class="load-more-button" @click="loadMoreRows">Load More</button>
+            <!-- Component 4: Main View (Table and Stats Display) -->
+            <div class="main-view">
+                <!-- Table Container with Scrollable Body -->
+                <div class="table-container">
+                    <table class="styled-table">
+                        <thead>
+                            <tr>
+                                <th v-for="column in selectedColumns" :key="column">{{ column }}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr v-for="(row, index) in visibleData" :key="index">
+                                <td v-for="column in selectedColumns" :key="column">{{ row[column] }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <!-- Load More Button -->
+                    <div v-if="canLoadMore" class="load-more-container">
+                        <button class="load-more-button" @click="loadMoreRows">Load More</button>
+                    </div>
                 </div>
-            </div>
-            <!-- Stats Container with Scrollable Body -->
-            <div class="stats-container">
-                <table class="styled-table">
-                    <thead>
-                        <tr>
-                            <th v-for="column in statsColumns" :key="column">{{ column }}</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr v-for="(row, index) in stats" :key="index">
-                            <td v-for="column in statsColumns" :key="column">{{ row[column] }}</td>
-                        </tr>
-                    </tbody>
-                </table>
+                <!-- Stats Container with Scrollable Body -->
+                <div class="stats-container">
+                    <table class="styled-table">
+                        <thead>
+                            <tr>
+                                <th v-for="column in statsColumns" :key="column">{{ column }}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr v-for="(row, index) in stats" :key="index">
+                                <td v-for="column in statsColumns" :key="column">{{ row[column] }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
@@ -97,7 +101,7 @@ export default {
         };
     },
     computed: {
-        ...mapState(["selectedDb", "selectedTable", "selectedColumns", "selectedIds", "dateRange", "selectedInterval", "selectedStatistics", "selectedMethod", "exportColumns", "exportIds", "exportDate", "exportInterval", "dateType", "exportDateType", "exportPath", "exportFilename", "exportFormat", "exportOptions"]),
+        ...mapState(["selectedDb", "selectedTable", "selectedColumns", "selectedIds", "dateRange", "selectedInterval", "selectedStatistics", "selectedMethod", "exportColumns", "exportIds", "exportDate", "exportInterval", "dateType", "exportDateType", "exportPath", "exportFilename", "exportFormat", "exportOptions", "theme"]),
     },
     methods: {
         ...mapActions(["updateSelectedColumns"]),
@@ -137,7 +141,7 @@ export default {
                 });
                 if (this.selectedInterval === 'seasonally' && !this.selectedMethod.includes('Equal') && !this.selectedColumns.includes('Season')) {
                     this.updateSelectedColumns(this.selectedColumns.concat(['Season']));
-                } else{
+                } else {
                     this.updateSelectedColumns(this.selectedColumns.filter((column) => column !== 'Season'));
                 }
                 this.data = response.data.data;
@@ -170,7 +174,7 @@ export default {
                 });
                 if (this.selectedInterval === 'seasonally' && !this.selectedMethod.includes('Equal') && !this.selectedColumns.includes('Season')) {
                     this.updateSelectedColumns(this.selectedColumns.concat(['Season']));
-                } else{
+                } else {
                     this.updateSelectedColumns(this.selectedColumns.filter((column) => column !== 'Season'));
                 }
             } catch (error) {
@@ -182,70 +186,124 @@ export default {
 </script>
 
 <style scoped>
+/* Theme variables */
+.light {
+    --background-color: #ffffff;
+    --text-color: #000000;
+    --border-color: #ddd;
+    --secondary-bg-color: #f3f3f3;
+    --hover-bg-color: #f1f1f1;
+    --table-header-bg: #9e3203;
+    --table-header-text: #ffffff;
+    --button-bg: linear-gradient(to bottom right, #8B5CF6, #3B82F6); /* from-purple-600 to-blue-500 */
+    --button-text: #1F2937;
+    --border-color: #ddd;
+    --hover-bg-color: #f1f1f1;
+    --top-bar-bg: #b85b14;
+    --top-bar-text: #fff;
+    --taskbar-bg: #35495e;
+    --taskbar-text: #fff;
+    --active-bg: #009879;
+}
+
+.dark {
+    --background-color: #121212;
+    --text-color: #e0e0e0;
+    --border-color: #444;
+    --secondary-bg-color: #333;
+    --hover-bg-color: #555;
+    --table-header-bg: #444;
+    --table-header-text: #e0e0e0;
+    --button-bg: #333;
+    --button-text: #e0e0e0;
+    --border-color: #444;
+    --hover-bg-color: #555;
+    --top-bar-bg: #1e1e1e;
+    --top-bar-text: #e0e0e0;
+    --taskbar-bg: #2d2d2d;
+    --taskbar-text: #cfcfcf;
+    --active-bg: #5a5a5a;
+}
+
 body,
 html {
     margin: 0;
     padding: 0;
     height: 100%;
-    overflow: hidden;
     /* Ensure no scroll at the global level */
+    background-color: var(--background-color);
+    color: var(--text-color);
+    overflow: hidden;
 }
 
 .content {
     display: flex;
     flex-direction: row;
-    height: calc(100vh - 130px);
+    height: calc(100vh - 115px);
     /* Adjust to the viewport, minus top bar and taskbar */
-}
-
-.left-panel {
-    display: flex;
-    flex-direction: column;
-    width: 25%;
-    /* Takes 1/4 of the horizontal space */
-    height: 100%;
-    /* Ensure full height */
     overflow: hidden;
 }
 
+.folder-navigation,
+.column-navigation,
+.settings-panel,
+.main-view,
+.table-container,
+.stats-container {
+    background-color: var(--background-color);
+    border: 1px solid var(--border-color);
+    color: var(--text-color);
+}
+
 .folder-navigation {
+    display: flex;
+    flex-direction: column;
+    width: 20%;
+    /* Takes 1/4 of the horizontal space */
+    height: calc(100% - 20px);
     margin: 0;
-    border: 1px solid #ddd;
     padding: 10px;
-    height: 35%;
     /* Takes 1/4 of the vertical space */
-    overflow-y: auto;
+    overflow: auto;
 }
 
 .column-navigation {
     margin: 0;
-    border: 1px solid #ddd;
     padding: 0px;
-    height: 85%;
-    /* Takes the remaining vertical space */
-    overflow-y: auto;
+    width: 15%;
+    height: 100%;
+    flex-direction: column;
+}
+
+/* Right Panel: Settings Panel and Main View */
+.right-panel {
+    display: flex;
+    flex-direction: column;
+    width: 80%;
+    height: 100%;
 }
 
 .settings-panel {
-    width: 50%;
+    width: 99%;
     /* Takes 2/4 of the horizontal space */
-    height: 100%;
+    height: 30%;
     /* Ensure full height */
-    margin: 10px;
-    border: 1px solid #ddd;
-    padding: 10px;
-    overflow-y: auto;
+    margin: 0px;
+    padding: 5px;
+    display: flex;
+    flex-direction: row;
+    justify-content: left;
+    gap: 5px;
 }
 
 .main-view {
-    width: 50%;
+    width: 99%;
     /* Takes 2/4 of the horizontal space */
-    height: 100%;
+    height: 75%;
     /* Ensure full height */
     margin: 0px;
-    border: 1px solid #ddd;
-    padding: 10px;
-    overflow-y: auto;
+    padding: 5px;
+    overflow: auto;
 }
 
 .table-container,
@@ -267,41 +325,42 @@ html {
     position: sticky;
     top: 0;
     z-index: 2;
-    background-color: #9e3203;
-    color: #ffffff;
+    background-color: var(--table-header-bg);
+    color: var(--table-header-text);
 }
 
 .styled-table th,
 .styled-table td {
     padding: 12px 15px;
-    border: 1px solid #dddddd;
+    border: 1px solid var(--border-color);
 }
 
 .styled-table tbody tr:nth-of-type(even) {
-    background-color: #f3f3f3;
+    background-color: var(--secondary-bg-color);
 }
 
 .styled-table tbody tr:hover {
-    background-color: #f1f1f1;
+    background-color: var(--hover-bg-color);
 }
 
-.fetch-button,
-.export-button {
-    background-color: #009879;
-    color: white;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    margin-top: 20px;
+button {
+    background-color: var(--button-bg);
+    color: var(--button-text);
+    padding: 0.5rem;
+    margin-bottom: 0.5rem;
+    margin-inline-end: 0.5rem;
+    border-radius: 0.5rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-.load-more-button {
-    background-color: #009879;
-    color: white;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
+button:hover {
+    background-color: var(--hover-bg-color);
+}
+
+button:focus {
+    outline: none;
+    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.5); /* Optional, adjust for better contrast */
 }
 </style>

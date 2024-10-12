@@ -24,34 +24,45 @@ def fetch_data_from_db(
 ):
     """Fetch data from SQLite database with optional ID filtering."""
     conn = sqlite3.connect(os.path.join(PATHFILE, db_path))
-    query = f"SELECT * FROM {table_name}"
+    cursor = conn.cursor()
+
+    # Use parameterized queries to avoid SQL injection
+    query = f"SELECT * FROM {table_name}"  # Table name is not parameterized
+    params = []
 
     # If a specific ID is provided, filter by that ID
     if selected_id != [""]:
-        # For multiple ids
-        query += f" WHERE ID IN ({','.join(selected_id)})"
+        # Use placeholders for each ID
+        placeholders = ",".join(["?"] * len(selected_id))
+        query += f" WHERE ID IN ({placeholders})"
+        params.extend(selected_id)
 
     # If columns are specified, fetch only those columns
     if columns != "All":
-        query = query.replace("*", columns)
+        column_names = ",".join(columns.split(","))
+        query = query.replace("*", column_names)
 
     # If start and end dates are provided, filter by date range
     if start_date and end_date and date_type == "Month":
         if "WHERE" in query:
-            query += f" AND {date_type} >= {start_date} AND {date_type} <= {end_date}"
+            query += f" AND {date_type} >= ? AND {date_type} <= ?"
         else:
-            query += f" WHERE {date_type} >= {start_date} AND {date_type} <= {end_date}"
+            query += f" WHERE {date_type} >= ? AND {date_type} <= ?"
+        params.extend([start_date, end_date])
     elif start_date and end_date and date_type in ["Time", "Date"]:
         if "WHERE" in query:
-            query += f" AND {date_type} >= '{start_date}' AND {date_type} <= '{end_date}'"
+            query += f" AND {date_type} >= ? AND {date_type} <= ?"
         else:
-            query += f" WHERE {date_type} >= '{start_date}' AND {date_type} <= '{end_date}'"
+            query += f" WHERE {date_type} >= ? AND {date_type} <= ?"
+        params.extend([start_date, end_date])
 
-    df = pd.read_sql_query(query, conn)
+    # Execute the parameterized query
+    df = pd.read_sql_query(query, conn, params=params)
     df = df.map(round_numeric_values)
 
     conn.close()
     return df
+
 
 def get_columns_and_time_range(db_path, table_name):
     """Fetch column names and time range from a SQLite database table."""
@@ -197,6 +208,12 @@ def list_files():
     base_folder = folder_path
     base_path = sys._MEIPASS if getattr(sys, 'frozen', False) else os.path.dirname(__file__)
     folder_path = os.path.join(base_path, folder_path)  # Absolute path Get absolute path relative to app.py
+    allowed_base_path = os.path.abspath(os.path.join(base_path, base_folder))  # Absolute base folder path
+
+    # Validate that the requested path is within the allowed base directory
+    if not folder_path.startswith(allowed_base_path):
+        return abort(400, "Invalid folder path")
+
     try:
         files_and_folders = []
         root = os.path.abspath(base_folder)  # Absolute path to the base folder
@@ -218,16 +235,15 @@ def list_files():
                 )
             # Append files
             for name in files:
-                if name.endswith(".db3"):
-                    file_rel_path = os.path.join(rel_dir, name)
-                    # Ensure the relative path starts with the base folder name
-                    file_rel_path = file_rel_path[file_rel_path.find(base_folder):]
-                    files_and_folders.append(
-                        {
-                            "type": "file",
-                            "name": file_rel_path,
-                        }
-                    )
+                file_rel_path = os.path.join(rel_dir, name)
+                # Ensure the relative path starts with the base folder name
+                file_rel_path = file_rel_path[file_rel_path.find(base_folder):]
+                files_and_folders.append(
+                    {
+                        "type": "database" if file_rel_path.endswith(".db3") else "file",
+                        "name": file_rel_path,
+                    }
+                )
 
         return jsonify(files_and_folders)
     except Exception as e:

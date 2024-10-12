@@ -43,7 +43,7 @@ const nsisSource = path.join(
 );
 
 // Destination path
-const destination = path.join(__dirname, "target");
+const destination = path.join(__dirname, "target", "release");
 
 // Move files function
 function moveFiles(sourcePath, destPath) {

@@ -11,6 +11,7 @@ const store = createStore({
       start: null,
       end: null,
     },
+    theme: "light",
     databases: [],
     tables: [],
     columns: [],
@@ -51,6 +52,9 @@ const store = createStore({
       state.dateType = dateType;
       state.exportDate = exportDate;
       state.exportDateType = exportDateType;
+    },
+    SET_THEME(state, theme) {
+      state.theme = theme;
     },
     SET_SELECTED_DB(state, db) {
       state.selectedDb = db;
@@ -173,6 +177,9 @@ const store = createStore({
     // Add similar actions for other components
     updateSelectedDb({ commit }, db) {
       commit("SET_SELECTED_DB", db);
+    },
+    updateTheme({ commit }, theme) {
+      commit("SET_THEME", theme);
     },
     updateSelectedTable({ commit }, table) {
       commit("SET_SELECTED_TABLE", table);
