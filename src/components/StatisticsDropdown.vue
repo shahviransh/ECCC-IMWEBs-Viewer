@@ -2,8 +2,7 @@
     <div class="statistics-container">
         <label for="statistics-select" class="statistics-label">Select Statistics:</label>
         <Multiselect v-model="selectedStatistics" :options="option" :multiple="true" :close-on-select="false"
-            :clear-on-select="false" :preserve-search="true"
-            @update:modelValue="onStatisticsChange">
+            :clear-on-select="false" :preserve-search="true" @update:modelValue="onStatisticsChange">
         </Multiselect>
     </div>
 </template>
@@ -19,7 +18,7 @@ export default {
             option: ["None", "Average", "Sum", "Maximum", "Minimum", "Standard Deviation"],
         };
     },
-    components:{
+    components: {
         Multiselect,
     },
     methods: {
@@ -30,58 +29,31 @@ export default {
     },
 };
 </script>
-
+<style src="vue-multiselect/dist/vue-multiselect.css"></style>
 <style scoped>
 .multiselect__content-wrapper {
-    z-index: 1000; /* or a higher value */
+    z-index: 1000;
+    /* or a higher value */
+}
+
+/* Reduce width of the dropdown */
+.multiselect {
+    /* Set the desired width */
+    font-size: 14px;
+    overflow-y: auto;
+    max-height: 65px;
 }
 
 .statistics-container {
     display: flex;
     flex-direction: column;
-    margin: 10px 0;
+    margin: 5px 0;
 }
 
 .statistics-label {
     font-weight: 600;
-    margin-bottom: 5px;
+    margin-bottom: 0px;
     font-size: 14px;
     color: #333;
-}
-
-.statistics-dropdown {
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    background-color: #fff;
-    font-size: 14px;
-    color: #333;
-    cursor: pointer;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    transition: border-color 0.2s ease-in-out;
-    height: auto;
-}
-
-.statistics-dropdown:focus {
-    border-color: #555;
-    outline: none;
-}
-
-.statistics-dropdown:hover {
-    border-color: #888;
-}
-
-.statistics-dropdown option {
-    padding: 10px;
-}
-
-.statistics-dropdown[multiple] {
-    height: auto;
-    min-height: 150px;
-    /* Adjusts height for better multiple selection view */
-}
-
-.statistics-dropdown option:hover {
-    background-color: #f1f1f1;
 }
 </style>

@@ -22,6 +22,13 @@
                 </span>
                 <ExportConfig />
                 <span>
+                    <div class="export-field">
+                        <label for="export-stats">Export Table and/or Stats</label>
+                        <Multiselect v-model="selectedOptions" :options="filteredExportOptions" :multiple="true"
+                            :close-on-select="false" :clear-on-select="false" :preserve-search="true"
+                            placeholder="Select" @update:modelValue="onOptionsChange">
+                        </Multiselect>
+                    </div>
                     <button @click="fetchData">Fetch Data</button>
                     <button @click="exportData">Export Data</button>
                 </span>
@@ -78,6 +85,7 @@ import AggregationMethod from "../components/AggregationMethod.vue";
 import StatisticsDropdown from "../components/StatisticsDropdown.vue";
 import ExportConfig from "../components/ExportConfig.vue";
 import axios from 'axios';
+import Multiselect from "vue-multiselect";
 
 export default {
     name: "Project",
@@ -89,6 +97,7 @@ export default {
         AggregationMethod,
         StatisticsDropdown,
         ExportConfig,
+        Multiselect,
     },
     data() {
         return {
@@ -98,13 +107,24 @@ export default {
             rowLimit: 100,
             canLoadMore: true,
             data: [],
+            selectedOptions: [],
+            exportOptions: [
+                "Table",
+                "Stats"
+            ]
         };
     },
     computed: {
+        filteredExportOptions() {
+            // Conditionally include "Stats" based on your original condition
+            return this.selectedStatistics.includes('None') === this.selectedMethod.includes('Equal')
+                ? ['Table']
+                : ['Table', 'Stats'];
+        },
         ...mapState(["selectedDb", "selectedTable", "selectedColumns", "selectedIds", "dateRange", "selectedInterval", "selectedStatistics", "selectedMethod", "exportColumns", "exportIds", "exportDate", "exportInterval", "dateType", "exportDateType", "exportPath", "exportFilename", "exportFormat", "exportOptions", "theme"]),
     },
     methods: {
-        ...mapActions(["updateSelectedColumns"]),
+        ...mapActions(["updateSelectedColumns", "updateExportOptions"]),
         selectFolder() {
             // Placeholder for selecting a folder, could be integrated with backend logic
             this.folderPath = "Jenette_Creek_Watershed";
@@ -122,6 +142,13 @@ export default {
             if (this.visibleData.length >= this.data.length) {
                 this.canLoadMore = false; // Hide the load more button
             }
+        },
+        onOptionsChange(value) {
+            this.selectedOptions = value;
+            this.updateExportOptions({
+                table: this.selectedOptions.includes('Table'),
+                stats: this.selectedOptions.includes('Stats')
+            });
         },
         async fetchData() {
             try {
@@ -184,7 +211,7 @@ export default {
     },
 };
 </script>
-
+<style src="vue-multiselect/dist/vue-multiselect.css"></style>
 <style scoped>
 /* Theme variables */
 .light {
@@ -195,7 +222,8 @@ export default {
     --hover-bg-color: #f1f1f1;
     --table-header-bg: #9e3203;
     --table-header-text: #ffffff;
-    --button-bg: linear-gradient(to bottom right, #8B5CF6, #3B82F6); /* from-purple-600 to-blue-500 */
+    --button-bg: linear-gradient(to bottom right, #8B5CF6, #3B82F6);
+    /* from-purple-600 to-blue-500 */
     --button-text: #1F2937;
     --border-color: #ddd;
     --hover-bg-color: #f1f1f1;
@@ -242,6 +270,21 @@ html {
     height: calc(100vh - 115px);
     /* Adjust to the viewport, minus top bar and taskbar */
     overflow: hidden;
+}
+
+.multiselect__content-wrapper {
+    z-index: 1000;
+    /* or a higher value */
+}
+
+.multiselect {
+    min-height: 10px;
+}
+
+.export-field {
+    display: flex;
+    flex-direction: column;
+    cursor: pointer;
 }
 
 .folder-navigation,
@@ -346,9 +389,9 @@ html {
 button {
     background-color: var(--button-bg);
     color: var(--button-text);
-    padding: 0.5rem;
+    padding: 0.2rem;
     margin-bottom: 0.5rem;
-    margin-inline-end: 0.5rem;
+    margin-inline-end: 0.2rem;
     border-radius: 0.5rem;
     font-size: 0.875rem;
     font-weight: 500;
@@ -361,6 +404,7 @@ button:hover {
 
 button:focus {
     outline: none;
-    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.5); /* Optional, adjust for better contrast */
+    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.5);
+    /* Optional, adjust for better contrast */
 }
 </style>
