@@ -37,10 +37,6 @@ export default {
     },
     methods: {
         ...mapActions(['fetchDatabases', 'updateSelectedDb', 'fetchTables', 'updateSelectedTable']),
-        onDatabaseChange() {
-            this.updateSelectedDb(this.selectedDb);
-            this.fetchTables(this.selectedDb);
-        },
         listToTree(list) {
             let idCounter = 1;
             const tree = [];

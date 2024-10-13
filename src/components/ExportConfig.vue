@@ -54,7 +54,7 @@ export default {
                 this.updateExportFormat(value);
             },
         },
-        ...mapState(['selectedStatistics', 'selectedMethod', 'exportPath', 'exportFilename', 'exportFormat']),
+        ...mapState(['exportPath', 'exportFilename', 'exportFormat']),
     },
     methods: {
         ...mapActions(["updateExportPath", "updateExportFilename", "updateExportFormat"]),

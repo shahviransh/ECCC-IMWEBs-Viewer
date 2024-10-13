@@ -108,10 +108,6 @@ export default {
             canLoadMore: true,
             data: [],
             selectedOptions: [],
-            exportOptions: [
-                "Table",
-                "Stats"
-            ]
         };
     },
     computed: {
