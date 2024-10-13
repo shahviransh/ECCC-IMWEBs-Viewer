@@ -1,8 +1,8 @@
 {
   "$schema": "../node_modules/@tauri-apps/cli/config.schema.json",
-  "productName": "eccc-imwebs-viewer-backend",
+  "productName": "Imwebs-Viewer",
   "version": "0.1.0",
-  "identifier": "ca.eccc.imwebs-viewer-backend",
+  "identifier": "ca.eccc.imwebs-viewer",
   "build": {
     "frontendDist": "../dist",
     "devUrl": "http://localhost:1420",
@@ -12,7 +12,7 @@
   "app": {
     "windows": [
       {
-        "title": "eccc-imwebs-viewer-backend",
+        "title": "eccc-imwebs-viewer",
         "width": 800,
         "height": 600,
         "resizable": true,

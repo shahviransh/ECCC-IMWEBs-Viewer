@@ -1,9 +1,9 @@
 {
-  "name": "eccc-imwebs-viewer-backend",
+  "name": "eccc-imwebs-viewer",
   "private": true,
   "description": "A brief description of your app.",
   "author": "Viransh Shah",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "scripts": {
     "prestart": "node convert-package.js",
     "dev": "concurrently \"npm run vue-dev\" \"npm run python-dev\"",
@@ -14,7 +14,7 @@
     "electron": "npx electron . && vite",
     "electron:build": "vite build && electron-builder",
     "tauri": "node src-tauri\\main.js && tauri dev",
-    "tauri:build": "node src-tauri\\main.js && tauri build"
+    "tauri:build": "node src-tauri\\main.js && tauri build && node src-tauri\\move.js"
   },
   "dependencies": {
     "@tauri-apps/api": "^2.0.2",

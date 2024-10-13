@@ -30,9 +30,9 @@ app.on("ready", () => {
   let command;
   const backendPath = path.join(app.getAppPath(), '..', "backend");
   if (os.platform() === "win32") {
-    command = `start /B "" ${path.join(backendPath, "app.exe")}`; // Use 'start' for Windows
+    command = `start /B "" ${path.join(backendPath, "apppy-x86_64-pc-windows-msvc.exe")}`; // Use 'start' for Windows
   } else {
-    command = `./app &`; // Direct execution for Linux/macOS
+    command = `./apppy-x86_64-pc-windows-msvc &`; // Direct execution for Linux/macOS
     // Change directory to the backend folder before running the command
     process.chdir(backendPath);
   }
