@@ -221,8 +221,6 @@ export default {
     --button-bg: linear-gradient(to bottom right, #8B5CF6, #3B82F6);
     /* from-purple-600 to-blue-500 */
     --button-text: #1F2937;
-    --border-color: #ddd;
-    --hover-bg-color: #f1f1f1;
     --top-bar-bg: #b85b14;
     --top-bar-text: #fff;
     --taskbar-bg: #35495e;
@@ -240,8 +238,6 @@ export default {
     --table-header-text: #e0e0e0;
     --button-bg: #333;
     --button-text: #e0e0e0;
-    --border-color: #444;
-    --hover-bg-color: #555;
     --top-bar-bg: #1e1e1e;
     --top-bar-text: #e0e0e0;
     --taskbar-bg: #2d2d2d;
