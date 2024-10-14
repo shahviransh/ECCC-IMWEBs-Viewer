@@ -160,7 +160,7 @@ export default {
     display: flex;
     flex-direction: column;
     flex: 1;
-    min-width: 150px;
+    min-width: 8.35rem;
 }
 
 label {

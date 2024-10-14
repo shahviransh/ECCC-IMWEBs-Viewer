@@ -4,7 +4,7 @@
             <li v-for="(node, index) in treeData" :key="node.id">
                 <div :class="['node', { 
                         'folder-node': node.type === 'folder', 
-                        'file-node': node.type === 'file' || node.type === 'database', 
+                        'file-node': node.type === 'file' || node.type === 'database' || node.type === 'table', 
                         'top-level-node': index === 0,
                         'expanded': node.expanded }]"
 
@@ -67,6 +67,7 @@ export default {
     padding: 2px 0px;
     border-radius: 4px;
     user-select: none;
+    font-size: 16px;
 }
 
 /* Adjust padding for first-level nodes */
