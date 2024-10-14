@@ -120,34 +120,3 @@ export default {
     },
 };
 </script>
-
-<style scoped>
-.folder-tree {
-    list-style-type: none;
-    padding-left: 20px;
-}
-
-.node {
-    cursor: pointer;
-    margin: 5px 0;
-    padding: 2px 8px;
-    border-radius: 4px;
-}
-
-.folder-node:hover,
-.file-node:hover {
-    background-color: #f0f0f0;
-}
-
-.folder-node::before {
-    content: '▶ ';
-    display: inline-block;
-    width: 1em;
-    transform: rotate(0);
-    transition: transform 0.2s ease-in-out;
-}
-
-.folder-node[expanded="true"]::before {
-    transform: rotate(90deg);
-}
-</style>
