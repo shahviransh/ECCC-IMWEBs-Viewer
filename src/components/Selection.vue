@@ -132,17 +132,14 @@ export default {
 </script>
 <style src="vue-multiselect/dist/vue-multiselect.css"></style>
 <style scoped>
-.multiselect__content-wrapper {
-    z-index: 1000;
-    /* or a higher value */
-}
-
 .select-container {
     display: flex;
     flex-direction: row;
     gap: 5px;
     margin: 0px auto;
+    min-width: 32%;
     justify-content: left;
+    overflow-y: auto;
 }
 
 
@@ -150,9 +147,8 @@ export default {
     display: flex;
     flex-direction: column;
     flex: 1; /* Allow containers to grow/shrink equally */
-    min-width: 100px; /* Ensure a minimum width */
+    width: 100%; /* Ensure a minimum width */
     gap: 5px;
-    max-width: 200px;
     margin: 0px 0px;
     padding: 5px;
     background-color: #f9f9f9;
@@ -184,7 +180,7 @@ label {
 
 input[type="date"],
 input[type="text"] {
-    height: 25px;
+    height: 1.5rem;
     box-sizing: border-box;
 }
 

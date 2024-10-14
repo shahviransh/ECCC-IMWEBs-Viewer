@@ -99,33 +99,9 @@ label {
     height: 40px;
 }
 
-input.input-field {
-    padding: 10px;
-    font-size: 14px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    width: 100%;
-}
-
 .dropdown[multiple] {
-    height: auto;
+    height: 16rem;
     padding: 5px;
-    min-height: 250px; /* You can adjust the minimum height */
     overflow-y: auto; /* Allows scrolling */
-}
-
-input[type="date"],
-input[type="text"] {
-    height: 25px;
-    box-sizing: border-box;
-}
-
-input[type="date"]::-webkit-calendar-picker-indicator {
-    cursor: pointer;
-}
-
-input[type="text"]::placeholder {
-    color: #999;
-    font-style: italic;
 }
 </style>

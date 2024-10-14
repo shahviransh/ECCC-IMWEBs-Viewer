@@ -259,20 +259,14 @@ html {
 .content {
     display: flex;
     flex-direction: row;
-    height: calc(100vh - 115px);
+    height: calc(100vh - 16vh);
     /* Adjust to the viewport, minus top bar and taskbar */
     overflow: hidden;
-}
-
-.multiselect__content-wrapper {
-    z-index: 1000;
-    /* or a higher value */
 }
 
 .multiselect {
     /* Set the desired width */
     font-size: 14px;
-    max-height: 65px;
 }
 
 .export-field {
@@ -304,7 +298,7 @@ label {
     flex-direction: column;
     width: 20%;
     /* Takes 1/4 of the horizontal space */
-    height: calc(100% - 20px);
+    height: calc(100% - 3%);
     margin: 0;
     padding: 10px;
     /* Takes 1/4 of the vertical space */

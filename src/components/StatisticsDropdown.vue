@@ -31,17 +31,10 @@ export default {
 </script>
 <style src="vue-multiselect/dist/vue-multiselect.css"></style>
 <style scoped>
-.multiselect__content-wrapper {
-    z-index: 1000;
-    /* or a higher value */
-}
-
 /* Reduce width of the dropdown */
 .multiselect {
     /* Set the desired width */
     font-size: 14px;
-    overflow-y: auto;
-    max-height: 65px;
 }
 
 .statistics-container {
