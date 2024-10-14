@@ -23,7 +23,7 @@
                 <ExportConfig />
                 <span>
                     <div class="export-field">
-                        <label for="export-stats">Export Table and/or Stats</label>
+                        <label for="export-stats">Export Table and/or Stats:</label>
                         <Multiselect v-model="selectedOptions" :options="filteredExportOptions" :multiple="true"
                             :close-on-select="false" :clear-on-select="false" :preserve-search="true"
                             placeholder="Select" @update:modelValue="onOptionsChange">
@@ -270,13 +270,22 @@ html {
 }
 
 .multiselect {
-    min-height: 10px;
+    /* Set the desired width */
+    font-size: 14px;
+    max-height: 65px;
 }
 
 .export-field {
     display: flex;
     flex-direction: column;
     cursor: pointer;
+}
+
+label {
+    font-weight: 600;
+    font-size: 14px;
+    color: #333;
+    margin-bottom: 5px;
 }
 
 .folder-navigation,

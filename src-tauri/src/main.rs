@@ -41,7 +41,7 @@ async fn start_server() {
   .expect("Failed to start server");
 
   // Wait a few seconds for the server to start
-  sleep(Duration::from_secs(3));
+  sleep(Duration::from_secs(5));
 }
 
 fn main() {

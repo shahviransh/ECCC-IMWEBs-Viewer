@@ -67,14 +67,14 @@ export default {
 .form-container {
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: 5px;
     max-width: 500px;
-    margin: 20px auto;
-    padding: 20px;
+    margin: 0px auto;
+    padding: 10px;
     background-color: #f9f9f9;
     border-radius: 8px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    height: 38%; /* Set the total height of the container */
+    height: 46.5%; /* Set the total height of the container */
 }
 
 .form-group {
@@ -85,7 +85,7 @@ export default {
 
 label {
     font-weight: 600;
-    margin-bottom: 5px;
+    margin: 0px 0px 0px 0px;
     font-size: 14px;
 }
 
@@ -110,7 +110,7 @@ input.input-field {
 .dropdown[multiple] {
     height: auto;
     padding: 5px;
-    min-height: 200px; /* You can adjust the minimum height */
+    min-height: 250px; /* You can adjust the minimum height */
     overflow-y: auto; /* Allows scrolling */
 }
 

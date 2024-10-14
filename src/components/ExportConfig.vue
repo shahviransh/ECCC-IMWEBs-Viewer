@@ -66,9 +66,9 @@ export default {
 .export-container {
     display: flex;
     flex-direction: column;
-    gap: 15px;
-    margin-top: 20px;
-    overflow: auto;
+    gap: 10px;
+    margin: 0px auto;
+
 }
 
 label {
@@ -86,7 +86,7 @@ label {
 }
 
 .export-input {
-    padding: 10px;
+    padding: 5px;
     border: 1px solid #ccc;
     border-radius: 4px;
     font-size: 14px;
@@ -101,7 +101,7 @@ label {
 }
 
 .export-select {
-    padding: 10px;
+    padding: 5px;
     border: 1px solid #ccc;
     border-radius: 4px;
     font-size: 14px;

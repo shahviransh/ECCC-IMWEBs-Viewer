@@ -47,7 +47,10 @@ export default {
 .statistics-container {
     display: flex;
     flex-direction: column;
-    margin: 5px 0;
+    margin: 0px auto;
+    gap: 5px;
+    margin: 0px auto;
+    justify-content: center;
 }
 
 .statistics-label {
