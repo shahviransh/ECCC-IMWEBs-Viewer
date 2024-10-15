@@ -57,6 +57,7 @@ export default {
 
 .list-group {
     padding-left: 5px;
+    list-style-type: none;
 }
 
 .node {

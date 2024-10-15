@@ -120,6 +120,7 @@ export default {
 .taskbar button.active {
   background-color: var(--active-bg);
   color: white;
+  border-radius: 5px;
 }
 
 /* Theme variables */

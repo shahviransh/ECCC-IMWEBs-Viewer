@@ -76,7 +76,7 @@ export default {
 }
 
 .interval-dropdown {
-    padding: 10px;
+    padding: 5px;
     border: 1px solid #ccc;
     border-radius: 4px;
     background-color: #fff;
