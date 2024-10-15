@@ -1,6 +1,7 @@
 import sqlite3
 import csv
 import os
+import pandas as pd
 
 def get_aliases_from_lookup(lookup_db3_file, lookup_table_name):
     # Connect to the lookup database
@@ -81,9 +82,6 @@ def export_db3_to_csv_with_aliases(db3_files, lookup_aliases):
 lookup_db3_file = "backend\\Jenette_Creek_Watershed\\Database\\lookup.db3"
 lookup_table_name = "OUTPUT"
 
-# Fetch aliases from the lookup table
-lookup_aliases = get_aliases_from_lookup(lookup_db3_file, lookup_table_name)
-
 
 # List of .db3 files to process
 db3_files = [
@@ -92,4 +90,32 @@ db3_files = [
     "backend\\Jenette_Creek_Watershed\\Model01\\Output\\Scenario_2\\scenario_2.db3"
 ]
 
-export_db3_to_csv_with_aliases(db3_files, lookup_aliases)
+# Paths to your CSV files
+hydroclimate_csv = 'lookup\Hydroclimate_export.csv'
+bmp_csv = 'lookup\BMP_export.csv'
+scenario_csv = 'lookup\scenario_2_export.csv'
+
+# Load the CSV files into DataFrames
+hydroclimate_df = pd.read_csv(hydroclimate_csv)
+bmp_df = pd.read_csv(bmp_csv)
+scenario_df = pd.read_csv(scenario_csv)
+
+# Connect to your SQLite database (lookup.db3)
+conn = sqlite3.connect('backend\\Jenette_Creek_Watershed\\Database\\lookup.db3')
+cursor = conn.cursor()
+
+# Function to create a table in SQLite and insert data from DataFrame
+def create_and_insert_table(df, table_name):
+    # Create the table with column names similar to the CSV
+    df.to_sql(table_name, conn, if_exists='replace', index=False)
+    print(f"Table '{table_name}' has been created and data inserted.")
+
+# Insert data into the database
+create_and_insert_table(hydroclimate_df, 'Hydroclimate')
+create_and_insert_table(bmp_df, 'BMP')
+create_and_insert_table(scenario_df, 'scenario_2')
+
+# Commit changes and close the connection
+conn.commit()
+conn.close()
+print("Data has been successfully added to the database.")

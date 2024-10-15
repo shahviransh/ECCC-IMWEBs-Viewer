@@ -1,285 +1,285 @@
 Table Name,Table Alias,Column Name,Column Alias
-T_SNWB_Results,,Time,
-T_SNWB_Results,,ID,
-T_SNWB_Results,,P,Pcp
-T_SNWB_Results,,P_net,Net pcp
-T_SNWB_Results,,P_blow,Snow in/out
-T_SNWB_Results,,T,Temperature
-T_SNWB_Results,,Wind,Wind speed
-T_SNWB_Results,,SR,Snow redistribution
-T_SNWB_Results,,SE,Snow sublimation
-T_SNWB_Results,,SM,Snowmelt
-T_SNWB_Results,,SA,Snow accumulation
-T_GWWB_Results,,Time,
-T_GWWB_Results,,ID,
-T_GWWB_Results,,PERCO,Percolation
-T_GWWB_Results,,REVAP,GW revaporation
-T_GWWB_Results,,PERDE,Deep percolation
-T_GWWB_Results,,IRRI_GAIN,
-T_GWWB_Results,,IRRI_LOSS,
-T_GWWB_Results,,BaseFlow_mm,Baseflow
-T_GWWB_Results,,GW,GW Storage
-T_GWWB_Results,,BaseFlow_m3/s,Baseflow
-T_GWWB_Results,,Grazing_Loss,
-T_SOWB_Results,,Time,
-T_SOWB_Results,,ID,
-T_SOWB_Results,,P,Precipitation
-T_SOWB_Results,,T,Temperature
-T_SOWB_Results,,Soil_T,Soil temperature
-T_SOWB_Results,,Interception_loss,Interception
-T_SOWB_Results,,Depression_storage,Depression
-T_SOWB_Results,,Infiltration,Infiltration
-T_SOWB_Results,,Interception_ET,Interception ET
-T_SOWB_Results,,Depression_ET,Depression ET
-T_SOWB_Results,,Soil_ET,Soil ET
-T_SOWB_Results,,Revap,GW revaporation
-T_SOWB_Results,,Total_ET,Total ET
-T_SOWB_Results,,Net_Percolation,Net percolation
-T_SOWB_Results,,RS,Surface runoff
-T_SOWB_Results,,RI,Subsurface runoff
-T_SOWB_Results,,RG,GW runoff
-T_SOWB_Results,,R,Total runoff
-T_SOWB_Results,,S_WATER,Soil water content
-T_SOWB_Results,,S_MOI,Soil moisture
-T_SOWB_SUBAREA_Results,,Time,
-T_SOWB_SUBAREA_Results,,ID,
-T_SOWB_SUBAREA_Results,,P,
-T_SOWB_SUBAREA_Results,,T,
-T_SOWB_SUBAREA_Results,,Soil_T,
-T_SOWB_SUBAREA_Results,,Interception_loss,
-T_SOWB_SUBAREA_Results,,Depression_storage,
-T_SOWB_SUBAREA_Results,,Infiltration,
-T_SOWB_SUBAREA_Results,,Interception_ET,
-T_SOWB_SUBAREA_Results,,Depression_ET,
-T_SOWB_SUBAREA_Results,,Soil_ET,
-T_SOWB_SUBAREA_Results,,Revap,
-T_SOWB_SUBAREA_Results,,Total_ET,
-T_SOWB_SUBAREA_Results,,Net_Percolation,
-T_SOWB_SUBAREA_Results,,RS,
-T_SOWB_SUBAREA_Results,,RI,
-T_SOWB_SUBAREA_Results,,RG,
-T_SOWB_SUBAREA_Results,,R,
-T_SOWB_SUBAREA_Results,,S_WATER,
-T_SOWB_SUBAREA_Results,,S_MOI,
-T_TDWB_Results,,Time,
-T_TDWB_Results,,ID,
-T_TDWB_Results,,SoilMoisture,
-T_TDWB_Results,,Groundwater,
-T_TDWB_Results,,GroundwaterTable,
-T_TDWB_Results,,Vtileout,
-T_TDWB_Results,,Qtileout,
-T_TDWB_Results,,Vlag,
-T_SBOF_Results,,Time,
-T_SBOF_Results,,ID,
-T_SBOF_Results,,SBOF,Overland Q
-T_TDSB_Results,,Time,
-T_TDSB_Results,,ID,
-T_TDSB_Results,,SedTileOut,
-T_SEDI_Results,,Time,
-T_SEDI_Results,,ID,
-T_SEDI_Results,,Sediment,Sediment
-T_SEDI_SUBAREA_Results,,Time,
-T_SEDI_SUBAREA_Results,,ID,
-T_SEDI_SUBAREA_Results,,Sediment,
-T_TDNB_Results,,Time,
-T_TDNB_Results,,ID,
-T_TDNB_Results,,ORGN_TILEOUT,
-T_TDNB_Results,,NO3_TILEOUT,
-T_TDNB_Results,,ORGP_TILEOUT,
-T_TDNB_Results,,SOLP_TILEOUT,
-T_LOADING_Results,,Time,
-T_LOADING_Results,,ID,
-T_LOADING_Results,,discharge_Overland,
-T_LOADING_Results,,discharge_Lateral,
-T_LOADING_Results,,discharge_Groundwater,
-T_LOADING_Results,,OrganicN_Runoff,
-T_LOADING_Results,,NO3_Runoff,
-T_LOADING_Results,,NO3_Lateral,
-T_LOADING_Results,,NO3_Groundwater,
-T_LOADING_Results,,TN_Runoff,
-T_LOADING_Results,,OrganicP_Runoff,
-T_LOADING_Results,,MineralActiveP_Runoff,
-T_LOADING_Results,,MineralStableP_Runoff,
-T_LOADING_Results,,SolutionP_Runoff,
-T_LOADING_Results,,SolutionP_Groundwater,
-T_LOADING_Results,,TP_Runoff,
-T_LOADING_Results,,chla,
-T_LOADING_Results,,cbod,
-T_LOADING_Results,,o2,
-T_LOADING_Results,,OrganicN_Groundwater,
-T_LOADING_Results,,OrganicP_Groundwater,
-T_LOADING_SUBAREA_Results,,Time,
-T_LOADING_SUBAREA_Results,,ID,
-T_LOADING_SUBAREA_Results,,discharge_Overland,
-T_LOADING_SUBAREA_Results,,discharge_Lateral,
-T_LOADING_SUBAREA_Results,,discharge_Groundwater,
-T_LOADING_SUBAREA_Results,,OrganicN_Runoff,
-T_LOADING_SUBAREA_Results,,NO3_Runoff,
-T_LOADING_SUBAREA_Results,,NO3_Lateral,
-T_LOADING_SUBAREA_Results,,NO3_Groundwater,
-T_LOADING_SUBAREA_Results,,TN_Runoff,
-T_LOADING_SUBAREA_Results,,OrganicP_Runoff,
-T_LOADING_SUBAREA_Results,,MineralActiveP_Runoff,
-T_LOADING_SUBAREA_Results,,MineralStableP_Runoff,
-T_LOADING_SUBAREA_Results,,SolutionP_Runoff,
-T_LOADING_SUBAREA_Results,,SolutionP_Groundwater,
-T_LOADING_SUBAREA_Results,,TP_Runoff,
-T_LOADING_SUBAREA_Results,,chla,
-T_LOADING_SUBAREA_Results,,cbod,
-T_LOADING_SUBAREA_Results,,o2,
-T_LOADING_SUBAREA_Results,,OrganicN_Groundwater,
-T_LOADING_SUBAREA_Results,,OrganicP_Groundwater,
-T_CHSB_Results,,Time,
-T_CHSB_Results,,ID,
-T_CHSB_Results,,SedInUpStream,Sediment from upstream
-T_CHSB_Results,,SedInSubbasin,Sediment from uplands
-T_CHSB_Results,,SedDeposition,Sediment deposition
-T_CHSB_Results,,SedDegradation,Channel degradation
-T_CHSB_Results,,SedIrrigation,
-T_CHSB_Results,,SedStorage,Sediment in channel
-T_CHSB_Results,,SedOut,Sediment out
-T_CHSB_Results,,SedDrink,
-T_CHSB_Results,,SedDivIn,
-T_CHSB_Results,,SedDivOut,
-T_CHSB_Results,,SedTileIn,
-T_NUCON_Results,,Time,
-T_NUCON_Results,,ID,
-T_NUCON_Results,,algae_c,Algae
-T_NUCON_Results,,algae_l,Algae
-T_NUCON_Results,,chla_c,Chla
-T_NUCON_Results,,chla_l,Chla
-T_NUCON_Results,,cbod_c,Cbod
-T_NUCON_Results,,cbod_l,Cbod
-T_NUCON_Results,,o2_c,Dissolved oxygen
-T_NUCON_Results,,o2_l,Dissolved oxygen
-T_NUCON_Results,,nh4_c,NH4-N
-T_NUCON_Results,,nh4_l,NH4-N
-T_NUCON_Results,,no2_c,NO2-N
-T_NUCON_Results,,no2_l,NO2-N
-T_NUCON_Results,,no3_c,NO3-N
-T_NUCON_Results,,no3_l,NO3-N
-T_NUCON_Results,,organicN_c,OrgN
-T_NUCON_Results,,organicN_l,OrgN
-T_NUCON_Results,,solutionP_c,Solution P
-T_NUCON_Results,,solutionP_l,Solution P
-T_NUCON_Results,,organicP_c,OrgP
-T_NUCON_Results,,organicP_l,OrgP
-T_NUCON_Results,,totalN_c,Total N
-T_NUCON_Results,,totalN_l,Total N
-T_NUCON_Results,,totalP_c,Total P
-T_NUCON_Results,,totalP_l,Total P
-T_NUCON_Results,,TN_Irr,
-T_NUCON_Results,,TP_Irr,
-T_NUCON_Results,,TN_Drink,
-T_NUCON_Results,,TP_Drink,
-T_NUCON_Results,,TN_Div_IN,
-T_NUCON_Results,,TN_Div_OUT,
-T_NUCON_Results,,TP_Div_IN,
-T_NUCON_Results,,TP_Div_OUT,
-T_NUCON_Results,,nh4_l_tileout,
-T_NUCON_Results,,no3_l_tileout,
-T_NUCON_Results,,organicN_l_tileout,
-T_NUCON_Results,,solutionP_l_tileout,
-T_NUCON_Results,,organicP_l_tileout,
-T_NUCON_Results,,nh4_l_grzrch,
-T_NUCON_Results,,no3_l_grzrch,
-T_NUCON_Results,,organicN_l_grzrch,
-T_NUCON_Results,,solutionP_l_grzrch,
-T_NUCON_Results,,organicP_l_grzrch,
-T_NUCON_Results,,no3_l_upstream,
-T_NUCON_Results,,no2_l_upstream,
-T_NUCON_Results,,nh4_l_upstream,
-T_NUCON_Results,,organicN_l_upstream,
-T_NUCON_Results,,solutionP_l_upstream,
-T_NUCON_Results,,organicP_l_upstream,
-T_NUTB_Results,,Time,
-T_NUTB_Results,,ID,
-T_NUTB_Results,,ORGP_IN,OrgP in
-T_NUTB_Results,,ORGP_SETTLING,OrgP settling
-T_NUTB_Results,,ORGP_IRRIGATION,
-T_NUTB_Results,,ORGP_OUT,OrgP out
-T_NUTB_Results,,ORGP_STORAGE,OrgP storage
-T_NUTB_Results,,SOLP_IN,Soluble P in
-T_NUTB_Results,,SOLP_SETTLING,Soluble P settling
-T_NUTB_Results,,SOLP_IRRIGATION,
-T_NUTB_Results,,SOLP_OUT,Soluble P out
-T_NUTB_Results,,SOLP_STORAGE,Soluble P storage
-T_NUTB_Results,,ORGN_IN,OrgN in
-T_NUTB_Results,,ORGN_SETTLING,OrgN settling
-T_NUTB_Results,,ORGN_IRRIGATION,
-T_NUTB_Results,,ORGN_OUT,OrgN out
-T_NUTB_Results,,ORGN_STORAGE,OrgN storage
-T_NUTB_Results,,NO3_IN,NO3-N in
-T_NUTB_Results,,NO3_SETTLING,NO3-N settling
-T_NUTB_Results,,NO3_IRRIGATION,
-T_NUTB_Results,,NO3_OUT,NO3-N out
-T_NUTB_Results,,NO3_STORAGE,NO3-N storage
-T_NUTB_Results,,NH3_IN,NH3-N in
-T_NUTB_Results,,NH3_SETTLING,NH3-N settling
-T_NUTB_Results,,NH3_IRRIGATION,
-T_NUTB_Results,,NH3_OUT,NH3-N out
-T_NUTB_Results,,NH3_STORAGE,NH3-N storage
-T_NUTB_Results,,NO2_IN,NO2-N in
-T_NUTB_Results,,NO2_SETTLING,NO2-N settling
-T_NUTB_Results,,NO2_IRRIGATION,
-T_NUTB_Results,,NO2_OUT,NO2-N out
-T_NUTB_Results,,NO2_STORAGE,NO2-N storage
-T_NUTB_Results,,CHLA_OUT,Chla out
-T_NUTB_Results,,CHLA_STORAGE,Chla storage
-T_NUTB_Results,,SECI_DEPTH,Secchi-disk depth
-T_NUTB_Results,,TN_Irr,
-T_NUTB_Results,,TP_Irr,
-T_NUTB_Results,,TN_Drink,
-T_NUTB_Results,,TP_Drink,
-T_RECH_Results,,Time,
-T_RECH_Results,,ID,
-T_RECH_Results,,QS,Surface Q
-T_RECH_Results,,QI,Subsurface Q
-T_RECH_Results,,QG,Baseflow
-T_RECH_Results,,Q_m3,Total Q
-T_RECH_Results,,Q_mm,Total Q
-T_RESB_Results,,Time,
-T_RESB_Results,,ID,
-T_RESB_Results,,SedIn,Sediment in
-T_RESB_Results,,SedSettling,Sediment settling
-T_RESB_Results,,SedIrrigation,
-T_RESB_Results,,SedStorage,Sediment amount
-T_RESB_Results,,SedOut,Sediment out
-T_RESB_Results,,SedDrink,
-T_REWB_Results,,Time,
-T_REWB_Results,,ID,
-T_REWB_Results,,Qin,
-T_REWB_Results,,Vin,
-T_REWB_Results,,Precipitation,
-T_REWB_Results,,Evaporation,
-T_REWB_Results,,Percolation,
-T_REWB_Results,,Irrigation,
-T_REWB_Results,,Area,
-T_REWB_Results,,Storage,
-T_REWB_Results,,Vout,
-T_REWB_Results,,QSout,
-T_REWB_Results,,QIout,
-T_REWB_Results,,QGout,
-T_REWB_Results,,Qout_m3,
-T_REWB_Results,,Qout_mm,
-T_REWB_Results,,Qdrink,
-T_WABA_Results,,Time,
-T_WABA_Results,,ID,
-T_WABA_Results,,Vin,Q from upstream
-T_WABA_Results,,Vside,Q from uplands
-T_WABA_Results,,Vdiv,Q from flow diversion
-T_WABA_Results,,Vpoint,Q from point source
-T_WABA_Results,,Virri,
-T_WABA_Results,,Vseep,Transmission loss
-T_WABA_Results,,Vnb,Q channel to bank
-T_WABA_Results,,Ech,Evaporation loss
-T_WABA_Results,,Lbank,Q bank to GW
-T_WABA_Results,,Vbank,Q from bank storage
-T_WABA_Results,,Vout,Q out
-T_WABA_Results,,Vch,Reacg water storage
-T_WABA_Results,,Depth,Water depth
-T_WABA_Results,,Velocity,Flow velocity
-T_WABA_Results,,Vdrink,
-T_WABA_Results,,Vdivin,
-T_WABA_Results,,Vdivout,
-T_WABA_Results,,Vtilein,
+T_SNWB_Results,Subbasin snow water balance,Time,Date
+T_SNWB_Results,Subbasin snow water balance,ID,Subbasin ID
+T_SNWB_Results,Subbasin snow water balance,P,Precipitation (mm)
+T_SNWB_Results,Subbasin snow water balance,P_net,Net precipitation (mm)
+T_SNWB_Results,Subbasin snow water balance,P_blow,Snow blow in/out (mm)
+T_SNWB_Results,Subbasin snow water balance,T,Air temperature (oC)
+T_SNWB_Results,Subbasin snow water balance,Wind,Wind speed (m/s)
+T_SNWB_Results,Subbasin snow water balance,SR,Snow redistribution (mm)
+T_SNWB_Results,Subbasin snow water balance,SE,Snow sublimation (mm)
+T_SNWB_Results,Subbasin snow water balance,SM,Snowmelt (mm)
+T_SNWB_Results,Subbasin snow water balance,SA,Snow accumulation (mm)
+T_GWWB_Results,Subbasin groundwater balance,Time,Date
+T_GWWB_Results,Subbasin groundwater balance,ID,Subbasin ID
+T_GWWB_Results,Subbasin groundwater balance,PERCO,Percolation (mm)
+T_GWWB_Results,Subbasin groundwater balance,REVAP,Groundwater revaporation (mm)
+T_GWWB_Results,Subbasin groundwater balance,PERDE,Deep percolation (mm)
+T_GWWB_Results,Subbasin groundwater balance,IRRI_GAIN,Irrigation gain (mm)
+T_GWWB_Results,Subbasin groundwater balance,IRRI_LOSS,Irrigation loss (mm)
+T_GWWB_Results,Subbasin groundwater balance,BaseFlow_mm,Groundwater flow (mm)
+T_GWWB_Results,Subbasin groundwater balance,GW,Groundwater storage (mm)
+T_GWWB_Results,Subbasin groundwater balance,BaseFlow_m3/s,Groundwater flow (m^3/s)
+T_GWWB_Results,Subbasin groundwater balance,Grazing_Loss,Cattle drinking loss (mm)
+T_SOWB_Results,Subbasin soil water balance,Time,Date
+T_SOWB_Results,Subbasin soil water balance,ID,Subbasin ID
+T_SOWB_Results,Subbasin soil water balance,P,Precipitation (mm)
+T_SOWB_Results,Subbasin soil water balance,T,Air temperature (oC)
+T_SOWB_Results,Subbasin soil water balance,Soil_T,Soil temperature (oC)
+T_SOWB_Results,Subbasin soil water balance,Interception_loss,Interception (mm)
+T_SOWB_Results,Subbasin soil water balance,Depression_storage,Depression (mm)
+T_SOWB_Results,Subbasin soil water balance,Infiltration,Infiltration (mm)
+T_SOWB_Results,Subbasin soil water balance,Interception_ET,Interception ET (mm)
+T_SOWB_Results,Subbasin soil water balance,Depression_ET,Depression ET (mm)
+T_SOWB_Results,Subbasin soil water balance,Soil_ET,Soil ET (mm)
+T_SOWB_Results,Subbasin soil water balance,Revap,GW revaporation (mm)
+T_SOWB_Results,Subbasin soil water balance,Total_ET,Total ET (mm)
+T_SOWB_Results,Subbasin soil water balance,Net_Percolation,Net percolation (mm)
+T_SOWB_Results,Subbasin soil water balance,RS,Surface runoff (mm)
+T_SOWB_Results,Subbasin soil water balance,RI,Subsurface runoff (mm)
+T_SOWB_Results,Subbasin soil water balance,RG,GW runoff (mm)
+T_SOWB_Results,Subbasin soil water balance,R,Total runoff (mm)
+T_SOWB_Results,Subbasin soil water balance,S_WATER,Soil water content (mm)
+T_SOWB_Results,Subbasin soil water balance,S_MOI,Soil moisture (mm)
+T_SOWB_SUBAREA_Results,Subarea soil water balance,Time,Date
+T_SOWB_SUBAREA_Results,Subarea soil water balance,ID,Subarea ID
+T_SOWB_SUBAREA_Results,Subarea soil water balance,P,Precipitation (mm)
+T_SOWB_SUBAREA_Results,Subarea soil water balance,T,Air temperature (oC)
+T_SOWB_SUBAREA_Results,Subarea soil water balance,Soil_T,Soil temperature (oC)
+T_SOWB_SUBAREA_Results,Subarea soil water balance,Interception_loss,Interception (mm)
+T_SOWB_SUBAREA_Results,Subarea soil water balance,Depression_storage,Depression (mm)
+T_SOWB_SUBAREA_Results,Subarea soil water balance,Infiltration,Infiltration (mm)
+T_SOWB_SUBAREA_Results,Subarea soil water balance,Interception_ET,Interception ET (mm)
+T_SOWB_SUBAREA_Results,Subarea soil water balance,Depression_ET,Depression ET (mm)
+T_SOWB_SUBAREA_Results,Subarea soil water balance,Soil_ET,Soil ET (mm)
+T_SOWB_SUBAREA_Results,Subarea soil water balance,Revap,GW revaporation (mm)
+T_SOWB_SUBAREA_Results,Subarea soil water balance,Total_ET,Total ET (mm)
+T_SOWB_SUBAREA_Results,Subarea soil water balance,Net_Percolation,Net percolation (mm)
+T_SOWB_SUBAREA_Results,Subarea soil water balance,RS,Surface runoff (mm)
+T_SOWB_SUBAREA_Results,Subarea soil water balance,RI,Subsurface runoff (mm)
+T_SOWB_SUBAREA_Results,Subarea soil water balance,RG,GW runoff (mm)
+T_SOWB_SUBAREA_Results,Subarea soil water balance,R,Total runoff (mm)
+T_SOWB_SUBAREA_Results,Subarea soil water balance,S_WATER,Soil water content (mm)
+T_SOWB_SUBAREA_Results,Subarea soil water balance,S_MOI,Soil moisture (mm)
+T_TDWB_Results,Tile drain water balance,Time,Date
+T_TDWB_Results,Tile drain water balance,ID,Tile drain ID
+T_TDWB_Results,Tile drain water balance,SoilMoisture,Soil moisture (mm)
+T_TDWB_Results,Tile drain water balance,Groundwater,Groundwater (mm)
+T_TDWB_Results,Tile drain water balance,GroundwaterTable,Groundwater table (mm)
+T_TDWB_Results,Tile drain water balance,Vtileout,Tile flow out (m^3/d)
+T_TDWB_Results,Tile drain water balance,Qtileout,Tile discharge (m^3/s)
+T_TDWB_Results,Tile drain water balance,Vlag,Tile water lag (m^3/d)
+T_SBOF_Results,Subbasin overland flow,Time,Date
+T_SBOF_Results,Subbasin overland flow,ID,Subbasin ID
+T_SBOF_Results,Subbasin overland flow,SBOF,Subbasin overland flow (mm)
+T_TDSB_Results,Tile drain sediment balance,Time,Date
+T_TDSB_Results,Tile drain sediment balance,ID,Tile drain ID
+T_TDSB_Results,Tile drain sediment balance,SedTileOut,Sediment tile out (t/d)
+T_SEDI_Results,Subbasin sediment yield,Time,Date
+T_SEDI_Results,Subbasin sediment yield,ID,Subbasin ID
+T_SEDI_Results,Subbasin sediment yield,Sediment,Sediment yield (t/d)
+T_SEDI_SUBAREA_Results,Subarea sediment yield,Time,Date
+T_SEDI_SUBAREA_Results,Subarea sediment yield,ID,Subarea ID
+T_SEDI_SUBAREA_Results,Subarea sediment yield,Sediment,Sediment yield (t/d)
+T_TDNB_Results,Tile drain nutrient balance,Time,Date
+T_TDNB_Results,Tile drain nutrient balance,ID,Tile drain ID
+T_TDNB_Results,Tile drain nutrient balance,ORGN_TILEOUT,OrgN tile out (kg/d)
+T_TDNB_Results,Tile drain nutrient balance,NO3_TILEOUT,NO3 tile out (kg/d)
+T_TDNB_Results,Tile drain nutrient balance,ORGP_TILEOUT,OrgP tile out (kg/d)
+T_TDNB_Results,Tile drain nutrient balance,SOLP_TILEOUT,SolP tile out (kg/d)
+T_LOADING_Results,Subbasin nutrient loading,Time,Date
+T_LOADING_Results,Subbasin nutrient loading,ID,Subbasin ID
+T_LOADING_Results,Subbasin nutrient loading,discharge_Overland,Discharge overland (m^3/s)
+T_LOADING_Results,Subbasin nutrient loading,discharge_Lateral,Discharge lateral (m^3/s)
+T_LOADING_Results,Subbasin nutrient loading,discharge_Groundwater,Discharge groundwater (m^3/s)
+T_LOADING_Results,Subbasin nutrient loading,OrganicN_Runoff,OrgN runoff (kg/d)
+T_LOADING_Results,Subbasin nutrient loading,NO3_Runoff,NO3 runoff (kg/d)
+T_LOADING_Results,Subbasin nutrient loading,NO3_Lateral,NO3 lateral (kg/d)
+T_LOADING_Results,Subbasin nutrient loading,NO3_Groundwater,NO3 groundwater (kg/d)
+T_LOADING_Results,Subbasin nutrient loading,TN_Runoff,TN runoff (kg/d)
+T_LOADING_Results,Subbasin nutrient loading,OrganicP_Runoff,OrgP runoff (kg/d)
+T_LOADING_Results,Subbasin nutrient loading,MineralActiveP_Runoff,Minera active P runoff (kg/d)
+T_LOADING_Results,Subbasin nutrient loading,MineralStableP_Runoff,Mineral stable P runoff (kg/d)
+T_LOADING_Results,Subbasin nutrient loading,SolutionP_Runoff,SolP runoff (kg/d)
+T_LOADING_Results,Subbasin nutrient loading,SolutionP_Groundwater,SolP groundwater (kg/d)
+T_LOADING_Results,Subbasin nutrient loading,TP_Runoff,TP runoff (kg/d)
+T_LOADING_Results,Subbasin nutrient loading,chla,Chl-a runoff (kg/d)
+T_LOADING_Results,Subbasin nutrient loading,cbod,CBOD runoff (kg/d)
+T_LOADING_Results,Subbasin nutrient loading,o2,O2 runoff (kg/d)
+T_LOADING_Results,Subbasin nutrient loading,OrganicN_Groundwater,OrgN groundwater (kg/d)
+T_LOADING_Results,Subbasin nutrient loading,OrganicP_Groundwater,OrgP groundwater (kg/d)
+T_LOADING_SUBAREA_Results,Subarea nutrient loading,Time,Date
+T_LOADING_SUBAREA_Results,Subarea nutrient loading,ID,Subarea ID
+T_LOADING_SUBAREA_Results,Subarea nutrient loading,discharge_Overland,Discharge overland (m^3/s)
+T_LOADING_SUBAREA_Results,Subarea nutrient loading,discharge_Lateral,Discharge lateral (m^3/s)
+T_LOADING_SUBAREA_Results,Subarea nutrient loading,discharge_Groundwater,Discharge groundwater (m^3/s)
+T_LOADING_SUBAREA_Results,Subarea nutrient loading,OrganicN_Runoff,OrgN runoff (kg/d)
+T_LOADING_SUBAREA_Results,Subarea nutrient loading,NO3_Runoff,NO3 runoff (kg/d)
+T_LOADING_SUBAREA_Results,Subarea nutrient loading,NO3_Lateral,NO3 lateral (kg/d)
+T_LOADING_SUBAREA_Results,Subarea nutrient loading,NO3_Groundwater,NO3 groundwater (kg/d)
+T_LOADING_SUBAREA_Results,Subarea nutrient loading,TN_Runoff,TN runoff (kg/d)
+T_LOADING_SUBAREA_Results,Subarea nutrient loading,OrganicP_Runoff,OrgP runoff (kg/d)
+T_LOADING_SUBAREA_Results,Subarea nutrient loading,MineralActiveP_Runoff,Minera active P runoff (kg/d)
+T_LOADING_SUBAREA_Results,Subarea nutrient loading,MineralStableP_Runoff,Mineral stable P runoff (kg/d)
+T_LOADING_SUBAREA_Results,Subarea nutrient loading,SolutionP_Runoff,SolP runoff (kg/d)
+T_LOADING_SUBAREA_Results,Subarea nutrient loading,SolutionP_Groundwater,SolP groundwater (kg/d)
+T_LOADING_SUBAREA_Results,Subarea nutrient loading,TP_Runoff,TP runoff (kg/d)
+T_LOADING_SUBAREA_Results,Subarea nutrient loading,chla,Chl-a runoff (kg/d)
+T_LOADING_SUBAREA_Results,Subarea nutrient loading,cbod,CBOD runoff (kg/d)
+T_LOADING_SUBAREA_Results,Subarea nutrient loading,o2,O2 runoff (kg/d)
+T_LOADING_SUBAREA_Results,Subarea nutrient loading,OrganicN_Groundwater,OrgN groundwater (kg/d)
+T_LOADING_SUBAREA_Results,Subarea nutrient loading,OrganicP_Groundwater,OrgP groundwater (kg/d)
+T_CHSB_Results,Channel sediment balance,Time,Date
+T_CHSB_Results,Channel sediment balance,ID,Reach ID
+T_CHSB_Results,Channel sediment balance,SedInUpStream,Sediment from upstream (t/d)
+T_CHSB_Results,Channel sediment balance,SedInSubbasin,Sediment from side subbasin (t/d)
+T_CHSB_Results,Channel sediment balance,SedDeposition,Sediment deposition (t/d)
+T_CHSB_Results,Channel sediment balance,SedDegradation,Channel degradation (t/d)
+T_CHSB_Results,Channel sediment balance,SedIrrigation,sediment irrigation (t/d)
+T_CHSB_Results,Channel sediment balance,SedStorage,Sediment storage (t)
+T_CHSB_Results,Channel sediment balance,SedOut,Sediment out (t/d)
+T_CHSB_Results,Channel sediment balance,SedDrink,Sediment drink water (t/d)
+T_CHSB_Results,Channel sediment balance,SedDivIn,Sediment diversion in (t/d)
+T_CHSB_Results,Channel sediment balance,SedDivOut,Sediment diversion out (t/d)
+T_CHSB_Results,Channel sediment balance,SedTileIn,Sediment tile drain (t/d)
+T_NUCON_Results,Reach nutrient concentration,Time,Date
+T_NUCON_Results,Reach nutrient concentration,ID,Reach ID
+T_NUCON_Results,Reach nutrient concentration,algae_c,Algae concentration (mg/l)
+T_NUCON_Results,Reach nutrient concentration,algae_l,Algae loading (kg/d)
+T_NUCON_Results,Reach nutrient concentration,chla_c,Chl-a concentration (mg/l)
+T_NUCON_Results,Reach nutrient concentration,chla_l,Chl-a loading (kg/d)
+T_NUCON_Results,Reach nutrient concentration,cbod_c,CBOD concentration (mg/l)
+T_NUCON_Results,Reach nutrient concentration,cbod_l,CBOD loading (kg/d)
+T_NUCON_Results,Reach nutrient concentration,o2_c,Dissolved oxygen concentration (mg/l)
+T_NUCON_Results,Reach nutrient concentration,o2_l,Dissolved oxygen loading (kg/d)
+T_NUCON_Results,Reach nutrient concentration,nh4_c,NH4-N concentration (mg/l)
+T_NUCON_Results,Reach nutrient concentration,nh4_l,NH4-N  loading (kg/d)
+T_NUCON_Results,Reach nutrient concentration,no2_c,NO2-N concentration (mg/l)
+T_NUCON_Results,Reach nutrient concentration,no2_l,NO2-N  loading (kg/d)
+T_NUCON_Results,Reach nutrient concentration,no3_c,NO3-N concentration (mg/l)
+T_NUCON_Results,Reach nutrient concentration,no3_l,NO3-N  loading (kg/d)
+T_NUCON_Results,Reach nutrient concentration,organicN_c,OrgN concentration (mg/l)
+T_NUCON_Results,Reach nutrient concentration,organicN_l,OrgN  loading (kg/d)
+T_NUCON_Results,Reach nutrient concentration,solutionP_c,Solution P concentration (mg/l)
+T_NUCON_Results,Reach nutrient concentration,solutionP_l,Solution P  loading (kg/d)
+T_NUCON_Results,Reach nutrient concentration,organicP_c,OrgP concentration (mg/l)
+T_NUCON_Results,Reach nutrient concentration,organicP_l,OrgP loading (kg/d)
+T_NUCON_Results,Reach nutrient concentration,totalN_c,Total N concentration (mg/l)
+T_NUCON_Results,Reach nutrient concentration,totalN_l,Total N loading (kg/d)
+T_NUCON_Results,Reach nutrient concentration,totalP_c,Total P concentration (mg/l)
+T_NUCON_Results,Reach nutrient concentration,totalP_l,Total P loading (kg/d)
+T_NUCON_Results,Reach nutrient concentration,TN_Irr,TN irrigation loading (kg/d)
+T_NUCON_Results,Reach nutrient concentration,TP_Irr,TP irrigation loading (kg/d)
+T_NUCON_Results,Reach nutrient concentration,TN_Drink,TN drink water loading (kg/d)
+T_NUCON_Results,Reach nutrient concentration,TP_Drink,TP drink water loading (kg/d)
+T_NUCON_Results,Reach nutrient concentration,TN_Div_IN,TN diversion in loading (kg/d)
+T_NUCON_Results,Reach nutrient concentration,TN_Div_OUT,TN diversion out loading (kg/d)
+T_NUCON_Results,Reach nutrient concentration,TP_Div_IN,TP diversion in loading (kg/d)
+T_NUCON_Results,Reach nutrient concentration,TP_Div_OUT,TP diversion out loading (kg/d)
+T_NUCON_Results,Reach nutrient concentration,nh4_l_tileout,NH4 tile flow (kg/d)
+T_NUCON_Results,Reach nutrient concentration,no3_l_tileout,NO3 tile flow (kg/d)
+T_NUCON_Results,Reach nutrient concentration,organicN_l_tileout,OrgN tile flow (kg/d)
+T_NUCON_Results,Reach nutrient concentration,solutionP_l_tileout,SolP tile flow (kg/d)
+T_NUCON_Results,Reach nutrient concentration,organicP_l_tileout,OrgP tile flow (kg/d)
+T_NUCON_Results,Reach nutrient concentration,nh4_l_grzrch,NH4 cattle in (kg/d)
+T_NUCON_Results,Reach nutrient concentration,no3_l_grzrch,NO3 cattle in (kg/d)
+T_NUCON_Results,Reach nutrient concentration,organicN_l_grzrch,OrgN cattle in (kg/d)
+T_NUCON_Results,Reach nutrient concentration,solutionP_l_grzrch,SolP cattle in (kg/d)
+T_NUCON_Results,Reach nutrient concentration,organicP_l_grzrch,OrgP cattle in (kg/d)
+T_NUCON_Results,Reach nutrient concentration,no3_l_upstream,NO3 upstream (kg/d)
+T_NUCON_Results,Reach nutrient concentration,no2_l_upstream,NO2 upstream (kg/d)
+T_NUCON_Results,Reach nutrient concentration,nh4_l_upstream,NH4 upstream (kg/d)
+T_NUCON_Results,Reach nutrient concentration,organicN_l_upstream,OrgN upstream (kg/d)
+T_NUCON_Results,Reach nutrient concentration,solutionP_l_upstream,SolP upstream (kg/d)
+T_NUCON_Results,Reach nutrient concentration,organicP_l_upstream,OrgP upstream (kg/d)
+T_NUTB_Results,Reservoir nutrient balance,Time,Date
+T_NUTB_Results,Reservoir nutrient balance,ID,Reservoir ID
+T_NUTB_Results,Reservoir nutrient balance,ORGP_IN,OrgP in (kg/d)
+T_NUTB_Results,Reservoir nutrient balance,ORGP_SETTLING,OrgP deposition (kg/d)
+T_NUTB_Results,Reservoir nutrient balance,ORGP_IRRIGATION,OrgP irrigation (kg/d)
+T_NUTB_Results,Reservoir nutrient balance,ORGP_OUT,OrgP out (kg/d)
+T_NUTB_Results,Reservoir nutrient balance,ORGP_STORAGE,OrgP storage (kg)
+T_NUTB_Results,Reservoir nutrient balance,SOLP_IN,SolP in (kg/d)
+T_NUTB_Results,Reservoir nutrient balance,SOLP_SETTLING,SolP leaching (kg/d)
+T_NUTB_Results,Reservoir nutrient balance,SOLP_IRRIGATION,SolP irrigation (kg/d)
+T_NUTB_Results,Reservoir nutrient balance,SOLP_OUT,SolP out (kg/d)
+T_NUTB_Results,Reservoir nutrient balance,SOLP_STORAGE,SolP storage (kg)
+T_NUTB_Results,Reservoir nutrient balance,ORGN_IN,OrgN in (kg/d)
+T_NUTB_Results,Reservoir nutrient balance,ORGN_SETTLING,OrgN deposition (kg/d)
+T_NUTB_Results,Reservoir nutrient balance,ORGN_IRRIGATION,OrgN irrigation (kg/d)
+T_NUTB_Results,Reservoir nutrient balance,ORGN_OUT,OrgN out (kg/d)
+T_NUTB_Results,Reservoir nutrient balance,ORGN_STORAGE,OrgN storage (kg)
+T_NUTB_Results,Reservoir nutrient balance,NO3_IN,NO3-N in (kg/d)
+T_NUTB_Results,Reservoir nutrient balance,NO3_SETTLING,NO3-N leaching (kg/d)
+T_NUTB_Results,Reservoir nutrient balance,NO3_IRRIGATION,NO3 irrigation (kg/d)
+T_NUTB_Results,Reservoir nutrient balance,NO3_OUT,NO3-N out (kg/d)
+T_NUTB_Results,Reservoir nutrient balance,NO3_STORAGE,NO3-N storage (kg)
+T_NUTB_Results,Reservoir nutrient balance,NH3_IN,NH3-N in (kg/d)
+T_NUTB_Results,Reservoir nutrient balance,NH3_SETTLING,NH3-N leaching (kg/d)
+T_NUTB_Results,Reservoir nutrient balance,NH3_IRRIGATION,NH3 irrigation (kg/d)
+T_NUTB_Results,Reservoir nutrient balance,NH3_OUT,NH3-N out (kg/d)
+T_NUTB_Results,Reservoir nutrient balance,NH3_STORAGE,NH3-N storage (kg)
+T_NUTB_Results,Reservoir nutrient balance,NO2_IN,NO2-N in (kg/d)
+T_NUTB_Results,Reservoir nutrient balance,NO2_SETTLING,NO2-N leaching (kg/d)
+T_NUTB_Results,Reservoir nutrient balance,NO2_IRRIGATION,NO2 irrigation (kg/d)
+T_NUTB_Results,Reservoir nutrient balance,NO2_OUT,NO2-N out (kg/d)
+T_NUTB_Results,Reservoir nutrient balance,NO2_STORAGE,NO2-N storage (kg)
+T_NUTB_Results,Reservoir nutrient balance,CHLA_OUT,Chl-a out (kg/d)
+T_NUTB_Results,Reservoir nutrient balance,CHLA_STORAGE,Chl-a storage (kg)
+T_NUTB_Results,Reservoir nutrient balance,SECI_DEPTH,Secchi-disk depth (m)
+T_NUTB_Results,Reservoir nutrient balance,TN_Irr,TN irrigation (kg/d)
+T_NUTB_Results,Reservoir nutrient balance,TP_Irr,TP irrigation (kg/d)
+T_NUTB_Results,Reservoir nutrient balance,TN_Drink,TN drink water (kg/d)
+T_NUTB_Results,Reservoir nutrient balance,TP_Drink,TP drink water (kg/d)
+T_RECH_Results,Discharge at reach outlet,Time,Date
+T_RECH_Results,Discharge at reach outlet,ID,Reach ID
+T_RECH_Results,Discharge at reach outlet,QS,Surface flow (m^3/s)
+T_RECH_Results,Discharge at reach outlet,QI,Interflow (m^3/s)
+T_RECH_Results,Discharge at reach outlet,QG,Groundwater flow (m^3/s)
+T_RECH_Results,Discharge at reach outlet,Q_m3,Total flow (m^3/s)
+T_RECH_Results,Discharge at reach outlet,Q_mm,Total flow (mm)
+T_RESB_Results,Reservoir sediment balance,Time,Date
+T_RESB_Results,Reservoir sediment balance,ID,Reservoir ID
+T_RESB_Results,Reservoir sediment balance,SedIn,Sediment in (t/d)
+T_RESB_Results,Reservoir sediment balance,SedSettling,Sediment deposition (t/d)
+T_RESB_Results,Reservoir sediment balance,SedIrrigation,sediment irrigation (t/d)
+T_RESB_Results,Reservoir sediment balance,SedStorage,Sediment storage (t)
+T_RESB_Results,Reservoir sediment balance,SedOut,Sediment out (t/d)
+T_RESB_Results,Reservoir sediment balance,SedDrink,Sediment drink water (t/d)
+T_REWB_Results,Reservoir water balance,Time,Date
+T_REWB_Results,Reservoir water balance,ID,Reservoir ID
+T_REWB_Results,Reservoir water balance,Qin,Flow in (m^3/s)
+T_REWB_Results,Reservoir water balance,Vin,Flow in (m^3/d)
+T_REWB_Results,Reservoir water balance,Precipitation,Precipitation (m^3/d)
+T_REWB_Results,Reservoir water balance,Evaporation,Evaporation (m^3/d)
+T_REWB_Results,Reservoir water balance,Percolation,Percolation (m^3/d)
+T_REWB_Results,Reservoir water balance,Irrigation,Irrigation (m^3/d)
+T_REWB_Results,Reservoir water balance,Area,Surface area (ha)
+T_REWB_Results,Reservoir water balance,Storage,Storage (10^4m^3)
+T_REWB_Results,Reservoir water balance,Vout,Flow out (m^3/d)
+T_REWB_Results,Reservoir water balance,QSout,Surface flow out (m^3/d)
+T_REWB_Results,Reservoir water balance,QIout,Interflow out (m^3/d)
+T_REWB_Results,Reservoir water balance,QGout,Groundwater out (m^3/d)
+T_REWB_Results,Reservoir water balance,Qout_m3,Total flow out (m^3/d)
+T_REWB_Results,Reservoir water balance,Qout_mm,Total flow out (mm)
+T_REWB_Results,Reservoir water balance,Qdrink,Drink water (m^3/d)
+T_WABA_Results,Reach water balance,Time,Date
+T_WABA_Results,Reach water balance,ID,Reach ID
+T_WABA_Results,Reach water balance,Vin,Flow in (m^3/d)
+T_WABA_Results,Reach water balance,Vside,Side flow (m^3/d)
+T_WABA_Results,Reach water balance,Vdiv,Flow diversion (m^3/d)
+T_WABA_Results,Reach water balance,Vpoint,Point source volume (m^3/d)
+T_WABA_Results,Reach water balance,Virri,Irrigation volume (m^3/d)
+T_WABA_Results,Reach water balance,Vseep,Transmission loss (m^3/d)
+T_WABA_Results,Reach water balance,Vnb,Bank loss (m^3/d)
+T_WABA_Results,Reach water balance,Ech,Evaporation loss (m^3/d)
+T_WABA_Results,Reach water balance,Lbank,Bank storage to groundwater (m^3/d)
+T_WABA_Results,Reach water balance,Vbank,Water from bank storage (m^3/d)
+T_WABA_Results,Reach water balance,Vout,Flow out (m^3/d)
+T_WABA_Results,Reach water balance,Vch,Reach water storage (m^3)
+T_WABA_Results,Reach water balance,Depth,Water depth (m)
+T_WABA_Results,Reach water balance,Velocity,Flow velocity (m/s)
+T_WABA_Results,Reach water balance,Vdrink,Drink water volume (m^3/d)
+T_WABA_Results,Reach water balance,Vdivin,Flow-in diversion (m^3/d)
+T_WABA_Results,Reach water balance,Vdivout,Flow-out diversion (m^3/d)
+T_WABA_Results,Reach water balance,Vtilein,Tile flow (m^3/d)

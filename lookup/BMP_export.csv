@@ -1,522 +1,522 @@
 Table Name,Table Alias,Column Name,Column Alias
-OFSW_parameter,,ID,
-OFSW_parameter,,Year,
-OFSW_parameter,,Subbasin,
-OFSW_parameter,,Source,
-OFSW_parameter,,SourceID,
-OFSW_parameter,,SELECTION,
-BMP_index,,ID,
-BMP_index,,Name,
-BMP_index,,Type,
-BMP_index,,CODE,
-BMP_scenarios,,ID,
-BMP_scenarios,,NAME,
-BMP_scenarios,,BMP,
-BMP_scenarios,,DISTRIBUTION,
-BMP_scenarios,,PARAMETER,
-LS_parameter,,Slope_perc,
-LS_parameter,,Max_length_m,
-Reach_BMP,,Scenario,
-Reach_BMP,,Reach,
-Reach_BMP,,PointSource,
-Reach_BMP,,FlowDiversion,
-Reach_BMP,,Reservoir,
-Reach_BMP,,Wetland,
-Reach_BMP,,CatchBasin,
-Reach_BMP,,GrassWaterway,
-Reach_BMP,,Dugout,
-Reach_BMP,,AccessManagement,
-Reach_Parameter,,#reach_id,
-Reach_Parameter,,subbasin_id,
-Reach_Parameter,,outlet_id,
-Reach_Parameter,,length,
-Reach_Parameter,,width,
-Reach_Parameter,,main_side_slope,
-Reach_Parameter,,floodplain_side_slope,
-Reach_Parameter,,w_ratio,
-Reach_Parameter,,depth,
-Reach_Parameter,,slope,
-Reach_Parameter,,order,
-Reach_Parameter,,manning,
-Reach_Parameter,,velocity,
-Reach_Parameter,,t0,
-Reach_Parameter,,d0,
-Reach_Parameter,,max_elevation,
-Reach_Parameter,,min_elevation,
-Reach_Parameter,,Ave_elevation,
-Reach_Parameter,,receive_reach_id,
-Reach_Parameter,,contribution_area,
-Reach_Parameter,,erodibility_factor,
-Reach_Parameter,,cover_factor,
-Reach_Parameter,,bc1,
-Reach_Parameter,,bc2,
-Reach_Parameter,,bc3,
-Reach_Parameter,,bc4,
-Reach_Parameter,,rk1,
-Reach_Parameter,,rk2,
-Reach_Parameter,,rk3,
-Reach_Parameter,,rk4,
-Reach_Parameter,,rs1,
-Reach_Parameter,,rs2,
-Reach_Parameter,,rs3,
-Reach_Parameter,,rs4,
-Reach_Parameter,,rs5,
-Reach_Parameter,,minFlow,
-RipaBuffer_VegeFilter_parameter,,ID,
-RipaBuffer_VegeFilter_parameter,,Code,
-RipaBuffer_VegeFilter_parameter,,Name,
-RipaBuffer_VegeFilter_parameter,,Runoff_c1,
-RipaBuffer_VegeFilter_parameter,,Runoff_c2,
-RipaBuffer_VegeFilter_parameter,,Runoff_c3,
-RipaBuffer_VegeFilter_parameter,,Sed_c1,
-RipaBuffer_VegeFilter_parameter,,Sed_c2,
-RipaBuffer_VegeFilter_parameter,,Sed_c3,
-RipaBuffer_VegeFilter_parameter,,OrgN_c1,
-RipaBuffer_VegeFilter_parameter,,OrgN_c2,
-RipaBuffer_VegeFilter_parameter,,NO3_c1,
-RipaBuffer_VegeFilter_parameter,,NO3_c2,
-RipaBuffer_VegeFilter_parameter,,PP_c1,
-RipaBuffer_VegeFilter_parameter,,DP_c1,
-RipaBuffer_VegeFilter_parameter,,DP_c2,
-RipaBuffer_VegeFilter_parameter,,NO3_Reduc_C1,
-RipaBuffer_VegeFilter_parameter,,NO3_Reduc_C2,
-crop_parameter,,ICNUM,
-crop_parameter,,CPNM,
-crop_parameter,,DESCRIPTION,
-crop_parameter,,IDC,
-crop_parameter,,BIO_E,
-crop_parameter,,HVSTI,
-crop_parameter,,BLAI,
-crop_parameter,,FRGRW1,
-crop_parameter,,LAIMX1,
-crop_parameter,,FRGRW2,
-crop_parameter,,LAIMX2,
-crop_parameter,,DLAI,
-crop_parameter,,CHTMX,
-crop_parameter,,RDMX,
-crop_parameter,,T_OPT,
-crop_parameter,,T_BASE,
-crop_parameter,,CNYLD,
-crop_parameter,,CPYLD,
-crop_parameter,,BN1,
-crop_parameter,,BN2,
-crop_parameter,,BN3,
-crop_parameter,,BP1,
-crop_parameter,,BP2,
-crop_parameter,,BP3,
-crop_parameter,,WSYF,
-crop_parameter,,USLE_C,
-crop_parameter,,GSI,
-crop_parameter,,VPDFR,
-crop_parameter,,FRGMAX,
-crop_parameter,,WAVP,
-crop_parameter,,CO2HI,
-crop_parameter,,BIOEHI,
-crop_parameter,,RSDCO_PL,
-crop_parameter,,OV_N,
-crop_parameter,,CN2A,
-crop_parameter,,CN2B,
-crop_parameter,,CN2C,
-crop_parameter,,CN2D,
-crop_parameter,,FERTFIELD,
-crop_parameter,,ALAI_MIN,
-crop_parameter,,BIO_LEAF,
-crop_parameter,,PHU,
-crop_parameter,,CNOP,
-crop_parameter,,LAI_INIT,
-crop_parameter,,BIO_INIT,
-crop_parameter,,CURYR_INIT,
-farm_info,,ID,
-farm_info,,Area_Ha,
-farm_subbasin,,Farm,
-farm_subbasin,,Subbasin,
-farm_subbasin,,Area_Ha,
-farm_subbasin,,ToFarm,
-farm_subbasin,,ToSubbasin,
-field_farm,,Field,
-field_farm,,Farm,
-field_farm,,Area_Ha,
-field_farm,,ToField,
-field_farm,,ToFarm,
-field_info,,ID,
-field_info,,Area_Ha,
-manure_and_nutrient_parameter,,BMP_ID,
-manure_and_nutrient_parameter,,Code,
-manure_and_nutrient_parameter,,Description,
-manure_and_nutrient_parameter,,Parameter,
-manure_and_nutrient_parameter,,Value,
-manure_and_nutrient_parameter,,Value_String,
-subbasin_info,,ID,
-subbasin_info,,Area_Ha,
-subbasin_info,,FlowAcc_Max,
-subbasin_info,,PRC_Avg,
-subbasin_info,,DSC_Avg,
-subbasin_info,,CN2_Avg,
-wetland_Parameter,,ID,
-wetland_Parameter,,OperationYear,
-wetland_Parameter,,Subbasin,
-wetland_Parameter,,Type,
-wetland_Parameter,,ContributionArea_ha,
-wetland_Parameter,,NormalArea_ha,
-wetland_Parameter,,NormalVolume_104M3,
-wetland_Parameter,,MaxArea_ha,
-wetland_Parameter,,MaxVolume_104M3,
-wetland_Parameter,,K_mmHr,
-wetland_Parameter,,SedimentConEqui_mgL,
-wetland_Parameter,,D50_um,
-wetland_Parameter,,SettVolN_mYr,
-wetland_Parameter,,SettVolP_mYr,
-wetland_Parameter,,ChlaProCo,
-wetland_Parameter,,WaterCalCo,
-wetland_Parameter,,InflowFrac,
-wetland_Parameter,,InitialVolume_104M3,
-wetland_Parameter,,InitialSediment_mgL,
-wetland_Parameter,,InitialNO3_mgL,
-wetland_Parameter,,InitialNO2_mgL,
-wetland_Parameter,,InitialNH3_mgL,
-wetland_Parameter,,InitialSolP_mgL,
-wetland_Parameter,,InitialOrgN_mgL,
-wetland_Parameter,,InitialOrgP_mgL,
-wetland_Parameter,,RoutingConstant,
-wetland_Parameter,,WetlandIDOld,
-wetland_Parameter,,ClassType,
-wetland_Parameter,,SELECTION,
-subbasin_multiplier,,ID,
-subbasin_multiplier,,SHC,
-subbasin_multiplier,,SOIL_T10,
-subbasin_multiplier,,INTERC_MAX,
-subbasin_multiplier,,INTERC_MIN,
-subbasin_multiplier,,USLE_C,
-subbasin_multiplier,,ROOT_DEPTH,
-subbasin_multiplier,,MANNING,
-subbasin_multiplier,,FIMP,
-subbasin_multiplier,,FCIMP,
-subbasin_multiplier,,CURBDEN,
-subbasin_multiplier,,URBCOEF,
-subbasin_multiplier,,DIRTMX,
-subbasin_multiplier,,THALF,
-subbasin_multiplier,,TNCONC,
-subbasin_multiplier,,TPCONC,
-subbasin_multiplier,,TNO3CONC,
-subbasin_multiplier,,URBCN2,
-subbasin_multiplier,,PET_LAI_COEFFICIENT,
-subbasin_multiplier,,CONDUCTIVITY,
-subbasin_multiplier,,DEPTH,
-subbasin_multiplier,,POROSITY,
-subbasin_multiplier,,FIELD_CAPACITY,
-subbasin_multiplier,,WILTING_POINT,
-subbasin_multiplier,,RESIDUAL,
-subbasin_multiplier,,PORE_INDEX,
-subbasin_multiplier,,DENSITY,
-subbasin_multiplier,,SAND,
-subbasin_multiplier,,CLAY,
-subbasin_multiplier,,SLIT,
-subbasin_multiplier,,USLE_K,
-subbasin_multiplier,,CN2,
-subbasin_multiplier,,RUNOFF_CO,
-subbasin_multiplier,,DEPRESSION,
-subbasin_multiplier,,SOIL_MOIST_IN,
-subbasin_multiplier,,SOIL_NO3_IN,
-subbasin_multiplier,,SOIL_ORGN_IN,
-subbasin_multiplier,,SOIL_SOLP_IN,
-subbasin_multiplier,,SOIL_ORGP_IN,
-subbasin_multiplier,,INTERFLOW_SCALE_FACTOR,
-reach_lookup,,UpStream,
-reach_lookup,,DownStream,
-reach_lookup,,Rank,
-crop_management,,Scenario,
-crop_management,,Location,
-crop_management,,ID,
-crop_management,,CropCode,
-crop_management,,Year,
-crop_management,,PlantingDay,
-crop_management,,PlantingMon,
-crop_management,,HarvestDay,
-crop_management,,HarvestMon,
-crop_management,,HarvestEfficiency,
-crop_management,,HarvestType,
-crop_management,,HarvestIndexOverride,
-crop_management,,CNOP,
-crop_management,,StoverFraction,
-crop_management,,IsGrain,
-crop_management,,PRCOP,
-tillage_parameter,,ITNUM,
-tillage_parameter,,TILLNM,
-tillage_parameter,,DESCRIPTION,
-tillage_parameter,,EFFMIX,
-tillage_parameter,,DEPTIL,
-tillage_parameter,,CNOP_CN2,
-tillage_parameter,,PRC,
-tillage_parameter,,DSC,
-fertilizer_parameter,,IFNUM,
-fertilizer_parameter,,FERTNM,
-fertilizer_parameter,,DESCRIPTION,
-fertilizer_parameter,,FMINN,
-fertilizer_parameter,,FMINP,
-fertilizer_parameter,,FORGN,
-fertilizer_parameter,,FORGP,
-fertilizer_parameter,,FNH3N,
-fertilizer_parameter,,BACTPDB,
-fertilizer_parameter,,BACTLPDB,
-fertilizer_parameter,,BACKTKDDB,
-fertilizer_parameter,,IsManure,
-RipaBuffer_management,,Scenario,
-RipaBuffer_management,,ID,
-RipaBuffer_management,,Year,
-RipaBuffer_management,,RIBUF_ID,
-RipaBuffer_management,,Subbasin,
-RipaBuffer_management,,VegetationID,
-RipaBuffer_management,,Length,
-RipaBuffer_management,,Width,
-RipaBuffer_management,,Area_ha,
-RipaBuffer_management,,Drainage_Area,
-RipaBuffer_management,,Area_Ratio,
-RipaBuffer_management,,Slope,
-RipaBuffer_management,,Sol_K,
-RipaBuffer_management,,Sol_porosity,
-RipaBuffer_management,,Root_Depth,
-RipaBuffer_management,,SELECTION,
-SubareaRiparianBufferLookup,,SubareaId,
-SubareaRiparianBufferLookup,,LocationId,
-SubareaRiparianBufferLookup,,FractionToBmp,
-SubareaRiparianBufferLookup,,FractionToSubarea,
-SubareaRiparianBufferDrainageLookup,,LocationId,
-SubareaRiparianBufferDrainageLookup,,SubareaId,
-SubareaRiparianBufferDrainageLookup,,FractionToSubarea,
-SubareaTileDrainLookup,,SubareaId,
-SubareaTileDrainLookup,,LocationId,
-SubareaTileDrainLookup,,FractionToBmp,
-SubareaTileDrainLookup,,FractionToSubarea,
-tiledrain_att,,OBJECTID_12,
-tiledrain_att,,OBJECTID_1,
-tiledrain_att,,OBJECTID,
-tiledrain_att,,Field_Code,
-tiledrain_att,,Reclass,
-tiledrain_att,,Shape_Leng,
-tiledrain_att,,Shape_Le_1,
-tiledrain_att,,PumpScheme,
-tiledrain_att,,Shape_Length,
-tiledrain_att,,Shape_Area,
-tiledrain_att,,Id,
-tiledrain_att,,Tile_Spacing_mm,
-tiledrain_att,,Tile_Depth_mm,
-outlet_drainage,,Id,
-outlet_drainage,,Reach,
-outlet_drainage,,DrainageCapacity,
-IMWEBsWetlands_InptWtlnds_Inter,,OBJECTID,
-IMWEBsWetlands_InptWtlnds_Inter,,FID_11_Wetlands,
-IMWEBsWetlands_InptWtlnds_Inter,,Shape_Leng,
-IMWEBsWetlands_InptWtlnds_Inter,,ID,
-IMWEBsWetlands_InptWtlnds_Inter,,FieldType,
-IMWEBsWetlands_InptWtlnds_Inter,,FID_IMWEBsWetlands,
-IMWEBsWetlands_InptWtlnds_Inter,,Id_1,
-IMWEBsWetlands_InptWtlnds_Inter,,gridcode,
-IMWEBsWetlands_InptWtlnds_Inter,,Shape_Length,
-IMWEBsWetlands_InptWtlnds_Inter,,Shape_Area,
-JEN_WetlandParameter,,ID,
-JEN_WetlandParameter,,Shape_Leng,
-JEN_WetlandParameter,,Shape_Area,
-JEN_WetlandParameter,,MaxAreaExisting_ha,
-JEN_WetlandParameter,,MaxVolumeExisting_104M3,
-JEN_WetlandParameter,,MaxAreaRestored_ha,
-JEN_WetlandParameter,,MaxVolumeRestored_104M3,
-JEN_WetlandParameter,,ScenarioType,
-JEN_WetlandParameter,,WetlandType,
-JEN_WetlandParameter,,NormalAreaExisting_ha,
-JEN_WetlandParameter,,NormalVolumeExisting_104M3,
-JEN_WetlandParameter,,NormalAreaRestored_ha,
-JEN_WetlandParameter,,NormalVolumeRestored_104M3,
-IMWEBsWetlands_Subbasin_Inter,,OBJECTID,
-IMWEBsWetlands_Subbasin_Inter,,FID_IMWEBsWetlands,
-IMWEBsWetlands_Subbasin_Inter,,Id,
-IMWEBsWetlands_Subbasin_Inter,,gridcode,
-IMWEBsWetlands_Subbasin_Inter,,FID_subbasin_dis,
-IMWEBsWetlands_Subbasin_Inter,,gridcode_1,
-IMWEBsWetlands_Subbasin_Inter,,Shape_Length,
-IMWEBsWetlands_Subbasin_Inter,,Shape_Area,
-WetlandInputImwebsLookup,,WetlandIdInput,
-WetlandInputImwebsLookup,,WetlandIdImwebs,
-WetlandInputImwebsLookup,,Area_ha,
-WetlandInputImwebsLookup,,ToInput,
-WetlandInputImwebsLookup,,ToImwebs,
-WetlandParameterImwebs,,Id,
-WetlandParameterImwebs,,MaxAreaExisting_ha,
-WetlandParameterImwebs,,MaxVolumeExisting_104M3,
-WetlandParameterImwebs,,MaxAreaRestored_ha,
-WetlandParameterImwebs,,MaxVolumeRestored_104M3,
-WetlandParameterImwebs,,NormalAreaExisting_ha,
-WetlandParameterImwebs,,NormalVolumeExisting_104M3,
-WetlandParameterImwebs,,NormalAreaRestored_ha,
-WetlandParameterImwebs,,NormalVolumeRestored_104M3,
-WetlandParameterImwebs,,ScenarioType,
-WetlandParameterImwebs,,WetlandType,
-Subarea,,Id,
-Subarea,,SubbasinId,
-Subarea,,FieldId,
-Subarea,,Area,
-Subarea,,Elevation,
-Subarea,,Slope,
-Subarea,,USLE_P,
-Subarea,,MoistureInitial,
-Subarea,,FlowAccumulationAverage,
-Subarea,,WetlandFraction,
-Subarea,,TravelTimeAverage2,
-Subarea,,TravelTimeAverage10,
-Subarea,,TravelTimeAverage100,
-Subarea,,TravelTimeStd2,
-Subarea,,TravelTimeStd10,
-Subarea,,TravelTimeStd100,
-Subarea,,TopographyWeight,
-Subarea,,LateralWidth,
-SubareaLanduseType,,SubareaId,
-SubareaLanduseType,,LanduseTypeId,
-SubareaLanduseType,,Area,
-SubareaSoilType,,SubareaId,
-SubareaSoilType,,SoilTypeId,
-SubareaSoilType,,Area,
-CellSubarea,,CellIndex,
-CellSubarea,,SubareaId,
-field_subbasin,,SubbasinId,
-field_subbasin,,FieldId,
-field_subbasin,,Area_ha,
-field_subbasin,,ToField,
-field_subbasin,,ToSubbasin,
-tldn_parameter,,Scenario,
-tldn_parameter,,Id,
-tldn_parameter,,StartYear,
-tldn_parameter,,StartMon,
-tldn_parameter,,StartDay,
-tldn_parameter,,FieldId,
-tldn_parameter,,OutletReachId,
-tldn_parameter,,Type,
-tldn_parameter,,Elevation,
-tldn_parameter,,Depth,
-tldn_parameter,,ControlDepth,
-tldn_parameter,,ControlStartMon,
-tldn_parameter,,ControlEndMon,
-tldn_parameter,,Radius,
-tldn_parameter,,Spacing,
-tldn_parameter,,OutletCapacity,
-tldn_parameter,,LagCoefficient,
-tldn_parameter,,DepthToImperviableLayer,
-tldn_parameter,,LateralKScale,
-tldn_parameter,,SedimentCon,
-tldn_parameter,,OrgNConc,
-tldn_parameter,,OrgPConc,
-tldn_parameter,,PRCTile,
-tldn_parameter,,CNTile,
-tldn_parameter,,GWT0,
-Reservoir_data,,ID,
-Reservoir_data,,SubbasinId,
-Reservoir_data,,SA_EM,
-Reservoir_data,,V_EM,
-Reservoir_data,,SA_PR,
-Reservoir_data,,V_PR,
-Reservoir_data,,INI_S,
-Reservoir_data,,k_res,
-Reservoir_data,,OFLOWMX01,
-Reservoir_data,,OFLOWMX02,
-Reservoir_data,,OFLOWMX03,
-Reservoir_data,,OFLOWMX04,
-Reservoir_data,,OFLOWMX05,
-Reservoir_data,,OFLOWMX06,
-Reservoir_data,,OFLOWMX07,
-Reservoir_data,,OFLOWMX08,
-Reservoir_data,,OFLOWMX09,
-Reservoir_data,,OFLOWMX10,
-Reservoir_data,,OFLOWMX11,
-Reservoir_data,,OFLOWMX12,
-Reservoir_data,,STARG01,
-Reservoir_data,,STARG02,
-Reservoir_data,,STARG03,
-Reservoir_data,,STARG04,
-Reservoir_data,,STARG05,
-Reservoir_data,,STARG06,
-Reservoir_data,,STARG07,
-Reservoir_data,,STARG08,
-Reservoir_data,,STARG09,
-Reservoir_data,,STARG10,
-Reservoir_data,,STARG11,
-Reservoir_data,,STARG12,
-fertilizer_management,,Scenario,
-fertilizer_management,,Location,
-fertilizer_management,,Year,
-fertilizer_management,,FerMon,
-fertilizer_management,,FerDay,
-fertilizer_management,,FerType,
-fertilizer_management,,FerRate,
-fertilizer_management,,FerSurface,
-tillage_management,,Scenario,
-tillage_management,,Location,
-tillage_management,,Year,
-tillage_management,,TillMon,
-tillage_management,,TillDay,
-tillage_management,,TillCode,
-Reservoir,,ID,
-Reservoir,,XLL,
-Reservoir,,YLL,
-Reservoir,,OPERATION,
-Reservoir,,SA_EM,
-Reservoir,,V_EM,
-Reservoir,,SA_PR,
-Reservoir,,V_PR,
-Reservoir,,INI_S,
-Reservoir,,Q_REL,
-Reservoir,,k_res,
-Reservoir,,OFLOWMN01,
-Reservoir,,OFLOWMN02,
-Reservoir,,OFLOWMN03,
-Reservoir,,OFLOWMN04,
-Reservoir,,OFLOWMN05,
-Reservoir,,OFLOWMN06,
-Reservoir,,OFLOWMN07,
-Reservoir,,OFLOWMN08,
-Reservoir,,OFLOWMN09,
-Reservoir,,OFLOWMN10,
-Reservoir,,OFLOWMN11,
-Reservoir,,OFLOWMN12,
-Reservoir,,OFLOWMX01,
-Reservoir,,OFLOWMX02,
-Reservoir,,OFLOWMX03,
-Reservoir,,OFLOWMX04,
-Reservoir,,OFLOWMX05,
-Reservoir,,OFLOWMX06,
-Reservoir,,OFLOWMX07,
-Reservoir,,OFLOWMX08,
-Reservoir,,OFLOWMX09,
-Reservoir,,OFLOWMX10,
-Reservoir,,OFLOWMX11,
-Reservoir,,OFLOWMX12,
-Reservoir,,METHOD,
-Reservoir,,SEDMETHOD,
-Reservoir,,INT_SC,
-Reservoir,,NSED,
-Reservoir,,D50,
-Reservoir,,NUTMETHOD,
-Reservoir,,FILE,
-Reservoir,,PSETLR,
-Reservoir,,NSETLR,
-Reservoir,,CHLAR,
-Reservoir,,SECCIR,
-Reservoir,,ORGP,
-Reservoir,,SOLP,
-Reservoir,,ORGN,
-Reservoir,,NO3,
-Reservoir,,NH3,
-Reservoir,,NO2,
-Reservoir,,IFLOD1R,
-Reservoir,,IFLOD2R,
-Reservoir,,NDTARGR,
-Reservoir,,STARG01,
-Reservoir,,STARG02,
-Reservoir,,STARG03,
-Reservoir,,STARG04,
-Reservoir,,STARG05,
-Reservoir,,STARG06,
-Reservoir,,STARG07,
-Reservoir,,STARG08,
-Reservoir,,STARG09,
-Reservoir,,STARG10,
-Reservoir,,STARG11,
-Reservoir,,STARG12,
-Reservoir,,SELECTION,
+OFSW_parameter,Off-site watering,ID,ID
+OFSW_parameter,Off-site watering,Year,Year
+OFSW_parameter,Off-site watering,Subbasin,Subbasin
+OFSW_parameter,Off-site watering,Source,Water source
+OFSW_parameter,Off-site watering,SourceID,Source ID
+OFSW_parameter,Off-site watering,SELECTION,Selection
+BMP_index,BMP index,ID,ID
+BMP_index,BMP index,Name,Name
+BMP_index,BMP index,Type,Type
+BMP_index,BMP index,CODE,Code
+BMP_scenarios,BMP scenarios,ID,ID
+BMP_scenarios,BMP scenarios,NAME,Name
+BMP_scenarios,BMP scenarios,BMP,BMP
+BMP_scenarios,BMP scenarios,DISTRIBUTION,Distribution 
+BMP_scenarios,BMP scenarios,PARAMETER,Parameter
+LS_parameter,Slope length,Slope_perc,Slope 
+LS_parameter,Slope length,Max_length_m,Max slope length
+Reach_BMP,Reach BMP,Scenario,Scenario
+Reach_BMP,Reach BMP,Reach,Reach
+Reach_BMP,Reach BMP,PointSource,Point source
+Reach_BMP,Reach BMP,FlowDiversion,Flow diversion
+Reach_BMP,Reach BMP,Reservoir,Reservoir
+Reach_BMP,Reach BMP,Wetland,Wetland
+Reach_BMP,Reach BMP,CatchBasin,Catch basin
+Reach_BMP,Reach BMP,GrassWaterway,Grass waterway
+Reach_BMP,Reach BMP,Dugout,Dugout
+Reach_BMP,Reach BMP,AccessManagement,Access management
+Reach_Parameter,Reach Parameter,#reach_id,Reach ID
+Reach_Parameter,Reach Parameter,subbasin_id,Subbasin ID
+Reach_Parameter,Reach Parameter,outlet_id,Outlet ID
+Reach_Parameter,Reach Parameter,length,Length
+Reach_Parameter,Reach Parameter,width,Midth
+Reach_Parameter,Reach Parameter,main_side_slope,Mainstream side slope
+Reach_Parameter,Reach Parameter,floodplain_side_slope,Floodplain side slope
+Reach_Parameter,Reach Parameter,w_ratio,Width-depth ratio
+Reach_Parameter,Reach Parameter,depth,Depth
+Reach_Parameter,Reach Parameter,slope,Slope 
+Reach_Parameter,Reach Parameter,order,Stream order
+Reach_Parameter,Reach Parameter,manning,Manning coeffivcient
+Reach_Parameter,Reach Parameter,velocity,Velocity
+Reach_Parameter,Reach Parameter,t0,Average travel time
+Reach_Parameter,Reach Parameter,d0,Thavel time standard deviation
+Reach_Parameter,Reach Parameter,max_elevation,Max elevation
+Reach_Parameter,Reach Parameter,min_elevation,Min elevation
+Reach_Parameter,Reach Parameter,Ave_elevation,Average elevation
+Reach_Parameter,Reach Parameter,receive_reach_id,Receiving reach ID
+Reach_Parameter,Reach Parameter,contribution_area,Contributing area
+Reach_Parameter,Reach Parameter,erodibility_factor,Erodibility factor
+Reach_Parameter,Reach Parameter,cover_factor,Cover factor
+Reach_Parameter,Reach Parameter,bc1,NH4 -> NO2 rate constant
+Reach_Parameter,Reach Parameter,bc2,NO2 -> NO3 rate constant
+Reach_Parameter,Reach Parameter,bc3,OrgN -> NH4 rate constant
+Reach_Parameter,Reach Parameter,bc4,OrgP -> DP rate constant
+Reach_Parameter,Reach Parameter,rk1,CBOD deoxygenation rate
+Reach_Parameter,Reach Parameter,rk2,Oxigen rearaeration rate
+Reach_Parameter,Reach Parameter,rk3,CBOD loss rate
+Reach_Parameter,Reach Parameter,rk4,Benthic oxygen demand rate
+Reach_Parameter,Reach Parameter,rs1,Algal settling rate
+Reach_Parameter,Reach Parameter,rs2,Benthic DP source rate
+Reach_Parameter,Reach Parameter,rs3,Benthic NH4 source rate
+Reach_Parameter,Reach Parameter,rs4,OrgN settling rate
+Reach_Parameter,Reach Parameter,rs5,OrgP settling rate
+Reach_Parameter,Reach Parameter,minFlow,Minimum flow rate
+RipaBuffer_VegeFilter_parameter,Riparian buffer - Filter strip,ID,ID
+RipaBuffer_VegeFilter_parameter,Riparian buffer - Filter strip,Code,Code
+RipaBuffer_VegeFilter_parameter,Riparian buffer - Filter strip,Name,Name
+RipaBuffer_VegeFilter_parameter,Riparian buffer - Filter strip,Runoff_c1,Runoff coefficient 1
+RipaBuffer_VegeFilter_parameter,Riparian buffer - Filter strip,Runoff_c2,Runoff coefficient 2
+RipaBuffer_VegeFilter_parameter,Riparian buffer - Filter strip,Runoff_c3,Runoff coefficient 3
+RipaBuffer_VegeFilter_parameter,Riparian buffer - Filter strip,Sed_c1,Sediment coefficient 1
+RipaBuffer_VegeFilter_parameter,Riparian buffer - Filter strip,Sed_c2,Sediment coefficient 2
+RipaBuffer_VegeFilter_parameter,Riparian buffer - Filter strip,Sed_c3,Sediment coefficient 3
+RipaBuffer_VegeFilter_parameter,Riparian buffer - Filter strip,OrgN_c1,OrgN coefficient 1
+RipaBuffer_VegeFilter_parameter,Riparian buffer - Filter strip,OrgN_c2,OrgN coefficient 2
+RipaBuffer_VegeFilter_parameter,Riparian buffer - Filter strip,NO3_c1,NO3 coefficient 1
+RipaBuffer_VegeFilter_parameter,Riparian buffer - Filter strip,NO3_c2,NO3 coefficient 2
+RipaBuffer_VegeFilter_parameter,Riparian buffer - Filter strip,PP_c1,PP coefficient 2
+RipaBuffer_VegeFilter_parameter,Riparian buffer - Filter strip,DP_c1,DP coefficient 1
+RipaBuffer_VegeFilter_parameter,Riparian buffer - Filter strip,DP_c2,DP coefficient 2
+RipaBuffer_VegeFilter_parameter,Riparian buffer - Filter strip,NO3_Reduc_C1,NO3 reduction coefficient 1
+RipaBuffer_VegeFilter_parameter,Riparian buffer - Filter strip,NO3_Reduc_C2,NO3 reduction coefficient 2
+crop_parameter,Crop parameter,ICNUM,Plant code
+crop_parameter,Crop parameter,CPNM,Plant name
+crop_parameter,Crop parameter,DESCRIPTION,Full plant name
+crop_parameter,Crop parameter,IDC,Plant classification
+crop_parameter,Crop parameter,BIO_E,Biomass energy ratio
+crop_parameter,Crop parameter,HVSTI,Harvest index
+crop_parameter,Crop parameter,BLAI,Maximum potential LAI
+crop_parameter,Crop parameter,FRGRW1,First LAI point heat unit fraction 
+crop_parameter,Crop parameter,LAIMX1,First LAI fraction
+crop_parameter,Crop parameter,FRGRW2,SEcond LAI point heat unit fraction 
+crop_parameter,Crop parameter,LAIMX2,Second LAI fraction
+crop_parameter,Crop parameter,DLAI,LAI decline season fraction
+crop_parameter,Crop parameter,CHTMX,Maximum canopy hight (m)
+crop_parameter,Crop parameter,RDMX,Maximum root depth (m)
+crop_parameter,Crop parameter,T_OPT,Optimal temperature for growth
+crop_parameter,Crop parameter,T_BASE,Base temperature for growth
+crop_parameter,Crop parameter,CNYLD,Nitrogen fraction in yield (kg/kg)
+crop_parameter,Crop parameter,CPYLD,Phosphorus fraction in yield (kg/kg)
+crop_parameter,Crop parameter,BN1,Nitrogen uptake parameter 1
+crop_parameter,Crop parameter,BN2,Nitrogen uptake parameter 2
+crop_parameter,Crop parameter,BN3,Nitrogen uptake parameter 3
+crop_parameter,Crop parameter,BP1,Phosphorus uptake parameter 1
+crop_parameter,Crop parameter,BP2,Phosphorus uptake parameter 2
+crop_parameter,Crop parameter,BP3,Phosphorus uptake parameter 3
+crop_parameter,Crop parameter,WSYF,Lower limit of harvest index
+crop_parameter,Crop parameter,USLE_C,USLE cover factor
+crop_parameter,Crop parameter,GSI,Maximum stomatal conductance
+crop_parameter,Crop parameter,VPDFR,Second point vapor pressure deficit (kPa)
+crop_parameter,Crop parameter,FRGMAX,Second point stomatal conductance fraction
+crop_parameter,Crop parameter,WAVP,Radiation use efficiency per VPD
+crop_parameter,Crop parameter,CO2HI,CO2 concentration (uL/L)
+crop_parameter,Crop parameter,BIOEHI,Second point biomass-energy ratio
+crop_parameter,Crop parameter,RSDCO_PL,Plant residue decomposition ratio
+crop_parameter,Crop parameter,OV_N,Overland Manning coefficient
+crop_parameter,Crop parameter,CN2A,CN2 hydrology group A
+crop_parameter,Crop parameter,CN2B,CN2 hydrology group B
+crop_parameter,Crop parameter,CN2C,CN2 hydrology group C
+crop_parameter,Crop parameter,CN2D,CN2 hydrology group D
+crop_parameter,Crop parameter,FERTFIELD,Fertilizer field
+crop_parameter,Crop parameter,ALAI_MIN,Minimum LAI 
+crop_parameter,Crop parameter,BIO_LEAF,Fraction of biomass to residue
+crop_parameter,Crop parameter,PHU,Total number of heat units
+crop_parameter,Crop parameter,CNOP,Operational Curve Number
+crop_parameter,Crop parameter,LAI_INIT,Initial LAI
+crop_parameter,Crop parameter,BIO_INIT,Initial biomass
+crop_parameter,Crop parameter,CURYR_INIT,Initial age of trees
+farm_info,Farm information,ID,Farm ID
+farm_info,Farm information,Area_Ha,Area (ha)
+farm_subbasin,Farm - Subbasin,Farm,Farm ID
+farm_subbasin,Farm - Subbasin,Subbasin,Subbasin ID
+farm_subbasin,Farm - Subbasin,Area_Ha,Farm area (ha)
+farm_subbasin,Farm - Subbasin,ToFarm,Fraction of the farm
+farm_subbasin,Farm - Subbasin,ToSubbasin,Fraction of the subbasin
+field_farm,Field - Farm,Field,Field ID
+field_farm,Field - Farm,Farm,Farm ID
+field_farm,Field - Farm,Area_Ha,Filed area (ha)
+field_farm,Field - Farm,ToField,Fraction of the field
+field_farm,Field - Farm,ToFarm,Fraction of the farm
+field_info,Field information,ID,Field ID
+field_info,Field information,Area_Ha,Field area (ha)
+manure_and_nutrient_parameter,Manure-fertilizer management BMPs,BMP_ID,BMP ID
+manure_and_nutrient_parameter,Manure-fertilizer management BMPs,Code,BMP code
+manure_and_nutrient_parameter,Manure-fertilizer management BMPs,Description,BMP description
+manure_and_nutrient_parameter,Manure-fertilizer management BMPs,Parameter,Parameter name
+manure_and_nutrient_parameter,Manure-fertilizer management BMPs,Value,Parameter value
+manure_and_nutrient_parameter,Manure-fertilizer management BMPs,Value_String,Parameter value-string
+subbasin_info,Subbasin information,ID,ID
+subbasin_info,Subbasin information,Area_Ha,Subbasin area (ha)
+subbasin_info,Subbasin information,FlowAcc_Max,Max flow accumulation number
+subbasin_info,Subbasin information,PRC_Avg,Average potential runoff coefficient
+subbasin_info,Subbasin information,DSC_Avg,Average depression storage capacity (mm)
+subbasin_info,Subbasin information,CN2_Avg,Average curve number
+wetland_Parameter,Wetland parameter,ID,Wetland ID
+wetland_Parameter,Wetland parameter,OperationYear,Operation year
+wetland_Parameter,Wetland parameter,Subbasin,Subbasin ID
+wetland_Parameter,Wetland parameter,Type,Wetland type
+wetland_Parameter,Wetland parameter,ContributionArea_ha,Contributing area (ha)
+wetland_Parameter,Wetland parameter,NormalArea_ha,Normal area (ha)
+wetland_Parameter,Wetland parameter,NormalVolume_104M3,Normal volume (10^4m^3)
+wetland_Parameter,Wetland parameter,MaxArea_ha,Maximum area (ha)
+wetland_Parameter,Wetland parameter,MaxVolume_104M3,Maximum volume (10^4m^3)
+wetland_Parameter,Wetland parameter,K_mmHr,Bottom conductivity (mm/hr)
+wetland_Parameter,Wetland parameter,SedimentConEqui_mgL,Equilibrem sediment concentration (ml/l)
+wetland_Parameter,Wetland parameter,D50_um,Madian particle size diameter (um) 
+wetland_Parameter,Wetland parameter,SettVolN_mYr,Phosphorus settling velocity (m/yr)
+wetland_Parameter,Wetland parameter,SettVolP_mYr,Nitrogen settling velocity (m/yr)
+wetland_Parameter,Wetland parameter,ChlaProCo,ChlorophyII-a production coefficient
+wetland_Parameter,Wetland parameter,WaterCalCo,Water clarity coefficient
+wetland_Parameter,Wetland parameter,InflowFrac,Inflow fraction
+wetland_Parameter,Wetland parameter,InitialVolume_104M3,Initial volume (10^4m^3)
+wetland_Parameter,Wetland parameter,InitialSediment_mgL,Initial sediment concentration (mg/l)
+wetland_Parameter,Wetland parameter,InitialNO3_mgL,Initial NO3 concentration (mg/l)
+wetland_Parameter,Wetland parameter,InitialNO2_mgL,Initial NO2 concentration (mg/l)
+wetland_Parameter,Wetland parameter,InitialNH3_mgL,Initial NH3 concentration (mg/l)
+wetland_Parameter,Wetland parameter,InitialSolP_mgL,Initial soluble P concentration (mg/l)
+wetland_Parameter,Wetland parameter,InitialOrgN_mgL,Initial OrgN concentration (mg/l)
+wetland_Parameter,Wetland parameter,InitialOrgP_mgL,Initial OrgP concentration (mg/l)
+wetland_Parameter,Wetland parameter,RoutingConstant,Wetland routing constant
+wetland_Parameter,Wetland parameter,WetlandIDOld,Wetland ID old
+wetland_Parameter,Wetland parameter,ClassType,Class type
+wetland_Parameter,Wetland parameter,SELECTION,Selection 
+subbasin_multiplier,Subbasin multiplier,ID,Subbasin ID
+subbasin_multiplier,Subbasin multiplier,SHC,Snow holding capacity (mm)
+subbasin_multiplier,Subbasin multiplier,SOIL_T10,Soil temperature parameter
+subbasin_multiplier,Subbasin multiplier,INTERC_MAX,Max interception storage (mm)
+subbasin_multiplier,Subbasin multiplier,INTERC_MIN,Min interception storage (mm)
+subbasin_multiplier,Subbasin multiplier,USLE_C,USLE cover factor
+subbasin_multiplier,Subbasin multiplier,ROOT_DEPTH,Root depth
+subbasin_multiplier,Subbasin multiplier,MANNING,Manning coeffivcient
+subbasin_multiplier,Subbasin multiplier,FIMP,Urban impervious fraction
+subbasin_multiplier,Subbasin multiplier,FCIMP,Urban connected impervious fraction
+subbasin_multiplier,Subbasin multiplier,CURBDEN,Curb length density (km/ha)
+subbasin_multiplier,Subbasin multiplier,URBCOEF,Wash-off coefficient (mm^-1)
+subbasin_multiplier,Subbasin multiplier,DIRTMX,Max solid amount on the impervious area (kg/km)
+subbasin_multiplier,Subbasin multiplier,THALF,Days to half DIRTMX
+subbasin_multiplier,Subbasin multiplier,TNCONC,TN concentration in solid (mg/kg)
+subbasin_multiplier,Subbasin multiplier,TPCONC,TP concentration in solid (mg/kg)
+subbasin_multiplier,Subbasin multiplier,TNO3CONC,NO3 concentration in solid (mg/kg)
+subbasin_multiplier,Subbasin multiplier,URBCN2,CN2 moisture condition 2 in impervious area
+subbasin_multiplier,Subbasin multiplier,PET_LAI_COEFFICIENT,PET-LAI-coefficient
+subbasin_multiplier,Subbasin multiplier,CONDUCTIVITY,Soil hydraulic conductivity
+subbasin_multiplier,Subbasin multiplier,DEPTH,Soil depth
+subbasin_multiplier,Subbasin multiplier,POROSITY,Soil porosity
+subbasin_multiplier,Subbasin multiplier,FIELD_CAPACITY,Soil field capacity
+subbasin_multiplier,Subbasin multiplier,WILTING_POINT,Soil wilting point moisture
+subbasin_multiplier,Subbasin multiplier,RESIDUAL,Soil residue moisture
+subbasin_multiplier,Subbasin multiplier,PORE_INDEX,Soil pore size distribution index
+subbasin_multiplier,Subbasin multiplier,DENSITY,Soil density
+subbasin_multiplier,Subbasin multiplier,SAND,Sand fraction
+subbasin_multiplier,Subbasin multiplier,CLAY,Clay fraction
+subbasin_multiplier,Subbasin multiplier,SLIT,Silt fraction
+subbasin_multiplier,Subbasin multiplier,USLE_K,USLE soil erodibility factor
+subbasin_multiplier,Subbasin multiplier,CN2,Curve number - moisture condition 2
+subbasin_multiplier,Subbasin multiplier,RUNOFF_CO,Potential runoff coefficient
+subbasin_multiplier,Subbasin multiplier,DEPRESSION,Depression storage (mm)
+subbasin_multiplier,Subbasin multiplier,SOIL_MOIST_IN,Initial soil moisture fraction of field capacity
+subbasin_multiplier,Subbasin multiplier,SOIL_NO3_IN,Initial soil NO3 (mg/kg)
+subbasin_multiplier,Subbasin multiplier,SOIL_ORGN_IN,Initial soil OrgN (mg/kg)
+subbasin_multiplier,Subbasin multiplier,SOIL_SOLP_IN,Initial soil soluble P (mg/kg)
+subbasin_multiplier,Subbasin multiplier,SOIL_ORGP_IN,Initial soil OrgP (mg/kg)
+subbasin_multiplier,Subbasin multiplier,INTERFLOW_SCALE_FACTOR,Interflow scale factor
+reach_lookup,Reach lookup,UpStream,Upstream ID
+reach_lookup,Reach lookup,DownStream,Downstream ID
+reach_lookup,Reach lookup,Rank,Rank
+crop_management,Crop management,Scenario,Scenario
+crop_management,Crop management,Location,Location
+crop_management,Crop management,ID,ID
+crop_management,Crop management,CropCode,Crop code
+crop_management,Crop management,Year,Year
+crop_management,Crop management,PlantingDay,Planting day
+crop_management,Crop management,PlantingMon,Planting month
+crop_management,Crop management,HarvestDay,Harvest day
+crop_management,Crop management,HarvestMon,Harvest month
+crop_management,Crop management,HarvestEfficiency,Harvest efficiency
+crop_management,Crop management,HarvestType,Harvest type
+crop_management,Crop management,HarvestIndexOverride,Harvest index override
+crop_management,Crop management,CNOP,Operation curve number
+crop_management,Crop management,StoverFraction,Stover fraction
+crop_management,Crop management,IsGrain,Is grain or not
+crop_management,Crop management,PRCOP,Operation potential runoff coefficeint
+tillage_parameter,Tillage parameter,ITNUM,Tillage ID
+tillage_parameter,Tillage parameter,TILLNM,Tillage Name
+tillage_parameter,Tillage parameter,DESCRIPTION,Tillage full name
+tillage_parameter,Tillage parameter,EFFMIX,Mixing efficiency
+tillage_parameter,Tillage parameter,DEPTIL,Mixing depth (mm)
+tillage_parameter,Tillage parameter,CNOP_CN2,Relative operation curve number
+tillage_parameter,Tillage parameter,PRC,Relative operation potential runoff coefficeint
+tillage_parameter,Tillage parameter,DSC,Relative depression storage capacity
+fertilizer_parameter,Fertilizer parameter,IFNUM,Fertilizer ID
+fertilizer_parameter,Fertilizer parameter,FERTNM,Fertilizer code
+fertilizer_parameter,Fertilizer parameter,DESCRIPTION,Fertilizer name
+fertilizer_parameter,Fertilizer parameter,FMINN,Mineral N fraction
+fertilizer_parameter,Fertilizer parameter,FMINP,Mineral P fraction
+fertilizer_parameter,Fertilizer parameter,FORGN,Organic N fraction
+fertilizer_parameter,Fertilizer parameter,FORGP,Organic P fraction
+fertilizer_parameter,Fertilizer parameter,FNH3N,NH3-N fraction
+fertilizer_parameter,Fertilizer parameter,BACTPDB,Persistent bacteriaconcentration in manure
+fertilizer_parameter,Fertilizer parameter,BACTLPDB,Less persistent bacteria concentration in manure
+fertilizer_parameter,Fertilizer parameter,BACKTKDDB,Bacteria partition coefficient
+fertilizer_parameter,Fertilizer parameter,IsManure,Is manure or not
+RipaBuffer_management,Riparian buffer management,Scenario,Scenario ID
+RipaBuffer_management,Riparian buffer management,ID,Buffer number
+RipaBuffer_management,Riparian buffer management,Year,Year
+RipaBuffer_management,Riparian buffer management,RIBUF_ID,Buffer ID
+RipaBuffer_management,Riparian buffer management,Subbasin,Subbasin ID
+RipaBuffer_management,Riparian buffer management,VegetationID,Vegetation ID
+RipaBuffer_management,Riparian buffer management,Length,Buffer length (m)
+RipaBuffer_management,Riparian buffer management,Width,Buffer width (m)
+RipaBuffer_management,Riparian buffer management,Area_ha,Buffer area (ha)
+RipaBuffer_management,Riparian buffer management,Drainage_Area,Buffer drainage area (ha)
+RipaBuffer_management,Riparian buffer management,Area_Ratio,Drainage - buffer area ration
+RipaBuffer_management,Riparian buffer management,Slope,buffer slope
+RipaBuffer_management,Riparian buffer management,Sol_K,Buffer soil hydraulic conductivity (mm/hr)
+RipaBuffer_management,Riparian buffer management,Sol_porosity,Buffer soil porosity
+RipaBuffer_management,Riparian buffer management,Root_Depth,Buffer vegetation root depth (m)
+RipaBuffer_management,Riparian buffer management,SELECTION,Selection
+SubareaRiparianBufferLookup,Subarea - Riparian buffer,SubareaId,Subarea ID
+SubareaRiparianBufferLookup,Subarea - Riparian buffer,LocationId,Location ID
+SubareaRiparianBufferLookup,Subarea - Riparian buffer,FractionToBmp,Fraction of buffer area
+SubareaRiparianBufferLookup,Subarea - Riparian buffer,FractionToSubarea,Fraction of subbasin
+SubareaRiparianBufferDrainageLookup,Subarea - Riparian buffer - drainage,LocationId,Location ID
+SubareaRiparianBufferDrainageLookup,Subarea - Riparian buffer - drainage,SubareaId,Subarea ID
+SubareaRiparianBufferDrainageLookup,Subarea - Riparian buffer - drainage,FractionToSubarea,Fraction of Subarea
+SubareaTileDrainLookup,Subarea - Tile-drain,SubareaId,Subarea ID
+SubareaTileDrainLookup,Subarea - Tile-drain,LocationId,Location ID
+SubareaTileDrainLookup,Subarea - Tile-drain,FractionToBmp,Fraction of tile-drain area
+SubareaTileDrainLookup,Subarea - Tile-drain,FractionToSubarea,Fraction of subarea
+tiledrain_att,Tile-drain parameter,OBJECTID_12,Object ID
+tiledrain_att,Tile-drain parameter,OBJECTID_1,Object ID
+tiledrain_att,Tile-drain parameter,OBJECTID,Object ID
+tiledrain_att,Tile-drain parameter,Field_Code,Field ID
+tiledrain_att,Tile-drain parameter,Reclass,Crop code
+tiledrain_att,Tile-drain parameter,Shape_Leng,Shape length (m)
+tiledrain_att,Tile-drain parameter,Shape_Le_1,Shape length (m)
+tiledrain_att,Tile-drain parameter,PumpScheme,Pump scheme
+tiledrain_att,Tile-drain parameter,Shape_Length,Shape length (m)
+tiledrain_att,Tile-drain parameter,Shape_Area,Shape area (ha)
+tiledrain_att,Tile-drain parameter,Id,Tile drain ID
+tiledrain_att,Tile-drain parameter,Tile_Spacing_mm,Tile spacing (mm)
+tiledrain_att,Tile-drain parameter,Tile_Depth_mm,Tile depth (mm)
+outlet_drainage,Tile-drain outlet,Id,Tile drain outlet ID
+outlet_drainage,Tile-drain outlet,Reach,Reach ID
+outlet_drainage,Tile-drain outlet,DrainageCapacity,Tile flow capacity (m^3/d)
+IMWEBsWetlands_InptWtlnds_Inter,JEN input wetlands,OBJECTID,Object ID
+IMWEBsWetlands_InptWtlnds_Inter,JEN input wetlands,FID_11_Wetlands,Wetland number in Field 11
+IMWEBsWetlands_InptWtlnds_Inter,JEN input wetlands,Shape_Leng,Shape length in Field 11 (mm)
+IMWEBsWetlands_InptWtlnds_Inter,JEN input wetlands,ID,Wetland ID
+IMWEBsWetlands_InptWtlnds_Inter,JEN input wetlands,FieldType,Wetland field type
+IMWEBsWetlands_InptWtlnds_Inter,JEN input wetlands,FID_IMWEBsWetlands,IMWEBs wetland ID
+IMWEBsWetlands_InptWtlnds_Inter,JEN input wetlands,Id_1,IMWEBs wetland ID
+IMWEBsWetlands_InptWtlnds_Inter,JEN input wetlands,gridcode,Grid code
+IMWEBsWetlands_InptWtlnds_Inter,JEN input wetlands,Shape_Length,Wetland shape length (m)
+IMWEBsWetlands_InptWtlnds_Inter,JEN input wetlands,Shape_Area,Wetland shape area (ha)
+JEN_WetlandParameter,JEN wetland parameter,ID,Wetland ID
+JEN_WetlandParameter,JEN wetland parameter,Shape_Leng,Shape length (m)
+JEN_WetlandParameter,JEN wetland parameter,Shape_Area,Shape area (ha)
+JEN_WetlandParameter,JEN wetland parameter,MaxAreaExisting_ha,Maximum area existing (ha)
+JEN_WetlandParameter,JEN wetland parameter,MaxVolumeExisting_104M3,Maximum volume existing (10^4m^3)
+JEN_WetlandParameter,JEN wetland parameter,MaxAreaRestored_ha,Maximum area restored (ha)
+JEN_WetlandParameter,JEN wetland parameter,MaxVolumeRestored_104M3,Maximum volume retstored (10^4m^3)
+JEN_WetlandParameter,JEN wetland parameter,ScenarioType,Scenario type
+JEN_WetlandParameter,JEN wetland parameter,WetlandType,Wetland type
+JEN_WetlandParameter,JEN wetland parameter,NormalAreaExisting_ha,Normal area existing (ha)
+JEN_WetlandParameter,JEN wetland parameter,NormalVolumeExisting_104M3,Normal volume existing (10^4m^3)
+JEN_WetlandParameter,JEN wetland parameter,NormalAreaRestored_ha,Normal area restored (ha)
+JEN_WetlandParameter,JEN wetland parameter,NormalVolumeRestored_104M3,Normal volume restored (10^4m^3)
+IMWEBsWetlands_Subbasin_Inter,JEN Wetland - Subbasin,OBJECTID,Object ID
+IMWEBsWetlands_Subbasin_Inter,JEN Wetland - Subbasin,FID_IMWEBsWetlands,IMWEBs wetland Id
+IMWEBsWetlands_Subbasin_Inter,JEN Wetland - Subbasin,Id,Wetland Id
+IMWEBsWetlands_Subbasin_Inter,JEN Wetland - Subbasin,gridcode,Wetland grid code
+IMWEBsWetlands_Subbasin_Inter,JEN Wetland - Subbasin,FID_subbasin_dis,Subbasin ID
+IMWEBsWetlands_Subbasin_Inter,JEN Wetland - Subbasin,gridcode_1,Subbasin grid code
+IMWEBsWetlands_Subbasin_Inter,JEN Wetland - Subbasin,Shape_Length,Shape length (m)
+IMWEBsWetlands_Subbasin_Inter,JEN Wetland - Subbasin,Shape_Area,Shape area (ha)
+WetlandInputImwebsLookup,JEN Wetland - IMWEBs,WetlandIdInput,Wetland input ID
+WetlandInputImwebsLookup,JEN Wetland - IMWEBs,WetlandIdImwebs,Wetland IMWEBs ID
+WetlandInputImwebsLookup,JEN Wetland - IMWEBs,Area_ha,Wetland area (ha)
+WetlandInputImwebsLookup,JEN Wetland - IMWEBs,ToInput,Fraction of input wetland
+WetlandInputImwebsLookup,JEN Wetland - IMWEBs,ToImwebs,Fraction of IMWEBs wetland
+WetlandParameterImwebs,JEN Wetland parameter ,Id,Wetland ID
+WetlandParameterImwebs,JEN Wetland parameter ,MaxAreaExisting_ha,Maximum area existing (ha)
+WetlandParameterImwebs,JEN Wetland parameter ,MaxVolumeExisting_104M3,Maximum volume existing (10^4m^3)
+WetlandParameterImwebs,JEN Wetland parameter ,MaxAreaRestored_ha,Maximum area restored (ha)
+WetlandParameterImwebs,JEN Wetland parameter ,MaxVolumeRestored_104M3,Maximum volume retstored (10^4m^3)
+WetlandParameterImwebs,JEN Wetland parameter ,NormalAreaExisting_ha,Normal area existing (ha)
+WetlandParameterImwebs,JEN Wetland parameter ,NormalVolumeExisting_104M3,Normal volume existing (10^4m^3)
+WetlandParameterImwebs,JEN Wetland parameter ,NormalAreaRestored_ha,Normal area restored (ha)
+WetlandParameterImwebs,JEN Wetland parameter ,NormalVolumeRestored_104M3,Normal volume restored (10^4m^3)
+WetlandParameterImwebs,JEN Wetland parameter ,ScenarioType,Scenario type
+WetlandParameterImwebs,JEN Wetland parameter ,WetlandType,Wetland type
+Subarea,Subarea parameter,Id,Wetland ID
+Subarea,Subarea parameter,SubbasinId,Subbasin ID
+Subarea,Subarea parameter,FieldId,Field ID
+Subarea,Subarea parameter,Area,Subarea area (ha)
+Subarea,Subarea parameter,Elevation,Elevation (m)
+Subarea,Subarea parameter,Slope,Slope (%)
+Subarea,Subarea parameter,USLE_P,USLE practice factor
+Subarea,Subarea parameter,MoistureInitial,Initial soil moisture
+Subarea,Subarea parameter,FlowAccumulationAverage,Average flow accumulation number
+Subarea,Subarea parameter,WetlandFraction,Wetland fraction
+Subarea,Subarea parameter,TravelTimeAverage2,Average 2-yr flood travel time (hr)
+Subarea,Subarea parameter,TravelTimeAverage10,Average 10-yr flood travel time (hr)
+Subarea,Subarea parameter,TravelTimeAverage100,Average 100-yr flood travel time (hr)
+Subarea,Subarea parameter,TravelTimeStd2, Std of 2-yr flood travel time (hr)
+Subarea,Subarea parameter,TravelTimeStd10, Std of 10-yr flood travel time (hr)
+Subarea,Subarea parameter,TravelTimeStd100, Std of 100-yr flood travel time (hr)
+Subarea,Subarea parameter,TopographyWeight,Elevation weight
+Subarea,Subarea parameter,LateralWidth,Lateral width (m)
+SubareaLanduseType,Subarea land use type,SubareaId,Subarea ID
+SubareaLanduseType,Subarea land use type,LanduseTypeId,Landuse type ID
+SubareaLanduseType,Subarea land use type,Area,Area (ha)
+SubareaSoilType,Subarea soil type,SubareaId,Subarea ID
+SubareaSoilType,Subarea soil type,SoilTypeId,Soil type ID
+SubareaSoilType,Subarea soil type,Area,Area (ha)
+CellSubarea,Cell - Subarea,CellIndex,Cell Index
+CellSubarea,Cell - Subarea,SubareaId,Subarea ID
+field_subbasin,Field - Subbasin,SubbasinId,Subbasin ID
+field_subbasin,Field - Subbasin,FieldId,Field ID
+field_subbasin,Field - Subbasin,Area_ha,Area (ha)
+field_subbasin,Field - Subbasin,ToField,Fraction of field
+field_subbasin,Field - Subbasin,ToSubbasin,Fraction of Subbasin
+tldn_parameter,Tile-drain parameters,Scenario,Scenario ID
+tldn_parameter,Tile-drain parameters,Id,Tile drain Id
+tldn_parameter,Tile-drain parameters,StartYear,Starting year
+tldn_parameter,Tile-drain parameters,StartMon,Starting month
+tldn_parameter,Tile-drain parameters,StartDay,Starting day
+tldn_parameter,Tile-drain parameters,FieldId,Field ID
+tldn_parameter,Tile-drain parameters,OutletReachId,Outlet reach ID
+tldn_parameter,Tile-drain parameters,Type,Tile drain type
+tldn_parameter,Tile-drain parameters,Elevation,Elevation 9m)
+tldn_parameter,Tile-drain parameters,Depth,Depth (m)
+tldn_parameter,Tile-drain parameters,ControlDepth,Control depth (m)
+tldn_parameter,Tile-drain parameters,ControlStartMon,Control starting month
+tldn_parameter,Tile-drain parameters,ControlEndMon,Control end month
+tldn_parameter,Tile-drain parameters,Radius,Tile radius (mm)
+tldn_parameter,Tile-drain parameters,Spacing,tile spacing (mm)
+tldn_parameter,Tile-drain parameters,OutletCapacity,Outlet capacity (m^3/d)
+tldn_parameter,Tile-drain parameters,LagCoefficient,Tile lag coefficient
+tldn_parameter,Tile-drain parameters,DepthToImperviableLayer,Depth to imperviable layer (m)
+tldn_parameter,Tile-drain parameters,LateralKScale,Lateral conductivity scale factor
+tldn_parameter,Tile-drain parameters,SedimentCon,Sediment concentration (mg/l)
+tldn_parameter,Tile-drain parameters,OrgNConc,OrgN concentration (mg/l)
+tldn_parameter,Tile-drain parameters,OrgPConc,OrgP concentration (mg/l)
+tldn_parameter,Tile-drain parameters,PRCTile,PRC correction factor for tile drain field
+tldn_parameter,Tile-drain parameters,CNTile,CN2 correction factor for tile drain field
+tldn_parameter,Tile-drain parameters,GWT0,Initial groundwater storage (mm)
+Reservoir_data,Reservoir data,ID,Reservoir ID
+Reservoir_data,Reservoir data,SubbasinId,Subbasin ID
+Reservoir_data,Reservoir data,SA_EM,Emergency surface area (ha)
+Reservoir_data,Reservoir data,V_EM,Emergency volume (10^4m^3)
+Reservoir_data,Reservoir data,SA_PR,Principle surface area (ha)
+Reservoir_data,Reservoir data,V_PR,Principle volume (10^4m^3)
+Reservoir_data,Reservoir data,INI_S,Initial storage (10^4m^3)
+Reservoir_data,Reservoir data,k_res,Bottom hydraulic conductivity (mm/hr)
+Reservoir_data,Reservoir data,OFLOWMX01,Maximum outflow Jan. (m^3/s)
+Reservoir_data,Reservoir data,OFLOWMX02,Maximum outflow Feb. (m^3/s)
+Reservoir_data,Reservoir data,OFLOWMX03,Maximum outflow Mar. (m^3/s)
+Reservoir_data,Reservoir data,OFLOWMX04,Maximum outflow Apr. (m^3/s)
+Reservoir_data,Reservoir data,OFLOWMX05,Maximum outflow May (m^3/s)
+Reservoir_data,Reservoir data,OFLOWMX06,Maximum outflow Jun. (m^3/s)
+Reservoir_data,Reservoir data,OFLOWMX07,Maximum outflow Jul. (m^3/s)
+Reservoir_data,Reservoir data,OFLOWMX08,Maximum outflow Aug. (m^3/s)
+Reservoir_data,Reservoir data,OFLOWMX09,Maximum outflow Sep. (m^3/s)
+Reservoir_data,Reservoir data,OFLOWMX10,Maximum outflow Oct. (m^3/s)
+Reservoir_data,Reservoir data,OFLOWMX11,Maximum outflow Nov. (m^3/s)
+Reservoir_data,Reservoir data,OFLOWMX12,Maximum outflow Dec. (m^3/s)
+Reservoir_data,Reservoir data,STARG01,Target storage Jan. (10^4m^3)
+Reservoir_data,Reservoir data,STARG02,Target storage Feb. (10^4m^3)
+Reservoir_data,Reservoir data,STARG03,Target storage Mar. (10^4m^3)
+Reservoir_data,Reservoir data,STARG04,Target storage Apr. (10^4m^3)
+Reservoir_data,Reservoir data,STARG05,Target storage May. (10^4m^3)
+Reservoir_data,Reservoir data,STARG06,Target storage Jun. (10^4m^3)
+Reservoir_data,Reservoir data,STARG07,Target storage Jul. (10^4m^3)
+Reservoir_data,Reservoir data,STARG08,Target storage Aug. (10^4m^3)
+Reservoir_data,Reservoir data,STARG09,Target storage Sep. (10^4m^3)
+Reservoir_data,Reservoir data,STARG10,Target storage Oct. (10^4m^3)
+Reservoir_data,Reservoir data,STARG11,Target storage Nov. (10^4m^3)
+Reservoir_data,Reservoir data,STARG12,Target storage Dec. (10^4m^3)
+fertilizer_management,Fertilizer management,Scenario,Scenario ID
+fertilizer_management,Fertilizer management,Location,Filed ID
+fertilizer_management,Fertilizer management,Year,Year
+fertilizer_management,Fertilizer management,FerMon,Fertilizer application month
+fertilizer_management,Fertilizer management,FerDay,Fertilizer application date
+fertilizer_management,Fertilizer management,FerType,Fertilizer type
+fertilizer_management,Fertilizer management,FerRate,Fertilizer application rate (kg/ha)
+fertilizer_management,Fertilizer management,FerSurface,Fertilizer furface fraction 
+tillage_management,Tillage management,Scenario,Scenario ID
+tillage_management,Tillage management,Location,Field ID
+tillage_management,Tillage management,Year,Year
+tillage_management,Tillage management,TillMon,Tillage application month
+tillage_management,Tillage management,TillDay,Tillage application date
+tillage_management,Tillage management,TillCode,Tillage code
+Reservoir,Reservoir parameter,ID,Reservoir ID
+Reservoir,Reservoir parameter,XLL,X-coordinate
+Reservoir,Reservoir parameter,YLL,Y-coordinate
+Reservoir,Reservoir parameter,OPERATION,Operation year
+Reservoir,Reservoir parameter,SA_EM,Emergency surface area (ha)
+Reservoir,Reservoir parameter,V_EM,Emergency volume (10^4m^3)
+Reservoir,Reservoir parameter,SA_PR,Principle surface area (ha)
+Reservoir,Reservoir parameter,V_PR,Principle volume (10^4m^3)
+Reservoir,Reservoir parameter,INI_S,Initial storage (10^4m^3)
+Reservoir,Reservoir parameter,Q_REL,Average spillway release (m^3/s)
+Reservoir,Reservoir parameter,k_res,Bottom hydraulic conductivity (mm/hr)
+Reservoir,Reservoir parameter,OFLOWMN01,Minimum outflow Jan. (m^3/s)
+Reservoir,Reservoir parameter,OFLOWMN02,Minimum outflow Feb. (m^3/s)
+Reservoir,Reservoir parameter,OFLOWMN03,Minimum outflow Mar. (m^3/s)
+Reservoir,Reservoir parameter,OFLOWMN04,Minimum outflow Apr. (m^3/s)
+Reservoir,Reservoir parameter,OFLOWMN05,Minimum outflow May (m^3/s)
+Reservoir,Reservoir parameter,OFLOWMN06,Minimum outflow Jun. (m^3/s)
+Reservoir,Reservoir parameter,OFLOWMN07,Minimum outflow Jul. (m^3/s)
+Reservoir,Reservoir parameter,OFLOWMN08,Minimum outflow Aug. (m^3/s)
+Reservoir,Reservoir parameter,OFLOWMN09,Minimum outflow Sep. (m^3/s)
+Reservoir,Reservoir parameter,OFLOWMN10,Minimum outflow Oct. (m^3/s)
+Reservoir,Reservoir parameter,OFLOWMN11,Minimum outflow Nov. (m^3/s)
+Reservoir,Reservoir parameter,OFLOWMN12,Minimum outflow Dec. (m^3/s)
+Reservoir,Reservoir parameter,OFLOWMX01,Maximum outflow Jan. (m^3/s)
+Reservoir,Reservoir parameter,OFLOWMX02,Maximum outflow Feb. (m^3/s)
+Reservoir,Reservoir parameter,OFLOWMX03,Maximum outflow Mar. (m^3/s)
+Reservoir,Reservoir parameter,OFLOWMX04,Maximum outflow Apr. (m^3/s)
+Reservoir,Reservoir parameter,OFLOWMX05,Maximum outflow May (m^3/s)
+Reservoir,Reservoir parameter,OFLOWMX06,Maximum outflow Jun. (m^3/s)
+Reservoir,Reservoir parameter,OFLOWMX07,Maximum outflow Jul. (m^3/s)
+Reservoir,Reservoir parameter,OFLOWMX08,Maximum outflow Aug. (m^3/s)
+Reservoir,Reservoir parameter,OFLOWMX09,Maximum outflow Sep. (m^3/s)
+Reservoir,Reservoir parameter,OFLOWMX10,Maximum outflow Oct. (m^3/s)
+Reservoir,Reservoir parameter,OFLOWMX11,Maximum outflow Nov. (m^3/s)
+Reservoir,Reservoir parameter,OFLOWMX12,Maximum outflow Dec. (m^3/s)
+Reservoir,Reservoir parameter,METHOD,Flow routing method
+Reservoir,Reservoir parameter,SEDMETHOD,Sediment routing method
+Reservoir,Reservoir parameter,INT_SC,Initial sediment concentration (mg/l)
+Reservoir,Reservoir parameter,NSED,Normal sediment concentration (mg/l)
+Reservoir,Reservoir parameter,D50,Median sediment diameter [um]
+Reservoir,Reservoir parameter,NUTMETHOD,Nutrient routing method
+Reservoir,Reservoir parameter,FILE,Read in file name and path
+Reservoir,Reservoir parameter,PSETLR,Phosphorus settling rate (m/yr)
+Reservoir,Reservoir parameter,NSETLR,Nitrogen settling rate (m/yr)
+Reservoir,Reservoir parameter,CHLAR,ChlorophyII-a Pproduction coefficient
+Reservoir,Reservoir parameter,SECCIR,Water clarity coefficient
+Reservoir,Reservoir parameter,ORGP,Initial OrgP concentration (mg/l)
+Reservoir,Reservoir parameter,SOLP,Initial SolP concentration (mg/l)
+Reservoir,Reservoir parameter,ORGN,Initial OrgN concentration (mg/l)
+Reservoir,Reservoir parameter,NO3,Initial NO3 concentration (mg/l)
+Reservoir,Reservoir parameter,NH3,Initial NH3 concentration (mg/l)
+Reservoir,Reservoir parameter,NO2,Initial NO2 concentration (mg/l)
+Reservoir,Reservoir parameter,IFLOD1R,Beginning month of non-flood season
+Reservoir,Reservoir parameter,IFLOD2R,Ending month of non-flood season
+Reservoir,Reservoir parameter,NDTARGR,Days to reach target storage
+Reservoir,Reservoir parameter,STARG01,Target storage Jan. (10^4m^3)
+Reservoir,Reservoir parameter,STARG02,Target storage Feb. (10^4m^3)
+Reservoir,Reservoir parameter,STARG03,Target storage Mar. (10^4m^3)
+Reservoir,Reservoir parameter,STARG04,Target storage Apr. (10^4m^3)
+Reservoir,Reservoir parameter,STARG05,Target storage May. (10^4m^3)
+Reservoir,Reservoir parameter,STARG06,Target storage Jun. (10^4m^3)
+Reservoir,Reservoir parameter,STARG07,Target storage Jul. (10^4m^3)
+Reservoir,Reservoir parameter,STARG08,Target storage Aug. (10^4m^3)
+Reservoir,Reservoir parameter,STARG09,Target storage Sep. (10^4m^3)
+Reservoir,Reservoir parameter,STARG10,Target storage Oct. (10^4m^3)
+Reservoir,Reservoir parameter,STARG11,Target storage Nov. (10^4m^3)
+Reservoir,Reservoir parameter,STARG12,Target storage Dec. (10^4m^3)
+Reservoir,Reservoir parameter,SELECTION,Selection
