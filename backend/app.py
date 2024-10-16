@@ -1,7 +1,6 @@
 from flask import Flask, request, jsonify, send_file
 import signal
 import pandas as pd
-import sys
 import sqlite3
 import os
 from datetime import datetime
@@ -9,7 +8,7 @@ from flask_cors import CORS  # Import CORS
 
 app = Flask(__name__)
 CORS(app)  # Apply CORS to the entire app
-PATHFILE = sys._MEIPASS if getattr(app, 'frozen', False) else os.path.dirname(os.path.realpath(__file__))
+PATHFILE = os.path.dirname(os.path.realpath(__file__))
 
 
 # Helper function to fetch data from the SQLite database
@@ -206,7 +205,7 @@ def list_files():
     """
     folder_path = request.args.get("folder_path", "Jenette_Creek_Watershed")
     base_folder = folder_path
-    base_path = sys._MEIPASS if getattr(sys, 'frozen', False) else os.path.dirname(__file__)
+    base_path = os.path.dirname(__file__)
     folder_path = os.path.join(base_path, folder_path)  # Absolute path Get absolute path relative to app.py
     allowed_base_path = os.path.abspath(os.path.join(base_path, base_folder))  # Absolute base folder path
 
