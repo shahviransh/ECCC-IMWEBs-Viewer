@@ -206,7 +206,7 @@ def list_files():
     """
     folder_path = request.args.get("folder_path", "Jenette_Creek_Watershed")
     base_folder = folder_path
-    base_path = sys._MEIPASS if getattr(sys, 'frozen', False) else os.path.dirname(__file__)
+    base_path = (sys._MEIPASS if getattr(sys, 'frozen', False) else os.path.dirname(__file__)) if folder_path == "Jenette_Creek_Watershed" else folder_path
     folder_path = os.path.join(base_path, folder_path)  # Absolute path Get absolute path relative to app.py
     allowed_base_path = os.path.abspath(os.path.join(base_path, base_folder))  # Absolute base folder path
 
