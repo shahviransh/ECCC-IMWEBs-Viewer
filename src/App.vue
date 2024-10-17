@@ -54,13 +54,14 @@ export default {
     ...mapState(["theme"]),
   },
   methods: {
-    ...mapActions(["updateTheme"]),
+    ...mapActions(["updateTheme", "updatePageTitle"]),
     selectFolder() {
       // Placeholder for selecting a folder, could be integrated with backend logic
       this.folderPath = "Jenette_Creek_Watershed";
     },
     navigateTo(page) {
       this.activePage = page; // Update active page
+      this.updatePageTitle(this.activePage);
       this.$router.push({ name: page });
     },
     toggleTheme() {
@@ -72,6 +73,7 @@ export default {
   mounted() {
     // Set initial theme on load
     document.body.className = this.theme;
+    this.updatePageTitle(this.activePage);
   },
 };
 </script>

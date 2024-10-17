@@ -2,13 +2,12 @@
     <div class="folder-tree">
         <ul class="list-group">
             <li v-for="(node, index) in treeData" :key="node.id">
-                <div :class="['node', { 
-                        'folder-node': node.type === 'folder', 
-                        'file-node': node.type === 'file' || node.type === 'database' || node.type === 'table', 
-                        'top-level-node': index === 0,
-                        'expanded': node.expanded }]"
-
-                    @click="toggleNode(node)">
+                <div :class="['node', {
+                    'folder-node': node.type === 'folder',
+                    'file-node': node.type === 'file' || node.type === 'database' || node.type === 'table',
+                    'top-level-node': index === 0,
+                    'expanded': node.expanded
+                }]" @click="toggleNode(node)">
                     <span v-if="node.type === 'folder'">{{ node.expanded ? '📂' : '📁' }}</span>
                     <span v-else-if="node.type === 'database'">🗄️</span>
                     <span v-else>📄</span>
@@ -16,7 +15,7 @@
                 </div>
                 <!-- Recursively display children if the node is expanded -->
                 <folder-tree v-if="node.children && node.children.length > 0 && node.expanded" :treeData="node.children"
-                    @select="onSelect" />
+                    @select="onSelect" :page="page" />
             </li>
         </ul>
     </div>
@@ -29,6 +28,23 @@ export default {
         treeData: {
             type: Object,
             required: true
+        },
+        page: {
+            type: String,
+            required: true
+        }
+    },
+    watch: {
+        treeData: {
+            handler(newVal) {
+                this.expandNodesBasedOnPage(this.page);
+            },
+            deep: true
+        },
+        page: {
+            handler(newVal) {
+                this.expandNodesBasedOnPage(newVal);
+            }
         }
     },
     methods: {
@@ -43,6 +59,35 @@ export default {
         onSelect(node) {
             // Propagate the select event upwards
             this.$emit('select', node);
+        },
+        expandNodesBasedOnPage(page) {
+            if (page === 'Project') {
+                // Automatically expand the database node folder
+                this.expandSpecificNode(this.treeData, 'Database');
+            } else if (page === 'Table') {
+                // Automatically expand the Model01\Output\Scenario_2 folder
+                this.expandSpecificNode(this.treeData, 'Scenario_2');
+            }
+        },
+        expandSpecificNode(nodes, targetName) {
+            for (let node of nodes) {
+                if (node.type == 'folder') {
+                    if (node.id == 1){
+                        node.expanded = true;
+                    }
+                    if (node.name === targetName) {
+                        node.expanded = true;
+                        return; // Stop once the target node is found and expanded
+                    }
+                    // Recursively expand children nodes if they exist
+                    if (node.children && node.children.length > 0) {
+                        if (node.type === 'folder' && (node.name.includes("Model") || node.name.includes("Output"))) {
+                            node.expanded = true;
+                        }
+                        this.expandSpecificNode(node.children, targetName);
+                    }
+                }
+            }
         }
     }
 };
@@ -91,7 +136,8 @@ export default {
     transition: transform 0.2s ease-in-out;
 }
 
-.folder-node.expanded::before { /* Apply rotation when the node is expanded */
+.folder-node.expanded::before {
+    /* Apply rotation when the node is expanded */
     transform: rotate(90deg);
 }
 

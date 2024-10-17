@@ -12,6 +12,7 @@ const store = createStore({
       end: null,
     },
     theme: "light",
+    pageTitle: "",
     databases: [],
     tables: [],
     columns: [],
@@ -55,6 +56,9 @@ const store = createStore({
     },
     SET_THEME(state, theme) {
       state.theme = theme;
+    },
+    SET_PAGE_TITLE(state, title) {
+      state.pageTitle = title;
     },
     SET_SELECTED_DB(state, db) {
       state.selectedDb = db;
@@ -183,6 +187,9 @@ const store = createStore({
     },
     updateSelectedTable({ commit }, table) {
       commit("SET_SELECTED_TABLE", table);
+    },
+    updatePageTitle({ commit }, title) {
+      commit("SET_PAGE_TITLE", title);
     },
     updateSelectedColumns({ commit }, columns) {
       commit("SET_SELECTED_COLUMNS", columns);

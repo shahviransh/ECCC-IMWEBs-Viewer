@@ -1,6 +1,5 @@
 import { createRouter, createWebHistory } from "vue-router";
 import Project from "../pages/Project.vue";
-import Table from "../pages/Table.vue";
 import Graph from "../pages/Graph.vue";
 import Map from "../pages/Map.vue";
 import Calibration from "../pages/Calibration.vue";
@@ -21,7 +20,7 @@ const routes = [
   {
     path: "/table",
     name: "Table",
-    component: Table,
+    component: Project,
   },
   {
     path: "/graph",

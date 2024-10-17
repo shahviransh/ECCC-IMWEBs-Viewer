@@ -1,5 +1,5 @@
 <template>
-    <folder-tree :treeData="treeData" @select="onSelect" />
+    <folder-tree :treeData="treeData" :page="pageTitle" @select="onSelect" />
 </template>
 
 <script>
@@ -18,7 +18,7 @@ export default {
         FolderTree
     },
     computed: {
-        ...mapState(['databases', 'tables']),
+        ...mapState(['databases', 'tables', 'pageTitle']),
     },
     mounted() {
         this.fetchDatabases();
