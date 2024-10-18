@@ -64,10 +64,10 @@ export default {
         expandNodesBasedOnPage(page) {
             if (page === 'Table') {
                 // Automatically expand the database node folder
-                this.expandSpecificNode(this.treeData, 'Database');
+                this.expandSpecificNode(this.treeData, 'database');
             } else if (page === 'Project') {
                 // Automatically expand the Model01\Output\Scenario_2 folder
-                this.expandSpecificNode(this.treeData, 'Model');
+                this.expandSpecificNode(this.treeData, 'model');
             }
         },
         expandSpecificNode(nodes, targetName) {
@@ -77,7 +77,7 @@ export default {
                     this.expandSpecificNode(node.children, targetName);
                     return;
                 }
-                if (node.name.includes(targetName)) {
+                if (node.name.toLowerCase().includes(targetName)) {
                     node.expanded = true;
 
                     // Expand the folder child nodes
