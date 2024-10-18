@@ -30,7 +30,7 @@ async fn start_server() {
   let server_path = exe_dir
     .join("_up_")
     .join("backend")
-    .join("app")
+    .join("apppy")
     .join(format!("apppy-{}{}", target_triple, extension));
 
   println!("Starting server at {:?}", server_path);

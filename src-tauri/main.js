@@ -12,12 +12,12 @@ if (!targetTriple) {
 }
 
 // Rename the binary using the target triple
-const oldPath = path.resolve(__dirname, "..", "backend", "app", `apppy${ext}`);
+const oldPath = path.resolve(__dirname, "..", "backend", "apppy", `apppy${ext}`);
 const newPath = path.resolve(
   __dirname,
   "..",
   "backend",
-  "app",
+  "apppy",
   `apppy-${targetTriple}${ext}`
 );
 

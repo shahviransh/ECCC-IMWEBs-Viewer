@@ -57,14 +57,18 @@
   //   ],
   //   "extraResources": [
   //     {
-  //       "from": "backend/app",
+  //       "from": "backend/apppy",
   //       "to": "backend",
   //       "filter": [
   //         "**/*"
   //       ]
   //     },
-  //     "backend/app.py",
-  //     "backend/app.spec",
+  //     "backend/apppy.py",
+  //     "backend/config.py",
+  //     "backend/errors_handler.py",
+  //     "backend/routes.py",
+  //     "backend/services.py",
+  //     "backend/utils.py",
   //     "backend/requirements.txt"
   //   ]
   // }
