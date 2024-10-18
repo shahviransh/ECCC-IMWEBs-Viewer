@@ -38,6 +38,7 @@ export default {
         treeData: {
             handler(newVal) {
                 this.expandNodesBasedOnPage(this.page);
+                console.log('Tree data updated:', newVal);
             },
             deep: true
         },
@@ -61,30 +62,38 @@ export default {
             this.$emit('select', node);
         },
         expandNodesBasedOnPage(page) {
-            if (page === 'Project') {
+            if (page === 'Table') {
                 // Automatically expand the database node folder
                 this.expandSpecificNode(this.treeData, 'Database');
-            } else if (page === 'Table') {
+            } else if (page === 'Project') {
                 // Automatically expand the Model01\Output\Scenario_2 folder
-                this.expandSpecificNode(this.treeData, 'Scenario_2');
+                this.expandSpecificNode(this.treeData, 'Model');
             }
         },
         expandSpecificNode(nodes, targetName) {
-            for (let node of nodes) {
-                if (node.type == 'folder') {
-                    if (node.id == 1){
-                        node.expanded = true;
-                    }
-                    if (node.name === targetName) {
-                        node.expanded = true;
-                        return; // Stop once the target node is found and expanded
-                    }
-                    // Recursively expand children nodes if they exist
+            for (const node of nodes) {
+                if (node.id == 1) {
+                    node.expanded = true;
+                    this.expandSpecificNode(node.children, targetName);
+                    return;
+                }
+                if (node.name.includes(targetName)) {
+                    node.expanded = true;
+
+                    // Expand the folder child nodes
                     if (node.children && node.children.length > 0) {
-                        if (node.type === 'folder' && (node.name.includes("Model") || node.name.includes("Output"))) {
-                            node.expanded = true;
-                        }
-                        this.expandSpecificNode(node.children, targetName);
+                        this.expandAll(node.children);
+                    }
+                    return;
+                }
+            }
+        },
+        expandAll(nodes) {
+            for (const node of nodes) {
+                if (node.type == "folder") {
+                    node.expanded = true;
+                    if (node.children && node.children.length > 0) {
+                        this.expandAll(node.children);
                     }
                 }
             }
