@@ -23,7 +23,7 @@ def fetch_data_service(data):
         stats_df = None
 
         df = fetch_data_from_db(db_path, table_name, selected_id, columns, start_date, end_date, date_type)
-        
+        date_type = "Date" if "Date" in df.columns else date_type
         if "Equal" not in method and interval != "daily":
             df, stats_df = aggregate_data(df, interval, method, date_type)
         elif "None" not in statistics:

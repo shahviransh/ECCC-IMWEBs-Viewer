@@ -38,7 +38,6 @@ export default {
         treeData: {
             handler(newVal) {
                 this.expandNodesBasedOnPage(this.page);
-                console.log('Tree data updated:', newVal);
             },
             deep: true
         },
