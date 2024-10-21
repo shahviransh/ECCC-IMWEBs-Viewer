@@ -25,7 +25,7 @@
     </nav>
 
     <!-- Main Content -->
-    <router-view />
+    <router-view class="main-content" />
   </div>
 </template>
 
@@ -74,6 +74,7 @@ export default {
     // Set initial theme on load
     document.body.className = this.theme;
     this.updatePageTitle(this.activePage);
+    this.$router.push({ name: this.activePage});
   },
 };
 </script>
@@ -96,6 +97,10 @@ export default {
   align-items: center;
   justify-content: center;
   position: relative;
+}
+
+.main-content {
+  height: 100%;
 }
 
 .title-container {
