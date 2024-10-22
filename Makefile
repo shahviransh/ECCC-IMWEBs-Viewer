@@ -19,8 +19,9 @@ install:
 build:
 	@echo "Building Python backend..."
 	.\.venv\Scripts\activate
-	pyinstaller ./backend/apppy.py --onefile --distpath ./backend/ --specpath ./backend/ --workpath ./backend/build --name apppy
+	pyinstaller ./backend/apppy.py -y --distpath ./backend/ --specpath ./backend/ --workpath ./backend/build --name apppy
 	deactivate
+	xcopy backend\Jenette_Creek_Watershed backend\apppy\_internal\Jenette_Creek_Watershed /E /I
 ifeq ($(BUILD), tauri)
 	@echo "Building Tauri app..."
 	npm run tauri:build
