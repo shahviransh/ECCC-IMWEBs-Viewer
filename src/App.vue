@@ -1,5 +1,5 @@
 <template>
-  <div id="app" :class="theme">
+  <div id = "papp" :class="theme">
     <!-- Top Bar -->
     <header class="top-bar">
       <div class="title-container">
@@ -80,12 +80,16 @@ export default {
 </script>
 
 <style scoped>
-#app {
+#papp {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   color: #2c3e50;
-  margin: -8px;
-  padding: 0px;
   text-align: center;
+}
+
+html, body, #papp {
+  height: 100%;
+  margin: -0.5rem;
+  padding: 0px;
 }
 
 /* Apply theme variables */
@@ -100,6 +104,7 @@ export default {
 }
 
 .main-content {
+  flex-grow: 1;
   height: 100%;
 }
 

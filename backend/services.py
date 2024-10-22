@@ -206,10 +206,10 @@ def aggregate_data(df, interval, method, date_type):
     df[date_type] = pd.to_datetime(df[date_type])
     df.set_index(date_type, inplace=True)
     resampled_df = None
-
+    ID = "".join([col for col in df.columns if "ID" in col])
     # Resample the data based on the specified interval
     if interval == "monthly":
-        resampled_df = df.groupby('ID').resample("ME").first()
+        resampled_df = df.groupby(ID).resample("ME").first()
     elif interval == "seasonally":
         # Custom resampling for seasons
         df.reset_index(inplace=True)
@@ -217,12 +217,12 @@ def aggregate_data(df, interval, method, date_type):
         df.set_index(date_type, inplace=True)
         resampled_df = df
     elif interval == "yearly":
-        resampled_df = df.groupby('ID').resample("YE").first()
+        resampled_df = df.groupby(ID).resample("YE").first()
     else:
         resampled_df = df
     
     # Drop the ID column if it exists
-    resampled_df = resampled_df.drop(columns=['ID']) if 'ID' in resampled_df.index.names else resampled_df
+    resampled_df = resampled_df.drop(columns=[ID]) if ID in resampled_df.index.names else resampled_df
     resampled_df.reset_index(inplace=True)
     
     # Format the date column based on the interval

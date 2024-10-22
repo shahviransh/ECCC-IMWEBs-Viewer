@@ -17,6 +17,10 @@ install:
 
 # Build Electron or Tauri based on argument
 build:
+	@echo "Building Python backend..."
+	.\.venv\Scripts\activate
+	pyinstaller ./backend/apppy.py --onefile --distpath ./backend/ --specpath ./backend/ --workpath ./backend/build --name apppy
+	deactivate
 ifeq ($(BUILD), tauri)
 	@echo "Building Tauri app..."
 	npm run tauri:build

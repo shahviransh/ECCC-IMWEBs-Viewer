@@ -129,15 +129,26 @@ const store = createStore({
   actions: {
     async fetchDatabases({ commit }) {
       const apiBaseUrl = import.meta.env.VITE_APP_API_BASE_URL;
-      try {
-        const response = await axios.get(`${apiBaseUrl}/api/list_files`, {
-          params: { folder_path: "Jenette_Creek_Watershed" },
-        });
-        commit("SET_DATABASES", response.data);
-      } catch (error) {
-        console.error("Error fetching databases:", error);
+      const maxRetries = 5; // Maximum number of retry attempts
+      const retryDelay = 2000; // Delay between retries in milliseconds
+    
+      for (let attempt = 1; attempt <= maxRetries; attempt++) {
+        try {
+          const response = await axios.get(`${apiBaseUrl}/api/list_files`, {
+            params: { folder_path: "Jenette_Creek_Watershed" },
+          });
+          commit("SET_DATABASES", response.data);
+          return; // Exit the function if the request is successful
+        } catch (error) {
+          console.error(`Attempt ${attempt} - Error fetching databases:`, error);
+          if (attempt === maxRetries) {
+            console.error("Max retries reached. Failed to fetch databases.");
+            throw error; // Re-throw the error after the last attempt
+          }
+          await new Promise(resolve => setTimeout(resolve, retryDelay)); // Wait before retrying
+        }
       }
-    },
+    },    
     async fetchTables({ commit }, db) {
       const apiBaseUrl = import.meta.env.VITE_APP_API_BASE_URL;
       try {
