@@ -3,6 +3,7 @@ import os
 import pandas as pd
 from config import Config
 from datetime import datetime
+from flask import abort
 from pathlib import Path
 import sys
 
@@ -31,7 +32,7 @@ def fetch_data_service(data):
         
         return {"data": df.to_dict(orient="records"), "stats": stats_df.to_dict(orient="records") if stats_df is not None else [], "statsColumns": stats_df.columns.tolist() if stats_df is not None else []}
     except Exception as e:
-        return {"error at fetch_data_service": str(e)}
+        return abort(400, {"error at fetch_data_service": str(e)})
 
 def export_data_service(data):
     try:
@@ -52,7 +53,7 @@ def export_data_service(data):
         
         return file_path
     except Exception as e:
-        return {"error at export_data_service": str(e)}
+        return abort(400, {"error at export_data_service": str(e)})
 
 def fetch_data_from_db(db_path, table_name, selected_id, columns, start_date, end_date, date_type):
     conn = sqlite3.connect(os.path.join(Config.PATHFILE, db_path))
@@ -133,7 +134,7 @@ def get_table_names(db_path):
         alias_tables = [alias_mapping.get(table[0], {}).get('alias', table[0]) for table in tables]
         return alias_tables
     except Exception as e:
-        return {"error at get_table_names": str(e)}
+        return abort(400, {"error at get_table_names": str(e)})
 
 def get_files_and_folders(data):
     databases = set()
@@ -184,7 +185,7 @@ def get_files_and_folders(data):
 
         return files_and_folders
     except Exception as e:
-        return {"error at get_files_and_folders": str(e)}
+        return abort(400, {"error at get_files_and_folders": str(e)})
 
 # Example function to map date strings to seasons
 def get_season_from_date(date_str):
@@ -206,7 +207,7 @@ def aggregate_data(df, interval, method, date_type):
     df[date_type] = pd.to_datetime(df[date_type])
     df.set_index(date_type, inplace=True)
     resampled_df = None
-    ID = "".join([col for col in df.columns if "ID" in col])
+    ID = next((col for col in df.columns if "ID" in col), None)
     # Resample the data based on the specified interval
     if interval == "monthly":
         resampled_df = df.groupby(ID).resample("ME").first()
@@ -367,4 +368,4 @@ def get_columns_and_time_range(db_path, table_name):
         # Return alias column names instead of real ones
         return alias_columns, start_date, end_date, ids, date_type
     except Exception as e:
-        return {"error at get_columns_and_time_range": str(e)}
+        return abort(400, {"error at get_columns_and_time_range": str(e)})

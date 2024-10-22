@@ -29,5 +29,5 @@ try {
     console.error(`File ${oldPath} does not exist`);
   }
 } catch (error) {
-  console.error("Error renaming file:", error);
+  alert("Error renaming file:", error.message);
 }

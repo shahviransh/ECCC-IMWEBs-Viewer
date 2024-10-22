@@ -172,7 +172,7 @@ export default {
                 this.statsColumns = response.data.statsColumns;
                 this.loadInitialRows();
             } catch (error) {
-                console.error('Error fetching data:', error);
+                alert('Error fetching data: ' + error.message);
             }
         },
         async exportData() {
@@ -201,7 +201,7 @@ export default {
                     this.updateSelectedColumns(this.selectedColumns.filter((column) => column !== 'Season'));
                 }
             } catch (error) {
-                console.error('Error exporting data:', error);
+                alert('Error exporting data: ' + error.message);
             }
         },
     },

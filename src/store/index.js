@@ -140,9 +140,9 @@ const store = createStore({
           commit("SET_DATABASES", response.data);
           return; // Exit the function if the request is successful
         } catch (error) {
-          console.error(`Attempt ${attempt} - Error fetching databases:`, error);
+          alert(`Attempt ${attempt} - Error fetching databases:`, error.message);
           if (attempt === maxRetries) {
-            console.error("Max retries reached. Failed to fetch databases.");
+            alert("Max retries reached. Failed to fetch databases.");
             throw error; // Re-throw the error after the last attempt
           }
           await new Promise(resolve => setTimeout(resolve, retryDelay)); // Wait before retrying
@@ -157,7 +157,7 @@ const store = createStore({
         });
         commit("SET_TABLES", response.data);
       } catch (error) {
-        console.error("Error fetching tables:", error);
+        alert("Error fetching tables:", error.message);
       }
     },
     async fetchColumns({ commit }, { db, table }) {
@@ -186,7 +186,7 @@ const store = createStore({
           exportDateType: response.data.date_type,
         });
       } catch (error) {
-        console.error("Error fetching columns:", error);
+        alert("Error fetching columns:", error.message);
       }
     },
     // Add similar actions for other components
