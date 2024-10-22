@@ -38,6 +38,7 @@ export default {
         onIntervalChange() {
             this.exportInterval = this.selectedInterval;
             this.updateSelectedInterval(this.selectedInterval);
+            this.updateExportInterval(this.selectedInterval);
         },
         onExportChange() {
             this.updateExportInterval(this.exportInterval);

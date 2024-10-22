@@ -188,7 +188,7 @@ export default {
                         date_type: this.exportDateType,
                         interval: this.exportInterval,
                         statistics: this.selectedStatistics.join(","),
-                        method: this.exportMethod,
+                        method: this.selectedMethod.join(","),
                         export_path: this.exportPath,
                         export_filename: this.exportFilename,
                         export_format: this.exportFormat,
