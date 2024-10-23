@@ -2,7 +2,7 @@
     <div class="interval-export-container">
         <div class="interval-container">
             <label for="interval-select" class="interval-label">Select Interval:</label>
-            <select id="interval-select" v-model="selectedInterval" @change="onIntervalChange"
+            <select id="interval-select" v-model="selectInterval"
                 class="interval-dropdown">
                 <option value="daily">Daily</option>
                 <option value="monthly">Monthly</option>
@@ -13,7 +13,7 @@
 
         <div class="interval-container">
             <label for="interval-select" class="interval-label">Export Select Interval:</label>
-            <select id="interval-select" v-model="exportInterval" @change="onExportChange" class="interval-dropdown">
+            <select id="interval-select" v-model="expInterval" @change="onExportChange" class="interval-dropdown">
                 <option value="daily">Daily</option>
                 <option value="monthly">Monthly</option>
                 <option value="yearly">Yearly</option>
@@ -29,23 +29,36 @@ import { mapState, mapActions } from 'vuex'; // Import Vuex helpers
 export default {
     data() {
         return {
-            selectedInterval: "daily",
-            exportInterval: "daily",
         };
+    },
+    computed: {
+        selectInterval: {
+            get() {
+                return this.selectedInterval;
+            },
+            set(value) {
+                this.updateSelectedInterval(value);
+                this.updateExportInterval(value); // Update export interval as well to match selected interval
+            }
+        },
+        expInterval: {
+            get() {
+                return this.exportInterval;
+            },
+            set(value) {
+                this.updateExportInterval(value);
+            }
+        },
+        ...mapState(["selectedInterval", "exportInterval"]),
     },
     methods: {
         ...mapActions(["updateSelectedInterval", "updateExportInterval"]),
-        onIntervalChange() {
-            this.exportInterval = this.selectedInterval;
-            this.updateSelectedInterval(this.selectedInterval);
-            this.updateExportInterval(this.selectedInterval);
-        },
         onExportChange() {
             if (this.isValidExportInterval(this.selectedInterval, this.exportInterval)) {
                 this.updateExportInterval(this.exportInterval);
             } else {
                 alert("Export interval cannot be less than the selected interval.");
-                this.exportInterval = this.selectedInterval; // Reset export interval
+                this.updateExportInterval(this.selectedInterval);
             }
         },
         isValidExportInterval(importInterval, exportInterval) {

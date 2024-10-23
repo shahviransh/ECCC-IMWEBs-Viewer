@@ -33,6 +33,9 @@ const store = createStore({
     exportFilename: "exported_data",
     exportFormat: "csv",
     exportOptions: { data: false, stats: false },
+    defaultInterval: "",
+    defaultStartDate: "",
+    defaultEndDate: "",
   },
   mutations: {
     SET_DATABASES(state, databases) {
@@ -53,6 +56,11 @@ const store = createStore({
       state.dateType = dateType;
       state.exportDate = exportDate;
       state.exportDateType = exportDateType;
+    },
+    SET_DEFAULT_SELECTIONS(state, {defaultInterval, defaultStartDate, defaultEndDate}) {
+      state.defaultInterval = defaultInterval;
+      state.defaultStartDate = defaultStartDate;
+      state.defaultEndDate = defaultEndDate;
     },
     SET_THEME(state, theme) {
       state.theme = theme;
@@ -184,7 +192,10 @@ const store = createStore({
             end: response.data.end_date,
           },
           exportDateType: response.data.date_type,
+          selectedInterval: response.data.interval,
+          exportInterval: response.data.interval,
         });
+        commit("SET_DEFAULT_SELECTIONS", {defaultInterval: response.data.interval, defaultStartDate: response.data.start_date, defaultEndDate: response});
       } catch (error) {
         alert("Error fetching columns:", error.message);
       }

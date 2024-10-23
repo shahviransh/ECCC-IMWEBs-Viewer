@@ -36,7 +36,7 @@ def fetch_data_service(data):
         
         return {"data": df.to_dict(orient="records"), "stats": stats_df.to_dict(orient="records") if stats_df is not None else [], "statsColumns": stats_df.columns.tolist() if stats_df is not None else []}
     except Exception as e:
-        return abort(400, {"error at fetch_data_service": str(e)})
+        return {"error": "error at fetch_data_service "+ str(e)}
 
 def export_data_service(data):
     try:
@@ -57,9 +57,9 @@ def export_data_service(data):
         
         file_path = save_to_file(df, stats_df, f"{output_filename}.{output_format}", output_format, output_path, options)
         
-        return file_path
+        return {"file_path": file_path}
     except Exception as e:
-        return abort(400, {"error at export_data_service": str(e)})
+        return {"error": "error at export_data_service "+ str(e)}
 
 def fetch_data_from_db(db_path, table_name, selected_id, columns, start_date, end_date, date_type):
     conn = sqlite3.connect(os.path.join(Config.PATHFILE, db_path))
@@ -138,9 +138,9 @@ def get_table_names(db_path):
         conn.close()
         # Map real table names to alias names
         alias_tables = [alias_mapping.get(table[0], {}).get('alias', table[0]) for table in tables]
-        return alias_tables
+        return {"tables": alias_tables}
     except Exception as e:
-        return abort(400, {"error at get_table_names": str(e)})
+        return {"error": "error at get_table_names "+ str(e)}
 
 def get_files_and_folders(data):
     databases = set()
@@ -152,7 +152,7 @@ def get_files_and_folders(data):
 
     # Validate that the requested path is within the allowed base directory
     if not folder_path.startswith(allowed_base_path):
-        return abort(400, "Invalid folder path")
+        return {"error": "Invalid folder path."}
         
     try:
         files_and_folders = []
@@ -189,9 +189,9 @@ def get_files_and_folders(data):
 
         alias_mapping.update(load_alias_mapping(databases)) if not alias_mapping else None
 
-        return files_and_folders
+        return {"files_and_folders": files_and_folders}
     except Exception as e:
-        return abort(400, {"error at get_files_and_folders": str(e)})
+        return {"error": "error at get_files_and_folders "+ str(e)}
 
 # Example function to map date strings to seasons
 def get_season_from_date(date_str):
@@ -339,7 +339,7 @@ def get_columns_and_time_range(db_path, table_name):
         alias_columns = [alias_mapping.get(real_table_name, {}).get('columns', {}).get(col, col) for col in columns]
 
         # Initialize variables
-        start_date = end_date = date_type = None
+        start_date = end_date = date_type = interval = None
 
         # Check and query for specific date/time columns (using real column names)
         if "Time" in columns:
@@ -348,18 +348,26 @@ def get_columns_and_time_range(db_path, table_name):
             start_date = df["Time"].min().strftime("%Y-%m-%d")
             end_date = df["Time"].max().strftime("%Y-%m-%d")
             date_type = "Time"
+            interval = "daily"
         elif "Date" in columns:
             df = pd.read_sql_query(f"SELECT Date FROM {real_table_name}", conn)
             df["Date"] = pd.to_datetime(df["Date"])
             start_date = df["Date"].min().strftime("%Y-%m-%d")
             end_date = df["Date"].max().strftime("%Y-%m-%d")
             date_type = "Date"
+            interval = "daily"
         elif "Month" in columns:
             df = pd.read_sql_query(f"SELECT Month FROM {real_table_name}", conn)
             start_date = str(df["Month"].min())
             end_date = str(df["Month"].max())
             date_type = "Month"
-
+            interval = "monthly"
+        elif "Year" in columns:
+            df = pd.read_sql_query(f"SELECT Year FROM {real_table_name}", conn)
+            start_date = str(df["Year"].min())
+            end_date = str(df["Year"].max())
+            date_type = "Year"
+            interval = "yearly"
         # Get list of IDs if an ID column exists, without querying unnecessary data
         id_column = next((col for col in columns if "ID" in col), None)
         ids = []
@@ -372,6 +380,6 @@ def get_columns_and_time_range(db_path, table_name):
         conn.close()
 
         # Return alias column names instead of real ones
-        return alias_columns, start_date, end_date, ids, date_type
+        return {"columns": alias_columns, "start_date": start_date, "end_date": end_date, "ids": ids, "date_type": date_type, "interval": interval}
     except Exception as e:
-        return abort(400, {"error at get_columns_and_time_range": str(e)})
+        return {"error": "error at get_columns_and_time_range "+ str(e)}

@@ -10,6 +10,10 @@ def register_routes(app, cache):
     def get_data():
         data = request.args
         response = fetch_data_service(data)
+
+        if response.get("error", None):
+            return jsonify(response), 400
+
         return jsonify(response)
 
     @app.route("/api/export_data", methods=["GET"])
@@ -18,7 +22,10 @@ def register_routes(app, cache):
         data = request.args
         file_path = export_data_service(data)
 
-        return send_file(file_path, as_attachment=True)
+        if file_path.get("error", None):
+            return jsonify(file_path), 400
+
+        return send_file(file_path.get("file_path"), as_attachment=True)
 
     @app.route("/api/get_tables", methods=["GET"])
     @cache.cached(timeout=300, query_string=True)  # Cache this endpoint for 5 minutes (300 seconds)
@@ -28,7 +35,11 @@ def register_routes(app, cache):
 
         # Fetch the table names from the database
         tables = get_table_names(db_path)
-        return jsonify(tables)
+
+        if tables.get("error", None):
+            return jsonify(tables), 400
+
+        return jsonify(tables.get("tables"))
 
     @app.route("/api/list_files", methods=["GET"])
     @cache.cached(timeout=300, query_string=True)  # Cache this endpoint for 5 minutes (300 seconds)
@@ -39,7 +50,10 @@ def register_routes(app, cache):
         data = request.args
         files_and_folders = get_files_and_folders(data)
 
-        return jsonify(files_and_folders)
+        if files_and_folders.get("error", None):
+            return jsonify(files_and_folders), 400
+
+        return jsonify(files_and_folders.get("files_and_folders"))
 
 
     @app.route("/api/get_table_details", methods=["GET"])
@@ -52,17 +66,14 @@ def register_routes(app, cache):
         db_path = data.get("db_path")
         table_name = data.get("table_name")
         
-        # Fetch the column names, start date, end date, IDs, and date type
-        columns, start_date, end_date, ids, date_type = get_columns_and_time_range(db_path, table_name)
+        # Fetch the column names, start date, end date, IDs, date type, and default interval
+        columns_and_time_range_dict = get_columns_and_time_range(db_path, table_name)
+
+        if columns_and_time_range_dict.get("error", None):
+            return jsonify(columns_and_time_range_dict), 400
 
         return jsonify(
-            {
-                "columns": columns,
-                "start_date": start_date,
-                "end_date": end_date,
-                "ids": ids,
-                "date_type": date_type,
-            }
+            columns_and_time_range_dict
         )
     @app.route('/shutdown', methods=['GET'])
     def shutdown():
