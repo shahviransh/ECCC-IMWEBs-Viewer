@@ -26,8 +26,12 @@ def fetch_data_service(data):
         df = fetch_data_from_db(db_path, table_name, selected_id, columns, start_date, end_date, date_type)
         date_type = "Date" if "Date" in df.columns else date_type
         if "Equal" not in method and interval != "daily":
+            if not date_type:
+                return {"error": "Time conversion and statistics cannot be performed for non-time series data"}
             df, stats_df = aggregate_data(df, interval, method, date_type)
         elif "None" not in statistics:
+            if not date_type:
+                return {"error": "Time conversion and statistics cannot be performed for non-time series data"}
             stats_df = calculate_statistics(df, statistics, date_type)
         
         return {"data": df.to_dict(orient="records"), "stats": stats_df.to_dict(orient="records") if stats_df is not None else [], "statsColumns": stats_df.columns.tolist() if stats_df is not None else []}
@@ -37,6 +41,8 @@ def fetch_data_service(data):
 def export_data_service(data):
     try:
         output = fetch_data_service(data)
+        if output["error"]:
+            return output
         df = pd.DataFrame(output["data"])
         stats_df = pd.DataFrame(output["stats"]) if output["stats"] else None
 

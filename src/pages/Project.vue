@@ -162,6 +162,10 @@ export default {
                         method: this.selectedMethod.join(","),
                     }
                 });
+                if (response.data.error){
+                    alert('Error fetching data:'+ response.data.error);
+                    return;
+                }
                 if (this.selectedInterval === 'seasonally' && !this.selectedMethod.includes('Equal') && !this.selectedColumns.includes('Season')) {
                     this.updateSelectedColumns(this.selectedColumns.concat(['Season']));
                 } else {
@@ -177,7 +181,7 @@ export default {
         },
         async exportData() {
             try {
-                await axios.get(`${import.meta.env.VITE_APP_API_BASE_URL}/api/export_data`, {
+                const response = await axios.get(`${import.meta.env.VITE_APP_API_BASE_URL}/api/export_data`, {
                     params: {
                         db_path: this.selectedDb,
                         table_name: this.selectedTable,
@@ -195,6 +199,10 @@ export default {
                         options: this.exportOptions,
                     }
                 });
+                if (response.data.error){
+                    alert('Error fetching data:'+ response.data.error);
+                    return;
+                }
                 if (this.selectedInterval === 'seasonally' && !this.selectedMethod.includes('Equal') && !this.selectedColumns.includes('Season')) {
                     this.updateSelectedColumns(this.selectedColumns.concat(['Season']));
                 } else {

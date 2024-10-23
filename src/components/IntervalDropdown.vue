@@ -41,8 +41,17 @@ export default {
             this.updateExportInterval(this.selectedInterval);
         },
         onExportChange() {
-            this.updateExportInterval(this.exportInterval);
+            if (this.isValidExportInterval(this.selectedInterval, this.exportInterval)) {
+                this.updateExportInterval(this.exportInterval);
+            } else {
+                alert("Export interval cannot be less than the selected interval.");
+                this.exportInterval = this.selectedInterval; // Reset export interval
+            }
         },
+        isValidExportInterval(importInterval, exportInterval) {
+            const intervals = ["daily", "monthly", "seasonally", "yearly"];
+            return intervals.indexOf(exportInterval) >= intervals.indexOf(importInterval);
+        }
     },
 };
 </script>
