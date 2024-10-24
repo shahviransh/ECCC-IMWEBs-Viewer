@@ -195,7 +195,7 @@ const store = createStore({
           selectedInterval: response.data.interval,
           exportInterval: response.data.interval,
         });
-        commit("SET_DEFAULT_SELECTIONS", {defaultInterval: response.data.interval, defaultStartDate: response.data.start_date, defaultEndDate: response});
+        commit("SET_DEFAULT_SELECTIONS", {defaultInterval: response.data.interval, defaultStartDate: response.data.start_date, defaultEndDate: response.data.end_date});
       } catch (error) {
         alert("Error fetching columns:", error.message);
       }

@@ -30,20 +30,26 @@ export default {
 };
 </script>
 <style src="vue-multiselect/dist/vue-multiselect.css"></style>
-<style scoped>
-/* Reduce width of the dropdown */
+<style>
 .multiselect {
-    /* Set the desired width */
     font-size: 14px;
 }
 
+.multiselect__tag {
+    padding: 2px 18px 2px 5px;
+    margin-right: 5px;
+    font-size: 14px;
+}
+
+.multiselect__tag-icon {
+    line-height: 18px;
+}
+</style>
+<style scoped>
 .statistics-container {
     display: flex;
     flex-direction: column;
-    margin: 0px auto;
-    gap: 5px;
-    margin: 0px auto;
-    justify-content: center;
+    margin: 5px 0;
 }
 
 .statistics-label {

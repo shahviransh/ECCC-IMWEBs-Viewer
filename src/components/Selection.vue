@@ -2,6 +2,20 @@
     <div class="select-container">
         <div class="form-container">
             <div class="form-group">
+                <label for="date-start">Model Start Date:</label>
+                <input type="date" v-model="defaultStartDate" class="input-field" readonly />
+            </div>
+            <div class="form-group">
+                <label for="date-end">Model End Date:</label>
+                <input type="date" v-model="defaultEndDate" class="input-field" readonly />
+            </div>
+            <div class="form-group">
+                <label for="interval">Model Interval:</label>
+                <input type="text" v-model="capitalizedInterval" class="input-field" readonly />
+            </div>
+        </div>
+        <div class="form-container">
+            <div class="form-group">
                 <label for="id-select">Select IDs:</label>
                 <Multiselect v-model="selectIds" :options="ids" :multiple="true" :close-on-select="false"
                     :clear-on-select="false" :preserve-search="true" placeholder="Select IDs">
@@ -80,6 +94,12 @@ export default {
                 this.updateExportDateStart(value);
             }
         },
+        capitalizedInterval() {
+            if (this.defaultInterval) {
+                return this.defaultInterval.charAt(0).toUpperCase() + this.defaultInterval.slice(1);
+            }
+            return '';
+        },
         selectedDateEnd: {
             get() {
                 return this.dateRange.end; // Get the date range from Vuex
@@ -119,7 +139,7 @@ export default {
         expDateType() {
             return this.exportDateType; // Get the date type from Vuex (no need to set this directly)
         },
-        ...mapState(['columns', 'ids', 'selectedDb', 'selectedIds', 'dateRange', 'dateType', 'exportIds', 'exportDate', 'exportDateType']),
+        ...mapState(['columns', 'ids', 'selectedDb', 'selectedIds', 'dateRange', 'dateType', 'exportIds', 'exportDate', 'exportDateType', 'defaultStartDate', 'defaultEndDate', 'defaultInterval']),
     },
     data() {
         return {
@@ -137,7 +157,7 @@ export default {
     flex-direction: row;
     gap: 5px;
     margin: 0px auto;
-    min-width: 32%;
+    min-width: 45%;
     justify-content: left;
     overflow-y: auto;
 }
@@ -146,8 +166,10 @@ export default {
 .form-container {
     display: flex;
     flex-direction: column;
-    flex: 1; /* Allow containers to grow/shrink equally */
-    width: 100%; /* Ensure a minimum width */
+    flex: 1;
+    /* Allow containers to grow/shrink equally */
+    width: 100%;
+    /* Ensure a minimum width */
     gap: 5px;
     margin: 0px 0px;
     padding: 5px;

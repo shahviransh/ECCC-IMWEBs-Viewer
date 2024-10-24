@@ -81,5 +81,5 @@ def register_routes(app, cache):
         return 'Server shutting down...'
     @app.route('/clear_cache', methods=['GET'])
     def clear_cache_route():
-        clear_cache()
+        clear_cache(cache)
         return 'Cache cleared.'
