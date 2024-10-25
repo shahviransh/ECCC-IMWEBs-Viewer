@@ -1,9 +1,9 @@
 # Makefile for Tauri and Electron builds
 
-.PHONY: all prestart install build run-dev clean
+.PHONY: all prestart install build run-dev python clean
 
 # Default target
-all: prestart install 
+all: prestart install python
 
 # Prestart script
 prestart:
@@ -15,13 +15,15 @@ install:
 	@echo "Installing dependencies..."
 	npm install
 
-# Build Electron or Tauri based on argument
-build:
+python:
 	@echo "Building Python backend..."
-	.\.venv\Scripts\activate
-	pyinstaller ./backend/apppy.py -y --distpath ./backend/ --specpath ./backend/ --workpath ./backend/build --name apppy
+	@call .venv\Scripts\activate && \
+	pyinstaller backend\apppy.py -y --distpath backend\ --specpath backend\ --workpath backend\build --name apppy && \
 	deactivate
 	xcopy backend\Jenette_Creek_Watershed backend\apppy\_internal\Jenette_Creek_Watershed /E /I
+
+# Build Electron or Tauri based on argument
+build:
 ifeq ($(BUILD), tauri)
 	@echo "Building Tauri app..."
 	npm run tauri:build
@@ -35,6 +37,7 @@ endif
 
 # Run Electron or Tauri in development mode
 run-dev:
+	npm run build
 ifeq ($(RUN), tauri)
 	@echo "Running Tauri app in development mode..."
 	npm run tauri
@@ -49,4 +52,4 @@ endif
 # Clean build artifacts
 clean:
 	@echo "Cleaning build artifacts..."
-	rm -rf dist/ node_modules/ src-tauri/target/
+	rm -rf dist\ node_modules\ src-tauri\target\ backend\apppy\ backend\build\

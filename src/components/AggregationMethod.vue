@@ -3,7 +3,7 @@
         <label for="method-select" class="method-label">Select Method:</label>
         <Multiselect v-model="selectedMethod" :options="option" :multiple="true" :close-on-select="false"
             :clear-on-select="false" :preserve-search="true"
-            @update:modelValue="onMethodChange">
+            @update:modelValue="onMethodChange" :class="tagClass">
         </Multiselect>
     </div>
 </template>
@@ -27,9 +27,23 @@ export default {
             this.updateSelectedMethod(this.selectedMethod);
         },
     },
+    computed: {
+        tagClass() {
+            return this.selectedMethod.length > 4 ? 'small-tags' : 'normal-tags';
+        }
+    },
 };
 </script>
 <style src="vue-multiselect/dist/vue-multiselect.css"></style>
+<style>
+.small-tags .multiselect__tag {
+    font-size: 10px;
+}
+
+.normal-tags .multiselect__tag {
+    font-size: 12px;
+}
+</style>
 <style scoped>
 /* Reduce width of the dropdown */
 .multiselect {

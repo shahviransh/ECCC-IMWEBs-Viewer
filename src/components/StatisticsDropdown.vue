@@ -2,7 +2,7 @@
     <div class="statistics-container">
         <label for="statistics-select" class="statistics-label">Select Statistics:</label>
         <Multiselect v-model="selectedStatistics" :options="option" :multiple="true" :close-on-select="false"
-            :clear-on-select="false" :preserve-search="true" @update:modelValue="onStatisticsChange">
+            :clear-on-select="false" :preserve-search="true" @update:modelValue="onStatisticsChange" :class="tagClass"
         </Multiselect>
     </div>
 </template>
@@ -17,6 +17,11 @@ export default {
             selectedStatistics: ["None"],
             option: ["None", "Average", "Sum", "Maximum", "Minimum", "Standard Deviation"],
         };
+    },
+    computed: {
+        tagClass() {
+            return this.selectedStatistics.length > 4 ? 'small-tags' : 'normal-tags';
+        }
     },
     components: {
         Multiselect,
@@ -38,11 +43,19 @@ export default {
 .multiselect__tag {
     padding: 2px 18px 2px 5px;
     margin-right: 5px;
-    font-size: 14px;
+    font-size: 12px;
 }
 
 .multiselect__tag-icon {
-    line-height: 18px;
+    line-height: 16px;
+}
+
+.small-tags .multiselect__tag {
+    font-size: 10px;
+}
+
+.normal-tags .multiselect__tag {
+    font-size: 12px;
 }
 </style>
 <style scoped>
