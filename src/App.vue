@@ -78,18 +78,19 @@ export default {
   },
 };
 </script>
+<style>
+html, body, #app {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+</style>
 
 <style scoped>
 #papp {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   color: #2c3e50;
   text-align: center;
-}
-
-html, body, #papp {
-  height: 100%;
-  margin: -0.5rem;
-  padding: 0px;
 }
 
 /* Apply theme variables */

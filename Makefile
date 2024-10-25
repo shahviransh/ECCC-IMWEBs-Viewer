@@ -37,7 +37,6 @@ endif
 
 # Run Electron or Tauri in development mode
 run-dev:
-	npm run build
 ifeq ($(RUN), tauri)
 	@echo "Running Tauri app in development mode..."
 	npm run tauri

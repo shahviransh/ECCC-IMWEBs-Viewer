@@ -2,6 +2,7 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
 use std::{env, os::windows::process::CommandExt, process::Command, time::Duration, thread::sleep};
+use reqwest::Client; // Add reqwest for HTTP requests
 
 const CREATE_NO_WINDOW: u32 = 0x08000000;
 
@@ -44,6 +45,16 @@ async fn start_server() {
   sleep(Duration::from_secs(5));
 }
 
+async fn shutdown_flask() {
+  let client = Client::new();
+  // Send a shutdown request to the Flask server when Tauri closes
+  if let Err(_err) = client.get("http://127.0.0.1:5000/shutdown").send().await {
+    println!("Flask server shutdown request success.");
+  } else {
+    println!("Flask server shutdown request failed.");
+  }
+}
+
 fn main() {
   tauri::Builder::default()
     .setup(|_app| {
@@ -51,6 +62,12 @@ fn main() {
         start_server().await;
       });
       Ok(())
+    })
+    .on_window_event(|_app_handle, event| {
+      if let tauri::WindowEvent::CloseRequested { .. } = event {
+        // Trigger the Flask shutdown function on close request
+        tauri::async_runtime::block_on(shutdown_flask());
+      }
     })
     .run(tauri::generate_context!())
     .expect("error while running tauri application");
