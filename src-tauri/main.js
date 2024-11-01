@@ -17,10 +17,6 @@ if (!targetTriple) {
   process.exit(1);
 }
 
-if (targetTriple.includes("apple")) {
-  targetTriple = os.arch() === "arm64" ? targetTriple : "x86_64-apple-darwin";
-}
-
 // Rename the binary using the target triple
 const oldPath = path.resolve(__dirname, "..", "backend", "apppy", `apppy${ext}`);
 const newPath = path.resolve(
