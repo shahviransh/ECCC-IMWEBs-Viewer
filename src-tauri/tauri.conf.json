@@ -27,7 +27,7 @@
     "active": true,
     "targets": "all",
     "externalBin": [
-      "../backend/apppy/apppy.exe"
+      "../backend/apppy/apppy"
     ],
     "icon": [
       "icons/icon.ico"
