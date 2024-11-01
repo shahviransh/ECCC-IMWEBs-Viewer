@@ -18,7 +18,7 @@ if (!targetTriple) {
 }
 
 if (targetTriple === "aarch64-apple-darwin") {
-  targetTriple = os.arch() === "x64" ? "x86_64-apple-darwin" : targetTriple;
+  targetTriple = os.arch().includes("x64") ? "x86_64-apple-darwin" : targetTriple;
 }
 
 // Rename the binary using the target triple
