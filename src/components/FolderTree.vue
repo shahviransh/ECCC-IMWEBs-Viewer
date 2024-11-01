@@ -67,6 +67,9 @@ export default {
             } else if (page === 'Project') {
                 // Automatically expand the Model01\Output\Scenario_2 folder
                 this.expandSpecificNode(this.treeData, 'model');
+            } else if (page === 'Graph') {
+                // Automatically expand the Model01\Output\Scenario_2 folder
+                this.expandSpecificNode(this.treeData, 'model');
             }
         },
         expandSpecificNode(nodes, targetName) {
