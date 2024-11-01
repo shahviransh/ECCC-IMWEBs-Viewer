@@ -27,7 +27,7 @@ async fn start_server() {
     }
   );
   // Determine the server path using the fetched target triple
-  let extension = ".exe";
+  let extension = if cfg!(windows) { ".exe" } else { "" };
   let server_path = exe_dir
     .join("_up_")
     .join("backend")
