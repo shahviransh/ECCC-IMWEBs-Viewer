@@ -7,7 +7,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 
-const ext = process.platform === "win32" ? ".exe" : ".exe";
+const ext = process.platform === "win32" ? ".exe" : "";
 
 const rustInfo = execSync("rustc -vV");
 const targetTriple = /host: (\S+)/g.exec(rustInfo)[1];

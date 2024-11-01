@@ -58,11 +58,13 @@ def export_data_service(data):
             "stats": data.get("options[stats]", "true") == "true",
         }
         date_type = data.get("date_type")
+        graph_type = data.get("graph_type", "scatter")
+
         date_type = "Date" if "Date" in df.columns else date_type
         if not date_type:
             return {"error": "Graph creation cannot be performed for non-time series data"}
         
-        file_path = save_to_file(df, stats_df, f"{output_filename}.{output_format}", output_format, output_path, options, date_type)
+        file_path = save_to_file(df, stats_df, f"{output_filename}.{output_format}", output_format, output_path, options, date_type, graph_type)
         
         return {"file_path": file_path}
     except Exception as e:
@@ -109,7 +111,7 @@ def fetch_data_from_db(db_path, table_name, selected_id, columns, start_date, en
     return df.map(round_numeric_values)
 
 # Helper function to save data to CSV or text formats
-def save_to_file(dataframe1, dataframe2, filename, file_format, export_path, options, date_type):
+def save_to_file(dataframe1, dataframe2, filename, file_format, export_path, options, date_type, graph_type):
     """Save two DataFrames to the specified file format sequentially."""
     # Set the file path
     file_path = os.path.join(Config.PATHFILE, export_path) if not os.path.exists(export_path) else export_path
@@ -143,7 +145,7 @@ def save_to_file(dataframe1, dataframe2, filename, file_format, export_path, opt
             worksheet = writer.sheets['Sheet1']
 
             # Define chart type and add data for the chart
-            chart = workbook.add_chart({'type': 'line'})
+            chart = workbook.add_chart({'type': graph_type})
             
             for i, column in enumerate(dataframe1.columns[1:], start=1):
                 chart.add_series({
@@ -163,9 +165,16 @@ def save_to_file(dataframe1, dataframe2, filename, file_format, export_path, opt
         # Plot each column as a line on the same figure
         plt.figure(figsize=(10, 6))
 
-        # Iterate over each column except date_type to plot
-        for column in dataframe1.columns[1:]:
-            plt.plot(dataframe1[date_type], dataframe1[column], label=column)  # Plot each series with Time as x-axis
+        # Check the chart type and plot accordingly
+        if chart_type == "line":
+            for column in dataframe1.columns[1:]:
+                plt.plot(dataframe1[date_type], dataframe1[column], label=column)
+        elif chart_type == "bar":
+            for i, column in enumerate(dataframe1.columns[1:]):
+                plt.bar(dataframe1[date_type] + pd.DateOffset(i * 0.2), dataframe1[column], width=0.2, label=column)
+        elif chart_type == "scatter":
+            for column in dataframe1.columns[1:]:
+                plt.scatter(dataframe1[date_type], dataframe1[column], label=column)
 
         # Customize the plot
         plt.title(f"{date_type} Series Data")

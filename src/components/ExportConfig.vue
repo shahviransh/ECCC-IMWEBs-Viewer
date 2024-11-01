@@ -2,7 +2,7 @@
     <div class="export-container">
         <div class="export-field">
             <label for="export-path" class="export-label">Export Path:</label>
-            <input type="text" id="export-path" v-model="expPath" class="export-input" @change="onExportChange" />
+            <input type="text" id="export-path" v-model="expPath" class="export-input" />
         </div>
 
         <div class="export-field">
@@ -13,7 +13,7 @@
 
         <div class="export-field">
             <label for="export-format" class="export-label">Export Format:</label>
-            <select id="export-format" v-model="expFormat" class="export-select" @change="onExportFormatChange">
+            <select id="export-format" v-model="expFormat" class="export-select">
                 <option value="csv">CSV</option>
                 <option value="txt">Text</option>
                 <!-- Conditional Graph Export Options -->
@@ -26,6 +26,14 @@
                     <option value="pdf">Graph As PDF</option>
                 </template>
             </select>
+        </div v-if="pageTitle === 'Graph'" class="export-field">
+            <select v-model="graFormat" class="export-select">
+                <option value="bar">Bar</option>
+                <option value="line">Line</option>
+                <option value="scatter">Scatter</option>
+            </select>
+        <div>
+
         </div>
     </div>
 </template>
@@ -64,10 +72,18 @@ export default {
                 this.updateExportFormat(DOMPurify.sanitize(value));
             },
         },
-        ...mapState(['exportPath', 'exportFilename', 'exportFormat', "pageTitle"]),
+        graFormat: {
+            get() {
+                return this.graphType;
+            },
+            set(value) {
+                this.updateGraphType(DOMPurify.sanitize(value));
+            },
+        },
+        ...mapState(['exportPath', 'exportFilename', 'exportFormat', "pageTitle", "graphType"]),
     },
     methods: {
-        ...mapActions(["updateExportPath", "updateExportFilename", "updateExportFormat"]),
+        ...mapActions(["updateExportPath", "updateExportFilename", "updateExportFormat", "updateGraphType"]),
     },
 };
 </script>
