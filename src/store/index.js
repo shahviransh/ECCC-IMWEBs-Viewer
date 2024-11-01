@@ -17,6 +17,8 @@ const store = createStore({
     tables: [],
     columns: [],
     ids: [],
+    currentZoomStart: 0,
+    currentZoomEnd: 100,
     exportColumns: [],
     exportIds: [],
     exportDate: {
@@ -62,6 +64,10 @@ const store = createStore({
       state.defaultInterval = defaultInterval;
       state.defaultStartDate = defaultStartDate;
       state.defaultEndDate = defaultEndDate;
+    },
+    SET_CURRENT_ZOOM(state, { start, end }) {
+      state.currentZoomStart = start;
+      state.currentZoomEnd = end;
     },
     SET_GRAPH_TYPE(state, format) {
       state.graphType = format;
@@ -243,6 +249,9 @@ const store = createStore({
     },
     updateGraphType({ commit }, format) {
       commit("SET_GRAPH_TYPE", format);
+    },
+    updateCurrentZoom({ commit }, { start, end }) {
+      commit("SET_CURRENT_ZOOM", { start: start, end: end });
     },
     updateDateType({ commit }, type) {
       commit("SET_DATE_TYPE", type);

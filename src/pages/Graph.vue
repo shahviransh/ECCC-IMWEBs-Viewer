@@ -85,8 +85,6 @@ export default {
             canLoadMore: true,
             data: [],
             selectedOptions: [],
-            currentZoomStart: 0,
-            currentZoomEnd: 100,
         };
     },
     computed: {
@@ -164,7 +162,7 @@ export default {
                     }))
             };
         },
-        ...mapState(["selectedDb", "selectedTable", "selectedColumns", "selectedIds", "dateRange", "selectedInterval", "selectedStatistics", "selectedMethod", "exportColumns", "graphType", "exportIds", "exportDate", "exportInterval", "dateType", "exportDateType", "exportPath", "exportFilename", "exportFormat", "exportOptions", "theme"]),
+        ...mapState(["selectedDb", "selectedTable", "selectedColumns", "currentZoomStart", "currentZoomEnd", "selectedIds", "dateRange", "selectedInterval", "selectedStatistics", "selectedMethod", "exportColumns", "graphType", "exportIds", "exportDate", "exportInterval", "dateType", "exportDateType", "exportPath", "exportFilename", "exportFormat", "exportOptions", "theme"]),
     },
     methods: {
         ...mapActions(["updateSelectedColumns", "updateExportOptions"]),

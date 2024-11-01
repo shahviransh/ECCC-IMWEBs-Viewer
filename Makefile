@@ -21,7 +21,7 @@ python:
 	pyinstaller backend\apppy.py -y --distpath backend\ --specpath backend\ --workpath backend\build --name apppy && \
 	deactivate
 	xcopy backend\Jenette_Creek_Watershed backend\apppy\_internal\Jenette_Creek_Watershed /E /I
-	xcopy backend\apppy\apppy.exe backend\apppy\apppy /E /I
+	echo F | xcopy backend\apppy\apppy.exe backend\apppy\apppy /Y /F
 
 # Build Electron or Tauri based on argument
 build:
@@ -40,7 +40,7 @@ endif
 run-dev:
 ifeq ($(RUN), tauri)
 	@echo "Running Tauri app in development mode..."
-	npm run tauri
+	npm run tauri dev
 else ifeq ($(RUN), electron)
 	@echo "Running Electron app in development mode..."
 	npm run electron

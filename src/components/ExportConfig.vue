@@ -27,7 +27,8 @@
                 </template>
             </select>
         </div v-if="pageTitle === 'Graph'" class="export-field">
-            <select v-model="graFormat" class="export-select">
+        <label for="graph-type" class="export-label">Graph Type:</label>
+            <select v-model="graType" class="export-select">
                 <option value="bar">Bar</option>
                 <option value="line">Line</option>
                 <option value="scatter">Scatter</option>
@@ -72,7 +73,7 @@ export default {
                 this.updateExportFormat(DOMPurify.sanitize(value));
             },
         },
-        graFormat: {
+        graType: {
             get() {
                 return this.graphType;
             },
