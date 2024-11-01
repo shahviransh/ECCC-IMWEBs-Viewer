@@ -22,7 +22,6 @@ python:
 	deactivate
 	xcopy backend\Jenette_Creek_Watershed backend\apppy\_internal\Jenette_Creek_Watershed /E /I
 	xcopy backend\apppy\apppy.exe backend\apppy\apppy /E /I
-	xcopy backend\apppy\apppy.exe backend\apppy\apppy-x86_64-apple-darwin /E /I
 
 # Build Electron or Tauri based on argument
 build:
