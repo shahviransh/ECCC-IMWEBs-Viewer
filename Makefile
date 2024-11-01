@@ -40,7 +40,7 @@ endif
 run-dev:
 ifeq ($(RUN), tauri)
 	@echo "Running Tauri app in development mode..."
-	npm run tauri
+	npm run tauri dev
 else ifeq ($(RUN), electron)
 	@echo "Running Electron app in development mode..."
 	npm run electron

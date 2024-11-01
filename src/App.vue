@@ -18,9 +18,6 @@
         <span class="folder-path">{{ folderPath }}</span>
         <!-- Placeholder for additional tools components -->
         <!-- Zoom Controls -->
-        <div v-show="false">
-          <Graph :bookmark="device" ref="graph" />
-        </div>
         <!-- <button @click="handleZoomIn">Zoom In</button>
         <button @click="handleZoomOut">Zoom Out</button>
         <button @click="handleResetZoom">Reset Zoom</button> -->
@@ -39,8 +36,6 @@
 <script>
 import { mapState, mapActions } from "vuex";
 import Graph from "./pages/Graph.vue";
-import { ref } from 'vue';
-const graph = ref(null);
 
 export default {
   name: "App",
@@ -64,10 +59,10 @@ export default {
     Graph,
   },
   computed: {
-    ...mapState(["theme"]),
+    ...mapState(["theme", "currentZoomStart", "currentZoomEnd"]),
   },
   methods: {
-    ...mapActions(["updateTheme", "updatePageTitle"]),
+    ...mapActions(["updateTheme", "updatePageTitle", "updateCurrentZoom"]),
     selectFolder() {
       // Placeholder for selecting a folder, could be integrated with backend logic
       this.folderPath = "Jenette_Creek_Watershed";
@@ -83,13 +78,17 @@ export default {
       this.updateTheme(theme);
     },
     handleZoomIn() {
-      this.$refs.graph.zoomIn();
+      if (this.currentZoomEnd - this.currentZoomStart > 10) {
+        this.updateCurrentZoom({ start: this.currentZoomStart + 10, end: this.currentZoomEnd - 10 });
+      }
     },
     handleZoomOut() {
-      this.$refs.graph.zoomOut();
+      if (this.currentZoomStart > 0) {
+        this.updateCurrentZoom({ start: this.currentZoomStart - 10, end: this.currentZoomEnd + 10 });
+      }
     },
     handleResetZoom() {
-      this.$refs.graph.resetZoom();
+      this.updateCurrentZoom({ start: 0, end: 100 });
     },
   },
   mounted() {

@@ -29,8 +29,8 @@ const newPath = path.resolve(
 
 try {
   if (fs.existsSync(oldPath)) {
-    fs.renameSync(oldPath, newPath);
-    console.log(`Renamed sidecar to ${newPath}`);
+    fs.copyFileSync(oldPath, newPath);
+    console.log(`Copied sidecar to ${newPath}`);
   } else {
     console.error(`File ${oldPath} does not exist`);
   }
