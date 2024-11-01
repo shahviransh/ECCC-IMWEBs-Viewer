@@ -2,7 +2,7 @@
     <div class="form-container">
         <div class="form-group">
             <label for="column-select">Select Columns:</label>
-            <select class="dropdown" v-model="selectColumns" multiple>
+            <select class="dropdown" v-model="selectColumns" multiple :style="{ height: heightVar() }">
                 <option v-for="column in columns" :key="column" :value="column">{{ column }}</option>
             </select>
         </div>
@@ -10,8 +10,8 @@
     <div class="form-container">
         <div class="form-group">
             <label for="column-select">Export Select Columns:</label>
-            <select class="dropdown" v-model="expColumns" multiple>
-                <option v-for="column in columns" :key="column" :value="column">{{ column }}</option>
+            <select class="dropdown" v-model="expColumns" multiple :style="{ height: heightVar() }">
+            <option v-for="column in columns" :key="column" :value="column">{{ column }}</option>
             </select>
         </div>
     </div>
@@ -59,6 +59,10 @@ export default {
     },
     methods: {
         ...mapActions(['fetchColumns', 'updateSelectedColumns', 'updateExportColumns']),
+        heightVar() {
+            const isTauri = window.isTauri !== undefined;
+            return isTauri ? '39vh' : '37vh';
+        },
     },
 };
 </script>
@@ -74,7 +78,8 @@ export default {
     background-color: #f9f9f9;
     border-radius: 8px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    height: 46.5%; /* Set the total height of the container */
+    height: 47%;
+    /* Set the total height of the container */
 }
 
 .form-group {
@@ -96,12 +101,11 @@ label {
     background-color: #fff;
     font-size: 14px;
     width: 100%;
-    height: 40px;
 }
 
 .dropdown[multiple] {
-    height: 16rem;
     padding: 5px;
-    overflow-y: auto; /* Allows scrolling */
+    overflow-y: auto;
+    /* Allows scrolling */
 }
 </style>

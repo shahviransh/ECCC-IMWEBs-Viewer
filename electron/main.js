@@ -1,10 +1,14 @@
-const { app, BrowserWindow } = require("electron");
-const path = require("path");
-const { exec } = require("child_process");
-const os = require("os");
-const axios = require("axios");
+import { app, BrowserWindow } from "electron";
+import path from "path";
+import { dirname } from "path";
+import { fileURLToPath } from "url";
+import exec from "child_process";
+import os from "os";
+import axios from "axios";
 
 let pythonProcess = null;
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 function createWindow() {
   const mainWindow = new BrowserWindow({
@@ -28,9 +32,12 @@ function createWindow() {
 app.on("ready", () => {
   // Determine the backend executable based on the operating system
   let command;
-  const backendPath = path.join(app.getAppPath(), '..', "backend");
+  const backendPath = path.join(app.getAppPath(), "..", "backend");
   if (os.platform() === "win32") {
-    command = `start /B "" ${path.join(backendPath, "apppy-x86_64-pc-windows-msvc.exe")}`; // Use 'start' for Windows
+    command = `start /B "" ${path.join(
+      backendPath,
+      "apppy-x86_64-pc-windows-msvc.exe"
+    )}`; // Use 'start' for Windows
   } else {
     command = `./apppy-x86_64-pc-windows-msvc &`; // Direct execution for Linux/macOS
     // Change directory to the backend folder before running the command

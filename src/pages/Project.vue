@@ -1,6 +1,6 @@
 <template>
     <!-- Main Content -->
-    <div :class="[theme, 'content']">
+    <div :class="[theme, 'content']" :style="{ height: heightVar() }">
 
         <!-- Component 1: Folder Navigation -->
         <div class="folder-navigation">
@@ -121,9 +121,10 @@ export default {
     },
     methods: {
         ...mapActions(["updateSelectedColumns", "updateExportOptions"]),
-        selectFolder() {
-            // Placeholder for selecting a folder, could be integrated with backend logic
-            this.folderPath = "Jenette_Creek_Watershed";
+        heightVar() {
+            // Set the height based on the environment
+            const isTauri = window.isTauri !== undefined;
+            return isTauri ? 'calc(100vh - 14vh)' : 'calc(100vh - 16vh)';
         },
         loadInitialRows() {
             this.visibleData = this.data.slice(0, this.rowLimit);
@@ -162,8 +163,8 @@ export default {
                         method: this.selectedMethod.join(","),
                     }
                 });
-                if (response.data.error){
-                    alert('Error fetching data:'+ response.data.error);
+                if (response.data.error) {
+                    alert('Error fetching data:' + response.data.error);
                     return;
                 }
                 if (this.selectedInterval === 'seasonally' && !this.selectedMethod.includes('Equal') && !this.selectedColumns.includes('Season')) {
@@ -193,14 +194,15 @@ export default {
                         interval: this.exportInterval,
                         statistics: this.selectedStatistics.join(","),
                         method: this.selectedMethod.join(","),
+                        date_type: this.dateType,
                         export_path: this.exportPath,
                         export_filename: this.exportFilename,
                         export_format: this.exportFormat,
                         options: this.exportOptions,
                     }
                 });
-                if (response.data.error){
-                    alert('Error fetching data:'+ response.data.error);
+                if (response.data.error) {
+                    alert('Error fetching data:' + response.data.error);
                     return;
                 }
                 if (this.selectedInterval === 'seasonally' && !this.selectedMethod.includes('Equal') && !this.selectedColumns.includes('Season')) {
@@ -253,6 +255,11 @@ export default {
     --active-bg: #5a5a5a;
 }
 
+:root {
+    --top-bar-height: 14vh;
+    --task-bar-height: 0;
+}
+
 body,
 html {
     margin: 0;
@@ -267,7 +274,6 @@ html {
 .content {
     display: flex;
     flex-direction: row;
-    height: calc(100vh - 16vh);
     /* Adjust to the viewport, minus top bar and taskbar */
     overflow: hidden;
 }

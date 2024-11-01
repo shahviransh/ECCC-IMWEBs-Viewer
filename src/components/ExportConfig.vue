@@ -15,7 +15,16 @@
             <label for="export-format" class="export-label">Export Format:</label>
             <select id="export-format" v-model="expFormat" class="export-select" @change="onExportFormatChange">
                 <option value="csv">CSV</option>
-                <option value="text">Text</option>
+                <option value="txt">Text</option>
+                <!-- Conditional Graph Export Options -->
+                <template v-if="pageTitle === 'Graph'">
+                    <option value="xlsx">Graph In Excel</option>
+                    <option value="png">Graph As PNG</option>
+                    <option value="jpg">Graph As JPG</option>
+                    <option value="jpeg">Graph As JPEG</option>
+                    <option value="svg">Graph As SVG</option>
+                    <option value="pdf">Graph As PDF</option>
+                </template>
             </select>
         </div>
     </div>
@@ -23,6 +32,7 @@
 
 <script>
 import { mapState, mapActions } from 'vuex'; // Import Vuex helpers
+import DOMPurify from 'dompurify';
 
 export default {
     data() {
@@ -35,7 +45,7 @@ export default {
                 return this.exportPath;
             },
             set(value) {
-                this.updateExportPath(value);
+                this.updateExportPath(DOMPurify.sanitize(value));
             },
         },
         expFilename: {
@@ -43,7 +53,7 @@ export default {
                 return this.exportFilename;
             },
             set(value) {
-                this.updateExportFilename(value);
+                this.updateExportFilename(DOMPurify.sanitize(value));
             },
         },
         expFormat: {
@@ -51,10 +61,10 @@ export default {
                 return this.exportFormat;
             },
             set(value) {
-                this.updateExportFormat(value);
+                this.updateExportFormat(DOMPurify.sanitize(value));
             },
         },
-        ...mapState(['exportPath', 'exportFilename', 'exportFormat']),
+        ...mapState(['exportPath', 'exportFilename', 'exportFormat', "pageTitle"]),
     },
     methods: {
         ...mapActions(["updateExportPath", "updateExportFilename", "updateExportFormat"]),

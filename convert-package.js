@@ -1,5 +1,5 @@
-const fs = require('fs');
-const JSON5 = require('json5');
+import fs from 'fs';
+import JSON5 from 'json5';
 
 // Read the package.json5 file
 const packageJson5 = fs.readFileSync('./package.json5', 'utf-8');

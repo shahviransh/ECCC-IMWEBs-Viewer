@@ -1,5 +1,5 @@
 <template>
-  <div id = "papp" :class="theme">
+  <div id="papp" :class="theme">
     <!-- Top Bar -->
     <header class="top-bar">
       <div class="title-container">
@@ -17,6 +17,13 @@
         <button @click="selectFolder">📁 Select Folder</button>
         <span class="folder-path">{{ folderPath }}</span>
         <!-- Placeholder for additional tools components -->
+        <!-- Zoom Controls -->
+        <div v-show="false">
+          <Graph :bookmark="device" ref="graph" />
+        </div>
+        <!-- <button @click="handleZoomIn">Zoom In</button>
+        <button @click="handleZoomOut">Zoom Out</button>
+        <button @click="handleResetZoom">Reset Zoom</button> -->
       </div>
       <div class="taskbar-right">
         <button v-for="page in pages" :key="page" :class="{ active: page === activePage }" @click="navigateTo(page)">{{
@@ -31,6 +38,9 @@
 
 <script>
 import { mapState, mapActions } from "vuex";
+import Graph from "./pages/Graph.vue";
+import { ref } from 'vue';
+const graph = ref(null);
 
 export default {
   name: "App",
@@ -50,7 +60,10 @@ export default {
       activePage: "Project", // Set default page here
     };
   },
-  computed:{
+  components: {
+    Graph,
+  },
+  computed: {
     ...mapState(["theme"]),
   },
   methods: {
@@ -69,20 +82,31 @@ export default {
       document.body.className = theme; // Update body class for global styling
       this.updateTheme(theme);
     },
+    handleZoomIn() {
+      this.$refs.graph.zoomIn();
+    },
+    handleZoomOut() {
+      this.$refs.graph.zoomOut();
+    },
+    handleResetZoom() {
+      this.$refs.graph.resetZoom();
+    },
   },
   mounted() {
     // Set initial theme on load
     document.body.className = this.theme;
     this.updatePageTitle(this.activePage);
-    this.$router.push({ name: this.activePage});
+    this.$router.push({ name: this.activePage });
   },
 };
 </script>
 <style>
-html, body, #app {
-    height: 100%;
-    margin: 0;
-    padding: 0;
+html,
+body,
+#app {
+  height: 100%;
+  margin: 0;
+  padding: 0;
 }
 </style>
 

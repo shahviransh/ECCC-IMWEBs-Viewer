@@ -1,6 +1,9 @@
 import sqlite3
 import os
 import pandas as pd
+import xlsxwriter
+import matplotlib.pyplot as plt
+from matplotlib.ticker import MaxNLocator
 from config import Config
 from datetime import datetime
 from flask import abort
@@ -41,10 +44,10 @@ def fetch_data_service(data):
 def export_data_service(data):
     try:
         output = fetch_data_service(data)
-        if output["error"]:
+        if output.get("error", None):
             return output
         df = pd.DataFrame(output["data"])
-        stats_df = pd.DataFrame(output["stats"]) if output["stats"] else None
+        stats_df = pd.DataFrame(output["stats"]) if output.get("statsColumns", None) else None
 
         output_filename = data.get('export_filename', f"exported_data_{datetime.now().strftime('%Y%m%d%H%M%S')}")
         output_format = data.get("export_format", "csv")
@@ -54,8 +57,12 @@ def export_data_service(data):
             "data": data.get("options[data]", "true") == "true",
             "stats": data.get("options[stats]", "true") == "true",
         }
+        date_type = data.get("date_type")
+        date_type = "Date" if "Date" in df.columns else date_type
+        if not date_type:
+            return {"error": "Graph creation cannot be performed for non-time series data"}
         
-        file_path = save_to_file(df, stats_df, f"{output_filename}.{output_format}", output_format, output_path, options)
+        file_path = save_to_file(df, stats_df, f"{output_filename}.{output_format}", output_format, output_path, options, date_type)
         
         return {"file_path": file_path}
     except Exception as e:
@@ -102,7 +109,7 @@ def fetch_data_from_db(db_path, table_name, selected_id, columns, start_date, en
     return df.map(round_numeric_values)
 
 # Helper function to save data to CSV or text formats
-def save_to_file(dataframe1, dataframe2, filename, file_format, export_path, options):
+def save_to_file(dataframe1, dataframe2, filename, file_format, export_path, options, date_type):
     """Save two DataFrames to the specified file format sequentially."""
     # Set the file path
     file_path = os.path.join(Config.PATHFILE, export_path) if not os.path.exists(export_path) else export_path
@@ -119,13 +126,59 @@ def save_to_file(dataframe1, dataframe2, filename, file_format, export_path, opt
             if options['stats'] and dataframe2 is not None:
                 f.write("\n")  # Optional: Add a blank line or custom separator between the tables
                 dataframe2.to_csv(f, index=False)
-    elif file_format == "text":
+    elif file_format == "txt":
         with open(file_path, 'w') as f:
             if options['data']:
                 dataframe1.to_csv(f, index=False, sep=" ")
             if options['stats'] and dataframe2 is not None:
                 f.write("\n")  # Optional: Add a blank line or custom separator between the tables
                 dataframe2.to_csv(f, index=False, sep=" ")
+    elif file_format == "xlsx":
+        # Write the DataFrame to an Excel file
+        with pd.ExcelWriter(file_path, engine='xlsxwriter') as writer:
+            dataframe1.to_excel(writer, sheet_name='Sheet1', index=False)
+
+            # Access the workbook and worksheet objects
+            workbook = writer.book
+            worksheet = writer.sheets['Sheet1']
+
+            # Define chart type and add data for the chart
+            chart = workbook.add_chart({'type': 'line'})
+            
+            for i, column in enumerate(dataframe1.columns[1:], start=1):
+                chart.add_series({
+                    'name': column,
+                    'categories': f'=Sheet1!$A$2:$A${len(dataframe1)+1}',
+                    'values': f'=Sheet1!${chr(65+i)}$2:${chr(65+i)}${len(dataframe1)+1}',
+                })
+
+            # Customize the chart (optional)
+            chart.set_title({'name': f'{date_type} Series Data'})
+            chart.set_x_axis({'name': date_type})
+            chart.set_y_axis({'name': 'Values'})
+
+            # Insert the chart into the worksheet
+            worksheet.insert_chart(f'{chr(65 + len(dataframe1.columns))}2', chart)
+    elif file_format in ['png', 'jpg', 'jpeg', 'svg', 'pdf']:
+        # Plot each column as a line on the same figure
+        plt.figure(figsize=(10, 6))
+
+        # Iterate over each column except date_type to plot
+        for column in dataframe1.columns[1:]:
+            plt.plot(dataframe1[date_type], dataframe1[column], label=column)  # Plot each series with Time as x-axis
+
+        # Customize the plot
+        plt.title(f"{date_type} Series Data")
+        plt.xlabel(date_type)
+        plt.xticks(rotation=45)
+        # Use MaxNLocator to scale x-axis ticks without deleting labels
+        plt.gca().xaxis.set_major_locator(MaxNLocator(nbins=30))  # Adjust 'nbins' to control label frequency
+        plt.ylabel("Values")
+        plt.legend(title="Series")
+        plt.subplots_adjust(bottom=0.2, top=0.9, left=0.1, right=0.9)
+        
+        # Save the plot
+        plt.savefig(file_path, format=file_format)
 
     return file_path
 
