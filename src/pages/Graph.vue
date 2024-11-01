@@ -158,13 +158,13 @@ export default {
                     .filter(column => this.dateType === 'Month' ? column !== 'Month' : column !== 'Date')
                     .map(column => ({
                         name: column,
-                        type: 'scatter', // or 'bar', depending on the chart type
+                        type: this.graphType, // or 'bar', depending on the chart type
                         // Date/Month for x-axis, column values for y-axis
                         data: this.data.map(row => row[column])
                     }))
             };
         },
-        ...mapState(["selectedDb", "selectedTable", "selectedColumns", "selectedIds", "dateRange", "selectedInterval", "selectedStatistics", "selectedMethod", "exportColumns", "exportIds", "exportDate", "exportInterval", "dateType", "exportDateType", "exportPath", "exportFilename", "exportFormat", "exportOptions", "theme"]),
+        ...mapState(["selectedDb", "selectedTable", "selectedColumns", "selectedIds", "dateRange", "selectedInterval", "selectedStatistics", "selectedMethod", "exportColumns", "graphType", "exportIds", "exportDate", "exportInterval", "dateType", "exportDateType", "exportPath", "exportFilename", "exportFormat", "exportOptions", "theme"]),
     },
     methods: {
         ...mapActions(["updateSelectedColumns", "updateExportOptions"]),
@@ -231,6 +231,7 @@ export default {
                         export_filename: this.exportFilename,
                         export_format: this.exportFormat,
                         options: this.exportOptions,
+                        graph_type: this.graphType,
                     }
                 });
                 if (response.data.error) {

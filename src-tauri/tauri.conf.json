@@ -30,7 +30,22 @@
       "../backend/apppy/apppy"
     ],
     "icon": [
-      "icons/icon.ico"
+      "icons/icon.ico",
+        "icons/icon_128x128.ico",
+        "icons/icon_256x256.ico",
+        "icons/icon_512x512.ico",
+        "icons/icon_128x128.png",
+        "icons/icon_256x256.png",
+        "icons/icon_512x512.png",
+        "icons/icon-1.png",
+        "icons/icon-2.png",
+        "icons/icon-3.png",
+        "icons/icon-4.png",
+        "icons/icon-5.png",
+        "icons/icon-6.png",
+        "icons/icon-7.png",
+        "icons/icon-8.png",
+        "icons/icon-9.png"
     ],
     "resources": [
       "../backend/apppy/**/*",

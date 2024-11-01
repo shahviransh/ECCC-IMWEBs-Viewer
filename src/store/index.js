@@ -32,6 +32,7 @@ const store = createStore({
     exportPath: "dataExport",
     exportFilename: "exported_data",
     exportFormat: "csv",
+    graphType: "scatter",
     exportOptions: { data: false, stats: false },
     defaultInterval: "",
     defaultStartDate: "",
@@ -61,6 +62,9 @@ const store = createStore({
       state.defaultInterval = defaultInterval;
       state.defaultStartDate = defaultStartDate;
       state.defaultEndDate = defaultEndDate;
+    },
+    SET_GRAPH_TYPE(state, format) {
+      state.graphType = format;
     },
     SET_THEME(state, theme) {
       state.theme = theme;
@@ -236,6 +240,9 @@ const store = createStore({
     },
     updateExportDateEnd({ commit }, end) {
       commit("SET_EXPORT_DATE", { start: null, end: end });
+    },
+    updateGraphType({ commit }, format) {
+      commit("SET_GRAPH_TYPE", format);
     },
     updateDateType({ commit }, type) {
       commit("SET_DATE_TYPE", type);

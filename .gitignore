@@ -17,9 +17,6 @@ dist-ssr
 *.local
 __pycache__
 _internal
-*.exe
-app
-apppy
 
 # Editor directories and files
 .vscode/*

@@ -1,9 +1,10 @@
 // Prevents additional console window on Windows in release, DO NOT REMOVE!!
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
-use std::{env, os::windows::process::CommandExt, process::Command, time::Duration, thread::sleep};
-use reqwest::Client; // Add reqwest for HTTP requests
+use std::{env, process::Command, time::Duration, thread::sleep};
+use reqwest::Client;
 
+#[cfg(target_os = "windows")]
 const CREATE_NO_WINDOW: u32 = 0x08000000;
 
 #[tauri::command]
@@ -37,10 +38,14 @@ async fn start_server() {
   println!("Starting server at {:?}", server_path);
   // Spawn the server as a background process
   let mut command = Command::new(server_path);
-  command.creation_flags(CREATE_NO_WINDOW) // hide console window on Windows
-  .spawn()  
-  .expect("Failed to start server");
-
+  // Only apply CREATE_NO_WINDOW on Windows to suppress console
+  #[cfg(target_os = "windows")]
+  {
+      use std::os::windows::process::CommandExt;
+      command.creation_flags(CREATE_NO_WINDOW);
+  }
+  command.spawn().expect("Failed to start server");
+  
   // Wait a few seconds for the server to start
   sleep(Duration::from_secs(5));
 }
