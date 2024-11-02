@@ -367,7 +367,7 @@ label {
 .settings-panel {
     width: 99%;
     /* Takes 2/4 of the horizontal space */
-    height: 30%;
+    height: 28%;
     /* Ensure full height */
     margin: 0px;
     padding: 5px;

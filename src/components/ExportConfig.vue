@@ -26,15 +26,14 @@
                     <option value="pdf">Graph As PDF</option>
                 </template>
             </select>
-        </div v-if="pageTitle === 'Graph'" class="export-field">
-        <label for="graph-type" class="export-label">Graph Type:</label>
+        </div>
+        <div v-if="pageTitle === 'Graph'" class="export-field">
+            <label for="graph-type" class="export-label">Graph Type:</label>
             <select v-model="graType" class="export-select">
                 <option value="bar">Bar</option>
                 <option value="line">Line</option>
                 <option value="scatter">Scatter</option>
             </select>
-        <div>
-
         </div>
     </div>
 </template>
@@ -95,7 +94,7 @@ export default {
     flex-direction: column;
     gap: 10px;
     margin: 0px auto;
-
+    overflow-y: auto;
 }
 
 label {
