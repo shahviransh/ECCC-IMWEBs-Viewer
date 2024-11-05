@@ -28,9 +28,11 @@ build:
 ifeq ($(BUILD), tauri)
 	@echo "Building Tauri app..."
 	npm run tauri:build
+	xcopy src-tauri\target\release "$(USERPROFILE)\OneDrive - McMaster University\Co-op 1st Work Term - ECCC\release" /Y /E /I /D
 else ifeq ($(BUILD), electron)
 	@echo "Building Electron app..."
 	npm run electron:build
+	xcopy dist "$(USERPROFILE)\OneDrive - McMaster University\Co-op 1st Work Term - ECCC\dist" /Y /E /I /D
 else
 	@echo "Please specify a valid BUILD option (tauri or electron)."
 	@exit 1
