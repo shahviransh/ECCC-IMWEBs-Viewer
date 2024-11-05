@@ -90,7 +90,7 @@ db3_files = [
     "backend\\Jenette_Creek_Watershed\\Model01\\Output\\Scenario_2\\scenario_2.db3"
 ]
 
-# Paths to your CSV files
+# Paths to our CSV files
 hydroclimate_csv = 'lookup\Hydroclimate_export.csv'
 bmp_csv = 'lookup\BMP_export.csv'
 scenario_csv = 'lookup\scenario_2_export.csv'
@@ -100,7 +100,7 @@ hydroclimate_df = pd.read_csv(hydroclimate_csv)
 bmp_df = pd.read_csv(bmp_csv)
 scenario_df = pd.read_csv(scenario_csv)
 
-# Connect to your SQLite database (lookup.db3)
+# Connect to our SQLite database (lookup.db3)
 conn = sqlite3.connect('backend\\Jenette_Creek_Watershed\\Database\\lookup.db3')
 cursor = conn.cursor()
 

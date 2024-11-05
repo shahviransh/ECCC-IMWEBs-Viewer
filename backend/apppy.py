@@ -10,7 +10,7 @@ app = Flask(__name__)
 CORS(app)
 
 # Configure caching
-cache = Cache(app, config={'CACHE_TYPE': 'SimpleCache', 'CACHE_DEFAULT_TIMEOUT': 300})
+cache = Cache(app, config={"CACHE_TYPE": "SimpleCache", "CACHE_DEFAULT_TIMEOUT": 300})
 
 # Register routes and error handlers
 register_routes(app, cache)
