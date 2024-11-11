@@ -1,17 +1,20 @@
 <template>
+    <h5 class="parameter-heading">Parameters:</h5>
     <div class="form-container">
         <div class="form-group">
             <label for="column-select">Select Columns:</label>
-            <select class="dropdown" v-model="selectColumns" multiple :style="{ height: heightVar() }">
+            <select id="column-select" class="dropdown" v-model="selectColumns" multiple
+                :style="{ height: heightVar() }">
                 <option v-for="column in columns" :key="column" :value="column">{{ column }}</option>
             </select>
         </div>
     </div>
     <div class="form-container">
         <div class="form-group">
-            <label for="column-select">Export Select Columns:</label>
-            <select class="dropdown" v-model="expColumns" multiple :style="{ height: heightVar() }">
-            <option v-for="column in columns" :key="column" :value="column">{{ column }}</option>
+            <label for="export-column-select">Export Select Columns:</label>
+            <select id="export-column-select" class="dropdown" v-model="expColumns" multiple
+                :style="{ height: heightVar() }">
+                <option v-for="column in columns" :key="column" :value="column">{{ column }}</option>
             </select>
         </div>
     </div>
@@ -61,13 +64,20 @@ export default {
         ...mapActions(['fetchColumns', 'updateSelectedColumns', 'updateExportColumns']),
         heightVar() {
             const isTauri = window.isTauri !== undefined;
-            return isTauri ? '39vh' : '37vh';
+            return isTauri ? '36vh' : '34vh';
         },
     },
 };
 </script>
 <style src="vue-multiselect/dist/vue-multiselect.css"></style>
 <style scoped>
+.parameter-heading {
+    font-size: 16px;
+    font-weight: 600;
+    margin: 0px 0px 0px 0px;
+    color: #333;
+}
+
 .form-container {
     display: flex;
     flex-direction: column;
@@ -78,7 +88,7 @@ export default {
     background-color: #f9f9f9;
     border-radius: 8px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    height: 47%;
+    height: 45%;
     /* Set the total height of the container */
 }
 
@@ -106,6 +116,5 @@ label {
 .dropdown[multiple] {
     padding: 5px;
     overflow-y: auto;
-    /* Allows scrolling */
 }
 </style>

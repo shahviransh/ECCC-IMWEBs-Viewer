@@ -18,9 +18,9 @@
         <span class="folder-path">{{ folderPath }}</span>
         <!-- Placeholder for additional tools components -->
         <!-- Zoom Controls -->
-        <!-- <button @click="handleZoomIn">Zoom In</button>
+        <button @click="handleZoomIn">Zoom In</button>
         <button @click="handleZoomOut">Zoom Out</button>
-        <button @click="handleResetZoom">Reset Zoom</button> -->
+        <button @click="handleResetZoom">Reset Zoom</button>
       </div>
       <div class="taskbar-right">
         <button v-for="page in pages" :key="page" :class="{ active: page === activePage }" @click="navigateTo(page)">{{
@@ -35,7 +35,6 @@
 
 <script>
 import { mapState, mapActions } from "vuex";
-import Graph from "./pages/Graph.vue";
 
 export default {
   name: "App",
@@ -54,9 +53,6 @@ export default {
       folderPath: "",
       activePage: "Project", // Set default page here
     };
-  },
-  components: {
-    Graph,
   },
   computed: {
     ...mapState(["theme", "currentZoomStart", "currentZoomEnd"]),
