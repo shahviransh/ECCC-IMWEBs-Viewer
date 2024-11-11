@@ -1,5 +1,7 @@
 <template>
-    <folder-tree :treeData="treeData" :page="pageTitle" @select="onSelect" />
+    <div class="folder-tree">
+        <folder-tree :treeData="treeData" :page="pageTitle" @select="onSelect" />
+    </div>
 </template>
 
 <script>
@@ -120,3 +122,9 @@ export default {
     },
 };
 </script>
+
+<style scoped>
+.folder-tree {
+    min-width: 200px;
+}
+</style>

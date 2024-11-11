@@ -29,7 +29,7 @@
         </div>
         <div v-if="pageTitle === 'Graph'" class="export-field">
             <label for="graph-type" class="export-label">Graph Type:</label>
-            <select v-model="graType" class="export-select">
+            <select id="graph-type" v-model="graType" class="export-select">
                 <option value="bar">Bar</option>
                 <option value="line">Line</option>
                 <option value="scatter">Scatter</option>
@@ -69,7 +69,7 @@ export default {
                 return this.exportFormat;
             },
             set(value) {
-                this.updateExportFormat(DOMPurify.sanitize(value));
+                this.updateExportFormat(value);
             },
         },
         graType: {
@@ -77,7 +77,7 @@ export default {
                 return this.graphType;
             },
             set(value) {
-                this.updateGraphType(DOMPurify.sanitize(value));
+                this.updateGraphType(value);
             },
         },
         ...mapState(['exportPath', 'exportFilename', 'exportFormat', "pageTitle", "graphType"]),
@@ -92,8 +92,12 @@ export default {
 .export-container {
     display: flex;
     flex-direction: column;
-    gap: 10px;
-    margin: 0px auto;
+    gap: 5px;
+    margin: 0px 0px;
+    padding: 5px;
+    border-radius: 4px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    background-color: antiquewhite;
     overflow-y: auto;
 }
 
