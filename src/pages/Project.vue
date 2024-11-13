@@ -16,19 +16,10 @@
             <div class="settings-panel">
                 <Selection />
                 <IntervalDropdown />
-                <span>
-                    <StatisticsDropdown />
-                    <AggregationMethod />
-                </span>
+                <StatisticsDropdown />
                 <ExportConfig />
                 <span>
-                    <div class="export-field">
-                        <label for="export-stats">Export Table and/or Stats:</label>
-                        <Multiselect v-model="selectedOptions" :options="filteredExportOptions" :multiple="true"
-                            :close-on-select="false" :clear-on-select="false" :preserve-search="true"
-                            placeholder="Select" @update:modelValue="onOptionsChange">
-                        </Multiselect>
-                    </div>
+                    <ExportTableStats />
                     <button @click="fetchData">Fetch Data</button>
                     <button @click="exportData">Export Data</button>
                 </span>
@@ -81,9 +72,9 @@ import DatabaseDropdown from "../components/DatabaseDropdown.vue";
 import ColumnDropdown from "../components/ColumnDropdown.vue";
 import Selection from "../components/Selection.vue";
 import IntervalDropdown from "../components/IntervalDropdown.vue";
-import AggregationMethod from "../components/AggregationMethod.vue";
 import StatisticsDropdown from "../components/StatisticsDropdown.vue";
 import ExportConfig from "../components/ExportConfig.vue";
+import ExportTableStats from "../components/ExportTableStats.vue";
 import axios from 'axios';
 import Multiselect from "vue-multiselect";
 
@@ -94,9 +85,9 @@ export default {
         ColumnDropdown,
         Selection,
         IntervalDropdown,
-        AggregationMethod,
         StatisticsDropdown,
         ExportConfig,
+        ExportTableStats,
         Multiselect,
     },
     data() {
@@ -107,16 +98,9 @@ export default {
             rowLimit: 100,
             canLoadMore: true,
             data: [],
-            selectedOptions: [],
         };
     },
     computed: {
-        filteredExportOptions() {
-            // Conditionally include "Stats" based on your original condition
-            return this.selectedStatistics.includes('None') === this.selectedMethod.includes('Equal')
-                ? ['Table']
-                : ['Table', 'Stats'];
-        },
         ...mapState(["selectedDb", "selectedTable", "selectedColumns", "selectedIds", "dateRange", "selectedInterval", "selectedStatistics", "selectedMethod", "exportColumns", "exportIds", "exportDate", "exportInterval", "dateType", "exportDateType", "exportPath", "exportFilename", "exportFormat", "exportOptions", "theme"]),
     },
     methods: {
@@ -139,13 +123,6 @@ export default {
             if (this.visibleData.length >= this.data.length) {
                 this.canLoadMore = false; // Hide the load more button
             }
-        },
-        onOptionsChange(value) {
-            this.selectedOptions = value;
-            this.updateExportOptions({
-                table: this.selectedOptions.includes('Table'),
-                stats: this.selectedOptions.includes('Stats')
-            });
         },
         async fetchData() {
             try {
@@ -281,12 +258,6 @@ html {
 .multiselect {
     /* Set the desired width */
     font-size: 14px;
-}
-
-.export-field {
-    display: flex;
-    flex-direction: column;
-    cursor: pointer;
 }
 
 label {

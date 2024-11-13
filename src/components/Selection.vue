@@ -1,62 +1,67 @@
 <template>
     <div class="select-container">
-        <div class="form-container">
+        <div class="form-container-ref">
             <div class="form-group">
                 <label for="date-start">Model Start Date:</label>
-                <input type="date" v-model="defaultStartDate" class="input-field" readonly />
+                <input id="date-start" type="date" v-model="defaultStartDate" class="input-field" readonly />
             </div>
             <div class="form-group">
                 <label for="date-end">Model End Date:</label>
-                <input type="date" v-model="defaultEndDate" class="input-field" readonly />
+                <input id="date-end" type="date" v-model="defaultEndDate" class="input-field" readonly />
             </div>
             <div class="form-group">
                 <label for="interval">Model Interval:</label>
-                <input type="text" v-model="capitalizedInterval" class="input-field" readonly />
+                <input id="interval" type="text" v-model="capitalizedInterval" class="input-field" readonly />
             </div>
         </div>
         <div class="form-container">
             <div class="form-group">
                 <label for="id-select">Select IDs:</label>
-                <Multiselect v-model="selectIds" :options="ids" :multiple="true" :close-on-select="false"
+                <Multiselect id="id-select" v-model="selectIds" :options="ids" :multiple="true" :close-on-select="false"
                     :clear-on-select="false" :preserve-search="true" placeholder="Select IDs">
                 </Multiselect>
             </div>
             <div class="form-group">
-                <label for="date-start">Start Date:</label>
-                <input type="date" v-if="['Time', 'Date'].includes(daType)" v-model="selectedDateStart"
+                <label for="date-start-date" v-if="['Date', 'Time'].includes(daType)">Start Date:</label>
+                <label for="date-start-text" v-else-if="daType === 'Month'">Start Month:</label>
+                <input id="date-start" type="date" v-if="['Date', 'Time'].includes(daType)" v-model="selectedDateStart"
                     class="input-field" />
-                <input type="text" v-else-if="daType === 'Month'" v-model="selectedDateStart" placeholder="Enter month"
-                    class="input-field" />
+                <input id="date-start" type="text" v-else-if="daType === 'Month'" v-model="selectedDateStart"
+                    placeholder="Enter month" class="input-field" />
             </div>
             <div class="form-group">
-                <label for="date-end">End Date:</label>
-                <input type="date" v-if="['Time', 'Date'].includes(daType)" v-model="selectedDateEnd"
+                <label for="date-end-date" v-if="['Date', 'Time'].includes(daType)">Start Date:</label>
+                <label for="date-end-text" v-else-if="daType === 'Month'">Start Month:</label>
+                <input id="date-end" type="date" v-if="['Date', 'Time'].includes(daType)" v-model="selectedDateEnd"
                     class="input-field" />
-                <input type="text" v-else-if="daType === 'Month'" v-model="selectedDateEnd" placeholder="Enter month"
-                    class="input-field" />
+                <input id="date-end" type="text" v-else-if="daType === 'Month'" v-model="selectedDateEnd"
+                    placeholder="Enter month" class="input-field" />
             </div>
         </div>
         <div class="form-container">
             <div class="form-group">
-                <label for="id-select">Export Select IDs:</label>
-                <Multiselect v-model="expIds" :options="ids" :multiple="true" :close-on-select="false"
-                    :clear-on-select="false" :preserve-search="true" placeholder="Select IDs">
+                <label for="export-id-select">Export Select IDs:</label>
+                <Multiselect id="export-id-select" v-model="expIds" :options="ids" :multiple="true"
+                    :close-on-select="false" :clear-on-select="false" :preserve-search="true" placeholder="Select IDs">
                 </Multiselect>
             </div>
 
             <div class="form-group">
-                <label for="date-start">Start Date:</label>
-                <input type="date" v-if="['Time', 'Date'].includes(daType)" v-model="expDateStart"
+                <label for="exp-date-start-date" v-if="['Date', 'Time'].includes(daType)">Start Date:</label>
+                <label for="exp-date-start-text" v-else-if="daType === 'Month'">Start Month:</label>
+                <input id="exp-date-start" type="date" v-if="['Date', 'Time'].includes(daType)" v-model="expDateStart"
                     class="input-field" />
-                <input type="text" v-else-if="daType === 'Month'" v-model="expDateStart" placeholder="Enter month"
-                    class="input-field" />
+                <input id="exp-date-start" type="text" v-else-if="daType === 'Month'" v-model="expDateStart"
+                    placeholder="Enter month" class="input-field" />
             </div>
 
             <div class="form-group">
-                <label for="date-end">End Date:</label>
-                <input type="date" v-if="['Time', 'Date'].includes(daType)" v-model="expDateEnd" class="input-field" />
-                <input type="text" v-else-if="daType === 'Month'" v-model="expDateEnd" placeholder="Enter month"
+                <label for="exp-date-end-date" v-if="['Date', 'Time'].includes(daType)">End Date:</label>
+                <label for="exp-date-end-text" v-else-if="daType === 'Month'">End Month:</label>
+                <input id="exp-date-end" type="date" v-if="['Date', 'Time'].includes(daType)" v-model="expDateEnd"
                     class="input-field" />
+                <input id="exp-date-end" type="text" v-else-if="daType === 'Month'" v-model="expDateEnd"
+                    placeholder="Enter month" class="input-field" />
             </div>
         </div>
     </div>
@@ -65,6 +70,7 @@
 <script>
 import { mapState, mapActions } from 'vuex'; // Import Vuex helpers
 import Multiselect from 'vue-multiselect';
+
 export default {
     components: { Multiselect },
     props: {
@@ -163,19 +169,23 @@ export default {
 }
 
 
-.form-container {
+.form-container,
+.form-container-ref {
     display: flex;
     flex-direction: column;
-    flex: 1;
-    /* Allow containers to grow/shrink equally */
-    width: 100%;
-    /* Ensure a minimum width */
     gap: 5px;
     margin: 0px 0px;
     padding: 5px;
-    background-color: #f9f9f9;
     border-radius: 4px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.form-container-ref {
+    background-color: aliceblue;
+}
+
+.form-container {
+    background-color: antiquewhite;
 }
 
 .form-group {
