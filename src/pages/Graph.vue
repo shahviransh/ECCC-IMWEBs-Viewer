@@ -16,19 +16,10 @@
             <div class="settings-panel">
                 <Selection />
                 <IntervalDropdown />
-                <span>
-                    <StatisticsDropdown />
-                    <AggregationMethod />
-                </span>
+                <StatisticsDropdown />
                 <ExportConfig />
                 <span>
-                    <div class="export-field">
-                        <label for="export-stats">Export Table and/or Stats:</label>
-                        <Multiselect v-model="selectedOptions" :options="filteredExportOptions" :multiple="true"
-                            :close-on-select="false" :clear-on-select="false" :preserve-search="true"
-                            placeholder="Select" @update:modelValue="onOptionsChange">
-                        </Multiselect>
-                    </div>
+                    <ExportTableStats />
                     <button @click="fetchData">Fetch Data</button>
                     <button @click="exportData">Export Data</button>
                 </span>
@@ -49,9 +40,9 @@ import DatabaseDropdown from "../components/DatabaseDropdown.vue";
 import ColumnDropdown from "../components/ColumnDropdown.vue";
 import Selection from "../components/Selection.vue";
 import IntervalDropdown from "../components/IntervalDropdown.vue";
-import AggregationMethod from "../components/AggregationMethod.vue";
 import StatisticsDropdown from "../components/StatisticsDropdown.vue";
 import ExportConfig from "../components/ExportConfig.vue";
+import ExportTableStats from "../components/ExportTableStats.vue";
 import axios from 'axios';
 import Multiselect from "vue-multiselect";
 import { use } from 'echarts/core';
@@ -70,9 +61,9 @@ export default {
         ColumnDropdown,
         Selection,
         IntervalDropdown,
-        AggregationMethod,
         StatisticsDropdown,
         ExportConfig,
+        ExportTableStats,
         Multiselect,
         VChart,
     },
@@ -84,16 +75,10 @@ export default {
             rowLimit: 100,
             canLoadMore: true,
             data: [],
-            selectedOptions: [],
+            ID: this.selectedColumns.filter((column) => column.includes('ID')).join(''),
         };
     },
     computed: {
-        filteredExportOptions() {
-            // Conditionally include "Stats" based on your original condition
-            return this.selectedStatistics.includes('None') === this.selectedMethod.includes('Equal')
-                ? ['Table']
-                : ['Table', 'Stats'];
-        },
         chartOptions() {
             return {
                 title: {
@@ -106,7 +91,13 @@ export default {
                 legend: {
                     top: 'bottom',
                     // Exclude Date/Month from the legend
-                    data: this.selectedColumns.filter(column => this.dateType === 'Month' ? column !== 'Month' : column !== 'Date')
+                    data: this.selectedIds.length
+                        ? this.selectedColumns
+                            .filter(column => this.dateType === 'Month' ? column !== 'Month' : column !== 'Date')
+                            .flatMap(column =>
+                                this.selectedIds.map(id => `${column} - {ID}: ${id}`)
+                            ) // Legend entries in the format "Col - ID"
+                        : this.selectedColumns.filter(column => this.dateType === 'Month' ? column !== 'Month' : column !== 'Date')
                 },
                 grid: {
                     left: '2%',
@@ -152,14 +143,25 @@ export default {
                         fontSize: 14,
                     },
                 },
-                series: this.selectedColumns
-                    .filter(column => this.dateType === 'Month' ? column !== 'Month' : column !== 'Date')
-                    .map(column => ({
-                        name: column,
-                        type: this.graphType, // or 'bar', depending on the chart type
-                        // Date/Month for x-axis, column values for y-axis
-                        data: this.data.map(row => row[column])
-                    }))
+                series: this.selectedIds.length
+                    ? this.selectedColumns
+                        .filter(column => this.dateType === 'Month' ? column !== 'Month' : column !== 'Date')
+                        .flatMap(column =>
+                            this.selectedIds.map(id => ({
+                                name: `${column} - {ID}: ${id}`, // Series name in format "Col - ID"
+                                type: this.graphType,
+                                data: this.data
+                                    .filter(row => row.ID === id) // Filter data for the specific ID
+                                    .map(row => row[column]) // Get values for the specific column
+                            }))
+                        )
+                    : this.selectedColumns
+                        .filter(column => this.dateType === 'Month' ? column !== 'Month' : column !== 'Date')
+                        .map(column => ({
+                            name: column,
+                            type: this.graphType,
+                            data: this.data.map(row => row[column])
+                        }))
             };
         },
         ...mapState(["selectedDb", "selectedTable", "selectedColumns", "currentZoomStart", "currentZoomEnd", "selectedIds", "dateRange", "selectedInterval", "selectedStatistics", "selectedMethod", "exportColumns", "graphType", "exportIds", "exportDate", "exportInterval", "dateType", "exportDateType", "exportPath", "exportFilename", "exportFormat", "exportOptions", "theme"]),
@@ -170,13 +172,6 @@ export default {
             // Set the height based on the environment
             const isTauri = window.isTauri !== undefined;
             return isTauri ? 'calc(100vh - 14vh)' : 'calc(100vh - 16vh)';
-        },
-        onOptionsChange(value) {
-            this.selectedOptions = value;
-            this.updateExportOptions({
-                table: this.selectedOptions.includes('Table'),
-                stats: this.selectedOptions.includes('Stats')
-            });
         },
         async fetchData() {
             try {
@@ -314,12 +309,6 @@ html {
     font-size: 14px;
 }
 
-.export-field {
-    display: flex;
-    flex-direction: column;
-    cursor: pointer;
-}
-
 label {
     font-weight: 600;
     font-size: 14px;
@@ -367,7 +356,7 @@ label {
 .settings-panel {
     width: 99%;
     /* Takes 2/4 of the horizontal space */
-    height: 28%;
+    height: 30%;
     /* Ensure full height */
     margin: 0px;
     padding: 5px;
