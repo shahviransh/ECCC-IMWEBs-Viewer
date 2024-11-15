@@ -1,6 +1,6 @@
 # Makefile for Tauri and Electron builds
 
-.PHONY: all prestart install build run-dev python clean
+.PHONY: all prestart install build run python clean
 
 # Default target
 all: prestart install python
@@ -25,11 +25,11 @@ python:
 
 # Build Electron or Tauri based on argument
 build:
-ifeq ($(BUILD), tauri)
+ifeq ($(ARG), tauri)
 	@echo "Building Tauri app..."
 	npm run tauri:build
 	xcopy src-tauri\target\release "$(USERPROFILE)\OneDrive - McMaster University\Co-op 1st Work Term - ECCC\release" /Y /E /I /D
-else ifeq ($(BUILD), electron)
+else ifeq ($(ARG), electron)
 	@echo "Building Electron app..."
 	npm run electron:build
 	xcopy dist "$(USERPROFILE)\OneDrive - McMaster University\Co-op 1st Work Term - ECCC\dist" /Y /E /I /D
@@ -39,11 +39,11 @@ else
 endif
 
 # Run Electron or Tauri in development mode
-run-dev:
-ifeq ($(RUN), tauri)
+run:
+ifeq ($(ARG), tauri)
 	@echo "Running Tauri app in development mode..."
 	npm run tauri dev
-else ifeq ($(RUN), electron)
+else ifeq ($(ARG), electron)
 	@echo "Running Electron app in development mode..."
 	npm run electron
 else
