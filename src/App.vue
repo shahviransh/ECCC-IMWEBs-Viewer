@@ -30,11 +30,13 @@
 
     <!-- Main Content -->
     <router-view class="main-content" />
-  </div>
+    <MessageBox />
+      </div>
 </template>
 
 <script>
 import { mapState, mapActions } from "vuex";
+import MessageBox from "./components/MessageBox.vue";
 
 export default {
   name: "App",
@@ -56,6 +58,9 @@ export default {
   },
   computed: {
     ...mapState(["theme", "currentZoomStart", "currentZoomEnd"]),
+  },
+  components: {
+    MessageBox,
   },
   methods: {
     ...mapActions(["updateTheme", "updatePageTitle", "updateCurrentZoom"]),

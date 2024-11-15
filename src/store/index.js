@@ -39,6 +39,7 @@ const store = createStore({
     defaultInterval: "",
     defaultStartDate: "",
     defaultEndDate: "",
+    messages: [],
   },
   mutations: {
     SET_DATABASES(state, databases) {
@@ -80,6 +81,18 @@ const store = createStore({
     },
     SET_SELECTED_DB(state, db) {
       state.selectedDb = db;
+    },
+    PUSH_MESSAGE(state, { message, type }) {
+      state.messages.push({ text: message, type: type });
+    },
+    SLICE_MESSAGE(state, index) {
+      state.messages.splice(index, 1);
+    },
+    SHIFT_MESSAGE(state){
+      state.messages.shift();
+    },
+    CLEAR_MESSAGES(state) {
+      state.messages = [];
     },
     SET_SELECTED_TABLE(state, table) {
       state.selectedTable = table;
@@ -228,6 +241,18 @@ const store = createStore({
     },
     updateSelectedIds({ commit }, ids) {
       commit("SET_SELECTED_IDS", ids);
+    },
+    pushMessage({ commit }, { message, type }) {
+      commit("PUSH_MESSAGE", { message, type });
+    },
+    shiftMessage({ commit }) {
+      commit("SHIFT_MESSAGE");
+    },
+    sliceMessage({ commit }, index) {
+      commit("SLICE_MESSAGE", index);
+    },
+    clearMessages({ commit }) {
+      commit("CLEAR_MESSAGES");
     },
     updateSelectedDateStart({ commit }, start) {
       commit("SET_SELECTED_DATE", { start: start, end: null });

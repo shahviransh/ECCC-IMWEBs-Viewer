@@ -19,7 +19,7 @@ def fetch_data_service(data):
         db_path = data.get("db_path")
         table_name = data.get("table_name")
         columns = data.get("columns", "All")
-        selected_id = data.get("id").split(",")
+        selected_ids = data.get("id").split(",")
         start_date = data.get("start_date")
         end_date = data.get("end_date")
         date_type = data.get("date_type")
@@ -30,7 +30,7 @@ def fetch_data_service(data):
 
         # Fetch the data from the database and perform the required operations
         df = fetch_data_from_db(
-            db_path, table_name, selected_id, columns, start_date, end_date, date_type
+            db_path, table_name, selected_ids, columns, start_date, end_date, date_type
         )
         date_type = "Date" if "Date" in df.columns else date_type
 
@@ -101,7 +101,7 @@ def export_data_service(data):
             options,
             date_type,
             graph_type,
-            data.get("id").split(","),
+            list(map(int, data.get("id").split(","))),
         )
 
         return {"file_path": file_path}
@@ -110,7 +110,7 @@ def export_data_service(data):
 
 
 def fetch_data_from_db(
-    db_path, table_name, selected_id, columns, start_date, end_date, date_type
+    db_path, table_name, selected_ids, columns, start_date, end_date, date_type
 ):
     conn = sqlite3.connect(os.path.join(Config.PATHFILE, db_path))
 
@@ -130,15 +130,15 @@ def fetch_data_from_db(
     query = f"SELECT {columns if columns != 'All' else '*'} FROM {real_table_name}"
     params = []
 
-    # Add conditions for selected_id
-    if selected_id != [""]:
-        placeholders = ",".join(["?"] * len(selected_id))
+    # Add conditions for selected_ids
+    if selected_ids != [""]:
+        placeholders = ",".join(["?"] * len(selected_ids))
         query += f" WHERE ID IN ({placeholders})"
-        params.extend(selected_id)
+        params.extend(selected_ids)
 
     # Add date range conditions
     if start_date and end_date:
-        if selected_id != [""]:
+        if selected_ids != [""]:
             query += f" AND {date_type} BETWEEN ? AND ?"
         else:
             query += f" WHERE {date_type} BETWEEN ? AND ?"
@@ -190,7 +190,8 @@ def save_to_file(
         # Add more types if needed
     }
     # Check if the dataframe contains an ID column
-    ID = next((col for col in df.columns if "ID" in col), None)
+    ID = next((col for col in dataframe1.columns if "ID" in col), None)
+    dataframe1[date_type] = pd.to_datetime(dataframe1[date_type])
 
     # Write first dataframe and/or statistics dataframe to file with csv/text format
     if file_format == "csv":
@@ -221,22 +222,27 @@ def save_to_file(
             row_count = len(dataframe1) + 1
 
             if selected_ids != [""]:
+                # Sort dataframe by ID column for excel selection
+                dataframe1 = dataframe1.sort_values([ID])
                 # Only create separate series for each ID-Column combination if selected_ids is not empty
+                prev_end_row = 0
+                end_row = 0
                 for i, column in enumerate(dataframe1.columns[1:], start=1):
+                    if column == ID:
+                        continue
                     for j, selected_id in enumerate(selected_ids):
-                        # Get the end row index for the current selected_id
-                        end_row = (
-                            dataframe1[dataframe1[ID] == selected_id].index[-1] + 2
-                        )  # +2 to adjust for Excel 1-based indexing
-
                         # Previous end row index for the previous selected_id
                         prev_end_row = (
-                            dataframe1[dataframe1[ID] == selected_ids[j - 1]].index[
-                                -1
-                            ]
-                            + 2
+                            len(dataframe1[dataframe1[ID] == selected_ids[j - 1]]) * j
+                            + 2  # +2 for exclusive selection
                             if j > 0
                             else 2
+                        )
+
+                        # Get the end row index for the current selected_id
+                        end_row = (
+                            len(dataframe1[dataframe1[ID] == selected_id]) * (j+1)
+                            + 1 # +1 for inclusive selection
                         )
 
                         # Filter data for each ID-column combination
@@ -260,7 +266,15 @@ def save_to_file(
 
             # Customize the chart (optional)
             chart.set_title({"name": f"{date_type} Series Data"})
-            chart.set_x_axis({"name": date_type})
+            chart.set_x_axis(
+                {
+                    "name": date_type,
+                    "date_axis": True,
+                    "num_format": "yyyy-mm-dd",
+                    "major_gridlines": {"visible": True},
+                    "num_font": {"rotation": -45},
+                }
+            )
             chart.set_y_axis({"name": "Values"})
 
             # Insert the chart into the worksheet
@@ -274,6 +288,8 @@ def save_to_file(
             # Create separate plots for each ID-Column combination
             if graph_type == "bar":
                 for i, column in enumerate(dataframe1.columns[1:]):
+                    if column == ID:
+                        continue
                     for j, selected_id in enumerate(selected_ids):
                         filtered_data = dataframe1[dataframe1[ID] == selected_id]
                         plot_func(
@@ -284,6 +300,8 @@ def save_to_file(
                         )
             else:
                 for column in dataframe1.columns[1:]:
+                    if column == ID:
+                        continue
                     for selected_id in selected_ids:
                         filtered_data = dataframe1[dataframe1[ID] == selected_id]
                         plot_func(

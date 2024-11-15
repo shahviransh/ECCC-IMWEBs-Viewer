@@ -68,6 +68,7 @@
 
 <script>
 import { mapState, mapActions } from "vuex";
+import { nextTick } from "vue";
 import DatabaseDropdown from "../components/DatabaseDropdown.vue";
 import ColumnDropdown from "../components/ColumnDropdown.vue";
 import Selection from "../components/Selection.vue";
@@ -104,16 +105,18 @@ export default {
         ...mapState(["selectedDb", "selectedTable", "selectedColumns", "selectedIds", "dateRange", "selectedInterval", "selectedStatistics", "selectedMethod", "exportColumns", "exportIds", "exportDate", "exportInterval", "dateType", "exportDateType", "exportPath", "exportFilename", "exportFormat", "exportOptions", "theme"]),
     },
     methods: {
-        ...mapActions(["updateSelectedColumns", "updateExportOptions"]),
+        ...mapActions(["updateSelectedColumns", "updateExportOptions", "pushMessage", "shiftMessage", "clearMessages"]),
         heightVar() {
             // Set the height based on the environment
             const isTauri = window.isTauri !== undefined;
             return isTauri ? 'calc(100vh - 14vh)' : 'calc(100vh - 16vh)';
         },
+        // Load initial rows when the data is loaded
         loadInitialRows() {
             this.visibleData = this.data.slice(0, this.rowLimit);
             this.canLoadMore = this.data.length > this.rowLimit;
         },
+        // Load more rows when the load more button is clicked
         loadMoreRows() {
             const nextRowLimit = this.visibleData.length + this.rowLimit;
             const nextRows = this.data.slice(this.visibleData.length, nextRowLimit);
@@ -124,8 +127,13 @@ export default {
                 this.canLoadMore = false; // Hide the load more button
             }
         },
+        // Fetch data from the API
         async fetchData() {
             try {
+                this.pushMessage({ message: `Fetching ${this.selectedColumns.length} columns x ${this.data.length} rows`, type: 'info' });
+                if (this.statsColumns.length > 0) {
+                    this.pushMessage({ message: `Fetching ${this.statsColumns.length} statistics`, type: 'info' });
+                }
                 const response = await axios.get(`${import.meta.env.VITE_APP_API_BASE_URL}/api/get_data`, {
                     params: {
                         db_path: this.selectedDb,
@@ -153,12 +161,30 @@ export default {
                 this.stats = response.data.stats;
                 this.statsColumns = response.data.statsColumns;
                 this.loadInitialRows();
+
+                // Wait until the table has rendered, then trigger messages
+                this.$nextTick(() => {
+                    this.shiftMessage();
+                    this.pushMessage({ message: `Fetched ${this.selectedColumns.length} columns x ${this.data.length} rows`, type: 'success' });
+                    this.pushMessage({ message: `Loaded ${this.rowLimit} rows`, type: 'success' });
+                    if (this.statsColumns.length > 0) {
+                        this.shiftMessage();
+                        this.pushMessage({ message: `Fetched ${this.statsColumns.length} statistics columns for ${this.selectedMethod || this.selectedStatistics}`, type: 'success' });
+                    }
+
+                    // Clear messages after 5 seconds
+                    setTimeout(() => {
+                        this.clearMessages();
+                    }, 5000);
+                });
             } catch (error) {
                 alert('Error fetching data: ' + error.message);
             }
         },
+        // Export data to a file
         async exportData() {
             try {
+                this.pushMessage({ message: `Exporting ${this.exportColumns.length} columns x ${this.data.length} rows`, type: 'info' });
                 const response = await axios.get(`${import.meta.env.VITE_APP_API_BASE_URL}/api/export_data`, {
                     params: {
                         db_path: this.selectedDb,
@@ -182,11 +208,16 @@ export default {
                     alert('Error fetching data:' + response.data.error);
                     return;
                 }
+                this.shiftMessage();
+                this.pushMessage({ message: `Exported ${this.exportColumns.length} columns x ${this.data.length} rows`, type: 'success' });
                 if (this.selectedInterval === 'seasonally' && !this.selectedMethod.includes('Equal') && !this.selectedColumns.includes('Season')) {
                     this.updateSelectedColumns(this.selectedColumns.concat(['Season']));
                 } else {
                     this.updateSelectedColumns(this.selectedColumns.filter((column) => column !== 'Season'));
                 }
+                setTimeout(() => {
+                    this.clearMessages();
+                }, 5000);
             } catch (error) {
                 alert('Error exporting data: ' + error.message);
             }

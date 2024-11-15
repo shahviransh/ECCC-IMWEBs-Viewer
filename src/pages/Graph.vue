@@ -71,31 +71,65 @@ export default {
         return {
             stats: [],
             statsColumns: [],
-            visibleData: [],
-            rowLimit: 100,
-            canLoadMore: true,
             data: [],
-            ID: this.selectedColumns.filter((column) => column.includes('ID')).join(''),
+            ID: [],
         };
+    },
+    watch: {
+        chartOptions: {
+            // Watch for changes in the chart options and update messages after the chart is loaded
+            handler() {
+                if (this.data.length) {
+                    this.$nextTick(() => {
+                        setTimeout(() => {
+                            this.shiftMessage();
+                        }, 2000);
+                        this.pushMessage({ message: `Graph Loaded ${this.selectedColumns.length} columns x ${this.data.length} rows`, type: 'success' });
+                        setTimeout(() => {
+                            this.clearMessages();
+                        }, 5000);
+                    });
+                }
+            },
+            deep: true,
+        },
+        selectedColumns() {
+            this.ID = this.selectedColumns.filter((column) => column.includes('ID')).join("");
+        }
     },
     computed: {
         chartOptions() {
+            const xAxisData = this.data.map(row => row[this.dateType === 'Month' ? 'Month' : 'Date']);
+
+            // Preprocess `this.data` to create a lookup table for each ID and Date/Month
+            const dataLookup = {};
+            this.data.forEach(row => {
+                const id = row[this.ID];
+                const date = row[this.dateType === 'Month' ? 'Month' : 'Date'];
+
+                if (!dataLookup[id]) {
+                    dataLookup[id] = {};
+                }
+                dataLookup[id][date] = row;
+            });
             return {
                 title: {
                     text: 'Data Visualization',
                     left: 'center'
                 },
                 tooltip: {
-                    trigger: 'axis'
+                    trigger: 'axis',
                 },
                 legend: {
                     top: 'bottom',
+                    type: 'scroll',
+                    orient: 'horizontal', // Makes legend scrollable horizontally
                     // Exclude Date/Month from the legend
                     data: this.selectedIds.length
                         ? this.selectedColumns
-                            .filter(column => this.dateType === 'Month' ? column !== 'Month' : column !== 'Date')
+                            .filter(column => (this.dateType === 'Month' ? column !== 'Month' : column !== 'Date') && column !== this.ID)
                             .flatMap(column =>
-                                this.selectedIds.map(id => `${column} - {ID}: ${id}`)
+                                this.selectedIds.map(id => `${column} - ${this.ID}: ${id}`)
                             ) // Legend entries in the format "Col - ID"
                         : this.selectedColumns.filter(column => this.dateType === 'Month' ? column !== 'Month' : column !== 'Date')
                 },
@@ -120,7 +154,7 @@ export default {
                 ],
                 xAxis: {
                     type: 'category', // Set x-axis as time type
-                    data: this.data.map(row => row[this.dateType === 'Month' ? 'Month' : 'Date']),
+                    data: xAxisData,
                     name: this.dateType === 'Month' ? 'Month' : 'Date',  // Name of the x-axis
                     nameLocation: 'middle', // Position at the middle of the axis
                     nameTextStyle: {
@@ -145,18 +179,19 @@ export default {
                 },
                 series: this.selectedIds.length
                     ? this.selectedColumns
-                        .filter(column => this.dateType === 'Month' ? column !== 'Month' : column !== 'Date')
+                        .filter(column => (this.dateType === 'Month' ? column !== 'Month' : column !== 'Date') && column !== this.ID)
                         .flatMap(column =>
                             this.selectedIds.map(id => ({
-                                name: `${column} - {ID}: ${id}`, // Series name in format "Col - ID"
+                                name: `${column} - ${this.ID}: ${id}`,
                                 type: this.graphType,
-                                data: this.data
-                                    .filter(row => row.ID === id) // Filter data for the specific ID
-                                    .map(row => row[column]) // Get values for the specific column
+                                data: xAxisData.map(date => {
+                                    const row = dataLookup[id] && dataLookup[id][date];
+                                    return row ? row[column] : null;
+                                })
                             }))
                         )
                     : this.selectedColumns
-                        .filter(column => this.dateType === 'Month' ? column !== 'Month' : column !== 'Date')
+                        .filter(column => (this.dateType === 'Month' ? column !== 'Month' : column !== 'Date'))
                         .map(column => ({
                             name: column,
                             type: this.graphType,
@@ -167,14 +202,16 @@ export default {
         ...mapState(["selectedDb", "selectedTable", "selectedColumns", "currentZoomStart", "currentZoomEnd", "selectedIds", "dateRange", "selectedInterval", "selectedStatistics", "selectedMethod", "exportColumns", "graphType", "exportIds", "exportDate", "exportInterval", "dateType", "exportDateType", "exportPath", "exportFilename", "exportFormat", "exportOptions", "theme"]),
     },
     methods: {
-        ...mapActions(["updateSelectedColumns", "updateExportOptions"]),
+        ...mapActions(["updateSelectedColumns", "updateExportOptions", "pushMessage", "shiftMessage", "clearMessages"]),
         heightVar() {
             // Set the height based on the environment
             const isTauri = window.isTauri !== undefined;
             return isTauri ? 'calc(100vh - 14vh)' : 'calc(100vh - 16vh)';
         },
+        // Fetch data from the API
         async fetchData() {
             try {
+                this.pushMessage({ message: `Graph Loading ${this.selectedColumns.length} columns x ${this.data.length} rows`, type: 'info' });
                 const response = await axios.get(`${import.meta.env.VITE_APP_API_BASE_URL}/api/get_data`, {
                     params: {
                         db_path: this.selectedDb,
@@ -205,8 +242,10 @@ export default {
                 alert('Error fetching data: ' + error.message);
             }
         },
+        // Export data to a file
         async exportData() {
             try {
+                this.pushMessage({ message: `Exporting ${this.exportColumns.length} columns x ${this.data.length} rows`, type: 'info' });
                 const response = await axios.get(`${import.meta.env.VITE_APP_API_BASE_URL}/api/export_data`, {
                     params: {
                         db_path: this.selectedDb,
@@ -231,11 +270,16 @@ export default {
                     alert('Error fetching data:' + response.data.error);
                     return;
                 }
+                this.shiftMessage();
+                this.pushMessage({ message: `Exported ${this.exportColumns.length} columns x ${this.data.length} rows`, type: 'info' });
                 if (this.selectedInterval === 'seasonally' && !this.selectedMethod.includes('Equal') && !this.selectedColumns.includes('Season')) {
                     this.updateSelectedColumns(this.selectedColumns.concat(['Season']));
                 } else {
                     this.updateSelectedColumns(this.selectedColumns.filter((column) => column !== 'Season'));
                 }
+                setTimeout(() => {
+                    this.clearMessages();
+                }, 5000);
             } catch (error) {
                 alert('Error exporting data: ' + error.message);
             }
