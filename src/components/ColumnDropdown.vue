@@ -1,21 +1,44 @@
 <template>
     <h5 class="parameter-heading">Parameters:</h5>
-    <div class="form-container">
-        <div class="form-group">
-            <label for="column-select">Select Columns:</label>
-            <select id="column-select" class="dropdown" v-model="selectColumns" multiple
-                :style="{ height: heightVar() }">
-                <option v-for="column in columns" :key="column" :value="column">{{ column }}</option>
-            </select>
+    <div v-if="pageTitle === 'Project'">
+        <div class="form-container">
+            <div class="form-group">
+                <label for="column-select">Select Columns:</label>
+                <select id="column-select" class="dropdown" v-model="selectColumns" multiple
+                    :style="{ height: heightVar() }">
+                    <option v-for="column in columns" :key="column" :value="column">{{ column }}</option>
+                </select>
+            </div>
+        </div>
+        <div class="form-container">
+            <div class="form-group">
+                <label for="export-column-select">Export Select Columns:</label>
+                <select id="export-column-select" class="dropdown" v-model="expColumns" multiple
+                    :style="{ height: heightVar() }">
+                    <option v-for="column in columns" :key="column" :value="column">{{ column }}</option>
+                </select>
+            </div>
         </div>
     </div>
-    <div class="form-container">
-        <div class="form-group">
-            <label for="export-column-select">Export Select Columns:</label>
-            <select id="export-column-select" class="dropdown" v-model="expColumns" multiple
-                :style="{ height: heightVar() }">
-                <option v-for="column in columns" :key="column" :value="column">{{ column }}</option>
-            </select>
+    <!-- Conditional Axes Dropdowns -->
+    <div v-if="pageTitle === 'Graph'">
+        <div class="form-container x-axis">
+            <div class="form-group">
+                <label for="x-axis-select">X-Axis:</label>
+                <select id="x-axis-select" class="dropdown" v-model="xaxis" :style="{ height: heightVar() }">
+                    <option v-for="column in columns.filter(col => col === 'Date' || col === 'Month')" :key="column"
+                        :value="column">{{ column }}</option>
+                </select>
+            </div>
+        </div>
+        <div class="form-container">
+            <div class="form-group">
+                <label for="y-axis-select">Y-Axis:</label>
+                <select id="y-axis-select" class="dropdown" v-model="yaxis" multiple :style="{ height: heightVar() }">
+                    <option v-for="column in columns.filter(col => col !== 'Date' && col !== 'Month')" :key="column"
+                        :value="column">{{ column }}</option>
+                </select>
+            </div>
         </div>
     </div>
 </template>
@@ -49,7 +72,23 @@ export default {
                 this.updateExportColumns(value);
             }
         },
-        ...mapState(['columns', 'ids', 'selectedDb', 'selectedColumns', 'exportColumns']),
+        xaxis: {
+            get() {
+                return this.xAxis;
+            },
+            set(value) {
+                this.updateXAxis(value);
+            }
+        },
+        yaxis: {
+            get() {
+                return this.yAxis
+            },
+            set(value) {
+                this.updateYAxis(value);
+            }
+        },
+        ...mapState(['columns', 'ids', 'selectedDb', 'selectedColumns', 'exportColumns', 'pageTitle', 'xAxis', 'yAxis'])
     },
     data() {
         return {
@@ -61,7 +100,7 @@ export default {
         },
     },
     methods: {
-        ...mapActions(['fetchColumns', 'updateSelectedColumns', 'updateExportColumns']),
+        ...mapActions(['fetchColumns', 'updateSelectedColumns', 'updateExportColumns', 'updateXAxis', 'updateYAxis']),
         heightVar() {
             const isTauri = window.isTauri !== undefined;
             return isTauri ? '36vh' : '34vh';

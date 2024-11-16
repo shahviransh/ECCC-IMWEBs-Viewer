@@ -211,7 +211,6 @@ export default {
         // Fetch data from the API
         async fetchData() {
             try {
-                this.pushMessage({ message: `Graph Loading ${this.selectedColumns.length} columns x ${this.data.length} rows`, type: 'info' });
                 const response = await axios.get(`${import.meta.env.VITE_APP_API_BASE_URL}/api/get_data`, {
                     params: {
                         db_path: this.selectedDb,
@@ -238,6 +237,7 @@ export default {
                 this.data = response.data.data;
                 this.stats = response.data.stats;
                 this.statsColumns = response.data.statsColumns;
+                this.pushMessage({ message: `Graph Loading ${this.selectedColumns.length} columns x ${this.data.length} rows`, type: 'info' });
             } catch (error) {
                 alert('Error fetching data: ' + error.message);
             }
@@ -400,7 +400,7 @@ label {
 .settings-panel {
     width: 99%;
     /* Takes 2/4 of the horizontal space */
-    height: 27.5%;
+    height: 30%;
     /* Ensure full height */
     margin: 0px;
     padding: 5px;

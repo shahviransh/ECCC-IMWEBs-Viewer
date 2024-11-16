@@ -130,7 +130,6 @@ export default {
         // Fetch data from the API
         async fetchData() {
             try {
-                this.pushMessage({ message: `Fetching ${this.selectedColumns.length} columns x ${this.data.length} rows`, type: 'info' });
                 if (this.statsColumns.length > 0) {
                     this.pushMessage({ message: `Fetching ${this.statsColumns.length} statistics`, type: 'info' });
                 }
@@ -160,6 +159,7 @@ export default {
                 this.data = response.data.data;
                 this.stats = response.data.stats;
                 this.statsColumns = response.data.statsColumns;
+                this.pushMessage({ message: `Fetching ${this.selectedColumns.length} columns x ${this.data.length} rows`, type: 'info' });
                 this.loadInitialRows();
 
                 // Wait until the table has rendered, then trigger messages

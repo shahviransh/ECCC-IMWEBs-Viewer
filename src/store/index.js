@@ -40,6 +40,8 @@ const store = createStore({
     defaultStartDate: "",
     defaultEndDate: "",
     messages: [],
+    xAxis: "",
+    yAxis: [],
   },
   mutations: {
     SET_DATABASES(state, databases) {
@@ -81,6 +83,15 @@ const store = createStore({
     },
     SET_SELECTED_DB(state, db) {
       state.selectedDb = db;
+    },
+    SET_XAXIS(state, xAxis){
+      state.xAxis = xAxis;
+    },
+    SET_YAXIS(state, yAxis){
+      state.yAxis = yAxis;
+      state.selectedColumns = [state.xAxis, ...yAxis];
+      state.exportColumns = [...state.selectedColumns];
+      console.log(state.selectedColumns);
     },
     PUSH_MESSAGE(state, { message, type }) {
       state.messages.push({ text: message, type: type });
@@ -241,6 +252,12 @@ const store = createStore({
     },
     updateSelectedIds({ commit }, ids) {
       commit("SET_SELECTED_IDS", ids);
+    },
+    updateYAxis({ commit }, yAxis) {
+      commit("SET_YAXIS", yAxis);
+    },
+    updateXAxis({ commit }, xAxis) {
+      commit("SET_XAXIS", xAxis);
     },
     pushMessage({ commit }, { message, type }) {
       commit("PUSH_MESSAGE", { message, type });
