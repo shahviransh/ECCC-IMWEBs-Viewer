@@ -99,13 +99,13 @@ export default {
     },
     computed: {
         chartOptions() {
-            const xAxisData = this.data.map(row => row[this.dateType === 'Month' ? 'Month' : 'Date']);
+            const xAxisData = this.data.map(row => row[this.dateType]);
 
             // Preprocess `this.data` to create a lookup table for each ID and Date/Month
             const dataLookup = {};
             this.data.forEach(row => {
                 const id = row[this.ID];
-                const date = row[this.dateType === 'Month' ? 'Month' : 'Date'];
+                const date = row[this.dateType];
 
                 if (!dataLookup[id]) {
                     dataLookup[id] = {};
@@ -113,10 +113,6 @@ export default {
                 dataLookup[id][date] = row;
             });
             return {
-                title: {
-                    text: 'Data Visualization',
-                    left: 'center'
-                },
                 tooltip: {
                     trigger: 'axis',
                 },
@@ -127,11 +123,11 @@ export default {
                     // Exclude Date/Month from the legend
                     data: this.selectedIds.length
                         ? this.selectedColumns
-                            .filter(column => (this.dateType === 'Month' ? column !== 'Month' : column !== 'Date') && column !== this.ID)
+                            .filter(column => column !== this.dateType && column !== this.ID)
                             .flatMap(column =>
                                 this.selectedIds.map(id => `${column} - ${this.ID}: ${id}`)
                             ) // Legend entries in the format "Col - ID"
-                        : this.selectedColumns.filter(column => this.dateType === 'Month' ? column !== 'Month' : column !== 'Date')
+                        : this.selectedColumns.filter(column => column !== this.dateType)
                 },
                 grid: {
                     left: '2%',
@@ -155,35 +151,91 @@ export default {
                 xAxis: {
                     type: 'category', // Set x-axis as time type
                     data: xAxisData,
-                    name: this.dateType === 'Month' ? 'Month' : 'Date',  // Name of the x-axis
+                    name: this.dateType,  // Name of the x-axis
                     nameLocation: 'middle', // Position at the middle of the axis
                     nameTextStyle: {
                         fontSize: 14,
                         padding: 10,
+                        color: 'black',
                     },
                     axisLabel: {
                         fontSize: 14,
+                        color: 'black',
                     },
+                    axisLine: {
+                        lineStyle: {
+                            color: 'black',
+                            width: 2
+                        }
+                    },
+                    splitLine: {
+                        show: false
+                    }
                 },
-                yAxis: {
-                    type: 'value',
-                    name: 'Value',  // Y-axis title
-                    nameLocation: 'middle',
-                    nameTextStyle: {
-                        fontSize: 14,
-                        padding: 30,
+                yAxis: [
+                    {
+                        type: 'value',
+                        name: 'Primary Axis',
+                        nameLocation: 'middle',
+                        nameTextStyle: {
+                            fontSize: 14,
+                            padding: 30,
+                            color: 'black',
+                        },
+                        axisLabel: {
+                            fontSize: 14,
+                            color: 'black',
+                        },
+                        axisLine: {
+                            show: true,
+                            lineStyle: {
+                                color: 'black',
+                                width: 2
+                            }
+                        },
+                        splitLine: {
+                            lineStyle: {
+                                type: 'solid',
+                                color: '#ccc'
+                            }
+                        }
                     },
-                    axisLabel: {
-                        fontSize: 14,
-                    },
-                },
+                    {
+                        type: 'value',
+                        name: 'Secondary Axis',
+                        nameLocation: 'middle',
+                        nameTextStyle: {
+                            fontSize: 14,
+                            padding: 30,
+                            color: 'black',
+                        },
+                        axisLabel: {
+                            fontSize: 14,
+                            color: 'black',
+                        },
+                        axisLine: {
+                            show: true,
+                            lineStyle: {
+                                color: 'black',
+                                width: 2
+                            }
+                        },
+                        splitLine: {
+                            lineStyle: {
+                                type: 'dashed',
+                                color: '#ccc'
+                            }
+                        }
+                    }
+                ],
                 series: this.selectedIds.length
                     ? this.selectedColumns
-                        .filter(column => (this.dateType === 'Month' ? column !== 'Month' : column !== 'Date') && column !== this.ID)
+                        .filter(column => column !== this.dateType && column !== this.ID)
                         .flatMap(column =>
                             this.selectedIds.map(id => ({
                                 name: `${column} - ${this.ID}: ${id}`,
                                 type: this.graphType,
+                                yAxisIndex: columnNeedsSecondaryAxis(column) ? 1 : 0, // Dynamically assign y-axis
                                 data: xAxisData.map(date => {
                                     const row = dataLookup[id] && dataLookup[id][date];
                                     return row ? row[column] : null;
@@ -191,10 +243,11 @@ export default {
                             }))
                         )
                     : this.selectedColumns
-                        .filter(column => (this.dateType === 'Month' ? column !== 'Month' : column !== 'Date'))
+                        .filter(column => column !== this.dateType)
                         .map(column => ({
                             name: column,
                             type: this.graphType,
+                            yAxisIndex: columnNeedsSecondaryAxis(column) ? 1 : 0, // Dynamically assign y-axis
                             data: this.data.map(row => row[column])
                         }))
             };
@@ -207,6 +260,10 @@ export default {
             // Set the height based on the environment
             const isTauri = window.isTauri !== undefined;
             return isTauri ? 'calc(100vh - 14vh)' : 'calc(100vh - 16vh)';
+        },
+        columnNeedsSecondaryAxis(column) {
+            // Adjust logic based on actual data thresholds
+            return this.data.some(row => row[column] > 100);
         },
         // Fetch data from the API
         async fetchData() {

@@ -1,5 +1,5 @@
 Table Name,Table Alias,Column Name,Column Alias
-T_SNWB_Results,Subbasin snow water balance,Time,Date
+T_SNWB_Results,Subbasin snow water balance,Time,Time
 T_SNWB_Results,Subbasin snow water balance,ID,Subbasin ID
 T_SNWB_Results,Subbasin snow water balance,P,Precipitation (mm)
 T_SNWB_Results,Subbasin snow water balance,P_net,Net precipitation (mm)
@@ -10,7 +10,7 @@ T_SNWB_Results,Subbasin snow water balance,SR,Snow redistribution (mm)
 T_SNWB_Results,Subbasin snow water balance,SE,Snow sublimation (mm)
 T_SNWB_Results,Subbasin snow water balance,SM,Snowmelt (mm)
 T_SNWB_Results,Subbasin snow water balance,SA,Snow accumulation (mm)
-T_GWWB_Results,Subbasin groundwater balance,Time,Date
+T_GWWB_Results,Subbasin groundwater balance,Time,Time
 T_GWWB_Results,Subbasin groundwater balance,ID,Subbasin ID
 T_GWWB_Results,Subbasin groundwater balance,PERCO,Percolation (mm)
 T_GWWB_Results,Subbasin groundwater balance,REVAP,Groundwater revaporation (mm)
@@ -21,7 +21,7 @@ T_GWWB_Results,Subbasin groundwater balance,BaseFlow_mm,Groundwater flow (mm)
 T_GWWB_Results,Subbasin groundwater balance,GW,Groundwater storage (mm)
 T_GWWB_Results,Subbasin groundwater balance,BaseFlow_m3/s,Groundwater flow (m^3/s)
 T_GWWB_Results,Subbasin groundwater balance,Grazing_Loss,Cattle drinking loss (mm)
-T_SOWB_Results,Subbasin soil water balance,Time,Date
+T_SOWB_Results,Subbasin soil water balance,Time,Time
 T_SOWB_Results,Subbasin soil water balance,ID,Subbasin ID
 T_SOWB_Results,Subbasin soil water balance,P,Precipitation (mm)
 T_SOWB_Results,Subbasin soil water balance,T,Air temperature (oC)
@@ -41,7 +41,7 @@ T_SOWB_Results,Subbasin soil water balance,RG,GW runoff (mm)
 T_SOWB_Results,Subbasin soil water balance,R,Total runoff (mm)
 T_SOWB_Results,Subbasin soil water balance,S_WATER,Soil water content (mm)
 T_SOWB_Results,Subbasin soil water balance,S_MOI,Soil moisture (mm)
-T_SOWB_SUBAREA_Results,Subarea soil water balance,Time,Date
+T_SOWB_SUBAREA_Results,Subarea soil water balance,Time,Time
 T_SOWB_SUBAREA_Results,Subarea soil water balance,ID,Subarea ID
 T_SOWB_SUBAREA_Results,Subarea soil water balance,P,Precipitation (mm)
 T_SOWB_SUBAREA_Results,Subarea soil water balance,T,Air temperature (oC)
@@ -61,7 +61,7 @@ T_SOWB_SUBAREA_Results,Subarea soil water balance,RG,GW runoff (mm)
 T_SOWB_SUBAREA_Results,Subarea soil water balance,R,Total runoff (mm)
 T_SOWB_SUBAREA_Results,Subarea soil water balance,S_WATER,Soil water content (mm)
 T_SOWB_SUBAREA_Results,Subarea soil water balance,S_MOI,Soil moisture (mm)
-T_TDWB_Results,Tile drain water balance,Time,Date
+T_TDWB_Results,Tile drain water balance,Time,Time
 T_TDWB_Results,Tile drain water balance,ID,Tile drain ID
 T_TDWB_Results,Tile drain water balance,SoilMoisture,Soil moisture (mm)
 T_TDWB_Results,Tile drain water balance,Groundwater,Groundwater (mm)
@@ -69,25 +69,25 @@ T_TDWB_Results,Tile drain water balance,GroundwaterTable,Groundwater table (mm)
 T_TDWB_Results,Tile drain water balance,Vtileout,Tile flow out (m^3/d)
 T_TDWB_Results,Tile drain water balance,Qtileout,Tile discharge (m^3/s)
 T_TDWB_Results,Tile drain water balance,Vlag,Tile water lag (m^3/d)
-T_SBOF_Results,Subbasin overland flow,Time,Date
+T_SBOF_Results,Subbasin overland flow,Time,Time
 T_SBOF_Results,Subbasin overland flow,ID,Subbasin ID
 T_SBOF_Results,Subbasin overland flow,SBOF,Subbasin overland flow (mm)
-T_TDSB_Results,Tile drain sediment balance,Time,Date
+T_TDSB_Results,Tile drain sediment balance,Time,Time
 T_TDSB_Results,Tile drain sediment balance,ID,Tile drain ID
 T_TDSB_Results,Tile drain sediment balance,SedTileOut,Sediment tile out (t/d)
-T_SEDI_Results,Subbasin sediment yield,Time,Date
+T_SEDI_Results,Subbasin sediment yield,Time,Time
 T_SEDI_Results,Subbasin sediment yield,ID,Subbasin ID
 T_SEDI_Results,Subbasin sediment yield,Sediment,Sediment yield (t/d)
-T_SEDI_SUBAREA_Results,Subarea sediment yield,Time,Date
+T_SEDI_SUBAREA_Results,Subarea sediment yield,Time,Time
 T_SEDI_SUBAREA_Results,Subarea sediment yield,ID,Subarea ID
 T_SEDI_SUBAREA_Results,Subarea sediment yield,Sediment,Sediment yield (t/d)
-T_TDNB_Results,Tile drain nutrient balance,Time,Date
+T_TDNB_Results,Tile drain nutrient balance,Time,Time
 T_TDNB_Results,Tile drain nutrient balance,ID,Tile drain ID
 T_TDNB_Results,Tile drain nutrient balance,ORGN_TILEOUT,OrgN tile out (kg/d)
 T_TDNB_Results,Tile drain nutrient balance,NO3_TILEOUT,NO3 tile out (kg/d)
 T_TDNB_Results,Tile drain nutrient balance,ORGP_TILEOUT,OrgP tile out (kg/d)
 T_TDNB_Results,Tile drain nutrient balance,SOLP_TILEOUT,SolP tile out (kg/d)
-T_LOADING_Results,Subbasin nutrient loading,Time,Date
+T_LOADING_Results,Subbasin nutrient loading,Time,Time
 T_LOADING_Results,Subbasin nutrient loading,ID,Subbasin ID
 T_LOADING_Results,Subbasin nutrient loading,discharge_Overland,Discharge overland (m^3/s)
 T_LOADING_Results,Subbasin nutrient loading,discharge_Lateral,Discharge lateral (m^3/s)
@@ -108,7 +108,7 @@ T_LOADING_Results,Subbasin nutrient loading,cbod,CBOD runoff (kg/d)
 T_LOADING_Results,Subbasin nutrient loading,o2,O2 runoff (kg/d)
 T_LOADING_Results,Subbasin nutrient loading,OrganicN_Groundwater,OrgN groundwater (kg/d)
 T_LOADING_Results,Subbasin nutrient loading,OrganicP_Groundwater,OrgP groundwater (kg/d)
-T_LOADING_SUBAREA_Results,Subarea nutrient loading,Time,Date
+T_LOADING_SUBAREA_Results,Subarea nutrient loading,Time,Time
 T_LOADING_SUBAREA_Results,Subarea nutrient loading,ID,Subarea ID
 T_LOADING_SUBAREA_Results,Subarea nutrient loading,discharge_Overland,Discharge overland (m^3/s)
 T_LOADING_SUBAREA_Results,Subarea nutrient loading,discharge_Lateral,Discharge lateral (m^3/s)
@@ -129,7 +129,7 @@ T_LOADING_SUBAREA_Results,Subarea nutrient loading,cbod,CBOD runoff (kg/d)
 T_LOADING_SUBAREA_Results,Subarea nutrient loading,o2,O2 runoff (kg/d)
 T_LOADING_SUBAREA_Results,Subarea nutrient loading,OrganicN_Groundwater,OrgN groundwater (kg/d)
 T_LOADING_SUBAREA_Results,Subarea nutrient loading,OrganicP_Groundwater,OrgP groundwater (kg/d)
-T_CHSB_Results,Channel sediment balance,Time,Date
+T_CHSB_Results,Channel sediment balance,Time,Time
 T_CHSB_Results,Channel sediment balance,ID,Reach ID
 T_CHSB_Results,Channel sediment balance,SedInUpStream,Sediment from upstream (t/d)
 T_CHSB_Results,Channel sediment balance,SedInSubbasin,Sediment from side subbasin (t/d)
@@ -142,7 +142,7 @@ T_CHSB_Results,Channel sediment balance,SedDrink,Sediment drink water (t/d)
 T_CHSB_Results,Channel sediment balance,SedDivIn,Sediment diversion in (t/d)
 T_CHSB_Results,Channel sediment balance,SedDivOut,Sediment diversion out (t/d)
 T_CHSB_Results,Channel sediment balance,SedTileIn,Sediment tile drain (t/d)
-T_NUCON_Results,Reach nutrient concentration,Time,Date
+T_NUCON_Results,Reach nutrient concentration,Time,Time
 T_NUCON_Results,Reach nutrient concentration,ID,Reach ID
 T_NUCON_Results,Reach nutrient concentration,algae_c,Algae concentration (mg/l)
 T_NUCON_Results,Reach nutrient concentration,algae_l,Algae loading (kg/d)
@@ -192,7 +192,7 @@ T_NUCON_Results,Reach nutrient concentration,nh4_l_upstream,NH4 upstream (kg/d)
 T_NUCON_Results,Reach nutrient concentration,organicN_l_upstream,OrgN upstream (kg/d)
 T_NUCON_Results,Reach nutrient concentration,solutionP_l_upstream,SolP upstream (kg/d)
 T_NUCON_Results,Reach nutrient concentration,organicP_l_upstream,OrgP upstream (kg/d)
-T_NUTB_Results,Reservoir nutrient balance,Time,Date
+T_NUTB_Results,Reservoir nutrient balance,Time,Time
 T_NUTB_Results,Reservoir nutrient balance,ID,Reservoir ID
 T_NUTB_Results,Reservoir nutrient balance,ORGP_IN,OrgP in (kg/d)
 T_NUTB_Results,Reservoir nutrient balance,ORGP_SETTLING,OrgP deposition (kg/d)
@@ -231,14 +231,14 @@ T_NUTB_Results,Reservoir nutrient balance,TN_Irr,TN irrigation (kg/d)
 T_NUTB_Results,Reservoir nutrient balance,TP_Irr,TP irrigation (kg/d)
 T_NUTB_Results,Reservoir nutrient balance,TN_Drink,TN drink water (kg/d)
 T_NUTB_Results,Reservoir nutrient balance,TP_Drink,TP drink water (kg/d)
-T_RECH_Results,Discharge at reach outlet,Time,Date
+T_RECH_Results,Discharge at reach outlet,Time,Time
 T_RECH_Results,Discharge at reach outlet,ID,Reach ID
 T_RECH_Results,Discharge at reach outlet,QS,Surface flow (m^3/s)
 T_RECH_Results,Discharge at reach outlet,QI,Interflow (m^3/s)
 T_RECH_Results,Discharge at reach outlet,QG,Groundwater flow (m^3/s)
 T_RECH_Results,Discharge at reach outlet,Q_m3,Total flow (m^3/s)
 T_RECH_Results,Discharge at reach outlet,Q_mm,Total flow (mm)
-T_RESB_Results,Reservoir sediment balance,Time,Date
+T_RESB_Results,Reservoir sediment balance,Time,Time
 T_RESB_Results,Reservoir sediment balance,ID,Reservoir ID
 T_RESB_Results,Reservoir sediment balance,SedIn,Sediment in (t/d)
 T_RESB_Results,Reservoir sediment balance,SedSettling,Sediment deposition (t/d)
@@ -246,7 +246,7 @@ T_RESB_Results,Reservoir sediment balance,SedIrrigation,sediment irrigation (t/d
 T_RESB_Results,Reservoir sediment balance,SedStorage,Sediment storage (t)
 T_RESB_Results,Reservoir sediment balance,SedOut,Sediment out (t/d)
 T_RESB_Results,Reservoir sediment balance,SedDrink,Sediment drink water (t/d)
-T_REWB_Results,Reservoir water balance,Time,Date
+T_REWB_Results,Reservoir water balance,Time,Time
 T_REWB_Results,Reservoir water balance,ID,Reservoir ID
 T_REWB_Results,Reservoir water balance,Qin,Flow in (m^3/s)
 T_REWB_Results,Reservoir water balance,Vin,Flow in (m^3/d)
@@ -263,7 +263,7 @@ T_REWB_Results,Reservoir water balance,QGout,Groundwater out (m^3/d)
 T_REWB_Results,Reservoir water balance,Qout_m3,Total flow out (m^3/d)
 T_REWB_Results,Reservoir water balance,Qout_mm,Total flow out (mm)
 T_REWB_Results,Reservoir water balance,Qdrink,Drink water (m^3/d)
-T_WABA_Results,Reach water balance,Time,Date
+T_WABA_Results,Reach water balance,Time,Time
 T_WABA_Results,Reach water balance,ID,Reach ID
 T_WABA_Results,Reach water balance,Vin,Flow in (m^3/d)
 T_WABA_Results,Reach water balance,Vside,Side flow (m^3/d)

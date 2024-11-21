@@ -91,9 +91,9 @@ db3_files = [
 ]
 
 # Paths to our CSV files
-hydroclimate_csv = 'lookup\Hydroclimate_export.csv'
-bmp_csv = 'lookup\BMP_export.csv'
-scenario_csv = 'lookup\scenario_2_export.csv'
+hydroclimate_csv = 'lookup\\Hydroclimate_export.csv'
+bmp_csv = 'lookup\\BMP_export.csv'
+scenario_csv = 'lookup\\scenario_2_export.csv'
 
 # Load the CSV files into DataFrames
 hydroclimate_df = pd.read_csv(hydroclimate_csv)

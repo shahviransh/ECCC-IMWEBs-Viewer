@@ -1,13 +1,13 @@
 <template>
     <div class="statistics-container">
-        <label for="statistics-select" class="statistics-label">Select Statistics:</label>
-        <Multiselect id="statistics-select" v-model="selectedStatistics" :options="option" :multiple="true" :close-on-select="false"
-            :clear-on-select="false" :preserve-search="true" @update:modelValue="onStatisticsChange" :class="tagClass">
-        </Multiselect>
-        <label for="method-select" class="method-label">Select Methods:</label>
+        <label for="method-select" class="method-label">Method Conversion:</label>
         <Multiselect id="method-select" v-model="selectedMethod" :options="options" :multiple="true" :close-on-select="false"
             :clear-on-select="false" :preserve-search="true"
             @update:modelValue="onMethodChange" :class="tagClassMethod">
+        </Multiselect>
+        <label for="statistics-select" class="statistics-label">Select Statistics:</label>
+        <Multiselect id="statistics-select" v-model="selectedStatistics" :options="option" :multiple="true" :close-on-select="false"
+            :clear-on-select="false" :preserve-search="true" @update:modelValue="onStatisticsChange" :class="tagClass">
         </Multiselect>
     </div>
 </template>

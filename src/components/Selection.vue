@@ -22,17 +22,17 @@
                 </Multiselect>
             </div>
             <div class="form-group">
-                <label for="date-start-date" v-if="['Date', 'Time'].includes(daType)">Start Date:</label>
+                <label for="date-start-date" v-if="['Time'].includes(daType)">Start Date:</label>
                 <label for="date-start-text" v-else-if="daType === 'Month'">Start Month:</label>
-                <input id="date-start" type="date" v-if="['Date', 'Time'].includes(daType)" v-model="selectedDateStart"
+                <input id="date-start" type="date" v-if="['Time'].includes(daType)" v-model="selectedDateStart"
                     class="input-field" />
                 <input id="date-start" type="text" v-else-if="daType === 'Month'" v-model="selectedDateStart"
                     placeholder="Enter month" class="input-field" />
             </div>
             <div class="form-group">
-                <label for="date-end-date" v-if="['Date', 'Time'].includes(daType)">Start Date:</label>
+                <label for="date-end-date" v-if="['Time'].includes(daType)">Start Date:</label>
                 <label for="date-end-text" v-else-if="daType === 'Month'">Start Month:</label>
-                <input id="date-end" type="date" v-if="['Date', 'Time'].includes(daType)" v-model="selectedDateEnd"
+                <input id="date-end" type="date" v-if="['Time'].includes(daType)" v-model="selectedDateEnd"
                     class="input-field" />
                 <input id="date-end" type="text" v-else-if="daType === 'Month'" v-model="selectedDateEnd"
                     placeholder="Enter month" class="input-field" />
@@ -47,18 +47,18 @@
             </div>
 
             <div class="form-group">
-                <label for="exp-date-start-date" v-if="['Date', 'Time'].includes(daType)">Start Date:</label>
+                <label for="exp-date-start-date" v-if="['Time'].includes(daType)">Start Date:</label>
                 <label for="exp-date-start-text" v-else-if="daType === 'Month'">Start Month:</label>
-                <input id="exp-date-start" type="date" v-if="['Date', 'Time'].includes(daType)" v-model="expDateStart"
+                <input id="exp-date-start" type="date" v-if="['Time'].includes(daType)" v-model="expDateStart"
                     class="input-field" />
                 <input id="exp-date-start" type="text" v-else-if="daType === 'Month'" v-model="expDateStart"
                     placeholder="Enter month" class="input-field" />
             </div>
 
             <div class="form-group">
-                <label for="exp-date-end-date" v-if="['Date', 'Time'].includes(daType)">End Date:</label>
+                <label for="exp-date-end-date" v-if="['Time'].includes(daType)">End Date:</label>
                 <label for="exp-date-end-text" v-else-if="daType === 'Month'">End Month:</label>
-                <input id="exp-date-end" type="date" v-if="['Date', 'Time'].includes(daType)" v-model="expDateEnd"
+                <input id="exp-date-end" type="date" v-if="['Time'].includes(daType)" v-model="expDateEnd"
                     class="input-field" />
                 <input id="exp-date-end" type="text" v-else-if="daType === 'Month'" v-model="expDateEnd"
                     placeholder="Enter month" class="input-field" />

@@ -32,7 +32,6 @@ def fetch_data_service(data):
         df = fetch_data_from_db(
             db_path, table_name, selected_ids, columns, start_date, end_date, date_type
         )
-        date_type = "Date" if "Date" in df.columns else date_type
 
         # Perform time conversion and aggregation if necessary
         if "Equal" not in method and interval != "daily":
@@ -84,7 +83,6 @@ def export_data_service(data):
         date_type = data.get("date_type")
         graph_type = data.get("graph_type", "scatter")
 
-        date_type = "Date" if "Date" in df.columns else date_type
         if not date_type:
             return {
                 "error": "Graph creation cannot be performed for non-time series data"
@@ -209,7 +207,7 @@ def save_to_file(
                 f.write("\n")
                 dataframe2.to_csv(f, index=False, sep=" ")
     elif file_format == "xlsx":
-        # Write the DataFrame to an Excel file
+    # Write the DataFrame to an Excel file
         with pd.ExcelWriter(file_path, engine="xlsxwriter") as writer:
             dataframe1.to_excel(writer, sheet_name="Sheet1", index=False)
 
@@ -221,12 +219,23 @@ def save_to_file(
             chart = workbook.add_chart({"type": graph_type})
             row_count = len(dataframe1) + 1
 
+            # Separate columns into primary and secondary y-axis based on a threshold
+            primary_axis_columns = []  # Columns for the primary y-axis
+            secondary_axis_columns = []  # Columns for the secondary y-axis
+
+            # Example threshold: values > 100 go to the secondary y-axis
+            for column in dataframe1.columns[1:]:
+                if dataframe1[column].max() > 100:
+                    secondary_axis_columns.append(column)
+                else:
+                    primary_axis_columns.append(column)
+
             if selected_ids != [""]:
                 # Sort dataframe by ID column for excel selection
                 dataframe1 = dataframe1.sort_values([ID])
-                # Only create separate series for each ID-Column combination if selected_ids is not empty
                 prev_end_row = 0
                 end_row = 0
+
                 for i, column in enumerate(dataframe1.columns[1:], start=1):
                     if column == ID:
                         continue
@@ -241,8 +250,8 @@ def save_to_file(
 
                         # Get the end row index for the current selected_id
                         end_row = (
-                            len(dataframe1[dataframe1[ID] == selected_id]) * (j+1)
-                            + 1 # +1 for inclusive selection
+                            len(dataframe1[dataframe1[ID] == selected_id]) * (j + 1)
+                            + 1  # +1 for inclusive selection
                         )
 
                         # Filter data for each ID-column combination
@@ -251,6 +260,7 @@ def save_to_file(
                                 "name": f"{column} - {ID}: {selected_id}",
                                 "categories": f"Sheet1!$A${prev_end_row}:$A${end_row}",  # Assuming date column is in column A
                                 "values": f"Sheet1!${chr(65+i)}${prev_end_row}:${chr(65+i)}${end_row}",
+                                "y2_axis": column in secondary_axis_columns,  # Assign to secondary y-axis if applicable
                             }
                         )
             else:
@@ -261,11 +271,11 @@ def save_to_file(
                             "name": column,
                             "categories": f"Sheet1!$A$2:$A${row_count}",
                             "values": f"Sheet1!${chr(65+i)}$2:${chr(65+i)}${row_count}",
+                            "y2_axis": column in secondary_axis_columns,  # Assign to secondary y-axis if applicable
                         }
                     )
 
-            # Customize the chart (optional)
-            chart.set_title({"name": f"{date_type} Series Data"})
+            # Customize the chart
             chart.set_x_axis(
                 {
                     "name": date_type,
@@ -275,14 +285,27 @@ def save_to_file(
                     "num_font": {"rotation": -45},
                 }
             )
-            chart.set_y_axis({"name": "Values"})
+            chart.set_y_axis({"name": "Primary Axis (Smaller Values)"})
+            chart.set_y2_axis({"name": "Secondary Axis (Larger Values)"})  # Add second y-axis
 
             # Insert the chart into the worksheet
             worksheet.insert_chart(f"{chr(65 + len(dataframe1.columns))}2", chart)
     elif file_format in ["png", "jpg", "jpeg", "svg", "pdf"]:
-        # Plot each column as a line on the same figure
-        plt.figure(figsize=(10, 6))
+    # Plot each column as a line on the same figure
+        fig, ax1 = plt.subplots(figsize=(10, 6))
+        ax2 = ax1.twinx()  # Create a secondary y-axis
         plot_func = plot_functions[graph_type]  # Get the function based on graph_type
+
+        # Keep track of which axis (primary or secondary) to use for each column
+        primary_axis_columns = []  # Columns for primary y-axis
+        secondary_axis_columns = []  # Columns for secondary y-axis
+
+        # Classify columns based on their value ranges (example threshold: >100 for secondary y-axis)
+        for column in dataframe1.columns[1:]:
+            if dataframe1[column].max() > 100:
+                secondary_axis_columns.append(column)
+            else:
+                primary_axis_columns.append(column)
 
         if selected_ids != [""]:
             # Create separate plots for each ID-Column combination
@@ -292,51 +315,101 @@ def save_to_file(
                         continue
                     for j, selected_id in enumerate(selected_ids):
                         filtered_data = dataframe1[dataframe1[ID] == selected_id]
-                        plot_func(
-                            filtered_data[date_type] + pd.DateOffset((i + j) * 0.2),
-                            filtered_data[column],
-                            width=0.2,
-                            label=f"{column} - {ID}: {selected_id}",
-                        )
+                        if column in primary_axis_columns:
+                            plot_func(
+                                filtered_data[date_type] + pd.DateOffset((i + j) * 0.2),
+                                filtered_data[column],
+                                width=0.2,
+                                label=f"{column} - {ID}: {selected_id}",
+                                ax=ax1,
+                            )
+                        elif column in secondary_axis_columns:
+                            plot_func(
+                                filtered_data[date_type] + pd.DateOffset((i + j) * 0.2),
+                                filtered_data[column],
+                                width=0.2,
+                                label=f"{column} - {ID}: {selected_id}",
+                                ax=ax2,
+                            )
             else:
                 for column in dataframe1.columns[1:]:
                     if column == ID:
                         continue
                     for selected_id in selected_ids:
                         filtered_data = dataframe1[dataframe1[ID] == selected_id]
-                        plot_func(
-                            filtered_data[date_type],
-                            filtered_data[column],
-                            label=f"{column} - {ID}: {selected_id}",
-                        )
+                        if column in primary_axis_columns:
+                            plot_func(
+                                filtered_data[date_type],
+                                filtered_data[column],
+                                label=f"{column} - {ID}: {selected_id}",
+                                ax=ax1,
+                            )
+                        elif column in secondary_axis_columns:
+                            plot_func(
+                                filtered_data[date_type],
+                                filtered_data[column],
+                                label=f"{column} - {ID}: {selected_id}",
+                                ax=ax2,
+                            )
         else:
             # Plot each column as a single series if selected_ids is empty
             if graph_type == "bar":
                 for i, column in enumerate(dataframe1.columns[1:]):
-                    plot_func(
-                        dataframe1[date_type] + pd.DateOffset(i * 0.2),
-                        dataframe1[column],
-                        width=0.2,
-                        label=column,
-                    )
+                    if column in primary_axis_columns:
+                        plot_func(
+                            dataframe1[date_type] + pd.DateOffset(i * 0.2),
+                            dataframe1[column],
+                            width=0.2,
+                            label=column,
+                            ax=ax1,
+                        )
+                    elif column in secondary_axis_columns:
+                        plot_func(
+                            dataframe1[date_type] + pd.DateOffset(i * 0.2),
+                            dataframe1[column],
+                            width=0.2,
+                            label=column,
+                            ax=ax2,
+                        )
             else:
                 for column in dataframe1.columns[1:]:
-                    plot_func(dataframe1[date_type], dataframe1[column], label=column)
+                    if column in primary_axis_columns:
+                        plot_func(
+                            dataframe1[date_type],
+                            dataframe1[column],
+                            label=column,
+                            ax=ax1,
+                        )
+                    elif column in secondary_axis_columns:
+                        plot_func(
+                            dataframe1[date_type],
+                            dataframe1[column],
+                            label=column,
+                            ax=ax2,
+                        )
 
-        # Customize the plot
-        plt.title(f"{date_type} Series Data")
-        plt.xlabel(date_type)
+        # Customize the primary axis
+        ax1.set_xlabel(date_type)
+        ax1.set_ylabel("Primary Y-Axis (Smaller Values)")
+        ax1.tick_params(axis='y')
+        ax1.legend(loc="upper left", title="Primary Series")
+        ax1.xaxis.set_major_locator(MaxNLocator(nbins=30))  # Scale x-axis ticks
+        ax1.grid(visible=True, linestyle='--', alpha=0.6)
+
+        # Customize the secondary axis
+        ax2.set_ylabel("Secondary Y-Axis (Larger Values)")
+        ax2.tick_params(axis='y')
+        ax2.legend(loc="upper right", title="Secondary Series")
+
+        # Rotate x-axis labels
         plt.xticks(rotation=45)
-        # Use MaxNLocator to scale x-axis ticks without deleting labels
-        plt.gca().xaxis.set_major_locator(
-            MaxNLocator(nbins=30)
-        )  # Adjust 'nbins' to control label frequency
-        plt.ylabel("Values")
-        plt.legend(title="Series")
-        plt.subplots_adjust(bottom=0.2, top=0.9, left=0.1, right=0.9)
+
+        # Adjust layout
+        plt.subplots_adjust(bottom=0.2, top=0.9, left=0.1, right=0.85)
 
         # Save the plot
         plt.savefig(file_path, format=file_format)
+
 
     return file_path
 
@@ -439,7 +512,7 @@ def get_season_from_date(date_str):
 # Helper function to apply time interval aggregation
 def aggregate_data(df, interval, method, date_type):
     """Aggregate data based on the specified interval and method."""
-    # Convert the 'date' column to datetime
+    # Convert the 'Time' column to datetime
     df[date_type] = pd.to_datetime(df[date_type])
     df.set_index(date_type, inplace=True)
     resampled_df = None
@@ -605,7 +678,7 @@ def get_columns_and_time_range(db_path, table_name):
             df["Date"] = pd.to_datetime(df["Date"])
             start_date = df["Date"].min().strftime("%Y-%m-%d")
             end_date = df["Date"].max().strftime("%Y-%m-%d")
-            date_type = "Date"
+            date_type = "Time"
             interval = "daily"
         elif "Month" in columns:
             df = pd.read_sql_query(f"SELECT Month FROM {real_table_name}", conn)

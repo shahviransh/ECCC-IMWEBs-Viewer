@@ -26,7 +26,7 @@
             <div class="form-group">
                 <label for="x-axis-select">X-Axis:</label>
                 <select id="x-axis-select" class="dropdown" v-model="xaxis" :style="{ height: heightVar() }">
-                    <option v-for="column in columns.filter(col => col === 'Date' || col === 'Month')" :key="column"
+                    <option v-for="column in columns.filter(col => col === dateType)" :key="column"
                         :value="column">{{ column }}</option>
                 </select>
             </div>
@@ -35,7 +35,7 @@
             <div class="form-group">
                 <label for="y-axis-select">Y-Axis:</label>
                 <select id="y-axis-select" class="dropdown" v-model="yaxis" multiple :style="{ height: heightVar() }">
-                    <option v-for="column in columns.filter(col => col !== 'Date' && col !== 'Month')" :key="column"
+                    <option v-for="column in columns.filter(col => col !== dateType)" :key="column"
                         :value="column">{{ column }}</option>
                 </select>
             </div>
@@ -88,7 +88,7 @@ export default {
                 this.updateYAxis(value);
             }
         },
-        ...mapState(['columns', 'ids', 'selectedDb', 'selectedColumns', 'exportColumns', 'pageTitle', 'xAxis', 'yAxis'])
+        ...mapState(['columns', 'ids', 'selectedDb', 'selectedColumns', 'exportColumns', 'pageTitle', 'xAxis', 'yAxis', 'dateType'])
     },
     data() {
         return {
