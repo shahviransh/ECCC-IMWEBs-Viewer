@@ -31,7 +31,7 @@
                 </select>
             </div>
         </div>
-        <div class="form-container">
+        <div class="form-container y-axis">
             <div class="form-group">
                 <label for="y-axis-select">Y-Axis:</label>
                 <select id="y-axis-select" class="dropdown" v-model="yaxis" multiple :style="{ height: heightVar() }">
@@ -128,7 +128,14 @@ export default {
     border-radius: 8px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
     height: 45%;
-    /* Set the total height of the container */
+}
+
+.form-container.x-axis {
+    height: 15%;
+}
+
+.form-container.y-axis {
+    height: 75%;
 }
 
 .form-group {
