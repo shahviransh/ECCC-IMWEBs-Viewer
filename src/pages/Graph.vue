@@ -1,6 +1,6 @@
 <template>
     <!-- Main Content -->
-    <div :class="[theme, 'content']" :style="{ height: heightVar() }">
+    <div :class="[theme, 'content']" :style="{ height: heightVar(window) }">
 
         <!-- Component 1: Folder Navigation -->
         <div class="folder-navigation">
@@ -234,7 +234,7 @@ export default {
                         .flatMap(column =>
                             this.selectedIds.map(id => ({
                                 name: `${column} - ${this.ID}: ${id}`,
-                                type: this.graphType,
+                                type: this.getType(column),
                                 yAxisIndex: columnNeedsSecondaryAxis(column) ? 1 : 0, // Dynamically assign y-axis
                                 data: xAxisData.map(date => {
                                     const row = dataLookup[id] && dataLookup[id][date];
@@ -246,24 +246,23 @@ export default {
                         .filter(column => column !== this.dateType)
                         .map(column => ({
                             name: column,
-                            type: this.graphType,
+                            type: this.getType(column),
                             yAxisIndex: columnNeedsSecondaryAxis(column) ? 1 : 0, // Dynamically assign y-axis
                             data: this.data.map(row => row[column])
                         }))
             };
         },
-        ...mapState(["selectedDb", "selectedTable", "selectedColumns", "currentZoomStart", "currentZoomEnd", "selectedIds", "dateRange", "selectedInterval", "selectedStatistics", "selectedMethod", "exportColumns", "graphType", "exportIds", "exportDate", "exportInterval", "dateType", "exportDateType", "exportPath", "exportFilename", "exportFormat", "exportOptions", "theme"]),
+        ...mapState(["selectedDb", "selectedTable", "selectedColumns", "multiGraphType", "currentZoomStart", "currentZoomEnd", "selectedIds", "dateRange", "selectedInterval", "selectedStatistics", "selectedMethod", "exportColumns", "graphType", "exportIds", "exportDate", "exportInterval", "dateType", "exportDateType", "exportPath", "exportFilename", "exportFormat", "exportOptions", "theme"]),
     },
     methods: {
-        ...mapActions(["updateSelectedColumns", "updateExportOptions", "pushMessage", "shiftMessage", "clearMessages"]),
-        heightVar() {
-            // Set the height based on the environment
-            const isTauri = window.isTauri !== undefined;
-            return isTauri ? 'calc(100vh - 14vh)' : 'calc(100vh - 16vh)';
-        },
+        ...mapActions(["updateSelectedColumns", "updateExportOptions", "pushMessage", "shiftMessage", "clearMessages", "heightVar"]),
         columnNeedsSecondaryAxis(column) {
             // Adjust logic based on actual data thresholds
             return this.data.some(row => row[column] > 100);
+        },
+        getType(column) {
+            // Get the type of the column based on the data
+            return this.multiGraphType.find(col => col.name === column).type || this.graphType;
         },
         // Fetch data from the API
         async fetchData() {
@@ -345,186 +344,4 @@ export default {
 };
 </script>
 <style src="vue-multiselect/dist/vue-multiselect.css"></style>
-<style scoped>
-/* Theme variables */
-.light {
-    --background-color: #ffffff;
-    --text-color: #000000;
-    --border-color: #ddd;
-    --secondary-bg-color: #f3f3f3;
-    --hover-bg-color: #f1f1f1;
-    --table-header-bg: #9e3203;
-    --table-header-text: #ffffff;
-    --button-bg: linear-gradient(to bottom right, #8B5CF6, #3B82F6);
-    /* from-purple-600 to-blue-500 */
-    --button-text: #1F2937;
-    --top-bar-bg: #b85b14;
-    --top-bar-text: #fff;
-    --taskbar-bg: #35495e;
-    --taskbar-text: #fff;
-    --active-bg: #009879;
-}
-
-.dark {
-    --background-color: #121212;
-    --text-color: #e0e0e0;
-    --border-color: #444;
-    --secondary-bg-color: #333;
-    --hover-bg-color: #555;
-    --table-header-bg: #444;
-    --table-header-text: #e0e0e0;
-    --button-bg: #333;
-    --button-text: #e0e0e0;
-    --top-bar-bg: #1e1e1e;
-    --top-bar-text: #e0e0e0;
-    --taskbar-bg: #2d2d2d;
-    --taskbar-text: #cfcfcf;
-    --active-bg: #5a5a5a;
-}
-
-:root {
-    --top-bar-height: 14vh;
-    --task-bar-height: 0;
-}
-
-body,
-html {
-    margin: 0;
-    padding: 0;
-    height: 100%;
-    /* Ensure no scroll at the global level */
-    background-color: var(--background-color);
-    color: var(--text-color);
-    overflow: hidden;
-}
-
-.content {
-    display: flex;
-    flex-direction: row;
-    /* Adjust to the viewport, minus top bar and taskbar */
-    overflow: hidden;
-}
-
-.multiselect {
-    /* Set the desired width */
-    font-size: 14px;
-}
-
-label {
-    font-weight: 600;
-    font-size: 14px;
-    color: #333;
-    margin-bottom: 5px;
-}
-
-.folder-navigation,
-.column-navigation,
-.settings-panel,
-.main-view {
-    background-color: var(--background-color);
-    border: 1px solid var(--border-color);
-    color: var(--text-color);
-}
-
-.folder-navigation {
-    display: flex;
-    flex-direction: column;
-    width: 20%;
-    /* Takes 1/4 of the horizontal space */
-    height: calc(100% - 3%);
-    margin: 0;
-    padding: 10px;
-    /* Takes 1/4 of the vertical space */
-    overflow: auto;
-}
-
-.column-navigation {
-    margin: 0;
-    padding: 0px;
-    width: 15%;
-    height: 100%;
-    flex-direction: column;
-}
-
-/* Right Panel: Settings Panel and Main View */
-.right-panel {
-    display: flex;
-    flex-direction: column;
-    width: 80%;
-    height: 100%;
-}
-
-.settings-panel {
-    width: 99%;
-    /* Takes 2/4 of the horizontal space */
-    height: 30%;
-    /* Ensure full height */
-    margin: 0px;
-    padding: 5px;
-    display: flex;
-    flex-direction: row;
-    justify-content: left;
-    gap: 5px;
-}
-
-.main-view {
-    width: 99%;
-    /* Takes 2/4 of the horizontal space */
-    height: 75%;
-    /* Ensure full height */
-    margin: 0px;
-    padding: 5px;
-    overflow: auto;
-}
-
-.styled-table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 14px;
-    text-align: left;
-}
-
-.styled-table thead {
-    position: sticky;
-    top: 0;
-    z-index: 2;
-    background-color: var(--table-header-bg);
-    color: var(--table-header-text);
-}
-
-.styled-table th,
-.styled-table td {
-    padding: 12px 15px;
-    border: 1px solid var(--border-color);
-}
-
-.styled-table tbody tr:nth-of-type(even) {
-    background-color: var(--secondary-bg-color);
-}
-
-.styled-table tbody tr:hover {
-    background-color: var(--hover-bg-color);
-}
-
-button {
-    background-color: var(--button-bg);
-    color: var(--button-text);
-    padding: 0.2rem;
-    margin-bottom: 0.5rem;
-    margin-inline-end: 0.2rem;
-    border-radius: 0.5rem;
-    font-size: 0.875rem;
-    font-weight: 500;
-    transition: background-color 0.3s ease, color 0.3s ease;
-}
-
-button:hover {
-    background-color: var(--hover-bg-color);
-}
-
-button:focus {
-    outline: none;
-    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.5);
-    /* Optional, adjust for better contrast */
-}
-</style>
+<style src="../assets/pages.css"></style>

@@ -35,6 +35,7 @@ const store = createStore({
     exportFilename: "exported_data",
     exportFormat: "csv",
     graphType: "scatter",
+    multiGraphType: [],
     exportOptions: { data: false, stats: false },
     defaultInterval: "",
     defaultStartDate: "",
@@ -63,7 +64,10 @@ const store = createStore({
       state.exportDate = exportDate;
       state.exportDateType = exportDateType;
     },
-    SET_DEFAULT_SELECTIONS(state, {defaultInterval, defaultStartDate, defaultEndDate}) {
+    SET_DEFAULT_SELECTIONS(
+      state,
+      { defaultInterval, defaultStartDate, defaultEndDate }
+    ) {
       state.defaultInterval = defaultInterval;
       state.defaultStartDate = defaultStartDate;
       state.defaultEndDate = defaultEndDate;
@@ -75,6 +79,9 @@ const store = createStore({
     SET_GRAPH_TYPE(state, format) {
       state.graphType = format;
     },
+    SET_MULTI_GRAPH_TYPE(state, formats) {
+      state.multiGraphType = formats;
+    },
     SET_THEME(state, theme) {
       state.theme = theme;
     },
@@ -84,10 +91,10 @@ const store = createStore({
     SET_SELECTED_DB(state, db) {
       state.selectedDb = db;
     },
-    SET_XAXIS(state, xAxis){
+    SET_XAXIS(state, xAxis) {
       state.xAxis = xAxis;
     },
-    SET_YAXIS(state, yAxis){
+    SET_YAXIS(state, yAxis) {
       state.yAxis = yAxis;
       state.selectedColumns = [state.xAxis, ...yAxis];
       state.exportColumns = [...state.selectedColumns];
@@ -99,7 +106,7 @@ const store = createStore({
     SLICE_MESSAGE(state, index) {
       state.messages.splice(index, 1);
     },
-    SHIFT_MESSAGE(state){
+    SHIFT_MESSAGE(state) {
       state.messages.shift();
     },
     CLEAR_MESSAGES(state) {
@@ -173,7 +180,7 @@ const store = createStore({
       const apiBaseUrl = import.meta.env.VITE_APP_API_BASE_URL;
       const maxRetries = 5; // Maximum number of retry attempts
       const retryDelay = 2000; // Delay between retries in milliseconds
-    
+
       for (let attempt = 1; attempt <= maxRetries; attempt++) {
         try {
           const response = await axios.get(`${apiBaseUrl}/api/list_files`, {
@@ -182,15 +189,18 @@ const store = createStore({
           commit("SET_DATABASES", response.data);
           return; // Exit the function if the request is successful
         } catch (error) {
-          alert(`Attempt ${attempt} - Error fetching databases:`, error.message);
+          alert(
+            `Attempt ${attempt} - Error fetching databases:`,
+            error.message
+          );
           if (attempt === maxRetries) {
             alert("Max retries reached. Failed to fetch databases.");
             throw error; // Re-throw the error after the last attempt
           }
-          await new Promise(resolve => setTimeout(resolve, retryDelay)); // Wait before retrying
+          await new Promise((resolve) => setTimeout(resolve, retryDelay)); // Wait before retrying
         }
       }
-    },    
+    },
     async fetchTables({ commit }, db) {
       const apiBaseUrl = import.meta.env.VITE_APP_API_BASE_URL;
       try {
@@ -229,7 +239,11 @@ const store = createStore({
           selectedInterval: response.data.interval,
           exportInterval: response.data.interval,
         });
-        commit("SET_DEFAULT_SELECTIONS", {defaultInterval: response.data.interval, defaultStartDate: response.data.start_date, defaultEndDate: response.data.end_date});
+        commit("SET_DEFAULT_SELECTIONS", {
+          defaultInterval: response.data.interval,
+          defaultStartDate: response.data.start_date,
+          defaultEndDate: response.data.end_date,
+        });
       } catch (error) {
         alert("Error fetching columns:", error.message);
       }
@@ -258,6 +272,11 @@ const store = createStore({
     },
     updateXAxis({ commit }, xAxis) {
       commit("SET_XAXIS", xAxis);
+    },
+    heightVar({ commit }, window) {
+      // Set the height based on the environment
+      const isTauri = window.isTauri !== undefined;
+      return isTauri ? "calc(100vh - 14vh)" : "calc(100vh - 16vh)";
     },
     pushMessage({ commit }, { message, type }) {
       commit("PUSH_MESSAGE", { message, type });
@@ -291,6 +310,9 @@ const store = createStore({
     },
     updateGraphType({ commit }, format) {
       commit("SET_GRAPH_TYPE", format);
+    },
+    updateMultiGraphType({ commit }, formats) {
+      commit("SET_MULTI_GRAPH_TYPE", formats);
     },
     updateCurrentZoom({ commit }, { start, end }) {
       commit("SET_CURRENT_ZOOM", { start: start, end: end });

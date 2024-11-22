@@ -5,7 +5,7 @@
             <div class="form-group">
                 <label for="column-select">Select Columns:</label>
                 <select id="column-select" class="dropdown" v-model="selectColumns" multiple
-                    :style="{ height: heightVar() }">
+                    :style="{ height: heightVar(window) }">
                     <option v-for="column in columns" :key="column" :value="column">{{ column }}</option>
                 </select>
             </div>
@@ -14,7 +14,7 @@
             <div class="form-group">
                 <label for="export-column-select">Export Select Columns:</label>
                 <select id="export-column-select" class="dropdown" v-model="expColumns" multiple
-                    :style="{ height: heightVar() }">
+                    :style="{ height: heightVar(window) }">
                     <option v-for="column in columns" :key="column" :value="column">{{ column }}</option>
                 </select>
             </div>
@@ -25,7 +25,7 @@
         <div class="form-container x-axis">
             <div class="form-group">
                 <label for="x-axis-select">X-Axis:</label>
-                <select id="x-axis-select" class="dropdown" v-model="xaxis" :style="{ height: heightVar() }">
+                <select id="x-axis-select" class="dropdown" v-model="xaxis" :style="{ height: heightVar(window) }">
                     <option v-for="column in columns.filter(col => col === dateType)" :key="column"
                         :value="column">{{ column }}</option>
                 </select>
@@ -34,7 +34,7 @@
         <div class="form-container y-axis">
             <div class="form-group">
                 <label for="y-axis-select">Y-Axis:</label>
-                <select id="y-axis-select" class="dropdown" v-model="yaxis" multiple :style="{ height: heightVar() }">
+                <select id="y-axis-select" class="dropdown" v-model="yaxis" multiple :style="{ height: heightVar(window) }">
                     <option v-for="column in columns.filter(col => col !== dateType)" :key="column"
                         :value="column">{{ column }}</option>
                 </select>
@@ -100,7 +100,7 @@ export default {
         },
     },
     methods: {
-        ...mapActions(['fetchColumns', 'updateSelectedColumns', 'updateExportColumns', 'updateXAxis', 'updateYAxis']),
+        ...mapActions(['fetchColumns', 'updateSelectedColumns', 'updateExportColumns', 'updateXAxis', 'updateYAxis', 'heightVar']),
         heightVar() {
             const isTauri = window.isTauri !== undefined;
             return isTauri ? '36vh' : '34vh';
