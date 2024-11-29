@@ -135,7 +135,8 @@ export default {
                     {
                         type: 'slider',
                         start: this.currentZoomStart,
-                        end: this.currentZoomEnd
+                        end: this.currentZoomEnd,
+                        height: 20
                     },
                     {
                         type: 'inside',
