@@ -98,7 +98,6 @@ const store = createStore({
       state.yAxis = yAxis;
       state.selectedColumns = [state.xAxis, ...yAxis];
       state.exportColumns = [...state.selectedColumns];
-      console.log(state.selectedColumns);
     },
     PUSH_MESSAGE(state, { message, type }) {
       state.messages.push({ text: message, type: type });
@@ -273,8 +272,12 @@ const store = createStore({
     updateXAxis({ commit }, xAxis) {
       commit("SET_XAXIS", xAxis);
     },
-    pushMessage({ commit }, { message, type }) {
+    pushMessage({ commit }, { message, type, duration = 5000 }) {
+      const index = this.state.messages.length;
       commit("PUSH_MESSAGE", { message, type });
+      setTimeout(() => {
+        commit("SLICE_MESSAGE", index);
+      }, duration);
     },
     shiftMessage({ commit }) {
       commit("SHIFT_MESSAGE");

@@ -164,11 +164,9 @@ export default {
 
                 // Wait until the table has rendered, then trigger messages
                 this.$nextTick(() => {
-                    this.shiftMessage();
                     this.pushMessage({ message: `Fetched ${this.selectedColumns.length} columns x ${this.data.length} rows`, type: 'success' });
                     this.pushMessage({ message: `Loaded ${this.rowLimit} rows`, type: 'success' });
                     if (this.statsColumns.length > 0) {
-                        this.shiftMessage();
                         this.pushMessage({ message: `Fetched ${this.statsColumns.length} statistics columns for ${this.selectedMethod || this.selectedStatistics}`, type: 'success' });
                     }
 
@@ -208,7 +206,6 @@ export default {
                     alert('Error fetching data:' + response.data.error);
                     return;
                 }
-                this.shiftMessage();
                 this.pushMessage({ message: `Exported ${this.exportColumns.length} columns x ${this.data.length} rows`, type: 'success' });
                 if (this.selectedInterval === 'seasonally' && !this.selectedMethod.includes('Equal') && !this.selectedColumns.includes('Season')) {
                     this.updateSelectedColumns(this.selectedColumns.concat(['Season']));

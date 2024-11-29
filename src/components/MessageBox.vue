@@ -1,29 +1,25 @@
 <template>
-    <div class="message-container">
-      <transition-group name="fade" tag="div">
-        <div
-          v-for="(msg, index) in messages"
-          :key="index"
-          :class="['message-box', msg.type]"
-        >
-          <span>{{ msg.text }}</span>
-          <button @click="sliceMessage(index)" class="close-button">✕</button>
-        </div>
-      </transition-group>
-    </div>
-  </template>
+  <div class="message-container">
+    <transition-group name="fade" tag="div">
+      <div v-for="(msg, index) in messages" :key="index" :class="['message-box', msg.type]">
+        <span>{{ msg.text }}</span>
+        <button @click="sliceMessage(index)" class="close-button">✕</button>
+      </div>
+    </transition-group>
+  </div>
+</template>
 
 <script>
 import { mapState, mapActions } from 'vuex'; // Import Vuex helpers
 
 export default {
-    name: 'MessageBox',
-    computed: {
-        ...mapState(["messages"]),
-    },
-    methods: {
-        ...mapActions(["pushMessage", "sliceMessage"]),
-    },
+  name: 'MessageBox',
+  computed: {
+    ...mapState(["messages"]),
+  },
+  methods: {
+    ...mapActions(["pushMessage", "sliceMessage"]),
+  },
 };
 </script>
 
@@ -71,11 +67,13 @@ export default {
   cursor: pointer;
 }
 
-.fade-enter-active, .fade-leave-active {
+.fade-enter-active,
+.fade-leave-active {
   transition: opacity 0.3s;
 }
 
-.fade-enter, .fade-leave-to {
+.fade-enter,
+.fade-leave-to {
   opacity: 0;
 }
 </style>

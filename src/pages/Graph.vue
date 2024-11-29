@@ -81,13 +81,8 @@ export default {
             handler() {
                 if (this.data.length) {
                     this.$nextTick(() => {
-                        setTimeout(() => {
-                            this.shiftMessage();
-                        }, 2000);
                         this.pushMessage({ message: `Graph Loaded ${this.selectedColumns.length} columns x ${this.data.length} rows`, type: 'success' });
-                        setTimeout(() => {
-                            this.clearMessages();
-                        }, 5000);
+                        setTimeout(() => this.shiftMessage(), 5000);
                     });
                 }
             },
@@ -331,7 +326,6 @@ export default {
                     alert('Error fetching data:' + response.data.error);
                     return;
                 }
-                this.shiftMessage();
                 this.pushMessage({ message: `Exported ${this.exportColumns.length} columns x ${this.data.length} rows`, type: 'info' });
                 if (this.selectedInterval === 'seasonally' && !this.selectedMethod.includes('Equal') && !this.selectedColumns.includes('Season')) {
                     this.updateSelectedColumns(this.selectedColumns.concat(['Season']));
