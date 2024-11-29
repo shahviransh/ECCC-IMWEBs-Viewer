@@ -1,11 +1,11 @@
 <template>
     <h5 class="parameter-heading">Parameters:</h5>
-    <div v-if="pageTitle === 'Project'">
+    <div v-if="['Project', 'Table'].includes(pageTitle)">
         <div class="form-container">
             <div class="form-group">
                 <label for="column-select">Select Columns:</label>
                 <select id="column-select" class="dropdown" v-model="selectColumns" multiple
-                    :style="{ height: heightVar(window) }">
+                    :style="{ height: heightVar() }">
                     <option v-for="column in columns" :key="column" :value="column">{{ column }}</option>
                 </select>
             </div>
@@ -14,7 +14,7 @@
             <div class="form-group">
                 <label for="export-column-select">Export Select Columns:</label>
                 <select id="export-column-select" class="dropdown" v-model="expColumns" multiple
-                    :style="{ height: heightVar(window) }">
+                    :style="{ height: heightVar() }">
                     <option v-for="column in columns" :key="column" :value="column">{{ column }}</option>
                 </select>
             </div>
@@ -22,19 +22,19 @@
     </div>
     <!-- Conditional Axes Dropdowns -->
     <div v-if="pageTitle === 'Graph'">
-        <div class="form-container x-axis">
+        <div class="form-container">
             <div class="form-group">
                 <label for="x-axis-select">X-Axis:</label>
-                <select id="x-axis-select" class="dropdown" v-model="xaxis" :style="{ height: heightVar(window) }">
+                <select id="x-axis-select" class="dropdown" v-model="xaxis" :style="{ height: heightVar(true) }">
                     <option v-for="column in columns.filter(col => col === dateType)" :key="column"
                         :value="column">{{ column }}</option>
                 </select>
             </div>
         </div>
-        <div class="form-container y-axis">
+        <div class="form-container">
             <div class="form-group">
                 <label for="y-axis-select">Y-Axis:</label>
-                <select id="y-axis-select" class="dropdown" v-model="yaxis" multiple :style="{ height: heightVar(window) }">
+                <select id="y-axis-select" class="dropdown" v-model="yaxis" multiple :style="{ height: heightVar(undefined, true) }">
                     <option v-for="column in columns.filter(col => col !== dateType)" :key="column"
                         :value="column">{{ column }}</option>
                 </select>
@@ -100,10 +100,12 @@ export default {
         },
     },
     methods: {
-        ...mapActions(['fetchColumns', 'updateSelectedColumns', 'updateExportColumns', 'updateXAxis', 'updateYAxis', 'heightVar']),
-        heightVar() {
+        ...mapActions(['fetchColumns', 'updateSelectedColumns', 'updateExportColumns', 'updateXAxis', 'updateYAxis']),
+        heightVar(isXAxis, isYAxis) {
             const isTauri = window.isTauri !== undefined;
-            return isTauri ? '36vh' : '34vh';
+            isXAxis = isXAxis !== undefined || isXAxis;
+            isYAxis = isYAxis !== undefined || isYAxis;
+            return isTauri ? '36vh' : isXAxis ? '5vh' : isYAxis ? '64vh' : '34vh';
         },
     },
 };
@@ -117,7 +119,7 @@ export default {
     color: #333;
 }
 
-.form-container {
+div.form-container {
     display: flex;
     flex-direction: column;
     gap: 5px;
@@ -127,15 +129,7 @@ export default {
     background-color: #f9f9f9;
     border-radius: 8px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    height: 45%;
-}
-
-.form-container.x-axis {
-    height: 15%;
-}
-
-.form-container.y-axis {
-    height: 75%;
+    height: 40%;
 }
 
 .form-group {

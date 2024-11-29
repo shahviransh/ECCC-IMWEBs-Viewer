@@ -1,6 +1,6 @@
 <template>
     <!-- Main Content -->
-    <div :class="[theme, 'content']" :style="{ height: heightVar(window) }">
+    <div :class="[theme, 'content']" :style="{ height: heightVar() }">
 
         <!-- Component 1: Folder Navigation -->
         <div class="folder-navigation">
@@ -105,7 +105,12 @@ export default {
         ...mapState(["selectedDb", "selectedTable", "selectedColumns", "selectedIds", "dateRange", "selectedInterval", "selectedStatistics", "selectedMethod", "exportColumns", "exportIds", "exportDate", "exportInterval", "dateType", "exportDateType", "exportPath", "exportFilename", "exportFormat", "exportOptions", "theme"]),
     },
     methods: {
-        ...mapActions(["updateSelectedColumns", "updateExportOptions", "pushMessage", "shiftMessage", "clearMessages", "heightVar"]),
+        ...mapActions(["updateSelectedColumns", "updateExportOptions", "pushMessage", "shiftMessage", "clearMessages"]),
+        heightVar() {
+            // Set the height based on the environment
+            const isTauri = window.isTauri !== undefined;
+            return isTauri ? "calc(100vh - 14vh)" : "calc(100vh - 16vh)";
+        },
         // Load initial rows when the data is loaded
         loadInitialRows() {
             this.visibleData = this.data.slice(0, this.rowLimit);

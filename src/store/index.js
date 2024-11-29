@@ -273,11 +273,6 @@ const store = createStore({
     updateXAxis({ commit }, xAxis) {
       commit("SET_XAXIS", xAxis);
     },
-    heightVar({ commit }, window) {
-      // Set the height based on the environment
-      const isTauri = window.isTauri !== undefined;
-      return isTauri ? "calc(100vh - 14vh)" : "calc(100vh - 16vh)";
-    },
     pushMessage({ commit }, { message, type }) {
       commit("PUSH_MESSAGE", { message, type });
     },

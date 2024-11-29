@@ -1,6 +1,6 @@
 <template>
     <!-- Main Content -->
-    <div :class="[theme, 'content']" :style="{ height: heightVar(window) }">
+    <div :class="[theme, 'content']" :style="{ height: heightVar() }">
 
         <!-- Component 1: Folder Navigation -->
         <div class="folder-navigation">
@@ -235,7 +235,7 @@ export default {
                             this.selectedIds.map(id => ({
                                 name: `${column} - ${this.ID}: ${id}`,
                                 type: this.getType(column),
-                                yAxisIndex: columnNeedsSecondaryAxis(column) ? 1 : 0, // Dynamically assign y-axis
+                                yAxisIndex: this.columnNeedsSecondaryAxis(column) ? 1 : 0, // Dynamically assign y-axis
                                 data: xAxisData.map(date => {
                                     const row = dataLookup[id] && dataLookup[id][date];
                                     return row ? row[column] : null;
@@ -247,7 +247,7 @@ export default {
                         .map(column => ({
                             name: column,
                             type: this.getType(column),
-                            yAxisIndex: columnNeedsSecondaryAxis(column) ? 1 : 0, // Dynamically assign y-axis
+                            yAxisIndex: this.columnNeedsSecondaryAxis(column) ? 1 : 0, // Dynamically assign y-axis
                             data: this.data.map(row => row[column])
                         }))
             };
@@ -255,14 +255,19 @@ export default {
         ...mapState(["selectedDb", "selectedTable", "selectedColumns", "multiGraphType", "currentZoomStart", "currentZoomEnd", "selectedIds", "dateRange", "selectedInterval", "selectedStatistics", "selectedMethod", "exportColumns", "graphType", "exportIds", "exportDate", "exportInterval", "dateType", "exportDateType", "exportPath", "exportFilename", "exportFormat", "exportOptions", "theme"]),
     },
     methods: {
-        ...mapActions(["updateSelectedColumns", "updateExportOptions", "pushMessage", "shiftMessage", "clearMessages", "heightVar"]),
+        ...mapActions(["updateSelectedColumns", "updateExportOptions", "pushMessage", "shiftMessage", "clearMessages"]),
         columnNeedsSecondaryAxis(column) {
             // Adjust logic based on actual data thresholds
             return this.data.some(row => row[column] > 100);
         },
+        heightVar() {
+            // Set the height based on the environment
+            const isTauri = window.isTauri !== undefined;
+            return isTauri ? "calc(100vh - 14vh)" : "calc(100vh - 16vh)";
+        },
         getType(column) {
             // Get the type of the column based on the data
-            return this.multiGraphType.find(col => col.name === column).type || this.graphType;
+            return this.multiGraphType.find(col => col.name === column)?.type || this.graphType;
         },
         // Fetch data from the API
         async fetchData() {

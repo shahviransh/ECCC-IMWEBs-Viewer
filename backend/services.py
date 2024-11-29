@@ -4,6 +4,7 @@ import pandas as pd
 import xlsxwriter
 import matplotlib.pyplot as plt
 from matplotlib.ticker import MaxNLocator
+from cycler import cycler
 from config import Config
 from datetime import datetime
 from flask import abort
@@ -191,6 +192,17 @@ def save_to_file(
     ID = next((col for col in dataframe1.columns if "ID" in col), None)
     dataframe1[date_type] = pd.to_datetime(dataframe1[date_type])
 
+    # Keep track of which axis (primary or secondary) to use for each column
+    primary_axis_columns = []  # Columns for primary y-axis
+    secondary_axis_columns = []  # Columns for secondary y-axis
+
+    # Classify columns based on their value ranges (example threshold: >100 for secondary y-axis)
+    for column in dataframe1.columns[1:]:
+        if dataframe1[column].max() > 100:
+            secondary_axis_columns.append(column)
+        else:
+            primary_axis_columns.append(column)
+
     # Write first dataframe and/or statistics dataframe to file with csv/text format
     if file_format == "csv":
         with open(file_path, "w", newline="") as f:
@@ -207,7 +219,7 @@ def save_to_file(
                 f.write("\n")
                 dataframe2.to_csv(f, index=False, sep=" ")
     elif file_format == "xlsx":
-    # Write the DataFrame to an Excel file
+        # Write the DataFrame to an Excel file
         with pd.ExcelWriter(file_path, engine="xlsxwriter") as writer:
             dataframe1.to_excel(writer, sheet_name="Sheet1", index=False)
 
@@ -218,17 +230,6 @@ def save_to_file(
             # Define chart type and add data for the chart
             chart = workbook.add_chart({"type": graph_type})
             row_count = len(dataframe1) + 1
-
-            # Separate columns into primary and secondary y-axis based on a threshold
-            primary_axis_columns = []  # Columns for the primary y-axis
-            secondary_axis_columns = []  # Columns for the secondary y-axis
-
-            # Example threshold: values > 100 go to the secondary y-axis
-            for column in dataframe1.columns[1:]:
-                if dataframe1[column].max() > 100:
-                    secondary_axis_columns.append(column)
-                else:
-                    primary_axis_columns.append(column)
 
             if selected_ids != [""]:
                 # Sort dataframe by ID column for excel selection
@@ -260,7 +261,8 @@ def save_to_file(
                                 "name": f"{column} - {ID}: {selected_id}",
                                 "categories": f"Sheet1!$A${prev_end_row}:$A${end_row}",  # Assuming date column is in column A
                                 "values": f"Sheet1!${chr(65+i)}${prev_end_row}:${chr(65+i)}${end_row}",
-                                "y2_axis": column in secondary_axis_columns,  # Assign to secondary y-axis if applicable
+                                "y2_axis": column
+                                in secondary_axis_columns,  # Assign to secondary y-axis if applicable
                             }
                         )
             else:
@@ -271,7 +273,8 @@ def save_to_file(
                             "name": column,
                             "categories": f"Sheet1!$A$2:$A${row_count}",
                             "values": f"Sheet1!${chr(65+i)}$2:${chr(65+i)}${row_count}",
-                            "y2_axis": column in secondary_axis_columns,  # Assign to secondary y-axis if applicable
+                            "y2_axis": column
+                            in secondary_axis_columns,  # Assign to secondary y-axis if applicable
                         }
                     )
 
@@ -286,130 +289,102 @@ def save_to_file(
                 }
             )
             chart.set_y_axis({"name": "Primary Axis (Smaller Values)"})
-            chart.set_y2_axis({"name": "Secondary Axis (Larger Values)"})  # Add second y-axis
+            chart.set_y2_axis(
+                {"name": "Secondary Axis (Larger Values)"}
+            )  # Add second y-axis
 
             # Insert the chart into the worksheet
             worksheet.insert_chart(f"{chr(65 + len(dataframe1.columns))}2", chart)
     elif file_format in ["png", "jpg", "jpeg", "svg", "pdf"]:
-    # Plot each column as a line on the same figure
+        # Plot each column as a line on the same figure
         fig, ax1 = plt.subplots(figsize=(10, 6))
         ax2 = ax1.twinx()  # Create a secondary y-axis
-        plot_func = plot_functions[graph_type]  # Get the function based on graph_type
+        plot_func_ax1 = getattr(ax1, graph_type)
+        plot_func_ax2 = getattr(ax2, graph_type)
 
-        # Keep track of which axis (primary or secondary) to use for each column
-        primary_axis_columns = []  # Columns for primary y-axis
-        secondary_axis_columns = []  # Columns for secondary y-axis
-
-        # Classify columns based on their value ranges (example threshold: >100 for secondary y-axis)
-        for column in dataframe1.columns[1:]:
-            if dataframe1[column].max() > 100:
-                secondary_axis_columns.append(column)
-            else:
-                primary_axis_columns.append(column)
+        ax1.set_prop_cycle(cycler(color=plt.cm.tab10.colors))
+        ax2.set_prop_cycle(cycler(color=plt.cm.Set2.colors))
 
         if selected_ids != [""]:
             # Create separate plots for each ID-Column combination
-            if graph_type == "bar":
-                for i, column in enumerate(dataframe1.columns[1:]):
-                    if column == ID:
-                        continue
-                    for j, selected_id in enumerate(selected_ids):
-                        filtered_data = dataframe1[dataframe1[ID] == selected_id]
-                        if column in primary_axis_columns:
-                            plot_func(
-                                filtered_data[date_type] + pd.DateOffset((i + j) * 0.2),
-                                filtered_data[column],
-                                width=0.2,
-                                label=f"{column} - {ID}: {selected_id}",
-                                ax=ax1,
-                            )
-                        elif column in secondary_axis_columns:
-                            plot_func(
-                                filtered_data[date_type] + pd.DateOffset((i + j) * 0.2),
-                                filtered_data[column],
-                                width=0.2,
-                                label=f"{column} - {ID}: {selected_id}",
-                                ax=ax2,
-                            )
-            else:
-                for column in dataframe1.columns[1:]:
-                    if column == ID:
-                        continue
-                    for selected_id in selected_ids:
-                        filtered_data = dataframe1[dataframe1[ID] == selected_id]
-                        if column in primary_axis_columns:
-                            plot_func(
-                                filtered_data[date_type],
-                                filtered_data[column],
-                                label=f"{column} - {ID}: {selected_id}",
-                                ax=ax1,
-                            )
-                        elif column in secondary_axis_columns:
-                            plot_func(
-                                filtered_data[date_type],
-                                filtered_data[column],
-                                label=f"{column} - {ID}: {selected_id}",
-                                ax=ax2,
-                            )
+            for i, column in enumerate(dataframe1.columns[1:]):
+                if column == ID:
+                    continue
+                for j, selected_id in enumerate(selected_ids):
+                    filtered_data = dataframe1[dataframe1[ID] == selected_id]
+                    if column in primary_axis_columns:
+                        plot_func_ax1(
+                            (
+                                filtered_data[date_type] + pd.DateOffset((i + j) * 0.2)
+                                if graph_type == "bar"
+                                else filtered_data[date_type]
+                            ),
+                            filtered_data[column],
+                            label=f"{column} - {ID}: {selected_id}",
+                            alpha=0.7
+                        )
+                    elif column in secondary_axis_columns:
+                        plot_func_ax2(
+                            (
+                                filtered_data[date_type] + pd.DateOffset((i + j) * 0.2)
+                                if graph_type == "bar"
+                                else filtered_data[date_type]
+                            ),
+                            filtered_data[column],
+                            label=f"{column} - {ID}: {selected_id}",
+                            alpha=0.7
+                        )
         else:
             # Plot each column as a single series if selected_ids is empty
-            if graph_type == "bar":
-                for i, column in enumerate(dataframe1.columns[1:]):
-                    if column in primary_axis_columns:
-                        plot_func(
-                            dataframe1[date_type] + pd.DateOffset(i * 0.2),
-                            dataframe1[column],
-                            width=0.2,
-                            label=column,
-                            ax=ax1,
-                        )
-                    elif column in secondary_axis_columns:
-                        plot_func(
-                            dataframe1[date_type] + pd.DateOffset(i * 0.2),
-                            dataframe1[column],
-                            width=0.2,
-                            label=column,
-                            ax=ax2,
-                        )
-            else:
-                for column in dataframe1.columns[1:]:
-                    if column in primary_axis_columns:
-                        plot_func(
-                            dataframe1[date_type],
-                            dataframe1[column],
-                            label=column,
-                            ax=ax1,
-                        )
-                    elif column in secondary_axis_columns:
-                        plot_func(
-                            dataframe1[date_type],
-                            dataframe1[column],
-                            label=column,
-                            ax=ax2,
-                        )
+            for i, column in enumerate(dataframe1.columns[1:]):
+                if column in primary_axis_columns:
+                    plot_func_ax1(
+                        (
+                            dataframe1[date_type] + pd.DateOffset(i * 0.2)
+                            if graph_type == "bar"
+                            else dataframe1[date_type]
+                        ),
+                        dataframe1[column],
+                        label=column,
+                        alpha=0.7
+                    )
+                elif column in secondary_axis_columns:
+                    plot_func_ax2(
+                        (
+                            dataframe1[date_type] + pd.DateOffset(i * 0.2)
+                            if graph_type == "bar"
+                            else dataframe1[date_type]
+                        ),
+                        dataframe1[column],
+                        label=column,
+                        alpha=0.7
+                    )
 
         # Customize the primary axis
         ax1.set_xlabel(date_type)
-        ax1.set_ylabel("Primary Y-Axis (Smaller Values)")
-        ax1.tick_params(axis='y')
-        ax1.legend(loc="upper left", title="Primary Series")
+        ax1.set_ylabel(f"{date_type} (Smaller Values)")
+        ax1.tick_params(axis="y")
         ax1.xaxis.set_major_locator(MaxNLocator(nbins=30))  # Scale x-axis ticks
-        ax1.grid(visible=True, linestyle='--', alpha=0.6)
+        ax1.grid(visible=True, linestyle="--", alpha=0.6)
 
         # Customize the secondary axis
-        ax2.set_ylabel("Secondary Y-Axis (Larger Values)")
-        ax2.tick_params(axis='y')
-        ax2.legend(loc="upper right", title="Secondary Series")
+        ax2.set_xlabel(date_type)
+        ax2.set_ylabel(f"{date_type} (Larger Values)")
+        ax2.tick_params(axis="y")
+        ax2.grid(visible=True, linestyle="--", alpha=0.6)
 
-        # Rotate x-axis labels
-        plt.xticks(rotation=45)
+        ax1.legend(loc="upper left")
+        ax2.legend(loc="upper right")
 
-        # Adjust layout
-        plt.subplots_adjust(bottom=0.2, top=0.9, left=0.1, right=0.85)
+        # Rotate x-axis labels (explicitly for ax1 and ax2 if shared x-axis is used)
+        for tick in ax1.get_xticklabels():
+            tick.set_rotation(45)
+
+        # Adjust layout to avoid label overlap
+        plt.tight_layout()
 
         # Save the plot
         plt.savefig(file_path, format=file_format)
-
 
     return file_path
 
