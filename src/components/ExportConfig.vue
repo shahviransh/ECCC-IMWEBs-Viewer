@@ -36,15 +36,32 @@
                 <option value="bar-line">Bar & Line</option>
                 <option value="line-scatter">Line & Scatter</option>
                 <option value="scatter-bar">Scatter & Bar</option>
+                <option value="bar-line-scatter">Bar, Line & Scatter</option>
             </select>
             <!-- Conditional Multiselects -->
             <div v-if="['bar-line', 'line-scatter', 'scatter-bar'].includes(graType)" class="export-field">
-                <label for="multiselect1" class="export-label">Select Columns for {{ this.mapping[0] }}:</label>
+                <label for="multiselect1" class="export-label">{{ capitalizedFirstLetter(this.mapping[0]) }}
+                    Columns:</label>
                 <Multiselect id="multiselect1" v-model="selectedColumns1" :options="filteredOptions1" :multiple="true"
                     :close-on-select="false" placeholder="Select Columns" @update:modelValue="onSelectionChange" />
 
-                <label for="multiselect2" class="export-label">Select Columns for {{ this.mapping[1] }}:</label>
+                <label for="multiselect2" class="export-label">{{ capitalizedFirstLetter(this.mapping[1]) }}
+                    Columns:</label>
                 <Multiselect id="multiselect2" v-model="selectedColumns2" :options="filteredOptions2" :multiple="true"
+                    :close-on-select="false" placeholder="Select Columns" @update:modelValue="onSelectionChange" />
+            </div>
+            <div v-if="graType === 'bar-line-scatter'" class="export-field">
+                <label for="multiselect3" class="export-label">{{ capitalizedFirstLetter(this.mapping[0]) }}
+                    Columns:</label>
+                <Multiselect id="multiselect3" v-model="selectedColumns3" :options="filteredOptions3" :multiple="true"
+                    :close-on-select="false" placeholder="Select Columns" @update:modelValue="onSelectionChange" />
+                <label for="multiselect4" class="export-label">{{ capitalizedFirstLetter(this.mapping[1]) }}
+                    Columns:</label>
+                <Multiselect id="multiselect4" v-model="selectedColumns4" :options="filteredOptions4" :multiple="true"
+                    :close-on-select="false" placeholder="Select Columns" @update:modelValue="onSelectionChange" />
+                <label for="multiselect5" class="export-label">{{ capitalizedFirstLetter(this.mapping[2]) }}
+                    Columns:</label>
+                <Multiselect id="multiselect5" v-model="selectedColumns5" :options="filteredOptions5" :multiple="true"
                     :close-on-select="false" placeholder="Select Columns" @update:modelValue="onSelectionChange" />
             </div>
         </div>
@@ -61,6 +78,9 @@ export default {
         return {
             selectedColumns1: [],
             selectedColumns2: [],
+            selectedColumns3: [],
+            selectedColumns4: [],
+            selectedColumns5: [],
             allOptions: this.selectedColumns,
             mapping: this.graType,
         };
@@ -107,14 +127,31 @@ export default {
         filteredOptions2() {
             return this.allOptions.filter(option => !this.selectedColumns1.includes(option));
         },
+        filteredOptions3() {
+            return this.allOptions.filter(option => !this.selectedColumns4.includes(option) && !this.selectedColumns5.includes(option));
+        },
+        filteredOptions4() {
+            return this.allOptions.filter(option => !this.selectedColumns3.includes(option) && !this.selectedColumns5.includes(option));
+        },
+        filteredOptions5() {
+            return this.allOptions.filter(option => !this.selectedColumns3.includes(option) && !this.selectedColumns4.includes(option));
+        },
         ...mapState(['exportPath', 'exportFilename', 'exportFormat', "pageTitle", "graphType", "selectedColumns", "dateType"]),
     },
     methods: {
-        ...mapActions(["updateExportPath", "updateExportFilename", "updateExportFormat", "updateGraphType", "updateMultiGraphType", "pushMessage"]),
+        ...mapActions(["updateExportPath", "updateExportFilename", "updateExportFormat", "updateGraphType", "updateMultiGraphType", 'capitalizedFirstLetter', "pushMessage"]),
         onSelectionChange() {
-            const col1 = this.selectedColumns1.map(col => ({ name: col, type: this.mapping[0] }));
-            const col2 = this.selectedColumns2.map(col => ({ name: col, type: this.mapping[1] }));
-            const formats = [...col1, ...col2];
+            let formats = [];
+            if (this.graType === "bar-line-scatter") {
+                const col1 = this.selectedColumns3.map(col => ({ name: col, type: this.mapping[0] }));
+                const col2 = this.selectedColumns4.map(col => ({ name: col, type: this.mapping[1] }));
+                const col3 = this.selectedColumns5.map(col => ({ name: col, type: this.mapping[2] }));
+                formats = [...col1, ...col2, ...col3];
+            } else {
+                const col1 = this.selectedColumns1.map(col => ({ name: col, type: this.mapping[0] }));
+                const col2 = this.selectedColumns2.map(col => ({ name: col, type: this.mapping[1] }));
+                formats = [...col1, ...col2];
+            }
 
             // Check if all selected columns are in formats
             const allColumnsInFormats = this.allOptions.every(col => formats.some(format => format.name === col));

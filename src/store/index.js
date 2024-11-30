@@ -318,6 +318,12 @@ const store = createStore({
     updateDateType({ commit }, type) {
       commit("SET_DATE_TYPE", type);
     },
+    capitalizedFirstLetter({ commit }, string) {
+      if (string) {
+        return string.charAt(0).toUpperCase() + string.slice(1);
+      }
+      return "";
+    },
     updateExportDateType({ commit }, type) {
       commit("SET_EXPORT_DATE_TYPE", type);
     },

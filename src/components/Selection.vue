@@ -101,10 +101,7 @@ export default {
             }
         },
         capitalizedInterval() {
-            if (this.defaultInterval) {
-                return this.defaultInterval.charAt(0).toUpperCase() + this.defaultInterval.slice(1);
-            }
-            return '';
+            return this.capitalizedFirstLetter(this.defaultInterval);
         },
         selectedDateEnd: {
             get() {
@@ -152,7 +149,7 @@ export default {
         };
     },
     methods: {
-        ...mapActions(['fetchColumns', 'updateSelectedIds', 'updateSelectedDateStart', 'updateSelectedDateEnd', 'updateExportIds', 'updateExportDateStart', 'updateExportDateEnd']),
+        ...mapActions(['fetchColumns', 'updateSelectedIds', 'updateSelectedDateStart', 'updateSelectedDateEnd', 'updateExportIds', 'updateExportDateStart', 'capitalizedFirstLetter', 'updateExportDateEnd']),
     },
 };
 </script>
