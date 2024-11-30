@@ -82,7 +82,7 @@ export default {
                 if (this.data.length) {
                     this.$nextTick(() => {
                         this.pushMessage({ message: `Graph Loaded ${this.selectedColumns.length} columns x ${this.data.length} rows`, type: 'success' });
-                        setTimeout(() => this.shiftMessage(), 5000);
+                        setTimeout(() => this.clearMessages(), 5000);
                     });
                 }
             },
@@ -90,7 +90,7 @@ export default {
         },
         selectedColumns() {
             this.ID = this.selectedColumns.filter((column) => column.includes('ID')).join("");
-        }
+        },
     },
     computed: {
         chartOptions() {
@@ -321,6 +321,7 @@ export default {
                         export_format: this.exportFormat,
                         options: this.exportOptions,
                         graph_type: this.graphType,
+                        multi_graph_type: this.multiGraphType,
                     }
                 });
                 if (response.data.error) {

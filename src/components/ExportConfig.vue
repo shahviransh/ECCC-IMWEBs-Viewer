@@ -33,19 +33,40 @@
                 <option value="bar">Bar</option>
                 <option value="line">Line</option>
                 <option value="scatter">Scatter</option>
+                <option value="bar-line">Bar & Line</option>
+                <option value="line-scatter">Line & Scatter</option>
+                <option value="scatter-bar">Scatter & Bar</option>
             </select>
+            <!-- Conditional Multiselects -->
+            <div v-if="['bar-line', 'line-scatter', 'scatter-bar'].includes(graType)" class="export-field">
+                <label for="multiselect1" class="export-label">Select Columns for {{ this.mapping[0] }}:</label>
+                <Multiselect id="multiselect1" v-model="selectedColumns1" :options="filteredOptions1" :multiple="true"
+                    :close-on-select="false" placeholder="Select Columns" @update:modelValue="onSelectionChange" />
+
+                <label for="multiselect2" class="export-label">Select Columns for {{ this.mapping[1] }}:</label>
+                <Multiselect id="multiselect2" v-model="selectedColumns2" :options="filteredOptions2" :multiple="true"
+                    :close-on-select="false" placeholder="Select Columns" @update:modelValue="onSelectionChange" />
+            </div>
         </div>
     </div>
 </template>
 
 <script>
 import { mapState, mapActions } from 'vuex'; // Import Vuex helpers
+import Multiselect from 'vue-multiselect';
 import DOMPurify from 'dompurify';
 
 export default {
     data() {
         return {
+            selectedColumns1: [],
+            selectedColumns2: [],
+            allOptions: this.selectedColumns,
+            mapping: this.graType,
         };
+    },
+    components: {
+        Multiselect,
     },
     computed: {
         expPath: {
@@ -80,10 +101,39 @@ export default {
                 this.updateGraphType(value);
             },
         },
-        ...mapState(['exportPath', 'exportFilename', 'exportFormat', "pageTitle", "graphType"]),
+        filteredOptions1() {
+            return this.allOptions.filter(option => !this.selectedColumns2.includes(option));
+        },
+        filteredOptions2() {
+            return this.allOptions.filter(option => !this.selectedColumns1.includes(option));
+        },
+        ...mapState(['exportPath', 'exportFilename', 'exportFormat', "pageTitle", "graphType", "selectedColumns", "dateType"]),
     },
     methods: {
-        ...mapActions(["updateExportPath", "updateExportFilename", "updateExportFormat", "updateGraphType"]),
+        ...mapActions(["updateExportPath", "updateExportFilename", "updateExportFormat", "updateGraphType", "updateMultiGraphType", "pushMessage"]),
+        onSelectionChange() {
+            const col1 = this.selectedColumns1.map(col => ({ name: col, type: this.mapping[0] }));
+            const col2 = this.selectedColumns2.map(col => ({ name: col, type: this.mapping[1] }));
+            const formats = [...col1, ...col2];
+
+            // Check if all selected columns are in formats
+            const allColumnsInFormats = this.allOptions.every(col => formats.some(format => format.name === col));
+            if (!allColumnsInFormats) {
+                this.pushMessage({ message: "All selected columns must be in the multi-graph formats", type: "error" });
+            } else {
+                this.pushMessage({ message: "All selected columns are in the multi-graph formats", type: "success" });
+            }
+
+            this.updateMultiGraphType(formats);
+        },
+    },
+    watch: {
+        graType() {
+            this.mapping = this.graType.split('-');
+        },
+        selectedColumns() {
+            this.allOptions = this.selectedColumns.filter(option => option !== this.dateType && !option.includes("ID"));
+        },
     },
 };
 </script>
