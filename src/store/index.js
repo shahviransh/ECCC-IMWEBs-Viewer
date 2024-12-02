@@ -273,9 +273,10 @@ const store = createStore({
       commit("SET_XAXIS", xAxis);
     },
     pushMessage({ commit }, { message, type, duration = 5000 }) {
+      const index = this.state.messages.length;
       commit("PUSH_MESSAGE", { message, type });
       setTimeout(() => {
-        commit("SHIFT_MESSAGE");
+        commit("SLICE_MESSAGE", index);
       }, duration);
     },
     shiftMessage({ commit }) {
@@ -316,12 +317,6 @@ const store = createStore({
     },
     updateDateType({ commit }, type) {
       commit("SET_DATE_TYPE", type);
-    },
-    capitalizedFirstLetter({ commit }, string) {
-      if (string) {
-        return string.charAt(0).toUpperCase() + string.slice(1);
-      }
-      return "";
     },
     updateExportDateType({ commit }, type) {
       commit("SET_EXPORT_DATE_TYPE", type);

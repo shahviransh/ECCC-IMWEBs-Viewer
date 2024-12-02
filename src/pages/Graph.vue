@@ -262,8 +262,18 @@ export default {
             return isTauri ? "calc(100vh - 14vh)" : "calc(100vh - 16vh)";
         },
         getType(column) {
-            // Get the type of the column based on the data
-            return this.multiGraphType.find(col => col.name === column)?.type || this.graphType;
+            // Use the Vuex state multiGraphType, which updates dynamically
+            if (this.multiGraphType?.length > 0) {
+                const multiGraph = this.multiGraphType.find(col => col.name === column);
+                if (multiGraph) {
+                    return multiGraph.type;
+                }
+            }
+            // Handle cases where graphType contains a dash ('-')
+            if (this.graphType.includes('-')) {
+                return this.graphType.split('-')[0];
+            }
+            return this.graphType;
         },
         // Fetch data from the API
         async fetchData() {

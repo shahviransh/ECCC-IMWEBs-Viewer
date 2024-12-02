@@ -150,6 +150,12 @@ export default {
     },
     methods: {
         ...mapActions(['fetchColumns', 'updateSelectedIds', 'updateSelectedDateStart', 'updateSelectedDateEnd', 'updateExportIds', 'updateExportDateStart', 'capitalizedFirstLetter', 'updateExportDateEnd']),
+        capitalizedFirstLetter(string) {
+            if (string) {
+                return string.charAt(0).toUpperCase() + string.slice(1);
+            }
+            return "";
+        },
     },
 };
 </script>
