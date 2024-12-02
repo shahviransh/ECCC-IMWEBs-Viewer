@@ -273,10 +273,9 @@ const store = createStore({
       commit("SET_XAXIS", xAxis);
     },
     pushMessage({ commit }, { message, type, duration = 5000 }) {
-      const index = this.state.messages.length;
       commit("PUSH_MESSAGE", { message, type });
       setTimeout(() => {
-        commit("SLICE_MESSAGE", index);
+        commit("SHIFT_MESSAGE");
       }, duration);
     },
     shiftMessage({ commit }) {

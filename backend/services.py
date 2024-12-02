@@ -84,10 +84,22 @@ def export_data_service(data):
         columns_list = data.get("columns", "All").split(",")
         date_type = data.get("date_type")
         graph_type = data.get("graph_type", "scatter")
-        multi_graph_type = data.get(
-            "multi_graph_type",
-            [{"type": graph_type, "name": column} for column in columns_list],
-        )
+
+        # Parse multi_graph_type
+        multi_graph_type = []
+        index = 0
+        while f"multi_graph_type[{index}][name]" in data:
+            name = data.get(f"multi_graph_type[{index}][name]")
+            graph_type = data.get(f"multi_graph_type[{index}][type]")
+            multi_graph_type.append({"name": name, "type": graph_type})
+            index += 1
+
+        if not multi_graph_type:
+            multi_graph_type = [
+                {"type": graph_type, "name": column}
+                for column in columns_list
+                if not column.endswith("ID") and column != date_type
+            ]
 
         if not date_type:
             return {
@@ -105,7 +117,7 @@ def export_data_service(data):
             options,
             date_type,
             multi_graph_type,
-            list(map(int, data.get("id").split(","))),
+            list(map(int, data.get("id").split(","))) if data.get("id") else [],
         )
 
         return {"file_path": file_path}
@@ -186,20 +198,20 @@ def save_to_file(
         os.makedirs(file_path)
     file_path = os.path.join(file_path, filename)
 
-    # Define a mapping of graph types to their respective plotting functions
-    plot_functions = {
-        "bar": plt.bar,
-        "line": plt.plot,
-        "scatter": plt.scatter,
-        # Add more types if needed
+    # Map graph types to Matplotlib Axes methods
+    GRAPH_TYPE_MAPPING = {
+        "line": "plot",
+        "bar": "bar",
+        "scatter": "scatter",
     }
+
     # Check if the dataframe contains an ID column
     ID = next((col for col in dataframe1.columns if "ID" in col), None)
     dataframe1[date_type] = pd.to_datetime(dataframe1[date_type])
 
     # Keep track of which axis (primary or secondary) to use for each column
-    primary_axis_columns = []  # Columns for primary y-axis
-    secondary_axis_columns = []  # Columns for secondary y-axis
+    primary_axis_columns = []
+    secondary_axis_columns = []
 
     # Classify columns based on their value ranges (example threshold: >100 for secondary y-axis)
     for column in dataframe1.columns[1:]:
@@ -226,68 +238,68 @@ def save_to_file(
     elif file_format == "xlsx":
         # Write the DataFrame to an Excel file
         with pd.ExcelWriter(file_path, engine="xlsxwriter") as writer:
+            # Sort dataframe by ID column for consistent selection
+            dataframe1 = dataframe1.sort_values([ID])
+            # Write the DataFrame to Excel
             dataframe1.to_excel(writer, sheet_name="Sheet1", index=False)
 
             # Access the workbook and worksheet objects
             workbook = writer.book
             worksheet = writer.sheets["Sheet1"]
-            chart = workbook.add_chart({"type": multi_graph_type[0]["type"]})
+
+            # Initialize the chart object
+            chart = None
 
             # Define chart type and add data for the chart
-            for column_graph in multi_graph_type[1:]:
-                overlay_chart = workbook.add_chart({"type": column_graph["type"]})
+            for i, column_graph in enumerate(multi_graph_type, start=1):
+                overlay_chart = (
+                    chart
+                    if i > 1 and multi_graph_type[i-2]["type"] == column_graph["type"]
+                    else workbook.add_chart({"type": column_graph["type"]})
+                )
                 column = column_graph["name"]
                 row_count = len(dataframe1) + 1
 
-                if selected_ids != [""]:
-                    # Sort dataframe by ID column for excel selection
-                    dataframe1 = dataframe1.sort_values([ID])
-                    prev_end_row = 0
-                    end_row = 0
+                if selected_ids and selected_ids != [""]:
+                    prev_end_row = 1  # Start from the first data row
 
-                    for i, column in enumerate(dataframe1.columns[1:], start=1):
-                        if column == ID:
-                            continue
-                        for j, selected_id in enumerate(selected_ids):
-                            # Previous end row index for the previous selected_id
-                            prev_end_row = (
-                                len(dataframe1[dataframe1[ID] == selected_ids[j - 1]])
-                                * j
-                                + 2  # +2 for exclusive selection
-                                if j > 0
-                                else 2
-                            )
+                    for j, selected_id in enumerate(selected_ids):
+                        # Calculate the start and end rows for the current ID
+                        start_row = prev_end_row + 1
+                        end_row = (
+                            start_row
+                            + len(dataframe1[dataframe1[ID] == selected_id])
+                            - 1
+                        )
 
-                            # Get the end row index for the current selected_id
-                            end_row = (
-                                len(dataframe1[dataframe1[ID] == selected_id]) * (j + 1)
-                                + 1  # +1 for inclusive selection
-                            )
-
-                            # Filter data for each ID-column combination
-                            overlay_chart.add_series(
-                                {
-                                    "name": f"{column} - {ID}: {selected_id}",
-                                    "categories": f"Sheet1!$A${prev_end_row}:$A${end_row}",  # Assuming date column is in column A
-                                    "values": f"Sheet1!${chr(65+i)}${prev_end_row}:${chr(65+i)}${end_row}",
-                                    "y2_axis": column
-                                    in secondary_axis_columns,  # Assign to secondary y-axis if applicable
-                                }
-                            )
-                else:
-                    # Add a single series for each selected column when selected_ids is empty
-                    for i, column in enumerate(dataframe1.columns[1:], start=1):
+                        # Add a series to the overlay chart
                         overlay_chart.add_series(
                             {
-                                "name": column,
-                                "categories": f"Sheet1!$A$2:$A${row_count}",
-                                "values": f"Sheet1!${chr(65+i)}$2:${chr(65+i)}${row_count}",
+                                "name": f"{column} - {ID}: {selected_id}",
+                                "categories": f"Sheet1!$A${start_row}:$A${end_row}",  # Assuming column A contains categories
+                                "values": f"Sheet1!${chr(65 + i + 1)}${start_row}:${chr(65 + i + 1)}${end_row}",
                                 "y2_axis": column
                                 in secondary_axis_columns,  # Assign to secondary y-axis if applicable
                             }
                         )
-                chart.combine(overlay_chart)
 
+                        # Update previous end row
+                        prev_end_row = end_row
+
+                else:
+                    # Add a single series for each selected column when selected_ids is empty
+                    overlay_chart.add_series(
+                        {
+                            "name": column,
+                            "categories": f"Sheet1!$A$2:$A${row_count}",
+                            "values": f"Sheet1!${chr(65 + i)}$2:${chr(65 + i)}${row_count}",
+                            "y2_axis": column in secondary_axis_columns,
+                        }
+                    )
+                if chart is None or (i > 1 and multi_graph_type[i-2]["type"] == column_graph["type"]):
+                    chart = overlay_chart
+                else:
+                    chart.combine(overlay_chart)
             # Customize the chart
             chart.set_x_axis(
                 {
@@ -298,10 +310,8 @@ def save_to_file(
                     "num_font": {"rotation": -45},
                 }
             )
-            chart.set_y_axis({"name": "Primary Axis (Smaller Values)"})
-            chart.set_y2_axis(
-                {"name": "Secondary Axis (Larger Values)"}
-            )  # Add second y-axis
+            chart.set_y_axis({"name": "Values (Smaller Values)"})
+            chart.set_y2_axis({"name": "Values (Larger Values)"})  # Add second y-axis
 
             # Insert the chart into the worksheet
             worksheet.insert_chart(f"{chr(65 + len(dataframe1.columns))}2", chart)
@@ -309,56 +319,52 @@ def save_to_file(
         # Plot each column as a line on the same figure
         fig, ax1 = plt.subplots(figsize=(10, 6))
         ax2 = ax1.twinx()  # Create a secondary y-axis
-        for column_graph in multi_graph_type:
+        for i, column_graph in enumerate(multi_graph_type):
             column = column_graph["name"]
             plot_func = getattr(
-                ax1 if column in primary_axis_columns else ax2, column_graph["type"]
+                ax1 if column in primary_axis_columns else ax2, GRAPH_TYPE_MAPPING[column_graph["type"]]
             )
 
             ax1.set_prop_cycle(cycler(color=plt.cm.tab10.colors))
             ax2.set_prop_cycle(cycler(color=plt.cm.Set2.colors))
 
-            if selected_ids != [""]:
+            if selected_ids and selected_ids != [""]:
                 # Create separate plots for each ID-Column combination
-                for i, column in enumerate(dataframe1.columns[1:]):
-                    if column == ID:
-                        continue
-                    for j, selected_id in enumerate(selected_ids):
-                        filtered_data = dataframe1[dataframe1[ID] == selected_id]
-                        plot_func(
-                            (
-                                filtered_data[date_type] + pd.DateOffset((i + j) * 0.2)
-                                if column_graph["type"] == "bar"
-                                else filtered_data[date_type]
-                            ),
-                            filtered_data[column],
-                            label=f"{column} - {ID}: {selected_id}",
-                            alpha=0.7,
-                        )
-            else:
-                # Plot each column as a single series if selected_ids is empty
-                for i, column in enumerate(dataframe1.columns[1:]):
+                for j, selected_id in enumerate(selected_ids):
+                    filtered_data = dataframe1[dataframe1[ID] == selected_id]
                     plot_func(
                         (
-                            dataframe1[date_type] + pd.DateOffset(i * 0.2)
+                            filtered_data[date_type] + pd.DateOffset((i + j) * 2)
                             if column_graph["type"] == "bar"
-                            else dataframe1[date_type]
+                            else filtered_data[date_type]
                         ),
-                        dataframe1[column],
-                        label=column,
+                        filtered_data[column],
+                        label=f"{column} - {ID}: {selected_id}",
                         alpha=0.7,
                     )
+            else:
+                # Plot each column as a single series if selected_ids is empty
+                plot_func(
+                    (
+                        dataframe1[date_type] + pd.DateOffset(i * 2)
+                        if column_graph["type"] == "bar"
+                        else dataframe1[date_type]
+                    ),
+                    dataframe1[column],
+                    label=column,
+                    alpha=0.7,
+                )
 
         # Customize the primary axis
         ax1.set_xlabel(date_type)
-        ax1.set_ylabel(f"{date_type} (Smaller Values)")
+        ax1.set_ylabel("Values (Smaller Values)")
         ax1.tick_params(axis="y")
         ax1.xaxis.set_major_locator(MaxNLocator(nbins=30))  # Scale x-axis ticks
         ax1.grid(visible=True, linestyle="--", alpha=0.6)
 
         # Customize the secondary axis
         ax2.set_xlabel(date_type)
-        ax2.set_ylabel(f"{date_type} (Larger Values)")
+        ax2.set_ylabel("Values (Larger Values)")
         ax2.tick_params(axis="y")
         ax2.grid(visible=True, linestyle="--", alpha=0.6)
 

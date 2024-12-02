@@ -33,36 +33,41 @@
                 <option value="bar">Bar</option>
                 <option value="line">Line</option>
                 <option value="scatter">Scatter</option>
-                <option value="bar-line">Bar & Line</option>
+                <option value="line-bar">Line & Bar</option>
                 <option value="line-scatter">Line & Scatter</option>
-                <option value="scatter-bar">Scatter & Bar</option>
-                <option value="bar-line-scatter">Bar, Line & Scatter</option>
+                <option value="bar-scatter">Bar & Scatter</option>
+                <option value="line-bar-scatter">Line, Bar & Scatter</option>
             </select>
             <!-- Conditional Multiselects -->
-            <div v-if="['bar-line', 'line-scatter', 'scatter-bar'].includes(graType)" class="export-field">
-                <label for="multiselect1" class="export-label">{{ capitalizedFirstLetter(this.mapping[0]) }}
+            <div v-if="['line-bar', 'line-scatter', 'bar-scatter'].includes(graType)" class="export-field">
+                <label for="multiselect1" class="export-label">{{ this.mapping[0] }}
                     Columns:</label>
                 <Multiselect id="multiselect1" v-model="selectedColumns1" :options="filteredOptions1" :multiple="true"
-                    :close-on-select="false" placeholder="Select Columns" @update:modelValue="onSelectionChange" />
+                    :close-on-select="false" placeholder="Select Columns" @update:modelValue="onSelectionChange"
+                    :class="tagClass(selectedColumns1)" />
 
-                <label for="multiselect2" class="export-label">{{ capitalizedFirstLetter(this.mapping[1]) }}
+                <label for="multiselect2" class="export-label">{{ this.mapping[1] }}
                     Columns:</label>
                 <Multiselect id="multiselect2" v-model="selectedColumns2" :options="filteredOptions2" :multiple="true"
-                    :close-on-select="false" placeholder="Select Columns" @update:modelValue="onSelectionChange" />
+                    :close-on-select="false" placeholder="Select Columns" @update:modelValue="onSelectionChange"
+                    :class="tagClass(selectedColumns2)" />
             </div>
-            <div v-if="graType === 'bar-line-scatter'" class="export-field">
-                <label for="multiselect3" class="export-label">{{ capitalizedFirstLetter(this.mapping[0]) }}
+            <div v-if="graType === 'line-bar-scatter'" class="export-field">
+                <label for="multiselect3" class="export-label">{{ this.mapping[0] }}
                     Columns:</label>
-                <Multiselect id="multiselect3" v-model="selectedColumns3" :options="filteredOptions3" :multiple="true"
-                    :close-on-select="false" placeholder="Select Columns" @update:modelValue="onSelectionChange" />
-                <label for="multiselect4" class="export-label">{{ capitalizedFirstLetter(this.mapping[1]) }}
+                <Multiselect id="multiselect3" v-model="selectedColumns1" :options="filteredOptions3" :multiple="true"
+                    :close-on-select="false" placeholder="Select Columns" @update:modelValue="onSelectionChange"
+                    :class="tagClass(selectedColumns1)" />
+                <label for="multiselect4" class="export-label">{{ this.mapping[1] }}
                     Columns:</label>
-                <Multiselect id="multiselect4" v-model="selectedColumns4" :options="filteredOptions4" :multiple="true"
-                    :close-on-select="false" placeholder="Select Columns" @update:modelValue="onSelectionChange" />
-                <label for="multiselect5" class="export-label">{{ capitalizedFirstLetter(this.mapping[2]) }}
+                <Multiselect id="multiselect4" v-model="selectedColumns2" :options="filteredOptions4" :multiple="true"
+                    :close-on-select="false" placeholder="Select Columns" @update:modelValue="onSelectionChange"
+                    :class="tagClass(selectedColumns2)" />
+                <label for="multiselect5" class="export-label">{{ this.mapping[2] }}
                     Columns:</label>
-                <Multiselect id="multiselect5" v-model="selectedColumns5" :options="filteredOptions5" :multiple="true"
-                    :close-on-select="false" placeholder="Select Columns" @update:modelValue="onSelectionChange" />
+                <Multiselect id="multiselect5" v-model="selectedColumns3" :options="filteredOptions5" :multiple="true"
+                    :close-on-select="false" placeholder="Select Columns" @update:modelValue="onSelectionChange"
+                    :class="tagClass(selectedColumns3)" />
             </div>
         </div>
     </div>
@@ -79,8 +84,6 @@ export default {
             selectedColumns1: [],
             selectedColumns2: [],
             selectedColumns3: [],
-            selectedColumns4: [],
-            selectedColumns5: [],
             allOptions: this.selectedColumns,
             mapping: this.graType,
         };
@@ -139,17 +142,16 @@ export default {
         ...mapState(['exportPath', 'exportFilename', 'exportFormat', "pageTitle", "graphType", "selectedColumns", "dateType"]),
     },
     methods: {
-        ...mapActions(["updateExportPath", "updateExportFilename", "updateExportFormat", "updateGraphType", "updateMultiGraphType", 'capitalizedFirstLetter', "pushMessage"]),
+        ...mapActions(["updateExportPath", "updateExportFilename", "updateExportFormat", "updateGraphType", "updateMultiGraphType", "pushMessage"]),
         onSelectionChange() {
             let formats = [];
-            if (this.graType === "bar-line-scatter") {
-                const col1 = this.selectedColumns3.map(col => ({ name: col, type: this.mapping[0] }));
-                const col2 = this.selectedColumns4.map(col => ({ name: col, type: this.mapping[1] }));
-                const col3 = this.selectedColumns5.map(col => ({ name: col, type: this.mapping[2] }));
+            console.log(this.selectedColumns1, this.selectedColumns2, this.selectedColumns3);
+            const col1 = this.selectedColumns1.map(col => ({ name: col, type: this.mapping[0] }));
+            const col2 = this.selectedColumns2.map(col => ({ name: col, type: this.mapping[1] }));
+            if (this.graType === "line-bar-scatter") {
+                const col3 = this.selectedColumns3.map(col => ({ name: col, type: this.mapping[2] }));
                 formats = [...col1, ...col2, ...col3];
             } else {
-                const col1 = this.selectedColumns1.map(col => ({ name: col, type: this.mapping[0] }));
-                const col2 = this.selectedColumns2.map(col => ({ name: col, type: this.mapping[1] }));
                 formats = [...col1, ...col2];
             }
 
@@ -163,9 +165,12 @@ export default {
 
             this.updateMultiGraphType(formats);
         },
+        tagClass(selectedVar) {
+            return selectedVar.length > 4 ? 'small-tags' : 'normal-tags';
+        },
     },
     watch: {
-        graType() {
+        graphType() {
             this.mapping = this.graType.split('-');
         },
         selectedColumns() {
