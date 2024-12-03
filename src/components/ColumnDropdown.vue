@@ -26,17 +26,18 @@
             <div class="form-group">
                 <label for="x-axis-select">X-Axis:</label>
                 <select id="x-axis-select" class="dropdown" v-model="xaxis" :style="{ height: heightVar(true) }">
-                    <option v-for="column in columns.filter(col => col === dateType)" :key="column"
-                        :value="column">{{ column }}</option>
+                    <option v-for="column in columns.filter(col => col === dateType)" :key="column" :value="column">{{
+                        column }}</option>
                 </select>
             </div>
         </div>
         <div class="form-container">
             <div class="form-group">
                 <label for="y-axis-select">Y-Axis:</label>
-                <select id="y-axis-select" class="dropdown" v-model="yaxis" multiple :style="{ height: heightVar(undefined, true) }">
-                    <option v-for="column in columns.filter(col => col !== dateType)" :key="column"
-                        :value="column">{{ column }}</option>
+                <select id="y-axis-select" class="dropdown" v-model="yaxis" multiple
+                    :style="{ height: heightVar(undefined, true) }">
+                    <option v-for="column in columns.filter(col => col !== dateType)" :key="column" :value="column">{{
+                        column }}</option>
                 </select>
             </div>
         </div>
@@ -105,7 +106,7 @@ export default {
             const isTauri = window.isTauri !== undefined;
             isXAxis = isXAxis !== undefined || isXAxis;
             isYAxis = isYAxis !== undefined || isYAxis;
-            return isTauri ? '36vh' : isXAxis ? '5vh' : isYAxis ? '64vh' : '34vh';
+            return isXAxis ? '5vh' : isYAxis ? isTauri ? '66vh' : '62vh' : '34vh';
         },
     },
 };
