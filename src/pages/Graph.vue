@@ -28,7 +28,7 @@
             <!-- Component 4: Main View (Table and Stats Display) -->
             <div class="main-view">
                 <!-- Graph Display -->
-                <v-chart :option="chartOptions"></v-chart>
+                <v-chart :option="chartOptions" :key="refreshKey"></v-chart>
             </div>
         </div>
     </div>
@@ -73,21 +73,10 @@ export default {
             statsColumns: [],
             data: [],
             ID: [],
+            refreshKey: 0,
         };
     },
     watch: {
-        chartOptions: {
-            // Watch for changes in the chart options and update messages after the chart is loaded
-            handler() {
-                if (this.data.length) {
-                    this.$nextTick(() => {
-                        this.pushMessage({ message: `Graph Loaded ${this.selectedColumns.length} columns x ${this.data.length} rows`, type: 'success' });
-                        setTimeout(() => this.clearMessages(), 5000);
-                    });
-                }
-            },
-            deep: true,
-        },
         selectedColumns() {
             this.ID = this.selectedColumns.filter((column) => column.includes('ID')).join("");
         },
@@ -108,6 +97,16 @@ export default {
                 dataLookup[id][date] = row;
             });
             return {
+                title: {
+                    text: this.getTitle(),
+                    left: 'center',
+                    top: '0%',
+                    textStyle: {
+                        fontSize: 16,
+                        fontWeight: 'bold',
+                        color: 'black',
+                    }
+                },
                 tooltip: {
                     trigger: 'axis',
                 },
@@ -171,11 +170,11 @@ export default {
                 yAxis: [
                     {
                         type: 'value',
-                        name: 'Primary Axis',
+                        name: 'Values',
                         nameLocation: 'middle',
                         nameTextStyle: {
                             fontSize: 14,
-                            padding: 30,
+                            padding: 15,
                             color: 'black',
                         },
                         axisLabel: {
@@ -189,39 +188,40 @@ export default {
                                 width: 2
                             }
                         },
-                        splitLine: {
-                            lineStyle: {
-                                type: 'solid',
-                                color: '#ccc'
-                            }
-                        }
-                    },
-                    {
-                        type: 'value',
-                        name: 'Secondary Axis',
-                        nameLocation: 'middle',
-                        nameTextStyle: {
-                            fontSize: 14,
-                            padding: 30,
-                            color: 'black',
-                        },
-                        axisLabel: {
-                            fontSize: 14,
-                            color: 'black',
-                        },
-                        axisLine: {
-                            show: true,
-                            lineStyle: {
-                                color: 'black',
-                                width: 2
-                            }
+                        axisTick: {
+                            alignWithLabel: true,
                         },
                         splitLine: {
                             lineStyle: {
                                 type: 'dashed',
-                                color: '#ccc'
+                                color: '#ccc',
+                            },
+                        },
+                        alignTicks: true,
+                        scale: true,
+                    },
+                    {
+                        type: 'value',
+                        nameLocation: 'middle',
+                        nameTextStyle: {
+                            fontSize: 14,
+                            padding: 10,
+                            color: 'black',
+                        },
+                        axisLabel: {
+                            fontSize: 14,
+                            color: 'black',
+                        },
+                        axisLine: {
+                            show: true,
+                            lineStyle: {
+                                color: 'black',
+                                width: 2
                             }
-                        }
+                        },
+                        splitLine: {
+                            show: false
+                        },
                     }
                 ],
                 series: this.selectedIds.length
@@ -260,6 +260,10 @@ export default {
             // Set the height based on the environment
             const isTauri = window.isTauri !== undefined;
             return isTauri ? "calc(100vh - 14vh)" : "calc(100vh - 16vh)";
+        },
+        getTitle() {
+            // Set the title based on the first three letters of selected columns names
+            return this.selectedColumns.length ? this.selectedColumns.filter(column => column !== this.dateType && column !== this.ID).map(col => col.slice(0, 3)).join(" - ") : "Graph";
         },
         getType(column) {
             // Use the Vuex state multiGraphType, which updates dynamically
@@ -304,6 +308,13 @@ export default {
                 this.data = response.data.data;
                 this.stats = response.data.stats;
                 this.statsColumns = response.data.statsColumns;
+                this.refreshKey += 1;
+
+                this.$nextTick(() => {
+                    this.pushMessage({ message: `Graph Loaded ${this.selectedColumns.length} columns x ${this.data.length} rows`, type: 'success' });
+                    setTimeout(() => this.clearMessages(), 5000);
+                });
+
                 this.pushMessage({ message: `Graph Loading ${this.selectedColumns.length} columns x ${this.data.length} rows`, type: 'info' });
             } catch (error) {
                 alert('Error fetching data: ' + error.message);

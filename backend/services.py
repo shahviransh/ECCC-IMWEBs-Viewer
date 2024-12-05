@@ -201,9 +201,10 @@ def save_to_file(
     # Map graph types to Matplotlib Axes methods
     GRAPH_TYPE_MAPPING = {
         "line": "plot",
-        "bar": "bar",
+        "bar": "column",
         "scatter": "scatter",
     }
+    graph_title = map(lambda x: x["name"][:4], multi_graph_type).join("-")
 
     # Check if the dataframe contains an ID column
     ID = next((col for col in dataframe1.columns if "ID" in col), None)
@@ -252,10 +253,15 @@ def save_to_file(
 
             # Define chart type and add data for the chart
             for i, column_graph in enumerate(multi_graph_type, start=1):
+                multi_graph_type_same = (
+                    i > 1 and multi_graph_type[i - 2]["type"] == column_graph["type"]
+                )
                 overlay_chart = (
                     chart
-                    if i > 1 and multi_graph_type[i-2]["type"] == column_graph["type"]
-                    else workbook.add_chart({"type": column_graph["type"]})
+                    if multi_graph_type_same
+                    else workbook.add_chart(
+                        {"type": GRAPH_TYPE_MAPPING[column_graph["type"]]}
+                    )
                 )
                 column = column_graph["name"]
                 row_count = len(dataframe1) + 1
@@ -296,7 +302,7 @@ def save_to_file(
                             "y2_axis": column in secondary_axis_columns,
                         }
                     )
-                if chart is None or (i > 1 and multi_graph_type[i-2]["type"] == column_graph["type"]):
+                if chart is None or multi_graph_type_same:
                     chart = overlay_chart
                 else:
                     chart.combine(overlay_chart)
@@ -310,6 +316,7 @@ def save_to_file(
                     "num_font": {"rotation": -45},
                 }
             )
+            chart.set_title({"name": graph_title})
             chart.set_y_axis({"name": "Values (Smaller Values)"})
             chart.set_y2_axis({"name": "Values (Larger Values)"})  # Add second y-axis
 
@@ -322,7 +329,8 @@ def save_to_file(
         for i, column_graph in enumerate(multi_graph_type):
             column = column_graph["name"]
             plot_func = getattr(
-                ax1 if column in primary_axis_columns else ax2, GRAPH_TYPE_MAPPING[column_graph["type"]]
+                ax1 if column in primary_axis_columns else ax2,
+                GRAPH_TYPE_MAPPING[column_graph["type"]],
             )
 
             ax1.set_prop_cycle(cycler(color=plt.cm.tab10.colors))
@@ -370,6 +378,8 @@ def save_to_file(
 
         ax1.legend(loc="upper left")
         ax2.legend(loc="upper right")
+
+        ax1.set_title(f"{graph_title}")
 
         # Rotate x-axis labels (explicitly for ax1 and ax2 if shared x-axis is used)
         for tick in ax1.get_xticklabels():

@@ -33,13 +33,13 @@
                 <option value="bar">Bar</option>
                 <option value="line">Line</option>
                 <option value="scatter">Scatter</option>
-                <option value="line-bar">Line & Bar</option>
+                <option value="bar-line">Line & Bar</option>
                 <option value="line-scatter">Line & Scatter</option>
                 <option value="bar-scatter">Bar & Scatter</option>
-                <option value="line-bar-scatter">Line, Bar & Scatter</option>
+                <option value="bar-line-scatter">Line, Bar & Scatter</option>
             </select>
             <!-- Conditional Multiselects -->
-            <div v-if="['line-bar', 'line-scatter', 'bar-scatter'].includes(graType)" class="export-field">
+            <div v-if="['bar-line', 'line-scatter', 'bar-scatter'].includes(graType)" class="export-field">
                 <label for="multiselect1" class="export-label">{{ capitalizedFirstLetter(this.mapping[0]) }}
                     Columns:</label>
                 <Multiselect id="multiselect1" v-model="selectedColumns1" :options="filteredOptions1" :multiple="true"
@@ -52,7 +52,7 @@
                     :close-on-select="false" placeholder="Select Columns" @update:modelValue="onSelectionChange"
                     :class="tagClass(selectedColumns2)" />
             </div>
-            <div v-else-if="graType === 'line-bar-scatter'" class="export-field">
+            <div v-else-if="graType === 'bar-line-scatter'" class="export-field">
                 <label for="multiselect3" class="export-label">{{ capitalizedFirstLetter(this.mapping[0]) }}
                     Columns:</label>
                 <Multiselect id="multiselect3" v-model="selectedColumns1" :options="filteredOptions3" :multiple="true"
@@ -147,7 +147,7 @@ export default {
             let formats = [];
             const col1 = this.selectedColumns1.map(col => ({ name: col, type: this.mapping[0] }));
             const col2 = this.selectedColumns2.map(col => ({ name: col, type: this.mapping[1] }));
-            if (this.graType === "line-bar-scatter") {
+            if (this.graType === "bar-line-scatter") {
                 const col3 = this.selectedColumns3.map(col => ({ name: col, type: this.mapping[2] }));
                 formats = [...col1, ...col2, ...col3];
             } else {
