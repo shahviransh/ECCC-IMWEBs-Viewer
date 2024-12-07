@@ -6,7 +6,8 @@
                     'folder-node': node.type === 'folder',
                     'file-node': node.type === 'file' || node.type === 'database' || node.type === 'table',
                     'top-level-node': index === 0,
-                    'expanded': node.expanded
+                    'expanded': node.expanded,
+                    'selected-node': node.selected
                 }]" @click="toggleNode(node)">
                     <span v-if="node.type === 'folder'">{{ node.expanded ? '📂' : '📁' }}</span>
                     <span v-else-if="node.type === 'database'">🗄️</span>
@@ -52,9 +53,11 @@ export default {
             if (node.type === 'folder' || node.type === 'database') {
                 // Toggle the expanded state directly
                 node.expanded = !node.expanded;
+            } else if (node.type === 'table') {
+                node.selected = !node.selected; // Toggle selection state
+                this.$emit('select', node.selected ? node : null); // Emit selected node or null if unselected
             }
-            // Emit the selected node to the parent
-            this.$emit('select', node);
+
         },
         onSelect(node) {
             // Propagate the select event upwards
@@ -131,6 +134,10 @@ export default {
 .top-level-node .node {
     padding-left: 0;
     padding-left: 0px;
+}
+
+.selected-node {
+    background-color: #d0e8ff;
 }
 
 .folder-node:hover,

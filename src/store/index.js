@@ -3,14 +3,17 @@ import axios from "axios";
 
 const store = createStore({
   state: {
-    selectedDb: null,
-    selectedTable: null,
+    selectedDbs: [],
+    selectedTables: [],
+    selectedDbsTables: [],
     selectedColumns: [],
     selectedIds: [],
     dateRange: {
       start: null,
       end: null,
     },
+    combinedIdColumn: null,
+    timeColumn: "Time",
     theme: "light",
     pageTitle: "",
     databases: [],
@@ -54,6 +57,15 @@ const store = createStore({
     SET_COLUMNS(state, { columns }) {
       state.columns = columns;
     },
+    SET_SELECTED_DB_TABLE_REMOVE(state, table) {
+      state.selectedDbsTables = state.selectedDbsTables.filter(
+        (t) => t.table !== table
+      );
+      state.selectedDbs = state.selectedDbsTables.map((dbTable) => dbTable.db);
+      state.selectedTables = state.selectedDbsTables.map(
+        (dbTable) => dbTable.table
+      );
+    },
     SET_OPTIONS(
       state,
       { ids, dateRange, dateType, exportDate, exportDateType }
@@ -88,8 +100,12 @@ const store = createStore({
     SET_PAGE_TITLE(state, title) {
       state.pageTitle = title;
     },
-    SET_SELECTED_DB(state, db) {
-      state.selectedDb = db;
+    SET_SELECTED_DBS_TABLES(state, { db, table }) {
+      state.selectedDbsTables.push({ db, table });
+      state.selectedDbs = state.selectedDbsTables.map((dbTable) => dbTable.db);
+      state.selectedTables = state.selectedDbsTables.map(
+        (dbTable) => dbTable.table
+      );
     },
     SET_XAXIS(state, xAxis) {
       state.xAxis = xAxis;
@@ -110,9 +126,6 @@ const store = createStore({
     },
     CLEAR_MESSAGES(state) {
       state.messages = [];
-    },
-    SET_SELECTED_TABLE(state, table) {
-      state.selectedTable = table;
     },
     SET_SELECTED_COLUMNS(state, columns) {
       state.selectedColumns = columns;
@@ -211,13 +224,14 @@ const store = createStore({
         alert("Error fetching tables:", error.message);
       }
     },
-    async fetchColumns({ commit }, { db, table }) {
+    async fetchColumns({ commit }, dbTables) {
       const apiBaseUrl = import.meta.env.VITE_APP_API_BASE_URL;
       try {
+        // Fetch all columns for all tables selected
         const response = await axios.get(
           `${apiBaseUrl}/api/get_table_details`,
           {
-            params: { db_path: db, table_name: table },
+            params: { db_tables: JSON.stringify(dbTables) },
           }
         );
         commit("SET_COLUMNS", {
@@ -248,14 +262,14 @@ const store = createStore({
       }
     },
     // Add similar actions for other components
-    updateSelectedDb({ commit }, db) {
-      commit("SET_SELECTED_DB", db);
+    updateSelectedDbsTables({ commit }, { db, table }) {
+      commit("SET_SELECTED_DBS_TABLES", { db, table });
     },
     updateTheme({ commit }, theme) {
       commit("SET_THEME", theme);
     },
-    updateSelectedTable({ commit }, table) {
-      commit("SET_SELECTED_TABLE", table);
+    removeSelectedDbTable({ commit }, table) {
+      commit("SET_SELECTED_DB_TABLE_REMOVE", table);
     },
     updatePageTitle({ commit }, title) {
       commit("SET_PAGE_TITLE", title);

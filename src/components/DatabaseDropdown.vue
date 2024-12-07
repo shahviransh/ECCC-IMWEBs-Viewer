@@ -38,7 +38,7 @@ export default {
         }
     },
     methods: {
-        ...mapActions(['fetchDatabases', 'updateSelectedDb', 'fetchTables', 'updateSelectedTable']),
+        ...mapActions(['fetchDatabases', 'fetchTables', 'updateSelectedDbsTables', 'removeSelectedDbTable']),
         listToTree(list) {
             let idCounter = 1;
             const tree = [];
@@ -89,6 +89,7 @@ export default {
                         id: `table-${table}`,
                         name: table,
                         type: 'table',
+                        selected: false,
                         expanded: false,
                         children: [] // Tables don't have further children
                     });
@@ -108,15 +109,22 @@ export default {
             return null;
         },
         onSelect(node) {
-            if (node.type === 'database') {
-                // Handle folder selection
-                this.selectedDb = node.path;
-                this.updateSelectedDb(this.selectedDb);
-                this.fetchTables(this.selectedDb);
-            } else if (node.type === 'table') {
-                // Handle table selection
-                this.selectedTable = node.name;
-                this.updateSelectedTable(this.selectedTable);
+            if (node) {
+                if (node.type === 'database') {
+                    this.selectedDb = node.path;
+                    this.fetchTables(this.selectedDb);
+                } else if (node.type === 'table') {
+                    this.selectedTable = node.name;
+                    this.updateSelectedDbsTables({
+                        db: this.selectedDb,
+                        table: this.selectedTable
+                    });
+                }
+            } else {
+                // Unselect table
+                this.removeSelectedDbTable(this.selectedTable);
+                this.selectedDb = null;
+                this.selectedTable = null;
             }
         }
     },
