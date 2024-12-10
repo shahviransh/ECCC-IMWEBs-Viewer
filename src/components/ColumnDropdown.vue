@@ -89,15 +89,15 @@ export default {
                 this.updateYAxis(value);
             }
         },
-        ...mapState(['columns', 'ids', 'selectedDb', 'selectedColumns', 'exportColumns', 'pageTitle', 'xAxis', 'yAxis', 'dateType'])
+        ...mapState(['columns', 'ids', 'selectedDbs', 'selectedColumns', 'exportColumns', 'pageTitle', 'xAxis', 'yAxis', 'dateType'])
     },
     data() {
         return {
         };
     },
     watch: {
-        selectedTable(newTable) {
-            this.fetchColumns({ db: this.selectedDb, table: newTable });
+        selectedTables(newDbsTables) {
+            this.fetchColumns(newDbsTables);
         },
     },
     methods: {

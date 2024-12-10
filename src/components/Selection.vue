@@ -142,7 +142,7 @@ export default {
         expDateType() {
             return this.exportDateType; // Get the date type from Vuex (no need to set this directly)
         },
-        ...mapState(['columns', 'ids', 'selectedDb', 'selectedIds', 'dateRange', 'dateType', 'exportIds', 'exportDate', 'exportDateType', 'defaultStartDate', 'defaultEndDate', 'defaultInterval']),
+        ...mapState(['columns', 'ids', 'selectedDbs', 'selectedIds', 'dateRange', 'dateType', 'exportIds', 'exportDate', 'exportDateType', 'defaultStartDate', 'defaultEndDate', 'defaultInterval']),
     },
     data() {
         return {
