@@ -9,7 +9,7 @@
 
         <!-- Component 2: Column Navigation -->
         <div class="column-navigation">
-            <ColumnDropdown :selectedTable="selectedTable" />
+            <ColumnDropdown :selectedDbsTables="selectedDbsTables" />
         </div>
         <div class="right-panel">
             <!-- Component 3: Selection, Interval, Aggregation, and Export Config -->
@@ -248,7 +248,7 @@ export default {
                         }))
             };
         },
-        ...mapState(["selectedDb", "selectedTable", "selectedColumns", "multiGraphType", "currentZoomStart", "currentZoomEnd", "selectedIds", "dateRange", "selectedInterval", "selectedStatistics", "selectedMethod", "exportColumns", "graphType", "exportIds", "exportDate", "exportInterval", "dateType", "exportDateType", "exportPath", "exportFilename", "exportFormat", "exportOptions", "theme"]),
+        ...mapState(["selectedDbsTables", "selectedColumns", "multiGraphType", "currentZoomStart", "currentZoomEnd", "selectedIds", "dateRange", "selectedInterval", "selectedStatistics", "selectedMethod", "exportColumns", "graphType", "exportIds", "exportDate", "exportInterval", "dateType", "exportDateType", "exportPath", "exportFilename", "exportFormat", "exportOptions", "theme"]),
     },
     methods: {
         ...mapActions(["updateSelectedColumns", "updateExportOptions", "pushMessage", "shiftMessage", "clearMessages"]),
@@ -284,8 +284,7 @@ export default {
             try {
                 const response = await axios.get(`${import.meta.env.VITE_APP_API_BASE_URL}/api/get_data`, {
                     params: {
-                        db_path: this.selectedDb,
-                        table_name: this.selectedTable,
+                        db_tables: JSON.stringify(this.selectedDbsTables),
                         columns: this.selectedColumns.filter((column) => column !== 'Season').join(","),
                         id: this.selectedIds.join(","),
                         start_date: this.dateRange.start,
@@ -326,8 +325,7 @@ export default {
                 this.pushMessage({ message: `Exporting ${this.exportColumns.length} columns x ${this.data.length} rows`, type: 'info' });
                 const response = await axios.get(`${import.meta.env.VITE_APP_API_BASE_URL}/api/export_data`, {
                     params: {
-                        db_path: this.selectedDb,
-                        table_name: this.selectedTable,
+                        db_tables: JSON.stringify(this.selectedDbsTables),
                         columns: this.exportColumns.filter((column) => column !== 'Season').join(","),
                         id: this.exportIds.join(","),
                         start_date: this.exportDate.start,
@@ -340,9 +338,9 @@ export default {
                         export_path: this.exportPath,
                         export_filename: this.exportFilename,
                         export_format: this.exportFormat,
-                        options: this.exportOptions,
+                        options: JSON.stringify(this.exportOptions),
                         graph_type: this.graphType,
-                        multi_graph_type: this.multiGraphType,
+                        multi_graph_type: JSON.stringify(this.multiGraphType),
                     }
                 });
                 if (response.data.error) {
