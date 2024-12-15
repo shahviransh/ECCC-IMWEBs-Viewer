@@ -49,8 +49,8 @@ import { mapState, mapActions } from 'vuex'; // Import Vuex helpers
 
 export default {
     props: {
-        selectedTable: {
-            type: String,
+        selectedDbsTables: {
+            type: Array,
             default: null
         }
     },
@@ -89,7 +89,7 @@ export default {
                 this.updateYAxis(value);
             }
         },
-        ...mapState(['columns', 'ids', 'selectedDbsTables', 'selectedColumns', 'exportColumns', 'pageTitle', 'xAxis', 'yAxis', 'dateType'])
+        ...mapState(['columns', 'ids', 'selectedColumns', 'exportColumns', 'pageTitle', 'xAxis', 'yAxis', 'dateType'])
     },
     data() {
         return {

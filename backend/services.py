@@ -735,6 +735,7 @@ def get_multi_columns_and_time_range(db_tables):
 
         for table in db_tables:
             table_key = f'{(table["db"], table["table"])}'
+
             columns_time_range = global_dbs_tables_columns.get(table_key)
 
             if not columns_time_range:
@@ -764,7 +765,10 @@ def get_multi_columns_and_time_range(db_tables):
         # Check consistency across tables for date_type, interval, start_date, end_date, and ids
         keys_to_check = ["date_type", "interval", "start_date", "end_date", "ids"]
         for key in keys_to_check:
-            unique_values = set(table[key] for table in multi_columns_time_range)
+            unique_values = set(
+                ",".join(table[key]) if key == "ids" else table[key]
+                for table in multi_columns_time_range
+            )
             if len(unique_values) > 1:
                 return {"error": f"Tables have different {key.replace('_', ' ')}"}
 

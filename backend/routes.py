@@ -6,7 +6,7 @@ from services import (
     get_files_and_folders,
     get_table_names,
     export_data_service,
-    get_columns_and_time_range,
+    get_multi_columns_and_time_range,
 )
 from utils import shutdown_server, clear_cache
 
@@ -21,7 +21,7 @@ def register_routes(app, cache):
         response = fetch_data_service(data)
 
         if response.get("error", None):
-            return jsonify(response), 400
+            return jsonify(response)
 
         return jsonify(response)
 
@@ -32,7 +32,7 @@ def register_routes(app, cache):
         file_path = export_data_service(data)
 
         if file_path.get("error", None):
-            return jsonify(file_path), 400
+            return jsonify(file_path)
 
         return send_file(file_path.get("file_path"), as_attachment=True)
 
@@ -48,7 +48,7 @@ def register_routes(app, cache):
         tables = get_table_names(db_path)
 
         if tables.get("error", None):
-            return jsonify(tables), 400
+            return jsonify(tables)
 
         return jsonify(tables.get("tables"))
 
@@ -64,7 +64,7 @@ def register_routes(app, cache):
         files_and_folders = get_files_and_folders(data)
 
         if files_and_folders.get("error", None):
-            return jsonify(files_and_folders), 400
+            return jsonify(files_and_folders)
 
         return jsonify(files_and_folders.get("files_and_folders"))
 
@@ -83,7 +83,7 @@ def register_routes(app, cache):
         columns_and_time_range_dict = get_multi_columns_and_time_range(db_tables)
 
         if columns_and_time_range_dict.get("error", None):
-            return jsonify(columns_and_time_range_dict), 400
+            return jsonify(columns_and_time_range_dict)
 
         return jsonify(columns_and_time_range_dict)
 

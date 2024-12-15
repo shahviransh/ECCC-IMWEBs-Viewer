@@ -53,6 +53,7 @@ export default {
             if (node.type === 'folder' || node.type === 'database') {
                 // Toggle the expanded state directly
                 node.expanded = !node.expanded;
+                this.$emit('select', node); // Emit the folder node
             } else if (node.type === 'table') {
                 node.selected = !node.selected; // Toggle selection state
                 this.$emit('select', node.selected ? node : null); // Emit selected node or null if unselected

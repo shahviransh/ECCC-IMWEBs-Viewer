@@ -58,6 +58,7 @@ const store = createStore({
       state.selectedDbsTables = state.selectedDbsTables.filter(
         (t) => t.table !== table
       );
+      console.log(state.selectedDbsTables);
     },
     SET_TOOLTIP_COLUMNS(state, columns) {
       state.tooltipColumns = { ...columns };
@@ -97,7 +98,14 @@ const store = createStore({
       state.pageTitle = title;
     },
     SET_SELECTED_DBS_TABLES(state, { db, table }) {
-      state.selectedDbsTables.push({ db, table });
+      if (
+        !state.selectedDbsTables.some((t) => t.db === db && t.table === table)
+      ) {
+        state.selectedDbsTables.push({ db, table });
+      }
+      const temp = state.selectedDbsTables;
+      state.selectedDbsTables = [...temp];
+      console.log(state.selectedDbsTables);
     },
     SET_XAXIS(state, xAxis) {
       state.xAxis = xAxis;
@@ -191,7 +199,7 @@ const store = createStore({
             params: { folder_path: "Jenette_Creek_Watershed" },
           });
           if (response.data.error) {
-            alert("Error fetching data:" + response.data.error);
+            alert("Error fetching data: " + response.data.error);
             return;
           }
           commit("SET_DATABASES", response.data);
@@ -216,12 +224,12 @@ const store = createStore({
           params: { db_path: db },
         });
         if (response.data.error) {
-          alert("Error fetching data:" + response.data.error);
+          alert("Error fetching data: " + response.data.error);
           return;
         }
         commit("SET_TABLES", response.data);
       } catch (error) {
-        alert("Error fetching tables:", error.message);
+        alert("Error fetching tables: ", error.message);
       }
     },
     async fetchColumns({ commit }, dbTables) {
@@ -235,7 +243,7 @@ const store = createStore({
           }
         );
         if (response.data.error) {
-          alert("Error fetching data:" + response.data.error);
+          alert("Error fetching data: " + response.data.error);
           return;
         }
         commit("SET_COLUMNS", {
@@ -263,7 +271,7 @@ const store = createStore({
         });
         commit("SET_TOOLTIP_COLUMNS", response.data.global_columns);
       } catch (error) {
-        alert("Error fetching columns:", error.message);
+        alert("Error fetching columns: ", error.message);
       }
     },
     // Add similar actions for other components
