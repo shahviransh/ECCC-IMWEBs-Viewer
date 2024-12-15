@@ -190,6 +190,10 @@ const store = createStore({
           const response = await axios.get(`${apiBaseUrl}/api/list_files`, {
             params: { folder_path: "Jenette_Creek_Watershed" },
           });
+          if (response.data.error) {
+            alert("Error fetching data:" + response.data.error);
+            return;
+          }
           commit("SET_DATABASES", response.data);
           return; // Exit the function if the request is successful
         } catch (error) {
@@ -211,6 +215,10 @@ const store = createStore({
         const response = await axios.get(`${apiBaseUrl}/api/get_tables`, {
           params: { db_path: db },
         });
+        if (response.data.error) {
+          alert("Error fetching data:" + response.data.error);
+          return;
+        }
         commit("SET_TABLES", response.data);
       } catch (error) {
         alert("Error fetching tables:", error.message);
@@ -226,6 +234,10 @@ const store = createStore({
             params: { db_tables: JSON.stringify(dbTables) },
           }
         );
+        if (response.data.error) {
+          alert("Error fetching data:" + response.data.error);
+          return;
+        }
         commit("SET_COLUMNS", {
           columns: response.data.columns,
         });
