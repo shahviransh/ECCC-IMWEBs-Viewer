@@ -3,8 +3,6 @@ import axios from "axios";
 
 const store = createStore({
   state: {
-    selectedDbs: [],
-    selectedTables: [],
     selectedDbsTables: [],
     selectedColumns: [],
     selectedIds: [],
@@ -12,8 +10,7 @@ const store = createStore({
       start: null,
       end: null,
     },
-    combinedIdColumn: null,
-    timeColumn: "Time",
+    tooltipColumns: {},
     theme: "light",
     pageTitle: "",
     databases: [],
@@ -61,10 +58,9 @@ const store = createStore({
       state.selectedDbsTables = state.selectedDbsTables.filter(
         (t) => t.table !== table
       );
-      state.selectedDbs = state.selectedDbsTables.map((dbTable) => dbTable.db);
-      state.selectedTables = state.selectedDbsTables.map(
-        (dbTable) => dbTable.table
-      );
+    },
+    SET_TOOLTIP_COLUMNS(state, columns) {
+      state.tooltipColumns = { ...columns };
     },
     SET_OPTIONS(
       state,
@@ -102,10 +98,6 @@ const store = createStore({
     },
     SET_SELECTED_DBS_TABLES(state, { db, table }) {
       state.selectedDbsTables.push({ db, table });
-      state.selectedDbs = state.selectedDbsTables.map((dbTable) => dbTable.db);
-      state.selectedTables = state.selectedDbsTables.map(
-        (dbTable) => dbTable.table
-      );
     },
     SET_XAXIS(state, xAxis) {
       state.xAxis = xAxis;
@@ -257,6 +249,7 @@ const store = createStore({
           defaultStartDate: response.data.start_date,
           defaultEndDate: response.data.end_date,
         });
+        commit("SET_TOOLTIP_COLUMNS", response.data.global_columns);
       } catch (error) {
         alert("Error fetching columns:", error.message);
       }
