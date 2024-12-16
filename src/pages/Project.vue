@@ -136,14 +136,14 @@ export default {
                 const response = await axios.get(`${import.meta.env.VITE_APP_API_BASE_URL}/api/get_data`, {
                     params: {
                         db_tables: JSON.stringify(this.selectedDbsTables),
-                        columns: this.selectedColumns.filter((column) => column !== 'Season').join(","),
-                        id: this.selectedIds.join(","),
+                        columns: JSON.stringify(this.selectedColumns.filter((column) => column !== 'Season')),
+                        id: JSON.stringify(this.selectedIds),
                         start_date: this.dateRange.start,
                         end_date: this.dateRange.end,
                         date_type: this.dateType,
                         interval: this.selectedInterval,
-                        statistics: this.selectedStatistics.join(","),
-                        method: this.selectedMethod.join(","),
+                        statistics: JSON.stringify(this.selectedStatistics),
+                        method: JSON.stringify(this.selectedMethod),
                     }
                 });
                 if (response.data.error) {
@@ -185,14 +185,14 @@ export default {
                 const response = await axios.get(`${import.meta.env.VITE_APP_API_BASE_URL}/api/export_data`, {
                     params: {
                         db_tables: JSON.stringify(this.selectedDbsTables),
-                        columns: this.exportColumns.filter((column) => column !== 'Season').join(","),
+                        columns: JSON.stringify(this.exportColumns.filter((column) => column !== 'Season')),
                         id: this.exportIds.join(","),
                         start_date: this.exportDate.start,
                         end_date: this.exportDate.end,
                         date_type: this.exportDateType,
                         interval: this.exportInterval,
-                        statistics: this.selectedStatistics.join(","),
-                        method: this.selectedMethod.join(","),
+                        statistics: JSON.stringify(this.selectedStatistics),
+                        method: JSON.stringify(this.selectedMethod),
                         date_type: this.dateType,
                         export_path: this.exportPath,
                         export_filename: this.exportFilename,

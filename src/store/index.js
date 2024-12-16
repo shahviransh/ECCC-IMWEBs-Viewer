@@ -53,12 +53,19 @@ const store = createStore({
     },
     SET_COLUMNS(state, { columns }) {
       state.columns = columns;
+
+      // Remove the selected/export columns that are not in the new columns
+      state.selectedColumns = state.selectedColumns.filter((column) =>
+        columns.includes(column)
+      );
+      state.exportColumns = state.exportColumns.filter((column) =>
+        columns.includes(column)
+      );
     },
     SET_SELECTED_DB_TABLE_REMOVE(state, table) {
       state.selectedDbsTables = state.selectedDbsTables.filter(
         (t) => t.table !== table
       );
-      console.log(state.selectedDbsTables);
     },
     SET_TOOLTIP_COLUMNS(state, columns) {
       state.tooltipColumns = { ...columns };
@@ -105,7 +112,6 @@ const store = createStore({
       }
       const temp = state.selectedDbsTables;
       state.selectedDbsTables = [...temp];
-      console.log(state.selectedDbsTables);
     },
     SET_XAXIS(state, xAxis) {
       state.xAxis = xAxis;
@@ -234,6 +240,7 @@ const store = createStore({
     },
     async fetchColumns({ commit }, dbTables) {
       const apiBaseUrl = import.meta.env.VITE_APP_API_BASE_URL;
+      console.log("dbTables:", dbTables);
       try {
         // Fetch all columns for all tables selected
         const response = await axios.get(
@@ -242,6 +249,7 @@ const store = createStore({
             params: { db_tables: JSON.stringify(dbTables) },
           }
         );
+        console.log("response:", response.data);
         if (response.data.error) {
           alert("Error fetching data: " + response.data.error);
           return;

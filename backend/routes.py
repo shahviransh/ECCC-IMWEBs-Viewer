@@ -42,10 +42,9 @@ def register_routes(app, cache):
     )  # Cache this endpoint for 5 minutes (300 seconds)
     def get_tables():
         data = request.args
-        db_path = data.get("db_path")
 
         # Fetch the table names from the database
-        tables = get_table_names(db_path)
+        tables = get_table_names(data)
 
         if tables.get("error", None):
             return jsonify(tables)
@@ -77,10 +76,9 @@ def register_routes(app, cache):
         Endpoint to get table column names, time start, time end, and ID list.
         """
         data = request.args
-        db_tables = data.get("db_tables")
 
         # Fetch the column names, start date, end date, IDs, date type, and default interval
-        columns_and_time_range_dict = get_multi_columns_and_time_range(db_tables)
+        columns_and_time_range_dict = get_multi_columns_and_time_range(data)
 
         if columns_and_time_range_dict.get("error", None):
             return jsonify(columns_and_time_range_dict)

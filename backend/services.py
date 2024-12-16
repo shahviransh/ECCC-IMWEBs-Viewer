@@ -11,23 +11,25 @@ from flask import abort
 from pathlib import Path
 import sys
 import json
+import threading
 
 alias_mapping = {}
 global_dbs_tables_columns = {}
+lock = threading.Lock()
 
 
 def fetch_data_service(data):
     try:
         # Extract the required parameters from the request data
         db_tables = json.loads(data.get("db_tables"))
-        columns = data.get("columns", "All")
-        selected_ids = data.get("id").split(",")
+        columns = json.loads(data.get("columns", "All"))
+        selected_ids = json.loads(data.get("id"))
         start_date = data.get("start_date")
         end_date = data.get("end_date")
         date_type = data.get("date_type")
         interval = data.get("interval", "daily")
-        method = data.get("method", "Equal").split(",")
-        statistics = data.get("statistics", "None").split(",")
+        method = json.loads(data.get("method", "Equal"))
+        statistics = json.loads(data.get("statistics", "None"))
         stats_df = None
 
         # Initialize DataFrame to store the merged data
@@ -37,7 +39,8 @@ def fetch_data_service(data):
         for table in db_tables:
             try:
                 table_key = f'{(table["db"], table["table"])}'
-                global_columns = global_dbs_tables_columns.get(table_key)
+                with lock:
+                    global_columns = global_dbs_tables_columns.get(table_key)
 
                 if not global_columns:
                     return {"error": f"No columns found for the table {table_key}"}
@@ -47,9 +50,11 @@ def fetch_data_service(data):
                     fetch_columns = columns
                 else:
                     # Only fetch columns that exist in the global columns
-                    fetch_columns = list(
-                        set(columns.split(",")).intersection(set(global_columns))
-                    )
+                    fetch_columns = []
+
+                    for col in columns:
+                        if col in global_columns:
+                            fetch_columns.append(col)
 
                 if not fetch_columns:
                     # If there are no common columns, skip the table
@@ -66,15 +71,13 @@ def fetch_data_service(data):
                     date_type,
                 )
 
-                # Drop rows with NaN in the required columns
-                if not df_temp.empty:
-                    df_temp.dropna(subset=global_columns, inplace=True)
-
                 # Merge the dataframes on 'Time' and 'ID'
                 if df.empty:
                     df = df_temp
                 else:
                     df = pd.merge(df, df_temp, on=[date_type, "ID"], how="outer")
+                    # Drop rows with NaN in the required columns
+                    df.dropna(inplace=True)
             except Exception as e:
                 return {"error": f"Error while processing table {table_key}: {str(e)}"}
 
@@ -126,7 +129,7 @@ def export_data_service(data):
         output_path = data.get("export_path", Config.EXPORT_PATH)
         # Handle options json stringify
         options = json.loads(data.get("options", '{"data": true, "stats": true}'))
-        columns_list = data.get("columns", "All").split(",")
+        columns_list = json.loads(data.get("columns", "All"))
         date_type = data.get("date_type")
         graph_type = data.get("graph_type", "scatter")
 
@@ -156,7 +159,7 @@ def export_data_service(data):
             options,
             date_type,
             multi_graph_type,
-            list(map(int, data.get("id").split(","))) if data.get("id") else [],
+            list(map(int, json.loads(data.get("id")))) if data.get("id") else [],
         )
 
         return {"file_path": file_path}
@@ -186,14 +189,14 @@ def fetch_data_from_db(
     params = []
 
     # Add conditions for selected_ids
-    if selected_ids != [""]:
+    if selected_ids != []:
         placeholders = ",".join(["?"] * len(selected_ids))
         query += f" WHERE ID IN ({placeholders})"
         params.extend(selected_ids)
 
     # Add date range conditions
     if start_date and end_date:
-        if selected_ids != [""]:
+        if selected_ids != []:
             query += f" AND {date_type} BETWEEN ? AND ?"
         else:
             query += f" WHERE {date_type} BETWEEN ? AND ?"
@@ -205,10 +208,14 @@ def fetch_data_from_db(
 
     # Map real column names back to alias if needed
     alias_columns = [
-        alias_mapping.get(real_table_name, {}).get("columns", {}).get(col, col)
+        (
+            alias_mapping.get(real_table_name, {}).get("columns", {}).get(col, col)
+            if "ID" not in col
+            else col
+        )
         for col in df.columns
     ]
-    df.columns = alias_columns.map(lambda column: "ID" if "ID" in column else column)
+    df.columns = alias_columns
 
     return df.map(round_numeric_values)
 
@@ -305,7 +312,7 @@ def save_to_file(
                 column = column_graph["name"]
                 row_count = len(dataframe1) + 1
 
-                if selected_ids and selected_ids != [""]:
+                if selected_ids and selected_ids != []:
                     prev_end_row = 1  # Start from the first data row
 
                     for j, selected_id in enumerate(selected_ids):
@@ -376,7 +383,7 @@ def save_to_file(
             ax1.set_prop_cycle(cycler(color=plt.cm.tab10.colors))
             ax2.set_prop_cycle(cycler(color=plt.cm.Set2.colors))
 
-            if selected_ids and selected_ids != [""]:
+            if selected_ids and selected_ids != []:
                 # Create separate plots for each ID-Column combination
                 for j, selected_id in enumerate(selected_ids):
                     filtered_data = dataframe1[dataframe1[ID] == selected_id]
@@ -434,8 +441,9 @@ def save_to_file(
     return file_path
 
 
-def get_table_names(db_path):
+def get_table_names(data):
     try:
+        db_path = data.get("db_path")
         conn = sqlite3.connect(os.path.join(Config.PATHFILE, db_path))
         cursor = conn.cursor()
         cursor.execute("SELECT name FROM sqlite_master WHERE type='table';")
@@ -709,7 +717,7 @@ def get_columns_and_time_range(db_path, table_name):
         if id_column:
             id_query = f"SELECT DISTINCT {id_column} FROM {real_table_name}"
             id_df = pd.read_sql_query(id_query, conn)
-            ids = id_df[id_column].astype(str).tolist()
+            ids = id_df[id_column].tolist()
 
         # Close the connection
         conn.close()
@@ -727,16 +735,17 @@ def get_columns_and_time_range(db_path, table_name):
         return {"error": f"Error in get_columns_and_time_range: {e}"}
 
 
-def get_multi_columns_and_time_range(db_tables):
+def get_multi_columns_and_time_range(data):
     """Fetch column names and time range from multiple SQLite database tables."""
     try:
-        db_tables = json.loads(db_tables)
+        db_tables = json.loads(data.get("db_tables"))
         multi_columns_time_range = []
 
         for table in db_tables:
             table_key = f'{(table["db"], table["table"])}'
 
-            columns_time_range = global_dbs_tables_columns.get(table_key)
+            with lock:
+                columns_time_range = global_dbs_tables_columns.get(table_key)
 
             if not columns_time_range:
                 columns_time_range = get_columns_and_time_range(
@@ -747,28 +756,28 @@ def get_multi_columns_and_time_range(db_tables):
                 if columns_time_range.get("error"):
                     return columns_time_range
 
-                global_dbs_tables_columns[table_key] = columns_time_range["columns"]
+                with lock:
+                    global_dbs_tables_columns[table_key] = columns_time_range[
+                        "columns"
+                    ] + ["ID"]
                 multi_columns_time_range.append(columns_time_range)
             else:
                 multi_columns_time_range.append(columns_time_range)
 
         # Verify each entry in global_dbs_tables_columns against db_tables
         existing_keys = {f'{(table["db"], table["table"])}' for table in db_tables}
-        keys_to_delete = [
-            key for key in global_dbs_tables_columns.keys() if key not in existing_keys
-        ]
-
-        # Delete keys that do not exist in db_tables
-        for key in keys_to_delete:
-            del global_dbs_tables_columns[key]
+        with lock:
+            keys_to_delete = [
+                key for key in global_dbs_tables_columns.keys() if key not in existing_keys
+            ]
+            # Delete keys that do not exist in db_tables
+            for key in keys_to_delete:
+                del global_dbs_tables_columns[key]
 
         # Check consistency across tables for date_type, interval, start_date, end_date, and ids
-        keys_to_check = ["date_type", "interval", "start_date", "end_date", "ids"]
+        keys_to_check = ["date_type", "interval", "start_date", "end_date"]
         for key in keys_to_check:
-            unique_values = set(
-                ",".join(table[key]) if key == "ids" else table[key]
-                for table in multi_columns_time_range
-            )
+            unique_values = set(table[key] for table in multi_columns_time_range)
             if len(unique_values) > 1:
                 return {"error": f"Tables have different {key.replace('_', ' ')}"}
 
@@ -781,14 +790,19 @@ def get_multi_columns_and_time_range(db_tables):
             and "ID" not in col
         ]
 
-        return {
-            "columns": columns,
-            "global_columns": global_dbs_tables_columns,
-            "start_date": multi_columns_time_range[0]["start_date"],
-            "end_date": multi_columns_time_range[0]["end_date"],
-            "ids": multi_columns_time_range[0]["ids"],
-            "date_type": multi_columns_time_range[0]["date_type"],
-            "interval": multi_columns_time_range[0]["interval"],
-        }
+        # Intersection of IDs from all tables
+        ids = set(multi_columns_time_range[0]["ids"]).intersection(
+            *[set(table["ids"]) for table in multi_columns_time_range]
+        )
+        with lock:
+            return {
+                "columns": columns,
+                "global_columns": global_dbs_tables_columns,
+                "start_date": multi_columns_time_range[0]["start_date"],
+                "end_date": multi_columns_time_range[0]["end_date"],
+                "ids": [str(id) for id in sorted(ids)],
+                "date_type": multi_columns_time_range[0]["date_type"],
+                "interval": multi_columns_time_range[0]["interval"],
+            }
     except Exception as e:
         return {"error": f"Error in get_multi_columns_and_time_range: {e}"}
