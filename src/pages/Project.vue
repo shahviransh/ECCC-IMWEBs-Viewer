@@ -146,6 +146,7 @@ export default {
                         method: JSON.stringify(this.selectedMethod),
                     }
                 });
+                console.log(response.data);
                 if (response.data.error) {
                     alert('Error fetching data:' + response.data.error);
                     return;

@@ -240,7 +240,6 @@ const store = createStore({
     },
     async fetchColumns({ commit }, dbTables) {
       const apiBaseUrl = import.meta.env.VITE_APP_API_BASE_URL;
-      console.log("dbTables:", dbTables);
       try {
         // Fetch all columns for all tables selected
         const response = await axios.get(
@@ -249,7 +248,6 @@ const store = createStore({
             params: { db_tables: JSON.stringify(dbTables) },
           }
         );
-        console.log("response:", response.data);
         if (response.data.error) {
           alert("Error fetching data: " + response.data.error);
           return;

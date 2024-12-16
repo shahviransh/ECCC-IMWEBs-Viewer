@@ -122,7 +122,6 @@ export default {
                 }
             } else {
                 // Unselect table
-                console.log('Unselecting table:', this.selectedTable);
                 this.removeSelectedDbTable(this.selectedTable);
                 this.selectedTable = null;
             }

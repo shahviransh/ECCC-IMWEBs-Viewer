@@ -39,8 +39,7 @@ def fetch_data_service(data):
         for table in db_tables:
             try:
                 table_key = f'{(table["db"], table["table"])}'
-                with lock:
-                    global_columns = global_dbs_tables_columns.get(table_key)
+                global_columns = global_dbs_tables_columns.get(table_key)
 
                 if not global_columns:
                     return {"error": f"No columns found for the table {table_key}"}
@@ -75,7 +74,8 @@ def fetch_data_service(data):
                 if df.empty:
                     df = df_temp
                 else:
-                    df = pd.merge(df, df_temp, on=[date_type, "ID"], how="outer")
+                    same_column = [col for col in df.columns if col in df_temp.columns]
+                    df = pd.merge(df, df_temp, on=[date_type, "ID"] + same_column, how="outer")
                     # Drop rows with NaN in the required columns
                     df.dropna(inplace=True)
             except Exception as e:
@@ -744,35 +744,26 @@ def get_multi_columns_and_time_range(data):
         for table in db_tables:
             table_key = f'{(table["db"], table["table"])}'
 
-            with lock:
-                columns_time_range = global_dbs_tables_columns.get(table_key)
+            columns_time_range = get_columns_and_time_range(table["db"], table["table"])
 
-            if not columns_time_range:
-                columns_time_range = get_columns_and_time_range(
-                    table["db"], table["table"]
-                )
+            if columns_time_range.get("error"):
+                return columns_time_range
 
-                # Save to global variable map for later use
-                if columns_time_range.get("error"):
-                    return columns_time_range
+            global_dbs_tables_columns[table_key] = columns_time_range["columns"] + [
+                "ID"
+            ]
 
-                with lock:
-                    global_dbs_tables_columns[table_key] = columns_time_range[
-                        "columns"
-                    ] + ["ID"]
-                multi_columns_time_range.append(columns_time_range)
-            else:
-                multi_columns_time_range.append(columns_time_range)
+            multi_columns_time_range.append(columns_time_range)
 
         # Verify each entry in global_dbs_tables_columns against db_tables
         existing_keys = {f'{(table["db"], table["table"])}' for table in db_tables}
-        with lock:
-            keys_to_delete = [
-                key for key in global_dbs_tables_columns.keys() if key not in existing_keys
-            ]
-            # Delete keys that do not exist in db_tables
-            for key in keys_to_delete:
-                del global_dbs_tables_columns[key]
+
+        keys_to_delete = [
+            key for key in global_dbs_tables_columns.keys() if key not in existing_keys
+        ]
+        # Delete keys that do not exist in db_tables
+        for key in keys_to_delete:
+            del global_dbs_tables_columns[key]
 
         # Check consistency across tables for date_type, interval, start_date, end_date, and ids
         keys_to_check = ["date_type", "interval", "start_date", "end_date"]
@@ -794,15 +785,15 @@ def get_multi_columns_and_time_range(data):
         ids = set(multi_columns_time_range[0]["ids"]).intersection(
             *[set(table["ids"]) for table in multi_columns_time_range]
         )
-        with lock:
-            return {
-                "columns": columns,
-                "global_columns": global_dbs_tables_columns,
-                "start_date": multi_columns_time_range[0]["start_date"],
-                "end_date": multi_columns_time_range[0]["end_date"],
-                "ids": [str(id) for id in sorted(ids)],
-                "date_type": multi_columns_time_range[0]["date_type"],
-                "interval": multi_columns_time_range[0]["interval"],
-            }
+
+        return {
+            "columns": columns,
+            "global_columns": global_dbs_tables_columns,
+            "start_date": multi_columns_time_range[0]["start_date"],
+            "end_date": multi_columns_time_range[0]["end_date"],
+            "ids": [str(id) for id in sorted(ids)],
+            "date_type": multi_columns_time_range[0]["date_type"],
+            "interval": multi_columns_time_range[0]["interval"],
+        }
     except Exception as e:
         return {"error": f"Error in get_multi_columns_and_time_range: {e}"}
