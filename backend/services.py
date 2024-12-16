@@ -75,7 +75,10 @@ def fetch_data_service(data):
                     df = df_temp
                 else:
                     same_column = [col for col in df.columns if col in df_temp.columns]
-                    df = pd.merge(df, df_temp, on=[date_type, "ID"] + same_column, how="outer")
+                    ID_col = [col for col in df.columns if "ID" in col]
+                    df = pd.merge(
+                        df, df_temp, on=[date_type] + ID_col + same_column, how="outer"
+                    )
                     # Drop rows with NaN in the required columns
                     df.dropna(inplace=True)
             except Exception as e:
@@ -704,9 +707,13 @@ def get_columns_and_time_range(db_path, table_name):
                 df = pd.read_sql_query(
                     f"SELECT {date_col} FROM {real_table_name}", conn
                 )
-                df[date_col] = pd.to_datetime(df[date_col], errors="coerce")
-                start_date = df[date_col].min().strftime("%Y-%m-%d")
-                end_date = df[date_col].max().strftime("%Y-%m-%d")
+                if date_col in ["Time", "Date"]:
+                    df[date_col] = pd.to_datetime(df[date_col], errors="coerce")
+                    start_date = df[date_col].min().strftime("%Y-%m-%d")
+                    end_date = df[date_col].max().strftime("%Y-%m-%d")
+                elif date_col in ["Month", "Year"]:
+                    start_date = int(df[date_col].min())
+                    end_date = int(df[date_col].max())
                 date_type = dtype
                 interval = inter
                 break
@@ -749,9 +756,11 @@ def get_multi_columns_and_time_range(data):
             if columns_time_range.get("error"):
                 return columns_time_range
 
-            global_dbs_tables_columns[table_key] = columns_time_range["columns"] + [
-                "ID"
-            ]
+            global_dbs_tables_columns[table_key] = (
+                columns_time_range["columns"] + ["ID"]
+                if columns_time_range["ids"] != []
+                else columns_time_range["columns"]
+            )
 
             multi_columns_time_range.append(columns_time_range)
 
@@ -772,12 +781,27 @@ def get_multi_columns_and_time_range(data):
             if len(unique_values) > 1:
                 return {"error": f"Tables have different {key.replace('_', ' ')}"}
 
-        # Combine all columns with date_type and 'ID' as first two columns
-        columns = [multi_columns_time_range[0]["date_type"], "ID"] + [
+        # Combine all columns with date_type as first column
+        columns = [multi_columns_time_range[0]["date_type"]]
+
+        # Check if ID column is present in any of the tables
+        include_id = any(
+            table.get("ids", []) != [] for table in multi_columns_time_range
+        )
+
+        if include_id:
+            columns.append("ID")
+
+        # Add all other columns from each table
+        columns += [
             col
             for table in multi_columns_time_range
             for col in table["columns"]
-            if col not in [multi_columns_time_range[0]["date_type"], "ID"]
+            if col
+            not in [
+                multi_columns_time_range[0]["date_type"],
+                "ID",
+            ]
             and "ID" not in col
         ]
 

@@ -1,13 +1,25 @@
 <template>
     <div class="select-container">
         <div class="form-container-ref">
-            <div class="form-group">
-                <label for="date-start">Model Start Date:</label>
-                <input id="date-start" type="date" v-model="defaultStartDate" class="input-field" readonly />
+            <div v-if="['Time'].includes(daType)">
+                <div class="form-group">
+                    <label for="date-start">Model Start Date:</label>
+                    <input id="date-start" type="date" v-model="defaultStartDate" class="input-field" readonly />
+                </div>
+                <div class="form-group">
+                    <label for="date-end">Model End Date:</label>
+                    <input id="date-end" type="date" v-model="defaultEndDate" class="input-field" readonly />
+                </div>
             </div>
-            <div class="form-group">
-                <label for="date-end">Model End Date:</label>
-                <input id="date-end" type="date" v-model="defaultEndDate" class="input-field" readonly />
+            <div v-else-if="daType === 'Month'">
+                <div class="form-group">
+                    <label for="date-start">Model Start Month:</label>
+                    <input id="date-start" type="text" v-model="defaultStartDate" class="input-field" readonly />
+                </div>
+                <div class="form-group">
+                    <label for="date-end">Model End Month:</label>
+                    <input id="date-end" type="text" v-model="defaultEndDate" class="input-field" readonly />
+                </div>
             </div>
             <div class="form-group">
                 <label for="interval">Model Interval:</label>

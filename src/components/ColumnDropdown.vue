@@ -6,7 +6,8 @@
                 <label for="column-select">Select Columns:</label>
                 <select id="column-select" class="dropdown" v-model="selectColumns" multiple
                     :style="{ height: heightVar() }">
-                    <option v-for="column in columns" :key="column" :value="column">{{ column }}</option>
+                    <option v-for="column in columns" :key="column" :value="column" :title="findTableName(column)">{{
+                        column }}</option>
                 </select>
             </div>
         </div>
@@ -15,7 +16,8 @@
                 <label for="export-column-select">Export Select Columns:</label>
                 <select id="export-column-select" class="dropdown" v-model="expColumns" multiple
                     :style="{ height: heightVar() }">
-                    <option v-for="column in columns" :key="column" :value="column">{{ column }}</option>
+                    <option v-for="column in columns" :key="column" :value="column" :title="findTableName(column)">{{
+                        column }}</option>
                 </select>
             </div>
         </div>
@@ -26,8 +28,9 @@
             <div class="form-group">
                 <label for="x-axis-select">X-Axis:</label>
                 <select id="x-axis-select" class="dropdown" v-model="xaxis" :style="{ height: heightVar(true) }">
-                    <option v-for="column in columns.filter(col => col === dateType)" :key="column" :value="column">{{
-                        column }}</option>
+                    <option v-for="column in columns.filter(col => col === dateType)" :key="column" :value="column"
+                        :title="findTableName(column)">{{
+                            column }}</option>
                 </select>
             </div>
         </div>
@@ -36,8 +39,9 @@
                 <label for="y-axis-select">Y-Axis:</label>
                 <select id="y-axis-select" class="dropdown" v-model="yaxis" multiple
                     :style="{ height: heightVar(undefined, true) }">
-                    <option v-for="column in columns.filter(col => col !== dateType)" :key="column" :value="column">{{
-                        column }}</option>
+                    <option v-for="column in columns.filter(col => col !== dateType)" :key="column" :value="column"
+                        :title="findTableName(column)">{{
+                            column }}</option>
                 </select>
             </div>
         </div>
@@ -89,7 +93,7 @@ export default {
                 this.updateYAxis(value);
             }
         },
-        ...mapState(['columns', 'ids', 'selectedColumns', 'exportColumns', 'pageTitle', 'xAxis', 'yAxis', 'dateType'])
+        ...mapState(['columns', 'ids', 'selectedColumns', 'dateType', 'tooltipColumns', 'exportColumns', 'pageTitle', 'xAxis', 'yAxis', 'dateType'])
     },
     data() {
         return {
@@ -102,6 +106,18 @@ export default {
     },
     methods: {
         ...mapActions(['fetchColumns', 'updateSelectedColumns', 'updateExportColumns', 'updateXAxis', 'updateYAxis']),
+        findTableName(column) {
+            for (const [key, columns] of Object.entries(this.tooltipColumns)) {
+                if (columns.includes(column)) {
+                    if ([this.dateType, 'ID'].includes(column)) {
+                        return 'All Tables';
+                    } else {
+                        return key.split(',')[1].replace(")", "").replace(/['"]/g, ''); // Assuming the key format is 'db_path,table_name'
+                    }
+                }
+            }
+            return 'Unknown'; // Fallback if no table is found
+        },
         heightVar(isXAxis, isYAxis) {
             const isTauri = window.isTauri !== undefined;
             isXAxis = isXAxis !== undefined || isXAxis;
