@@ -1,5 +1,6 @@
 import { createStore } from "vuex";
 import axios from "axios";
+import { time } from "echarts";
 
 const store = createStore({
   state: {
@@ -121,14 +122,11 @@ const store = createStore({
       state.selectedColumns = [state.xAxis, ...yAxis];
       state.exportColumns = [...state.selectedColumns];
     },
-    PUSH_MESSAGE(state, { message, type }) {
-      state.messages.push({ text: message, type: type });
+    PUSH_MESSAGE(state, { message, type, duration }) {
+      state.messages.push({ text: message, type: type, timeLeft: duration, totalTime: duration });
     },
     SLICE_MESSAGE(state, index) {
       state.messages.splice(index, 1);
-    },
-    SHIFT_MESSAGE(state) {
-      state.messages.shift();
     },
     CLEAR_MESSAGES(state) {
       state.messages = [];
@@ -305,15 +303,8 @@ const store = createStore({
     updateXAxis({ commit }, xAxis) {
       commit("SET_XAXIS", xAxis);
     },
-    pushMessage({ commit }, { message, type, duration = 5000 }) {
-      const index = this.state.messages.length;
-      commit("PUSH_MESSAGE", { message, type });
-      setTimeout(() => {
-        commit("SLICE_MESSAGE", index);
-      }, duration);
-    },
-    shiftMessage({ commit }) {
-      commit("SHIFT_MESSAGE");
+    pushMessage({ commit }, { message, type, duration = 1000 }) {
+      commit("PUSH_MESSAGE", { message, type, duration });
     },
     sliceMessage({ commit }, index) {
       commit("SLICE_MESSAGE", index);

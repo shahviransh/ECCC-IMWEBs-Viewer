@@ -251,7 +251,7 @@ export default {
         ...mapState(["selectedDbsTables", "selectedColumns", "multiGraphType", "currentZoomStart", "currentZoomEnd", "selectedIds", "dateRange", "selectedInterval", "selectedStatistics", "selectedMethod", "exportColumns", "graphType", "exportIds", "exportDate", "exportInterval", "dateType", "exportDateType", "exportPath", "exportFilename", "exportFormat", "exportOptions", "theme"]),
     },
     methods: {
-        ...mapActions(["updateSelectedColumns", "updateExportOptions", "pushMessage", "shiftMessage", "clearMessages"]),
+        ...mapActions(["updateSelectedColumns", "updateExportOptions", "pushMessage", "clearMessages"]),
         columnNeedsSecondaryAxis(column) {
             // Adjust logic based on actual data thresholds
             return this.data.some(row => row[column] > 100);
@@ -311,7 +311,6 @@ export default {
 
                 this.$nextTick(() => {
                     this.pushMessage({ message: `Graph Loaded ${this.selectedColumns.length} columns x ${this.data.length} rows`, type: 'success' });
-                    setTimeout(() => this.clearMessages(), 5000);
                 });
 
                 this.pushMessage({ message: `Graph Loading ${this.selectedColumns.length} columns x ${this.data.length} rows`, type: 'info' });
@@ -353,9 +352,6 @@ export default {
                 } else {
                     this.updateSelectedColumns(this.selectedColumns.filter((column) => column !== 'Season'));
                 }
-                setTimeout(() => {
-                    this.clearMessages();
-                }, 5000);
             } catch (error) {
                 alert('Error exporting data: ' + error.message);
             }

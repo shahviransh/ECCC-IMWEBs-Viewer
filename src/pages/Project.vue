@@ -105,7 +105,7 @@ export default {
         ...mapState(["selectedDbsTables", "selectedColumns", "selectedIds", "dateRange", "selectedInterval", "selectedStatistics", "selectedMethod", "exportColumns", "exportIds", "exportDate", "exportInterval", "dateType", "exportDateType", "exportPath", "exportFilename", "exportFormat", "exportOptions", "theme"]),
     },
     methods: {
-        ...mapActions(["updateSelectedColumns", "updateExportOptions", "pushMessage", "shiftMessage", "clearMessages"]),
+        ...mapActions(["updateSelectedColumns", "updateExportOptions", "pushMessage", "clearMessages"]),
         heightVar() {
             // Set the height based on the environment
             const isTauri = window.isTauri !== undefined;
@@ -146,7 +146,6 @@ export default {
                         method: JSON.stringify(this.selectedMethod),
                     }
                 });
-                console.log(response.data);
                 if (response.data.error) {
                     alert('Error fetching data:' + response.data.error);
                     return;
@@ -169,11 +168,6 @@ export default {
                     if (this.statsColumns.length > 0) {
                         this.pushMessage({ message: `Fetched ${this.statsColumns.length} statistics columns for ${this.selectedMethod || this.selectedStatistics}`, type: 'success' });
                     }
-
-                    // Clear messages after 5 seconds
-                    setTimeout(() => {
-                        this.clearMessages();
-                    }, 5000);
                 });
             } catch (error) {
                 alert('Error fetching data: ' + error.message);
@@ -211,9 +205,6 @@ export default {
                 } else {
                     this.updateSelectedColumns(this.selectedColumns.filter((column) => column !== 'Season'));
                 }
-                setTimeout(() => {
-                    this.clearMessages();
-                }, 5000);
             } catch (error) {
                 alert('Error exporting data: ' + error.message);
             }
