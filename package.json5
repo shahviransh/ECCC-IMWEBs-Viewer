@@ -8,7 +8,7 @@
   "scripts": {
     "prestart": "node convert-package.js",
     "dev": "concurrently \"npm run vue-dev\" \"npm run python-dev\"",
-    "python-dev": ".venv\\Scripts\\activate && python backend\\apppy.py",
+    "python-dev": ".venv\\Scripts\\activate && python -Xfrozen_modules=off -m debugpy --listen 5678 --wait-for-client backend\\apppy.py",
     "vue-dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
