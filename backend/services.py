@@ -109,7 +109,7 @@ def fetch_data_service(data):
             "statsColumns": stats_df.columns.tolist() if stats_df is not None else [],
         }
     except Exception as e:
-        return {"error": "error at fetch_data_service " + str(e)}
+        return {"error": "Error at fetch_data_service " + str(e)}
 
 
 def export_data_service(data):
@@ -167,7 +167,7 @@ def export_data_service(data):
 
         return {"file_path": file_path}
     except Exception as e:
-        return {"error": "error at export_data_service " + str(e)}
+        return {"error": "Error at export_data_service " + str(e)}
 
 
 def fetch_data_from_db(
@@ -462,7 +462,7 @@ def get_table_names(data):
         ]
         return {"tables": alias_tables}
     except Exception as e:
-        return {"error": "error at get_table_names " + str(e)}
+        return {"error": "Error at get_table_names " + str(e)}
 
 
 def get_files_and_folders(data):
@@ -528,7 +528,7 @@ def get_files_and_folders(data):
 
         return {"files_and_folders": files_and_folders}
     except Exception as e:
-        return {"error": "error at get_files_and_folders " + str(e)}
+        return {"error": "Error at get_files_and_folders " + str(e)}
 
 
 # Example function to map date strings to seasons
