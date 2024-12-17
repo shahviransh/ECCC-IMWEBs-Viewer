@@ -28,8 +28,8 @@ def fetch_data_service(data):
         end_date = data.get("end_date")
         date_type = data.get("date_type")
         interval = data.get("interval", "daily")
-        method = json.loads(data.get("method", "Equal"))
-        statistics = json.loads(data.get("statistics", "None"))
+        method = json.loads(data.get("method", "[Equal]"))
+        statistics = json.loads(data.get("statistics", "[None]"))
         stats_df = None
 
         # Initialize DataFrame to store the merged data
@@ -137,7 +137,7 @@ def export_data_service(data):
         graph_type = data.get("graph_type", "scatter")
 
         # Parse multi_graph_type
-        multi_graph_type = json.loads(data.get("multi_graph_type", []))
+        multi_graph_type = json.loads(data.get("multi_graph_type", "[]"))
 
         if not multi_graph_type:
             multi_graph_type = [
@@ -162,7 +162,7 @@ def export_data_service(data):
             options,
             date_type,
             multi_graph_type,
-            list(map(int, json.loads(data.get("id")))) if data.get("id") else [],
+            list(map(int, json.loads(data.get("id")))) if data.get("id") != [] else [],
         )
 
         return {"file_path": file_path}
@@ -253,7 +253,11 @@ def save_to_file(
         "bar": "column",
         "scatter": "scatter",
     }
-    graph_title = map(lambda x: x["name"][:4], multi_graph_type).join("-")
+    graph_title = (
+        "".join(list(map(lambda x: x["name"][:4], multi_graph_type)))
+        if multi_graph_type != []
+        else ""
+    )
 
     # Check if the dataframe contains an ID column
     ID = next((col for col in dataframe1.columns if "ID" in col), None)
@@ -273,14 +277,14 @@ def save_to_file(
     # Write first dataframe and/or statistics dataframe to file with csv/text format
     if file_format == "csv":
         with open(file_path, "w", newline="") as f:
-            if options["data"]:
+            if options["table"]:
                 dataframe1.to_csv(f, index=False)
             if options["stats"] and dataframe2 is not None:
                 f.write("\n")
                 dataframe2.to_csv(f, index=False)
     elif file_format == "txt":
         with open(file_path, "w") as f:
-            if options["data"]:
+            if options["table"]:
                 dataframe1.to_csv(f, index=False, sep=" ")
             if options["stats"] and dataframe2 is not None:
                 f.write("\n")

@@ -326,7 +326,7 @@ export default {
                     params: {
                         db_tables: JSON.stringify(this.selectedDbsTables),
                         columns: JSON.stringify(this.exportColumns.filter((column) => column !== 'Season')),
-                        id: this.exportIds.join(","),
+                        id: JSON.stringify(this.exportIds),
                         start_date: this.exportDate.start,
                         end_date: this.exportDate.end,
                         date_type: this.exportDateType,
