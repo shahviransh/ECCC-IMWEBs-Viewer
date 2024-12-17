@@ -5,9 +5,11 @@
             <div class="form-group">
                 <label for="column-select">Select Columns:</label>
                 <select id="column-select" class="dropdown" v-model="selectColumns" multiple
-                    :style="{ height: heightVar() }">
-                    <option v-for="column in columns" :key="column" :value="column" :title="findTableName(column)">{{
-                        column }}</option>
+                    :style="{ height: heightVar() }" @mousedown.prevent="toggleSelection($event, selectColumns)">
+                    <option v-for="column in columns" :key="column" :value="column" :title="findTableName(column)"
+                        @click.stop>
+                        {{ column }}
+                    </option>
                 </select>
             </div>
         </div>
@@ -15,9 +17,11 @@
             <div class="form-group">
                 <label for="export-column-select">Export Select Columns:</label>
                 <select id="export-column-select" class="dropdown" v-model="expColumns" multiple
-                    :style="{ height: heightVar() }">
-                    <option v-for="column in columns" :key="column" :value="column" :title="findTableName(column)">{{
-                        column }}</option>
+                    :style="{ height: heightVar() }" @mousedown.prevent="toggleSelection($event, expColumns)">
+                    <option v-for="column in columns" :key="column" :value="column" :title="findTableName(column)"
+                        @click.stop>
+                        {{ column }}
+                    </option>
                 </select>
             </div>
         </div>
@@ -29,8 +33,9 @@
                 <label for="x-axis-select">X-Axis:</label>
                 <select id="x-axis-select" class="dropdown" v-model="xaxis" :style="{ height: heightVar(true) }">
                     <option v-for="column in columns.filter(col => col === dateType)" :key="column" :value="column"
-                        :title="findTableName(column)">{{
-                            column }}</option>
+                        :title="findTableName(column)">
+                        {{ column }}
+                    </option>
                 </select>
             </div>
         </div>
@@ -38,10 +43,11 @@
             <div class="form-group">
                 <label for="y-axis-select">Y-Axis:</label>
                 <select id="y-axis-select" class="dropdown" v-model="yaxis" multiple
-                    :style="{ height: heightVar(undefined, true) }">
+                    :style="{ height: heightVar(undefined, true) }" @mousedown.prevent="toggleSelection($event, yaxis)">
                     <option v-for="column in columns.filter(col => col !== dateType)" :key="column" :value="column"
-                        :title="findTableName(column)">{{
-                            column }}</option>
+                        :title="findTableName(column)" @click.stop>
+                        {{ column }}
+                    </option>
                 </select>
             </div>
         </div>
@@ -124,6 +130,25 @@ export default {
             isYAxis = isYAxis !== undefined || isYAxis;
             return isXAxis ? '5vh' : isYAxis ? isTauri ? '66vh' : '62vh' : '34vh';
         },
+        toggleSelection(event, modelArray) {
+            const option = event.target;
+            if (option.tagName === 'OPTION') {
+                const optionValue = option.value;
+                const index = modelArray.indexOf(optionValue);
+                if (index > -1) {
+                    modelArray.splice(index, 1); // Remove if already selected
+                } else {
+                    modelArray.push(optionValue); // Add if not selected
+                }
+                // Prevent default and stop propagation to avoid native behavior
+                event.preventDefault();
+                event.stopPropagation();
+                // Vue nextTick to ensure the DOM updates with Vue reactivity
+                this.$nextTick(() => {
+                    this.$forceUpdate(); // Force update to reflect changes
+                });
+            }
+        }
     },
 };
 </script>

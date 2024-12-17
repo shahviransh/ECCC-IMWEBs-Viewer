@@ -42,8 +42,8 @@
                     placeholder="Enter month" class="input-field" />
             </div>
             <div class="form-group">
-                <label for="date-end-date" v-if="['Time'].includes(daType)">Start Date:</label>
-                <label for="date-end-text" v-else-if="daType === 'Month'">Start Month:</label>
+                <label for="date-end-date" v-if="['Time'].includes(daType)">End Date:</label>
+                <label for="date-end-text" v-else-if="daType === 'Month'">End Month:</label>
                 <input id="date-end" type="date" v-if="['Time'].includes(daType)" v-model="selectedDateEnd"
                     class="input-field" />
                 <input id="date-end" type="text" v-else-if="daType === 'Month'" v-model="selectedDateEnd"

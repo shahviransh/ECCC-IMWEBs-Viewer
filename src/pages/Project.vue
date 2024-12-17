@@ -130,9 +130,6 @@ export default {
         // Fetch data from the API
         async fetchData() {
             try {
-                if (this.statsColumns.length > 0) {
-                    this.pushMessage({ message: `Fetching ${this.statsColumns.length} statistics`, type: 'info' });
-                }
                 const response = await axios.get(`${import.meta.env.VITE_APP_API_BASE_URL}/api/get_data`, {
                     params: {
                         db_tables: JSON.stringify(this.selectedDbsTables),
@@ -176,7 +173,6 @@ export default {
         // Export data to a file
         async exportData() {
             try {
-                this.pushMessage({ message: `Exporting ${this.exportColumns.length} columns x ${this.data.length} rows`, type: 'info' });
                 const response = await axios.get(`${import.meta.env.VITE_APP_API_BASE_URL}/api/export_data`, {
                     params: {
                         db_tables: JSON.stringify(this.selectedDbsTables),

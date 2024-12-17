@@ -3,7 +3,7 @@ import os
 import pandas as pd
 import xlsxwriter
 import matplotlib.pyplot as plt
-from matplotlib.ticker import MaxNLocator
+from matplotlib.ticker import MaxNLocator, LinearLocator
 from cycler import cycler
 from config import Config
 from datetime import datetime
@@ -380,15 +380,19 @@ def save_to_file(
         # Plot each column as a line on the same figure
         fig, ax1 = plt.subplots(figsize=(10, 6))
         ax2 = ax1.twinx()  # Create a secondary y-axis
+        # Setting color cycles
+        ax1.set_prop_cycle(cycler(color=plt.cm.tab10.colors))
+        # Check if ax2 will have plots
+        ax2_has_data = any(column_graph["name"] not in primary_axis_columns for column_graph in multi_graph_type)
+        if ax2_has_data:
+            ax2.set_prop_cycle(cycler(color=plt.cm.Set2.colors))
+
         for i, column_graph in enumerate(multi_graph_type):
             column = column_graph["name"]
             plot_func = getattr(
                 ax1 if column in primary_axis_columns else ax2,
                 GRAPH_TYPE_MAPPING[column_graph["type"]],
             )
-
-            ax1.set_prop_cycle(cycler(color=plt.cm.tab10.colors))
-            ax2.set_prop_cycle(cycler(color=plt.cm.Set2.colors))
 
             if selected_ids and selected_ids != []:
                 # Create separate plots for each ID-Column combination
@@ -417,21 +421,22 @@ def save_to_file(
                     alpha=0.7,
                 )
 
-        # Customize the primary axis
+        # Customize axes
         ax1.set_xlabel(date_type)
         ax1.set_ylabel("Values (Smaller Values)")
-        ax1.tick_params(axis="y")
-        ax1.xaxis.set_major_locator(MaxNLocator(nbins=30))  # Scale x-axis ticks
+        ax1.xaxis.set_major_locator(MaxNLocator(nbins=30))  # Scale x&y-axis ticks
+        ax1.yaxis.set_major_locator(LinearLocator(numticks=8))
         ax1.grid(visible=True, linestyle="--", alpha=0.6)
 
-        # Customize the secondary axis
-        ax2.set_xlabel(date_type)
-        ax2.set_ylabel("Values (Larger Values)")
-        ax2.tick_params(axis="y")
-        ax2.grid(visible=True, linestyle="--", alpha=0.6)
+        if ax2_has_data:
+            ax2.set_ylabel("Values (Larger Values)")
+            ax2.xaxis.set_major_locator(MaxNLocator(nbins=30))  # Ensure same number of x&y-axis ticks on both axes
+            ax2.yaxis.set_major_locator(LinearLocator(numticks=8))
+            ax2.grid(visible=True, linestyle="--", alpha=0.6)
 
         ax1.legend(loc="upper left")
-        ax2.legend(loc="upper right")
+        if ax2_has_data:
+            ax2.legend(loc="upper right")
 
         ax1.set_title(f"{graph_title}")
 
@@ -779,11 +784,17 @@ def get_multi_columns_and_time_range(data):
             del global_dbs_tables_columns[key]
 
         # Check consistency across tables for date_type, interval, start_date, end_date, and ids
-        keys_to_check = ["date_type", "interval", "start_date", "end_date"]
+        keys_to_check = ["date_type", "interval"]
         for key in keys_to_check:
             unique_values = set(table[key] for table in multi_columns_time_range)
             if len(unique_values) > 1:
                 return {"error": f"Tables have different {key.replace('_', ' ')}"}
+
+        # Intersection of start and end dates from all tables
+        start_dates = [table["start_date"] for table in multi_columns_time_range]
+        end_dates = [table["end_date"] for table in multi_columns_time_range]
+        start_date = max(start_dates)
+        end_date = min(end_dates)
 
         # Combine all columns with date_type as first column
         columns = [multi_columns_time_range[0]["date_type"]]
@@ -817,8 +828,8 @@ def get_multi_columns_and_time_range(data):
         return {
             "columns": columns,
             "global_columns": global_dbs_tables_columns,
-            "start_date": multi_columns_time_range[0]["start_date"],
-            "end_date": multi_columns_time_range[0]["end_date"],
+            "start_date": start_date,
+            "end_date": end_date,
             "ids": [str(id) for id in sorted(ids)],
             "date_type": multi_columns_time_range[0]["date_type"],
             "interval": multi_columns_time_range[0]["interval"],
