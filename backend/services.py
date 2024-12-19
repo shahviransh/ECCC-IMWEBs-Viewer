@@ -35,11 +35,12 @@ def fetch_data_service(data):
         # Initialize DataFrame to store the merged data
         df = pd.DataFrame()
 
-        # Fetch the data for each database and table, and merge it based on 'Time' & 'ID'
+        # Fetch the data for each database and table, and merge it based on date_type & 'ID'
         for table in db_tables:
             try:
                 table_key = f'{(table["db"], table["table"])}'
                 global_columns = global_dbs_tables_columns.get(table_key)
+                duplicate_columns = []
 
                 if not global_columns:
                     return {"error": f"No columns found for the table {table_key}"}
@@ -52,6 +53,9 @@ def fetch_data_service(data):
                     fetch_columns = []
 
                     for col in columns:
+                        if col.startswith(table["table"]):
+                            duplicate_columns.append(col)
+                            col = col[len(table["table"]) + 1 :]
                         if col in global_columns:
                             fetch_columns.append(col)
 
@@ -70,15 +74,26 @@ def fetch_data_service(data):
                     date_type,
                 )
 
-                # Merge the dataframes on 'Time' and 'ID'
+                # Rename columns to table-column format
+                for col in duplicate_columns:
+                    col_temp = col[len(table["table"]) + 1 :]
+                    if col in df_temp.columns:
+                        df_temp.rename(columns={col_temp: col}, inplace=True)
+
+                # Merge the dataframes on date_type and 'ID' columns
                 if df.empty:
                     df = df_temp
                 else:
-                    same_column = [col for col in df.columns if col in df_temp.columns]
-                    ID_col = [col for col in df.columns if "ID" in col]
-                    df = pd.merge(
-                        df, df_temp, on=[date_type] + ID_col + same_column, how="outer"
-                    )
+                    # Identify columns for merging; ignore columns with dash if they represent different data sources
+                    merge_on_columns = [date_type] + [
+                        col for col in df.columns if "ID" in col
+                    ]
+                    for col in df.columns:
+                        if col in df_temp.columns and not col.startswith(
+                            table["table"]
+                        ):
+                            merge_on_columns.append(col)
+                    df = pd.merge(df, df_temp, on=merge_on_columns, how="outer")
                     # Drop rows with NaN in the required columns
                     df.dropna(inplace=True)
             except Exception as e:
@@ -383,7 +398,10 @@ def save_to_file(
         # Setting color cycles
         ax1.set_prop_cycle(cycler(color=plt.cm.tab10.colors))
         # Check if ax2 will have plots
-        ax2_has_data = any(column_graph["name"] not in primary_axis_columns for column_graph in multi_graph_type)
+        ax2_has_data = any(
+            column_graph["name"] not in primary_axis_columns
+            for column_graph in multi_graph_type
+        )
         if ax2_has_data:
             ax2.set_prop_cycle(cycler(color=plt.cm.Set2.colors))
 
@@ -430,7 +448,9 @@ def save_to_file(
 
         if ax2_has_data:
             ax2.set_ylabel("Values (Larger Values)")
-            ax2.xaxis.set_major_locator(MaxNLocator(nbins=30))  # Ensure same number of x&y-axis ticks on both axes
+            ax2.xaxis.set_major_locator(
+                MaxNLocator(nbins=30)
+            )  # Ensure same number of x&y-axis ticks on both axes
             ax2.yaxis.set_major_locator(LinearLocator(numticks=8))
             ax2.grid(visible=True, linestyle="--", alpha=0.6)
 
@@ -552,7 +572,7 @@ def get_season_from_date(date_str):
 # Helper function to apply time interval aggregation
 def aggregate_data(df, interval, method, date_type):
     """Aggregate data based on the specified interval and method."""
-    # Convert the 'Time' column to datetime
+    # Convert the date_type column to datetime
     df[date_type] = pd.to_datetime(df[date_type])
     df.set_index(date_type, inplace=True)
     resampled_df = None
@@ -756,14 +776,29 @@ def get_multi_columns_and_time_range(data):
     try:
         db_tables = json.loads(data.get("db_tables"))
         multi_columns_time_range = []
+        all_columns = set()
 
         for table in db_tables:
             table_key = f'{(table["db"], table["table"])}'
 
             columns_time_range = get_columns_and_time_range(table["db"], table["table"])
 
+            all_columns.update(columns_time_range["columns"])
+
             if columns_time_range.get("error"):
                 return columns_time_range
+
+            # Rename columns if they are duplicates by prefixing with the table name and a dash
+            prefixed_columns = [
+                (
+                    f"{table['table']}-{col}"
+                    if col in all_columns
+                    and col != columns_time_range["date_type"]
+                    and "ID" not in col
+                    else col
+                )
+                for col in columns_time_range["columns"]
+            ]
 
             global_dbs_tables_columns[table_key] = (
                 columns_time_range["columns"] + ["ID"]
@@ -771,7 +806,9 @@ def get_multi_columns_and_time_range(data):
                 else columns_time_range["columns"]
             )
 
-            multi_columns_time_range.append(columns_time_range)
+            multi_columns_time_range.append(
+                {**columns_time_range, "columns": prefixed_columns}
+            )
 
         # Verify each entry in global_dbs_tables_columns against db_tables
         existing_keys = {f'{(table["db"], table["table"])}' for table in db_tables}

@@ -25,7 +25,7 @@
                 </span>
             </div>
 
-            <!-- Component 4: Main View (Table and Stats Display) -->
+            <!-- Component 4: Main View (Graph Display) -->
             <div class="main-view">
                 <!-- Graph Display -->
                 <v-chart :option="chartOptions" :key="refreshKey"></v-chart>
