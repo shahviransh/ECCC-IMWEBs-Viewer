@@ -7,5 +7,5 @@ This application is built with Tauri, Vue 3 as the frontend, and Flask as the ba
 ## Installation
 
 - Download the release folder from this [link](https://mcmasteru365-my.sharepoint.com/:f:/g/personal/shahv47_mcmaster_ca/EpUkfRHvaldJv-w40D-CyP8BgdXqgzPoMrywj5u1dA_3Nw).
-- Run `Imwebs-Viewer_0.1.0_x64_en-US` (this requires admin privileges) or `Imwebs-Viewer_0.1.0_x64-setup`.
+- Run `Imwebs-Viewer_{version}_x64_en-US` (this requires admin privileges) or `Imwebs-Viewer_{version}_x64-setup`.
 - The application should launch, connecting the Vue 3 frontend with the Flask backend.
