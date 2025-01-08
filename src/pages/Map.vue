@@ -11,6 +11,20 @@
         <div class="column-navigation">
             <ColumnDropdown :selectedDbsTables="selectedDbsTables" />
         </div>
+
+        <!-- Component 3: Selection, Interval, Aggregation, and Export Config -->
+        <div class="settings-panel">
+            <Selection />
+            <IntervalDropdown />
+            <StatisticsDropdown />
+            <ExportConfig />
+            <span>
+                <ExportTableStats />
+                <button @click="fetchData">Fetch Data</button>
+                <button @click="exportData">Export Data</button>
+            </span>
+        </div>
+
         <div class="right-panel">
             <!-- Component 4: Main View -->
             <div class="main-view">
