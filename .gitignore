@@ -8,6 +8,7 @@ pnpm-debug.log*
 lerna-debug.log*
 Jenette_Creek_Watershed
 .venv
+.env
 
 node_modules
 
