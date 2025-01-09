@@ -5,6 +5,7 @@ from routes import register_routes
 from error_handlers import register_error_handlers
 from utils import shutdown_server, clear_cache  # Import from utils
 from config import Config
+from osgeo import gdal
 
 app = Flask(__name__)
 CORS(app)
