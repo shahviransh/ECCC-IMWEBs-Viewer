@@ -544,7 +544,7 @@ def get_files_and_folders(data):
                         "name": file_rel_path,
                     }
                 )
-
+        # Load alias mapping for each database
         (
             alias_mapping.update(load_alias_mapping(databases))
             if not alias_mapping

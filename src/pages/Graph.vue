@@ -96,6 +96,8 @@ export default {
                 }
                 dataLookup[id][date] = row;
             });
+
+            // Create the chart options
             return {
                 title: {
                     text: this.getTitle(),
@@ -113,7 +115,7 @@ export default {
                 legend: {
                     top: 'bottom',
                     type: 'scroll',
-                    orient: 'horizontal', // Makes legend scrollable horizontally
+                    orient: 'horizontal',
                     // Exclude Date/Month from the legend
                     data: this.selectedIds.length
                         ? this.selectedColumns
@@ -144,10 +146,10 @@ export default {
                     }
                 ],
                 xAxis: {
-                    type: 'category', // Set x-axis as time type
+                    type: 'category',
                     data: xAxisData,
-                    name: this.dateType,  // Name of the x-axis
-                    nameLocation: 'middle', // Position at the middle of the axis
+                    name: this.dateType,
+                    nameLocation: 'middle',
                     nameTextStyle: {
                         fontSize: 14,
                         padding: 10,
@@ -225,8 +227,9 @@ export default {
                     }
                 ],
                 series: this.selectedIds.length
-                    ? this.selectedColumns
+                    ? this.selectedColumns // Exclude Date/Month from the series
                         .filter(column => column !== this.dateType && column !== this.ID)
+                        // Create a series for each ID and Date/Month
                         .flatMap(column =>
                             this.selectedIds.map(id => ({
                                 name: `${column} - ${this.ID}: ${id}`,
@@ -240,6 +243,7 @@ export default {
                         )
                     : this.selectedColumns
                         .filter(column => column !== this.dateType)
+                        // Create a series for each column
                         .map(column => ({
                             name: column,
                             type: this.getType(column),
