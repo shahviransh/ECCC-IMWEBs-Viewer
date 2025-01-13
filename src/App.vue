@@ -17,10 +17,11 @@
         <button @click="selectFolder">📁 Select Folder</button>
         <span class="folder-path">{{ folderPath }}</span>
         <!-- Placeholder for additional tools components -->
-        <!-- Zoom Controls -->
-        <button @click="handleZoomIn">Zoom In</button>
-        <button @click="handleZoomOut">Zoom Out</button>
-        <button @click="handleResetZoom">Reset Zoom</button>
+        <span v-if="activePage === 'Graph'">
+          <button @click="handleZoomIn">Zoom In</button>
+          <button @click="handleZoomOut">Zoom Out</button>
+          <button @click="handleResetZoom">Reset Zoom</button>
+        </span>
       </div>
       <div class="taskbar-right">
         <button v-for="page in pages" :key="page" :class="{ active: page === activePage }" @click="navigateTo(page)">{{
@@ -31,7 +32,7 @@
     <!-- Main Content -->
     <router-view class="main-content" />
     <MessageBox />
-      </div>
+  </div>
 </template>
 
 <script>

@@ -11,25 +11,24 @@
         <div class="column-navigation">
             <ColumnDropdown :selectedDbsTables="selectedDbsTables" />
         </div>
-
-        <!-- Component 3: Selection, Interval, Aggregation, and Export Config -->
-        <div class="settings-panel">
-            <Selection />
-            <IntervalDropdown />
-            <StatisticsDropdown />
-            <ExportConfig />
-            <span>
-                <ExportTableStats />
-                <button @click="fetchData">Fetch Data</button>
-                <button @click="exportData">Export Data</button>
-            </span>
-        </div>
-
         <div class="right-panel">
+            <!-- Component 3: Selection, Interval, Aggregation, and Export Config -->
+            <div class="settings-panel">
+                <Selection />
+                <IntervalDropdown />
+                <StatisticsDropdown />
+                <ExportConfig />
+                <span>
+                    <ExportTableStats />
+                    <button @click="fetchData">Fetch Data</button>
+                    <button @click="exportData">Export Data</button>
+                </span>
+            </div>
+
             <!-- Component 4: Main View -->
             <div class="main-view">
-                <!-- Graph Display -->
-                <v-chart :option="chartOptions" :key="refreshKey"></v-chart>
+                <!-- Map Display -->
+                <div id="map" class="map-container"></div>
             </div>
         </div>
     </div>
@@ -46,17 +45,11 @@ import ExportConfig from "../components/ExportConfig.vue";
 import ExportTableStats from "../components/ExportTableStats.vue";
 import axios from 'axios';
 import Multiselect from "vue-multiselect";
-import { use } from 'echarts/core';
-import { LineChart, ScatterChart, BarChart } from 'echarts/charts';
-import { GridComponent, TooltipComponent, TitleComponent, LegendComponent, DataZoomComponent } from 'echarts/components';
-import { CanvasRenderer } from 'echarts/renderers';
-import VChart from 'vue-echarts';
-
-use([LineChart, BarChart, ScatterChart, GridComponent, TooltipComponent, TitleComponent, DataZoomComponent, LegendComponent, CanvasRenderer]);
-
+import mapboxgl from "mapbox-gl";
+import "mapbox-gl/dist/mapbox-gl.css";
 
 export default {
-    name: "Graph",
+    name: "Map",
     components: {
         DatabaseDropdown,
         ColumnDropdown,
@@ -66,7 +59,6 @@ export default {
         ExportConfig,
         ExportTableStats,
         Multiselect,
-        VChart,
     },
     data() {
         return {
@@ -75,18 +67,100 @@ export default {
             data: [],
             ID: [],
             refreshKey: 0,
+            map: null,
         };
     },
     watch: {
         selectedColumns() {
             this.ID = this.selectedColumns.filter((column) => column.includes('ID')).join("");
         },
+        selectedGeoFolder() {
+            this.initializeMap();
+        },
     },
     computed: {
-        ...mapState(["selectedDbsTables", "selectedColumns", "multiGraphType", "currentZoomStart", "currentZoomEnd", "selectedIds", "dateRange", "selectedInterval", "selectedStatistics", "selectedMethod", "exportColumns", "graphType", "exportIds", "exportDate", "exportInterval", "dateType", "exportDateType", "exportPath", "exportFilename", "exportFormat", "exportOptions", "theme"]),
+        ...mapState(["selectedDbsTables", "selectedGeoFolder", "selectedColumns", "multiGraphType", "currentZoomStart", "currentZoomEnd", "selectedIds", "dateRange", "selectedInterval", "selectedStatistics", "selectedMethod", "exportColumns", "graphType", "exportIds", "exportDate", "exportInterval", "dateType", "exportDateType", "exportPath", "exportFilename", "exportFormat", "exportOptions", "theme"]),
     },
     methods: {
         ...mapActions(["updateSelectedColumns", "updateExportOptions", "pushMessage", "clearMessages"]),
+        async initializeMap() {
+            mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_API;
+
+            // Destroy existing map instance if it exists
+            if (this.map) {
+                this.map.remove(); // Properly removes the Mapbox map instance
+                this.map = null; // Reset the map reference
+            }
+
+            // Fetch data from the backend
+            try {
+                const response = await axios.post(`${import.meta.env.VITE_APP_API_BASE_URL}/api/mapbox_shapefile`, {
+                    directory: this.selectedGeoFolder,
+                });
+
+                const { geojson, bounds, layers, center } = response.data;
+
+                // Create the Mapbox map instance
+                this.map = new mapboxgl.Map({
+                    container: "map", // ID of the container
+                    style: "mapbox://styles/mapbox/streets-v11", // Mapbox style URL
+                    center: center, // Center of the map
+                    zoom: 4,
+                });
+
+                this.map.on("load", () => {
+                    // Add GeoJSON source
+                    this.map.addSource("shapefile", {
+                        type: "geojson",
+                        data: geojson,
+                    });
+
+                    // Add layers from the backend
+                    layers.forEach((layer) => {
+                        this.map.addLayer(layer);
+                    });
+
+                    // Fit map to bounds
+                    this.map.fitBounds(bounds, { padding: 20 });
+                });
+
+                // Add Mapbox controls
+                this.addMapControls();
+                const mapDirectory = this.selectedGeoFolder.split("/");
+                this.pushMessage({ message: `${mapDirectory[mapDirectory.length - 1]} map loaded`, type: "success" });
+            } catch (error) {
+                console.error("Error loading Mapbox data:", error);
+            }
+        },
+        addMapControls() {
+            // Fullscreen control
+            this.map.addControl(new mapboxgl.FullscreenControl(), "top-right");
+
+            // Geolocation control
+            this.map.addControl(
+                new mapboxgl.GeolocateControl({
+                    positionOptions: {
+                        enableHighAccuracy: true,
+                    },
+                    trackUserLocation: true,
+                    showUserHeading: true,
+                }),
+                "top-right"
+            );
+
+            // Scale control
+            const scale = new mapboxgl.ScaleControl({
+                maxWidth: 200,
+                unit: "metric", // Use "imperial" for miles/feet
+            });
+            this.map.addControl(scale);
+
+            // Compass control
+            this.map.addControl(
+                new mapboxgl.NavigationControl({ showCompass: true }),
+                "top-right"
+            );
+        },
         columnNeedsSecondaryAxis(column) {
             // Adjust logic based on actual data thresholds
             return this.data.some(row => row[column] > 100);
@@ -195,3 +269,11 @@ export default {
 </script>
 <style src="vue-multiselect/dist/vue-multiselect.css"></style>
 <style src="../assets/pages.css"></style>
+<style>
+.mapboxgl-ctrl button {
+    padding: 0;
+    /* Remove extra padding */
+    margin: 0;
+    /* Remove extra margin */
+}
+</style>

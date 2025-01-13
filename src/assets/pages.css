@@ -131,6 +131,11 @@ label {
     overflow: auto;
 }
 
+.map-container {
+    width: 100%;
+    height: 100%;
+}  
+
 .table-container,
 .stats-container {
     max-width: 100%;

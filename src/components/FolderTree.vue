@@ -54,7 +54,7 @@ export default {
                 // Toggle the expanded state directly
                 node.expanded = !node.expanded;
                 this.$emit('select', node); // Emit the folder node
-            } else if (node.type === 'table') {
+            } else if (node.type === 'table' || node.type === 'file'){
                 node.selected = !node.selected; // Toggle selection state
                 this.$emit('select', node.selected ? node : null); // Emit selected node or null if unselected
             }
@@ -74,6 +74,9 @@ export default {
             } else if (page === 'Graph') {
                 // Automatically expand the Model01\Output\Scenario_2 folder
                 this.expandSpecificNode(this.treeData, 'model');
+            } else if (page === 'Map') {
+                // Automatically expand the Geospatial folder
+                this.expandSpecificNode(this.treeData, 'geospatial');
             }
         },
         expandSpecificNode(nodes, targetName) {

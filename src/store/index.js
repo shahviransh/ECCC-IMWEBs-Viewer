@@ -1,11 +1,11 @@
 import { createStore } from "vuex";
 import axios from "axios";
-import { time } from "echarts";
 
 const store = createStore({
   state: {
     selectedDbsTables: [],
     selectedColumns: [],
+    selectedGeoFolder: null,
     selectedIds: [],
     dateRange: {
       start: null,
@@ -114,6 +114,9 @@ const store = createStore({
       const temp = state.selectedDbsTables;
       state.selectedDbsTables = [...temp];
     },
+    SET_SELECTED_GEO_FOLDER(state, folder) {
+      state.selectedGeoFolder = folder;
+    },
     SET_XAXIS(state, xAxis) {
       state.xAxis = xAxis;
     },
@@ -123,7 +126,12 @@ const store = createStore({
       state.exportColumns = [...state.selectedColumns];
     },
     PUSH_MESSAGE(state, { message, type, duration }) {
-      state.messages.push({ text: message, type: type, timeLeft: duration, totalTime: duration });
+      state.messages.push({
+        text: message,
+        type: type,
+        timeLeft: duration,
+        totalTime: duration,
+      });
     },
     SLICE_MESSAGE(state, index) {
       state.messages.splice(index, 1);
@@ -134,6 +142,7 @@ const store = createStore({
     SET_SELECTED_COLUMNS(state, columns) {
       state.selectedColumns = columns;
       state.exportColumns = columns;
+      console.log(columns);
     },
     SET_SELECTED_IDS(state, ids) {
       state.selectedIds = ids;
@@ -193,13 +202,12 @@ const store = createStore({
   },
   actions: {
     async fetchDatabases({ commit }) {
-      const apiBaseUrl = import.meta.env.VITE_APP_API_BASE_URL;
       const maxRetries = 5; // Maximum number of retry attempts
       const retryDelay = 2000; // Delay between retries in milliseconds
 
       for (let attempt = 1; attempt <= maxRetries; attempt++) {
         try {
-          const response = await axios.get(`${apiBaseUrl}/api/list_files`, {
+          const response = await axios.get(`${import.meta.env.VITE_APP_API_BASE_URL}/api/list_files`, {
             params: { folder_path: "Jenette_Creek_Watershed" },
           });
           if (response.data.error) {
@@ -222,9 +230,8 @@ const store = createStore({
       }
     },
     async fetchTables({ commit }, db) {
-      const apiBaseUrl = import.meta.env.VITE_APP_API_BASE_URL;
       try {
-        const response = await axios.get(`${apiBaseUrl}/api/get_tables`, {
+        const response = await axios.get(`${import.meta.env.VITE_APP_API_BASE_URL}/api/get_tables`, {
           params: { db_path: db },
         });
         if (response.data.error) {
@@ -237,15 +244,21 @@ const store = createStore({
       }
     },
     async fetchColumns({ commit }, dbTables) {
-      const apiBaseUrl = import.meta.env.VITE_APP_API_BASE_URL;
       try {
-        // Fetch all columns for all tables selected
-        const response = await axios.get(
-          `${apiBaseUrl}/api/get_table_details`,
-          {
+        // Fecth based on dbTables or selectedGeoFolder
+        let response;
+        if (typeof dbTables === "object") {
+          // Fetch all columns for all tables selected
+          response = await axios.get(`${import.meta.env.VITE_APP_API_BASE_URL}/api/get_table_details`, {
             params: { db_tables: JSON.stringify(dbTables) },
-          }
-        );
+          });
+        } 
+        // else {
+        //   // Fetch all columns for the selected folder
+        //   response = await axios.get(`${import.meta.env.VITE_APP_API_BASE_URL}/api/get_dbf_details`, {
+        //     params: { directory: JSON.stringify(this.dbTables) },
+        //   });
+        // }
         if (response.data.error) {
           alert("Error fetching data: " + response.data.error);
           return;
@@ -281,6 +294,9 @@ const store = createStore({
     // Add similar actions for other components
     updateSelectedDbsTables({ commit }, { db, table }) {
       commit("SET_SELECTED_DBS_TABLES", { db, table });
+    },
+    updateSelectedGeoFolder({ commit }, folder) {
+      commit("SET_SELECTED_GEO_FOLDER", folder);
     },
     updateTheme({ commit }, theme) {
       commit("SET_THEME", theme);

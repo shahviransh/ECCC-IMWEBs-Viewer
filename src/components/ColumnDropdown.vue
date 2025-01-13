@@ -1,6 +1,6 @@
 <template>
     <h5 class="parameter-heading">Parameters:</h5>
-    <div v-if="['Project', 'Table'].includes(pageTitle)">
+    <div v-if="['Project', 'Table', 'Map'].includes(pageTitle)">
         <div class="form-container">
             <div class="form-group">
                 <label for="column-select">Select Columns:</label>
@@ -99,7 +99,7 @@ export default {
                 this.updateYAxis(value);
             }
         },
-        ...mapState(['columns', 'ids', 'selectedColumns', 'dateType', 'tooltipColumns', 'exportColumns', 'pageTitle', 'xAxis', 'yAxis', 'dateType'])
+        ...mapState(['columns', 'ids', 'selectedColumns', 'selectedGeoFolder', 'dateType', 'tooltipColumns', 'exportColumns', 'pageTitle', 'xAxis', 'yAxis', 'dateType'])
     },
     data() {
         return {
@@ -109,6 +109,9 @@ export default {
         selectedDbsTables(newDbsTables) {
             this.fetchColumns(newDbsTables);
         },
+        // selectedGeoFolder(newFolder) {
+        //     this.fetchColumns(newFolder);
+        // }
     },
     methods: {
         ...mapActions(['fetchColumns', 'updateSelectedColumns', 'updateExportColumns', 'updateXAxis', 'updateYAxis']),
@@ -147,6 +150,13 @@ export default {
                 this.$nextTick(() => {
                     this.$forceUpdate(); // Force update to reflect changes
                 });
+
+                if (['Project', 'Table', 'Map'].includes(this.pageTitle)) {
+                    this.updateSelectedColumns(modelArray);
+                    this.updateExportColumns(this.selectedColumns);
+                } else if (this.pageTitle === 'Graph') {
+                    this.updateYAxis(modelArray);
+                }
             }
         }
     },

@@ -13,7 +13,9 @@ export default {
         return {
             selectedDb: null,
             selectedTable: null,
+            selectedFolder: null,
             treeData: [],
+            separator: '/',
         };
     },
     components: {
@@ -38,21 +40,21 @@ export default {
         }
     },
     methods: {
-        ...mapActions(['fetchDatabases', 'fetchTables', 'updateSelectedDbsTables', 'removeSelectedDbTable']),
+        ...mapActions(['fetchDatabases', 'fetchTables', 'updateSelectedDbsTables', 'removeSelectedDbTable', 'updateSelectedGeoFolder']),
         listToTree(list) {
             let idCounter = 1;
             const tree = [];
             const lookup = {};
 
-            const isWindows = navigator.platform.indexOf('Win') > -1;
-            const separator = isWindows ? '\\' : '/';
-
             list.forEach(item => {
-                const parts = item.name.split(separator);
+                // Normalize paths to use the universal '/' separator
+                const normalizedPath = item.name.replace(/\\/g, this.separator);
+                const parts = normalizedPath.split(this.separator);
+
                 let currentLevel = tree;
 
                 parts.forEach((part, index) => {
-                    const path = parts.slice(0, index + 1).join(separator);
+                    const path = parts.slice(0, index + 1).join(this.separator);
                     let existingNode = lookup[path]; // Check if the path already exists
 
                     if (!existingNode) {
@@ -119,6 +121,9 @@ export default {
                         db: this.selectedDb,
                         table: this.selectedTable
                     });
+                } else if (node.type === 'file') {
+                    this.selectedFolder = node.path.substring(0, node.path.lastIndexOf(this.separator));
+                    this.updateSelectedGeoFolder(this.selectedFolder);
                 }
             } else {
                 // Unselect table
