@@ -2,8 +2,10 @@
   <div class="message-container">
     <transition-group name="fade" tag="div">
       <div v-for="(msg, index) in messages" :key="index" :class="['message-box', msg.type]">
-        <span>{{ msg.text }}</span>
-        <button @click="removeMessage(index)" class="close-button">✕</button>
+        <div class="message-content">
+          <span>{{ msg.text }}</span>
+          <button @click="removeMessage(index)" class="close-button">✕</button>
+        </div>
         <div class="countdown-bar" :style="{ width: (msg.timeLeft / msg.totalTime * 100) + '%' }"></div>
       </div>
     </transition-group>
@@ -87,6 +89,13 @@ export default {
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
   margin-bottom: 10px;
   transition: opacity 0.3s ease;
+}
+
+.message-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
 }
 
 .countdown-bar {
