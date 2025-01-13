@@ -12,4 +12,4 @@ class Config:
         ),
     )
     EXPORT_PATH = os.getenv("EXPORT_PATH", "dataExport")
-    LOOKUP = "Jenette_Creek_Watershed\\Database\\lookup.db3"
+    LOOKUP = "Jenette_Creek_Watershed/Database/lookup.db3"

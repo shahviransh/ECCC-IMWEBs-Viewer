@@ -38,7 +38,7 @@ def export_db3_to_csv_with_aliases(db3_files, lookup_aliases):
         base_name = os.path.splitext(os.path.basename(db3_file))[0]
 
         # Output CSV file name
-        csv_file_name = f"lookup\\{base_name}_export.csv"
+        csv_file_name = f"lookup/{base_name}_export.csv"
 
         # Connect to the SQLite database
         conn = sqlite3.connect(db3_file)
@@ -79,21 +79,21 @@ def export_db3_to_csv_with_aliases(db3_files, lookup_aliases):
         print(f"Exported data from {db3_file} to {csv_file_name}")
 
 # Define the path to the lookup .db3 file and the lookup table name
-lookup_db3_file = "backend\\Jenette_Creek_Watershed\\Database\\lookup.db3"
+lookup_db3_file = "backend/Jenette_Creek_Watershed/Database/lookup.db3"
 lookup_table_name = "OUTPUT"
 
 
 # List of .db3 files to process
 db3_files = [
-    "backend\\Jenette_Creek_Watershed\\Database\\Hydroclimate.db3",
-    "backend\\Jenette_Creek_Watershed\\Model01\\BMP.db3",
-    "backend\\Jenette_Creek_Watershed\\Model01\\Output\\Scenario_2\\scenario_2.db3"
+    "backend/Jenette_Creek_Watershed/Database/Hydroclimate.db3",
+    "backend/Jenette_Creek_Watershed/Model01/BMP.db3",
+    "backend/Jenette_Creek_Watershed/Model01/Output/Scenario_2/scenario_2.db3"
 ]
 
 # Paths to our CSV files
-hydroclimate_csv = 'lookup\\Hydroclimate_export.csv'
-bmp_csv = 'lookup\\BMP_export.csv'
-scenario_csv = 'lookup\\scenario_2_export.csv'
+hydroclimate_csv = 'lookup/Hydroclimate_export.csv'
+bmp_csv = 'lookup/BMP_export.csv'
+scenario_csv = 'lookup/scenario_2_export.csv'
 
 # Load the CSV files into DataFrames
 hydroclimate_df = pd.read_csv(hydroclimate_csv)
@@ -101,7 +101,7 @@ bmp_df = pd.read_csv(bmp_csv)
 scenario_df = pd.read_csv(scenario_csv)
 
 # Connect to our SQLite database (lookup.db3)
-conn = sqlite3.connect('backend\\Jenette_Creek_Watershed\\Database\\lookup.db3')
+conn = sqlite3.connect('backend/Jenette_Creek_Watershed/Database/lookup.db3')
 cursor = conn.cursor()
 
 # Function to create a table in SQLite and insert data from DataFrame

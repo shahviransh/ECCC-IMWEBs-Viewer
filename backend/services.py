@@ -12,6 +12,7 @@ from pathlib import Path
 import sys
 import json
 import threading
+from osgeo import ogr, osr
 
 alias_mapping = {}
 global_dbs_tables_columns = {}
@@ -124,7 +125,7 @@ def fetch_data_service(data):
             "statsColumns": stats_df.columns.tolist() if stats_df is not None else [],
         }
     except Exception as e:
-        return {"error": "Error at fetch_data_service " + str(e)}
+        return {"error": str(e)}
 
 
 def export_data_service(data):
@@ -182,7 +183,7 @@ def export_data_service(data):
 
         return {"file_path": file_path}
     except Exception as e:
-        return {"error": "Error at export_data_service " + str(e)}
+        return {"error": str(e)}
 
 
 def fetch_data_from_db(
@@ -487,7 +488,7 @@ def get_table_names(data):
         ]
         return {"tables": alias_tables}
     except Exception as e:
-        return {"error": "Error at get_table_names " + str(e)}
+        return {"error": str(e)}
 
 
 def get_files_and_folders(data):
@@ -553,7 +554,7 @@ def get_files_and_folders(data):
 
         return {"files_and_folders": files_and_folders}
     except Exception as e:
-        return {"error": "Error at get_files_and_folders " + str(e)}
+        return {"error": str(e)}
 
 
 # Example function to map date strings to seasons
@@ -768,7 +769,7 @@ def get_columns_and_time_range(db_path, table_name):
             "interval": interval,
         }
     except Exception as e:
-        return {"error": f"Error in get_columns_and_time_range: {e}"}
+        return {"error": str(e)}
 
 
 def get_multi_columns_and_time_range(data):
@@ -782,8 +783,6 @@ def get_multi_columns_and_time_range(data):
             table_key = f'{(table["db"], table["table"])}'
 
             columns_time_range = get_columns_and_time_range(table["db"], table["table"])
-
-            all_columns.update(columns_time_range["columns"])
 
             if columns_time_range.get("error"):
                 return columns_time_range
@@ -799,6 +798,8 @@ def get_multi_columns_and_time_range(data):
                 )
                 for col in columns_time_range["columns"]
             ]
+
+            all_columns.update(columns_time_range["columns"])
 
             global_dbs_tables_columns[table_key] = (
                 columns_time_range["columns"] + ["ID"]
@@ -872,4 +873,181 @@ def get_multi_columns_and_time_range(data):
             "interval": multi_columns_time_range[0]["interval"],
         }
     except Exception as e:
-        return {"error": f"Error in get_multi_columns_and_time_range: {e}"}
+        return {"error": str(e)}
+
+
+def get_dbf_details(data):
+    """Fetch details from a single DBase file."""
+    directory = os.path.join(Config.PATHFILE, data.get("directory"))
+
+    # Find the .dbf file in the directory
+    dbf_file = None
+    for ext in [".dbf"]:
+        files = [f for f in os.listdir(directory) if f.endswith(ext)]
+        if files:
+            dbf_file = os.path.join(directory, files[0])
+            break
+
+    if not dbf_file:
+        return {"error": "No .dbf file found in the directory."}
+
+    # Open the .dbf file using OGR
+    driver = ogr.GetDriverByName("ESRI Shapefile")
+    dataset = driver.Open(dbf_file, 0)
+    if dataset is None:
+        return {"error": "Failed to open .dbf file."}
+
+    layer = dataset.GetLayer()
+    if not layer:
+        return {"error": "No layer found in the .dbf file."}
+
+    # Get column names
+    layer_defn = layer.GetLayerDefn()
+    column_names = [
+        layer_defn.GetFieldDefn(i).GetName() for i in range(layer_defn.GetFieldCount())
+    ]
+
+    # Close the dataset
+    dataset = None
+
+    return {"columns": column_names}
+
+def process_geospatial_data_for_mapbox(data):
+    """
+    Process geospatial files (shapefiles, rasters, etc.) in the directory and return GeoJSON, bounds, and default Mapbox layer configurations.
+    """
+
+    directory = os.path.join(Config.PATHFILE, data.get("directory"))
+
+    # Required files for a complete shapefile
+    required_files = [".shp", ".prj", ".dbf", ".shx"]
+    shapefile = None
+
+    # Validate required shapefile components
+    for ext in required_files:
+        files = [f for f in os.listdir(directory) if f.endswith(ext)]
+        if not files:
+            return {"error": f"Missing required file: {ext} in directory {directory}"}
+        if ext == ".shp":
+            shapefile = os.path.join(directory, files[0])  # Get the main .shp file
+
+    if not shapefile:
+        return {"error": "No shapefile found in the directory."}
+
+    # Open shapefile
+    driver = ogr.GetDriverByName("ESRI Shapefile")
+    dataset = driver.Open(shapefile, 0)
+    if dataset is None:
+        return {"error": "Failed to open shapefile."}
+
+    layer = dataset.GetLayer()
+
+    # Handle Spatial Reference System
+    source_srs = layer.GetSpatialRef()  # Source spatial reference system
+    if not source_srs:
+        return {"error": "Shapefile has no spatial reference system defined."}
+
+    target_srs = osr.SpatialReference()
+    target_srs.ImportFromEPSG(4326)  # WGS84 (longitude/latitude)
+
+    coord_transform = osr.CoordinateTransformation(source_srs, target_srs)
+
+    # Create a new memory layer for the reprojected data
+    memory_driver = ogr.GetDriverByName("Memory")
+    memory_ds = memory_driver.CreateDataSource("reprojected")
+    reprojected_layer = memory_ds.CreateLayer(
+        "reprojected_layer", srs=target_srs, geom_type=layer.GetGeomType()
+    )
+
+    # Copy fields from the original layer
+    layer_defn = layer.GetLayerDefn()
+    for i in range(layer_defn.GetFieldCount()):
+        reprojected_layer.CreateField(layer_defn.GetFieldDefn(i))
+
+    # Reproject each feature
+    for feature in layer:
+        geom = feature.GetGeometryRef()
+        if geom:
+            geom.Transform(coord_transform)  # Transform geometry to WGS84
+            reprojected_feature = ogr.Feature(reprojected_layer.GetLayerDefn())
+            reprojected_feature.SetGeometry(geom)
+            for i in range(feature.GetFieldCount()):
+                reprojected_feature.SetField(i, feature.GetField(i))
+            reprojected_layer.CreateFeature(reprojected_feature)
+            reprojected_feature = None
+
+    # Convert reprojected layer to GeoJSON
+    geojson_driver = ogr.GetDriverByName("GeoJSON")
+    geojson_path = os.path.join(directory, "output.geojson")
+    if os.path.exists(geojson_path):
+        os.remove(geojson_path)
+
+    geojson_dataset = geojson_driver.CreateDataSource(geojson_path)
+    geojson_dataset.CopyLayer(reprojected_layer, "layer")
+    geojson_dataset = None
+
+    with open(geojson_path, "r") as file:
+        geojson_data = json.load(file)
+
+    # Remove the `crs` member if it exists
+    if "crs" in geojson_data:
+        del geojson_data["crs"]
+
+    # Save the updated GeoJSON back to the file
+    with open(geojson_path, "w") as file:
+        json.dump(geojson_data, file)
+
+    # Calculate bounds and center in WGS84
+    extent = reprojected_layer.GetExtent()  # (minX, maxX, minY, maxY)
+    bounds = [[extent[0], extent[2]], [extent[1], extent[3]]]
+    center = [
+        (extent[0] + extent[1]) / 2,  # Average longitude
+        (extent[2] + extent[3]) / 2,  # Average latitude
+    ]
+
+    # Handle Raster Files (if .tif exists)
+    raster_files = [f for f in os.listdir(directory) if f.endswith(".tif")]
+    raster_bounds = None
+    if raster_files:
+        raster_file = os.path.join(directory, raster_files[0])
+        raster_dataset = gdal.Open(raster_file)
+        if raster_dataset:
+            geotransform = raster_dataset.GetGeoTransform()
+            raster_bounds = [
+                [geotransform[0], geotransform[3]],  # Top-left
+                [
+                    geotransform[0] + geotransform[1] * raster_dataset.RasterXSize,
+                    geotransform[3] + geotransform[5] * raster_dataset.RasterYSize,
+                ],  # Bottom-right
+            ]
+            raster_dataset = None
+
+    # Default layer configuration
+    layer_configurations = [
+        {
+            "id": "shapefile-fill",
+            "type": "fill",
+            "source": "shapefile",
+            "paint": {
+                "fill-color": "#888888",
+                "fill-opacity": 0.0,
+            },
+        },
+        {
+            "id": "shapefile-line",
+            "type": "line",
+            "source": "shapefile",
+            "paint": {
+                "line-color": "#000000",
+                "line-width": 2,
+            },
+        },
+    ]
+
+    return {
+        "geojson": geojson_data,
+        "bounds": bounds,
+        "raster_bounds": raster_bounds,  # Include raster bounds if present
+        "center": center,
+        "layers": layer_configurations,
+    }
