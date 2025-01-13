@@ -8,7 +8,7 @@
   "scripts": {
     "prestart": "node convert-package.js",
     "dev": "concurrently \"npm run vue-dev\" \"npm run python-dev\"",
-    "python-dev": "conda activate venv && python -Xfrozen_modules=off -m debugpy --listen 5678 --wait-for-client backend\\apppy.py",
+    "python-dev": "conda activate venv && python -Xfrozen_modules=off -m debugpy --listen 5678 --wait-for-client backend/apppy.py",
     "vue-dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
@@ -25,6 +25,7 @@
     "dompurify": "^3.2.3",
     "echarts": "^5.6.0",
     "json5": "^2.2.3",
+    "mapbox-gl": "^3.9.2",
     "vue": "^3.3.4",
     "vue-echarts": "^7.0.3",
     "vue-multiselect": "^3.1.0",

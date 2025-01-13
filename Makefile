@@ -19,7 +19,7 @@ python:
 	@echo "Building Python backend..."
 	@call conda activate venv && \
 	pyinstaller backend\apppy.py -y --distpath backend\ --specpath backend\ --workpath backend\build --name apppy && \
-	deactivate
+	conda deactivate
 	xcopy backend\Jenette_Creek_Watershed backend\apppy\_internal\Jenette_Creek_Watershed /E /I
 	echo F | xcopy backend\apppy\apppy.exe backend\apppy\apppy /Y /F
 
