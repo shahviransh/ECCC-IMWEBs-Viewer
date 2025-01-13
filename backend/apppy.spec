@@ -5,7 +5,7 @@ a = Analysis(
     ['apppy.py'],
     pathex=[],
     binaries=[],
-    datas=[],
+    datas=[('C:/Users/viran/miniconda3/envs/venv/Library/share/proj', 'Library/share/proj')],
     hiddenimports=[],
     hookspath=[],
     hooksconfig={},

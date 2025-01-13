@@ -12,12 +12,13 @@ from pathlib import Path
 import sys
 import json
 import threading
-from osgeo import ogr, osr
+from osgeo import ogr, osr, gdal
 
 alias_mapping = {}
 global_dbs_tables_columns = {}
 lock = threading.Lock()
-
+os.environ["PROJ_LIB"] = Config.PROJ_LIB
+os.environ["GDAL_DATA"] = Config.GDAL_DATA
 
 def fetch_data_service(data):
     try:
@@ -920,7 +921,7 @@ def process_geospatial_data_for_mapbox(data):
     directory = os.path.join(Config.PATHFILE, data.get("directory"))
 
     # Required files for a complete shapefile
-    required_files = [".shp", ".prj", ".dbf", ".shx"]
+    required_files = [".shp"]
     shapefile = None
 
     # Validate required shapefile components
