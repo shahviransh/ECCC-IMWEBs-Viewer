@@ -99,7 +99,7 @@ def register_routes(app, cache):
 
         return jsonify(dbf_details)
     
-    @app.route("/api/mapbox_shapefile", methods=["POST"])
+    @app.route("/api/mapbox_shapefile", methods=["GET"])
     @cache.cached(
         timeout=300, query_string=True
     )
@@ -107,7 +107,7 @@ def register_routes(app, cache):
         """
         API endpoint to return GeoJSON, bounds, and layer configurations for Mapbox.
         """
-        data = request.json
+        data = request.args
 
         mapbox_data = process_geospatial_data_for_mapbox(data)
         

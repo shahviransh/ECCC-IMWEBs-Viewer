@@ -94,8 +94,10 @@ export default {
 
             // Fetch data from the backend
             try {
-                const response = await axios.post(`${import.meta.env.VITE_APP_API_BASE_URL}/api/mapbox_shapefile`, {
-                    directory: this.selectedGeoFolder,
+                const response = await axios.get(`${import.meta.env.VITE_APP_API_BASE_URL}/api/mapbox_shapefile`, {
+                    params: {
+                        directory: this.selectedGeoFolder,
+                    }
                 });
 
                 const { geojson, bounds, layers, center } = response.data;
