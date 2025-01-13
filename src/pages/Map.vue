@@ -100,7 +100,7 @@ export default {
                     }
                 });
 
-                const { geojson, bounds, raster, center, layers } = response.data;
+                const { geojson, bounds, raster_bounds, center, layers } = response.data;
 
                 // Create the Mapbox map instance
                 this.map = new mapboxgl.Map({

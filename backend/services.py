@@ -913,6 +913,28 @@ def get_dbf_details(data):
 
     return {"columns": column_names}
 
+def round_coordinates(geojson_data, decimal_points=4):
+    """
+    Recursively round all coordinates in the GeoJSON to a specified number of decimal points.
+    """
+    def round_coords(coords):
+        if isinstance(coords[0], list):
+            # If the first element is a list, recurse (for MultiPolygon, Polygon, etc.)
+            return [round_coords(c) for c in coords]
+        else:
+            # Otherwise, round the coordinates (for Point, etc.)
+            return [round(coord, decimal_points) for coord in coords]
+
+    if isinstance(geojson_data, str):
+        geojson_data = json.loads(geojson_data)
+
+    for feature in geojson_data.get("features", []):
+        geometry = feature.get("geometry", {})
+        if "coordinates" in geometry:
+            geometry["coordinates"] = round_coords(geometry["coordinates"])
+
+    return geojson_data
+
 def process_geospatial_data_for_mapbox(data):
     """
     Process geospatial files (shapefiles, rasters, etc.) in the directory and return GeoJSON, bounds, and default Mapbox layer configurations.
@@ -1046,7 +1068,7 @@ def process_geospatial_data_for_mapbox(data):
     ]
 
     return {
-        "geojson": geojson_data,
+        "geojson": round_coordinates(geojson_data),
         "bounds": bounds,
         "raster_bounds": raster_bounds,  # Include raster bounds if present
         "center": center,
