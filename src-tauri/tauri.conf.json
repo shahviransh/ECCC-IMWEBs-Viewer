@@ -26,6 +26,11 @@
   "bundle": {
     "active": true,
     "targets": "all",
+    "windows": {
+      "wix": {
+        "template": "main.wxs"
+      }
+    },
     "externalBin": [
       "../backend/apppy/apppy"
     ],
