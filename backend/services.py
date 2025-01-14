@@ -989,6 +989,10 @@ def process_geospatial_data_for_mapbox(data):
     target_srs = osr.SpatialReference()
     target_srs.ImportFromEPSG(4326)  # WGS84 (longitude/latitude)
 
+    # Ensure the axis order is longitude-latitude
+    if target_srs.SetAxisMappingStrategy:
+        target_srs.SetAxisMappingStrategy(osr.OAMS_TRADITIONAL_GIS_ORDER)
+
     coord_transform = osr.CoordinateTransformation(source_srs, target_srs)
 
     # Create a new memory layer for the reprojected data
