@@ -1,43 +1,19 @@
-# Stage 1: Base image with Node.js, Rust, and Conda
+# Stage 1: Base Image with Conda and Python
 FROM continuumio/miniconda3 AS base
 
 # Set working directory
 WORKDIR /app
 
-# Install Rust for Tauri
-RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
-ENV PATH=/root/.cargo/bin:$PATH
+# Copy Python project files
+COPY backend /app/backend
 
-# Install Tauri CLI globally
-RUN npm install -g @tauri-apps/cli
-
-# Copy Conda environment and install dependencies
-COPY backend/environment.yml /app/backend/environment.yml
+# Install Conda dependencies
 RUN conda env create -f backend/environment.yml && \
     conda clean -afy && \
     echo "conda activate venv" > ~/.bashrc
 
-# Install PyInstaller in the Conda environment
-RUN conda run -n venv pip install pyinstaller
-
 # Expose Conda environment PATH
-ENV PATH /opt/conda/envs/venv/bin:$PATH
-
-# Stage 2: Build Tauri frontend and backend executables
-FROM base AS tauri-builder
-
-# Set working directory
-WORKDIR /app
-
-# Copy Tauri and Python project files
-COPY package.json package-lock.json /app/
-COPY src /app/src
-COPY public /app/public
-COPY backend /app/backend
-COPY src-tauri /app/src-tauri
-
-# Install Node.js dependencies and build Tauri frontend
-RUN npm install && npm run build
+ENV PATH=/opt/conda/envs/venv/bin:$PATH
 
 # Package Python backend using PyInstaller
 RUN pyinstaller backend/apppy.py -y \
@@ -47,30 +23,46 @@ RUN pyinstaller backend/apppy.py -y \
     --name apppy \
     --add-data "/opt/conda/envs/venv/Library/share/proj:Library/share/proj"
 
-# Stage 3: Build Tauri release for all platforms
-FROM tauri-builder AS tauri-build-release
+# Stage 2: Node.js and Rust for Tauri
+FROM node:20 AS tauri-builder
 
-# Build Tauri release
-RUN npm run tauri build
+# Set working directory
+WORKDIR /app
 
-# Stage 4: Build cross-platform binaries (optional)
-FROM debian:bullseye AS tauri-cross-builder
+# Install Rust and Tauri CLI
+RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y && \
+    ~/.cargo/bin/rustup target add x86_64-unknown-linux-gnu x86_64-pc-windows-msvc aarch64-apple-darwin
+ENV PATH=/root/.cargo/bin:$PATH
 
-# Install cross-compilation tools
-RUN apt-get update && apt-get install -y \
-    build-essential \
-    libssl-dev \
-    curl \
-    jq \
-    && rm -rf /var/lib/apt/lists/*
+# Install Tauri CLI globally
+RUN npm install -g @tauri-apps/cli
 
-# Install Rust and cross-compilation targets
-RUN curl https://sh.rustup.rs -sSf | sh -s -- -y \
-    && ~/.cargo/bin/rustup target add x86_64-pc-windows-gnu x86_64-apple-darwin
+# Copy frontend and Tauri project files
+COPY package.json package-lock.json /app/
+COPY src /app/src
+COPY public /app/public
+COPY src-tauri /app/src-tauri
 
-# Copy built artifacts
-COPY --from=tauri-build-release /app/src-tauri/target/release/bundle /artifacts
-COPY --from=tauri-builder /app/backend /artifacts/backend
+# Install Node.js dependencies and build frontend
+RUN npm install && npm run build
 
-# Define outputs
+# Stage 3: Cross-Compilation with Rust
+FROM tauri-builder AS cross-builder
+
+# Build Tauri for all targets
+RUN npm run tauri build -- \
+    --target x86_64-unknown-linux-gnu \
+    --target x86_64-pc-windows-msvc \
+    --target aarch64-apple-darwin
+
+# Stage 4: Artifact Collection
+FROM debian:bullseye AS artifact-collector
+
+# Set working directory
+WORKDIR /artifacts
+
+# Copy Python and Tauri outputs
+COPY --from=base /app/backend/apppy /artifacts/backend/apppy
+COPY --from=cross-builder /app/src-tauri/target/release/bundle /artifacts/
+
 CMD ["ls", "/artifacts"]

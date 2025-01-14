@@ -20,6 +20,7 @@ lock = threading.Lock()
 os.environ["PROJ_LIB"] = Config.PROJ_LIB
 os.environ["GDAL_DATA"] = Config.GDAL_DATA
 
+
 def fetch_data_service(data):
     try:
         # Extract the required parameters from the request data
@@ -49,17 +50,28 @@ def fetch_data_service(data):
 
                 # Determine which columns to fetch
                 if columns == "All":
+                    # Fetch all columns for the table
                     fetch_columns = columns
                 else:
-                    # Only fetch columns that exist in the global columns
-                    fetch_columns = []
+                    fetch_columns = set()
+                    prefix_columns = [
+                        col for col in columns if col.startswith(table["table"])
+                    ]
 
                     for col in columns:
-                        if col.startswith(table["table"]):
-                            duplicate_columns.append(col)
-                            col = col[len(table["table"]) + 1 :]
-                        if col in global_columns:
-                            fetch_columns.append(col)
+                        if col in prefix_columns:
+                            original_col = col[
+                                len(table["table"]) + 1 :
+                            ]  # Strip prefix
+                            if original_col in global_columns:
+                                fetch_columns.add(original_col)
+                                duplicate_columns.append(col)
+                        elif col in global_columns:
+                            # Non-prefixed columns for tables without prefixes
+                            fetch_columns.add(col)
+
+                # Remove fetched columns from columns list
+                columns = list(set(columns) - set(fetch_columns)) + [date_type]
 
                 if not fetch_columns:
                     # If there are no common columns, skip the table
@@ -79,7 +91,7 @@ def fetch_data_service(data):
                 # Rename columns to table-column format
                 for col in duplicate_columns:
                     col_temp = col[len(table["table"]) + 1 :]
-                    if col in df_temp.columns:
+                    if col_temp in df_temp.columns:
                         df_temp.rename(columns={col_temp: col}, inplace=True)
 
                 # Merge the dataframes on date_type and 'ID' columns
@@ -87,9 +99,7 @@ def fetch_data_service(data):
                     df = df_temp
                 else:
                     # Identify columns for merging; ignore columns with dash if they represent different data sources
-                    merge_on_columns = [date_type] + [
-                        col for col in df.columns if "ID" in col
-                    ]
+                    merge_on_columns = [col for col in df.columns if "ID" in col]
                     for col in df.columns:
                         if col in df_temp.columns and not col.startswith(
                             table["table"]
@@ -913,10 +923,12 @@ def get_dbf_details(data):
 
     return {"columns": column_names}
 
+
 def round_coordinates(geojson_data, decimal_points=4):
     """
     Recursively round all coordinates in the GeoJSON to a specified number of decimal points.
     """
+
     def round_coords(coords):
         if isinstance(coords[0], list):
             # If the first element is a list, recurse (for MultiPolygon, Polygon, etc.)
@@ -934,6 +946,7 @@ def round_coordinates(geojson_data, decimal_points=4):
             geometry["coordinates"] = round_coords(geometry["coordinates"])
 
     return geojson_data
+
 
 def process_geospatial_data_for_mapbox(data):
     """
