@@ -131,7 +131,7 @@ export default {
             const isTauri = window.isTauri !== undefined;
             isXAxis = isXAxis !== undefined || isXAxis;
             isYAxis = isYAxis !== undefined || isYAxis;
-            return isXAxis ? '5vh' : isYAxis ? isTauri ? '66vh' : '62vh' : '34vh';
+            return isXAxis ? '5vh' : isYAxis ? isTauri ? '66vh' : '62vh' : isTauri ? '36vh' : '34vh';
         },
         toggleSelection(event, modelArray) {
             const option = event.target;

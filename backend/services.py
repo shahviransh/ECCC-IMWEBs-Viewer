@@ -546,16 +546,19 @@ def get_files_and_folders(data):
                 file_rel_path = os.path.join(rel_dir, name)
                 # Ensure the relative path starts with the base folder name
                 file_rel_path = file_rel_path[file_rel_path.find(base_folder) :]
-                if file_rel_path.endswith(".db3") and "lookup" not in file_rel_path:
-                    databases.add(file_rel_path)
-                files_and_folders.append(
-                    {
-                        "type": (
-                            "database" if file_rel_path.endswith(".db3") else "file"
-                        ),
-                        "name": file_rel_path,
-                    }
-                )
+
+                # Only include .shp, .db3, and .tif files
+                if file_rel_path.endswith((".shp", ".db3", ".tif")):
+                    if file_rel_path.endswith(".db3") and "lookup" not in file_rel_path:
+                        databases.add(file_rel_path)
+                    files_and_folders.append(
+                        {
+                            "type": (
+                                "database" if file_rel_path.endswith(".db3") else "file"
+                            ),
+                            "name": file_rel_path,
+                        }
+                    )
         # Load alias mapping for each database
         (
             alias_mapping.update(load_alias_mapping(databases))

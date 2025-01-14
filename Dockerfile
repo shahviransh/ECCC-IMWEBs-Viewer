@@ -16,10 +16,10 @@ RUN conda env create -f backend/environment.yml && \
 ENV PATH=/opt/conda/envs/venv/bin:$PATH
 
 # Package Python backend using PyInstaller
-RUN pyinstaller backend/apppy.py -y \
-    --distpath backend/ \
-    --specpath backend/ \
-    --workpath backend/build \
+RUN pyinstaller /app/backend/apppy.py -y \
+    --distpath /app/backend/ \
+    --specpath /app/backend/ \
+    --workpath /app/backend/build \
     --name apppy \
     --add-data "/opt/conda/envs/venv/Library/share/proj:Library/share/proj"
 
