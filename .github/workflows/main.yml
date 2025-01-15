@@ -5,8 +5,6 @@ on:
     branches:
       - main
 
-# This workflow will trigger on each push to the `release` branch to create or update a GitHub release, build your app, and upload the artifacts to the release.
-
 jobs:
   publish-tauri:
     permissions:
@@ -48,7 +46,41 @@ jobs:
         # You can remove the one that doesn't apply to your app to speed up the workflow a bit.
 
       - name: install frontend dependencies
-        run: npm install # change this to npm, pnpm or bun depending on which one you use.
+        run: |
+          node src-tauri/main.js
+          npm install # change this to npm, pnpm or bun depending on which one you use.
+
+      - name: install Conda and set up backend
+        run: |
+          wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh
+          bash miniconda.sh -b -p $HOME/miniconda
+          export PATH="$HOME/miniconda/bin:$PATH"
+          conda init bash
+          source ~/.bashrc
+          conda create -n venv python=3.9 -y
+          conda activate venv
+          pip install --no-cache-dir -r backend/requirements.txt
+          conda install -c conda-forge gdal -y
+        shell: bash
+
+      - name: build backend with PyInstaller
+        run: |
+          source ~/.bashrc
+          conda activate venv
+          pyinstaller backend/apppy.py -y --distpath backend/ --specpath backend/ --workpath backend/build --name apppy \
+            --add-data "$HOME/miniconda/envs/venv/share/proj:share/proj"
+        shell: bash
+      
+      - name: Unzip backend data
+        env:
+          GITHUB_LINK_PATH: ${{ secrets.GITHUB_LINK_PATH }}
+        run: |
+          unzip -o backend/apppy/Jenette_Creek_Watershed.zip -d backend/apppy/_internal/
+      
+      - name: verify backend executable
+        run: |
+          ls backend/
+        shell: bash
 
       - uses: tauri-apps/tauri-action@v0
         env:
@@ -60,8 +92,9 @@ jobs:
           releaseDraft: true
           prerelease: false
           args: ${{ matrix.args }}
+      
       - name: Upload Release Artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: "tauri-${{ matrix.platform }}-bundle"
           path: "src-tauri/target/release/bundle/" # Update this path to match where Tauri outputs the bundles.
