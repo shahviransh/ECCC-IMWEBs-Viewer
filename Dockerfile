@@ -5,7 +5,15 @@ FROM continuumio/miniconda3 AS base
 WORKDIR /app
 
 # Install necessary Linux tools
-RUN apt-get update && apt-get install -y binutils
+RUN apt-get update && apt-get install -y binutils libwebkit2gtk-4.0-dev \
+        build-essential \
+        curl \
+        wget \
+        file \
+        libssl-dev \
+        libgtk-3-dev \
+        libayatana-appindicator3-dev \
+        librsvg2-dev
 
 # Copy Python project files
 COPY backend /app/backend
@@ -36,8 +44,15 @@ FROM node:20 AS tauri-builder
 WORKDIR /app
 
 # Install necessary Linux tools
-RUN apt-get update && apt-get install -y libwebkit2gtk-4.0-dev libwebkit2gtk-4.1-dev \
-    libappindicator3-dev pkg-config libxtst-dev libgtk-3-dev librsvg2-dev patchelf
+RUN apt-get update && apt-get install -y libwebkit2gtk-4.0-dev \
+        build-essential \
+        curl \
+        wget \
+        file \
+        libssl-dev \
+        libgtk-3-dev \
+        libayatana-appindicator3-dev \
+        librsvg2-dev
 
 # Install Rust and Tauri CLI
 RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
