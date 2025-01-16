@@ -58,6 +58,7 @@ jobs:
       
       - name: 'Verify Authentication'
         run: gcloud auth list
+      
 
       - name: Install frontend dependencies
         run: npm install # change this to npm, pnpm or bun depending on which one you use.
