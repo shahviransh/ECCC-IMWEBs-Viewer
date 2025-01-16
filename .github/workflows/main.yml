@@ -61,12 +61,11 @@ jobs:
           echo $CONDA\condabin >> $GITHUB_PATH
           echo $CONDA\Scripts >> $GITHUB_PATH
           echo $CONDA\Library\bin >> $GITHUB_PATH
-          echo "where conda"
-          where conda
         shell: bash
 
       - name: Build backend with PyInstaller
         run: |
+          where conda
           conda install -n venv -c conda-forge gdal -y
           pip install --no-cache-dir -r backend/requirements.txt
           if [[ "${{ matrix.platform }}" == "windows-latest" ]]; then
