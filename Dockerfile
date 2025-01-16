@@ -55,8 +55,8 @@ COPY src /app/src
 COPY public /app/public
 COPY src-tauri /app/src-tauri
 
-# Install Node.js dependencies and build frontend
-RUN npm install && npm run build
+# Install Node.js dependencies
+RUN npm install
 
 # Stage 3: Compilation with Rust
 FROM tauri-builder AS cross-builder
@@ -65,10 +65,8 @@ FROM tauri-builder AS cross-builder
 COPY --from=base /app/backend /app/backend
 COPY --from=tauri-builder /app /app
 
-RUN dpkg -l | grep libxau
-
 # Build Tauri for all targets
-RUN npm run tauri build - --verbose
+RUN npm run tauri build
 
 # Stage 4: Artifact Collection
 FROM debian:bullseye AS artifact-collector
