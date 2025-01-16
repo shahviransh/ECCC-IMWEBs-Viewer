@@ -63,11 +63,16 @@ jobs:
           echo $CONDA\Library\bin >> $GITHUB_PATH
         shell: cmd
 
-      - name: Build backend with PyInstaller (windows only)
+      - name: Install backend dependencies (windows only)
         if: matrix.platform == 'windows-latest'
         run: |
           conda install -n venv -c conda-forge gdal -y && ^
-          pip install --no-cache-dir -r backend/requirements.txt && ^
+          pip install --no-cache-dir -r backend/requirements.txt
+        shell: cmd
+
+      - name: Build backend with PyInstaller (windows only)
+        if: matrix.platform == 'windows-latest'
+        run: |
           pyinstaller backend/apppy.py -y --distpath backend/ --specpath backend/ --workpath backend/build --name apppy ^
           --add-data "$CONDA/envs/venv/Library/share/proj:Library/share/proj"
         shell: cmd
