@@ -69,11 +69,16 @@ jobs:
           conda install -n venv -c conda-forge gdal -y
         shell: cmd
       
-      - name: Build backend with PyInstaller (windows only)
+      - name: Pip install dependencies (windows only)
         if: matrix.platform == 'windows-latest'
         run: |
           pip install --no-cache-dir -r backend/requirements.txt
-          pyinstaller backend/apppy.py -y --distpath backend/ --specpath backend/ --workpath backend/build --name apppy \
+        shell: cmd
+      
+      - name: Build backend with PyInstaller
+        if: matrix.platform == 'windows-latest'
+        run: |
+         pyinstaller backend/apppy.py -y --distpath backend/ --specpath backend/ --workpath backend/build --name apppy \
           --add-data "$CONDA/envs/venv/Library/share/proj:Library/share/proj"
         shell: cmd
 
