@@ -45,17 +45,6 @@ jobs:
         # webkitgtk 4.0 is for Tauri v1 - webkitgtk 4.1 is for Tauri v2.
         # You can remove the one that doesn't apply to your app to speed up the workflow a bit.
 
-      - name: Authenticate with Google Cloud
-        uses: google-github-actions/auth@v1
-        with:
-          credentials_json: ${{ secrets.GCS_KEY }}
-
-      - name: 'Set up Cloud SDK'
-        uses: 'google-github-actions/setup-gcloud@v2'
-        with:
-          project_id: 'augmented-vim-442108-f7'
-          version: 'latest'
-
       - name: Install frontend dependencies
         run: npm install # change this to npm, pnpm or bun depending on which one you use.
 
@@ -90,6 +79,17 @@ jobs:
           fi
         shell: bash
         
+      - name: Authenticate with Google Cloud
+        uses: google-github-actions/auth@v1
+        with:
+          credentials_json: ${{ secrets.GCS_KEY }}
+
+      - name: 'Set up Cloud SDK'
+        uses: 'google-github-actions/setup-gcloud@v2'
+        with:
+          project_id: 'augmented-vim-442108-f7'
+          version: 'latest'
+      
       - name: Unzip backend data
         run: |
           node src-tauri/main.js
