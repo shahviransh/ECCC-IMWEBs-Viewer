@@ -55,9 +55,6 @@ jobs:
         with:
           project_id: 'augmented-vim-442108-f7'
           version: 'latest'
-      
-      - name: 'Verify Authentication'
-        run: gcloud auth list
 
       - name: Install frontend dependencies
         run: npm install # change this to npm, pnpm or bun depending on which one you use.
@@ -68,17 +65,19 @@ jobs:
           auto-update-conda: true
           python-version: 3.12
 
+      - name: Add Conda to PATH
+        run: |
+          echo "Adding Conda to PATH"
+          echo C:\Miniconda\condabin\conda.bat >> %GITHUB_PATH%
+          echo C:\Miniconda\Scripts\conda.exe >> %GITHUB_PATH%
+        shell: cmd
+
       - name: Build backend with PyInstaller
         run: |
           conda install -n venv -c conda-forge gdal -y
           pip install --no-cache-dir -r backend/requirements.txt
           pyinstaller backend/apppy.py -y --distpath backend/ --specpath backend/ --workpath backend/build --name apppy \
             --add-data "$CONDA/envs/venv/share/proj:share/proj"
-        shell: bash
-
-      - name: Verify backend executable
-        run: |
-          ls backend/apppy/_internal
         shell: bash
         
       - name: Unzip backend data
@@ -101,4 +100,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: "tauri-${{ matrix.platform }}-bundle"
-          path: "src-tauri/target/release/bundle/" # Update this path to match where Tauri outputs the bundles.
+          path: "src-tauri/target/**/release/bundle/"
