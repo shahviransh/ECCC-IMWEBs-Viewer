@@ -54,27 +54,33 @@ jobs:
           auto-update-conda: true
           python-version: 3.12
 
-      - name: Add Conda to PATH (Windows Only)
+      - name: Add Conda to PATH (windows only)
         if: matrix.platform == 'windows-latest'
         run: |
           echo "Adding Conda to PATH..."
           echo $CONDA\condabin >> $GITHUB_PATH
           echo $CONDA\Scripts >> $GITHUB_PATH
           echo $CONDA\Library\bin >> $GITHUB_PATH
-        shell: bash
-
-      - name: Build backend with PyInstaller
+        shell: cmd
+      
+      - name: Build backend with PyInstaller (windows only)
+        if: matrix.platform == 'windows-latest'
         run: |
           where conda
           conda install -n venv -c conda-forge gdal -y
           pip install --no-cache-dir -r backend/requirements.txt
-          if [[ "${{ matrix.platform }}" == "windows-latest" ]]; then
-            pyinstaller backend/apppy.py -y --distpath backend/ --specpath backend/ --workpath backend/build --name apppy \
-              --add-data "$CONDA/envs/venv/Library/share/proj;Library/share/proj"
-          else
-            pyinstaller backend/apppy.py -y --distpath backend/ --specpath backend/ --workpath backend/build --name apppy \
+          pyinstaller backend/apppy.py -y --distpath backend/ --specpath backend/ --workpath backend/build --name apppy \
+              --add-data "$CONDA/envs/venv/Library/share/proj:Library/share/proj"
+        shell: cmd
+      
+      - name: Build backend with PyInstaller
+        if: matrix.platform != 'windows-latest'
+        run: |
+          where conda
+          conda install -n venv -c conda-forge gdal -y
+          pip install --no-cache-dir -r backend/requirements.txt
+          pyinstaller backend/apppy.py -y --distpath backend/ --specpath backend/ --workpath backend/build --name apppy \
               --add-data "$CONDA/envs/venv/share/proj:share/proj"
-          fi
         shell: bash
         
       - name: Authenticate with Google Cloud
