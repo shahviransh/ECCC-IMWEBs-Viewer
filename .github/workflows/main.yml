@@ -54,27 +54,25 @@ jobs:
           auto-update-conda: true
           python-version: 3.12
 
-
-      - name: Find Conda Path
+      - name: Add Conda to PATH (Windows Only)
+        if: matrix.platform == 'windows-latest'
         run: |
+          echo "Adding Conda to PATH..."
+          echo $CONDA\condabin >> $GITHUB_PATH
+          echo $CONDA\Scripts >> $GITHUB_PATH
+          echo $CONDA\Library\bin >> $GITHUB_PATH
+          echo "where conda"
           where conda
-
-      
-      - name: Find Conda Path
-        run: |
-          where conda
+        shell: bash
 
       - name: Build backend with PyInstaller
         run: |
+          conda install -n venv -c conda-forge gdal -y
+          pip install --no-cache-dir -r backend/requirements.txt
           if [[ "${{ matrix.platform }}" == "windows-latest" ]]; then
-            C:\Miniconda\condabin\conda.bat activate venv
-            C:\Miniconda\condabin\conda.bat install -c conda-forge gdal
-            pip install --no-cache-dir -r backend/requirements.txt
             pyinstaller backend/apppy.py -y --distpath backend/ --specpath backend/ --workpath backend/build --name apppy \
               --add-data "$CONDA/envs/venv/Library/share/proj;Library/share/proj"
           else
-            conda install -n venv -c conda-forge gdal -y
-            pip install --no-cache-dir -r backend/requirements.txt
             pyinstaller backend/apppy.py -y --distpath backend/ --specpath backend/ --workpath backend/build --name apppy \
               --add-data "$CONDA/envs/venv/share/proj:share/proj"
           fi
