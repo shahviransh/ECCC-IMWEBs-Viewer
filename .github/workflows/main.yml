@@ -64,7 +64,7 @@ jobs:
 
       - name: Verify backend executable
         run: |
-          ls backend/apppy
+          ls backend/apppy/_internal
         shell: bash
 
       - name: 'Set up Cloud SDK'
