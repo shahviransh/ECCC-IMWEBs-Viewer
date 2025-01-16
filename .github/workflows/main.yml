@@ -46,35 +46,26 @@ jobs:
         # You can remove the one that doesn't apply to your app to speed up the workflow a bit.
 
       - name: install frontend dependencies
-        run: |
-          node src-tauri/main.js
-          npm install # change this to npm, pnpm or bun depending on which one you use.
+        run: npm install # change this to npm, pnpm or bun depending on which one you use.
 
-      - name: install Conda and set up backend
-        run: |
-          wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh
-          bash miniconda.sh -b -p $HOME/miniconda
-          export PATH="$HOME/miniconda/bin:$PATH"
-          conda init bash
-          source ~/.bashrc
-          conda create -n venv python=3.9 -y
-          conda activate venv
-          pip install --no-cache-dir -r backend/requirements.txt
-          conda install -c conda-forge gdal -y
-        shell: bash
+      - uses: conda-incubator/setup-miniconda@v3
+        with:
+          activate-environment: venv
+          python-version: 3.12
 
       - name: build backend with PyInstaller
         run: |
-          source ~/.bashrc
-          conda activate venv
+          pip install --no-cache-dir -r backend/requirements.txt
+          conda install -c conda-forge gdal -y
           pyinstaller backend/apppy.py -y --distpath backend/ --specpath backend/ --workpath backend/build --name apppy \
-            --add-data "$HOME/miniconda/envs/venv/share/proj:share/proj"
+            --add-data "$CONDA/envs/venv/share/proj:share/proj"
         shell: bash
       
       - name: Unzip backend data
         env:
           GITHUB_LINK_PATH: ${{ secrets.GITHUB_LINK_PATH }}
         run: |
+          node src-tauri/main.js
           unzip -o backend/apppy/Jenette_Creek_Watershed.zip -d backend/apppy/_internal/
       
       - name: verify backend executable
