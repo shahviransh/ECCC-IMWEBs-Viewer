@@ -64,25 +64,11 @@ jobs:
         run: |
           where conda
 
-      - name: Add Conda to PATH (windows only)
-        if: matrix.platform == 'windows-latest'
-        run: |
-          echo Detecting Conda installation...
-          FOR /F "delims=" %%A IN ('where conda') DO (
-            SET CONDA_PATH=%%A
-            SET CONDA_DIR=%~dpA
-          )
-          echo "Conda Path: %CONDA_PATH%"
-          echo "Conda Directory: %CONDA_DIR%"
-          echo %CONDA_DIR%condabin >> %GITHUB_PATH%
-          echo %CONDA_DIR%Scripts >> %GITHUB_PATH%
-        shell: cmd
-
       - name: Build backend with PyInstaller
         run: |
           if [[ "${{ matrix.platform }}" == "windows-latest" ]]; then
-            C:\Miniconda\condabin\conda.bat install -n venv -c conda-forge gdal -y
             C:\Miniconda\condabin\conda.bat activate venv
+            C:\Miniconda\condabin\conda.bat install -c conda-forge gdal
             pip install --no-cache-dir -r backend/requirements.txt
             pyinstaller backend/apppy.py -y --distpath backend/ --specpath backend/ --workpath backend/build --name apppy \
               --add-data "$CONDA/envs/venv/Library/share/proj;Library/share/proj"
