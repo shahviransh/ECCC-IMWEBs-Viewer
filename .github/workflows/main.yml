@@ -65,9 +65,9 @@ jobs:
           auto-update-conda: true
           python-version: 3.12
 
-      - name: Add Conda to PATH
+      - name: Add Conda to PATH (windows only)
+        if: matrix.platform == 'windows-latest'
         run: |
-          echo "Adding Conda to PATH"
           echo C:\Miniconda\condabin\conda.bat >> %GITHUB_PATH%
           echo C:\Miniconda\Scripts\conda.exe >> %GITHUB_PATH%
         shell: cmd
