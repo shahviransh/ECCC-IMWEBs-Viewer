@@ -40,11 +40,9 @@ WORKDIR /app
 RUN apt-get update && apt-get install -y libwebkit2gtk-4.0-dev libwebkit2gtk-4.1-dev build-essential \
         libssl-dev libgtk-3-dev tree \
         libayatana-appindicator3-dev libgdk-pixbuf2.0-dev \
-        librsvg2-dev libjavascriptcoregtk-4.1-dev libfuse2
-
-RUN wget https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-x86_64.AppImage \
-        && chmod +x linuxdeploy-x86_64.AppImage \
-        && mv linuxdeploy-x86_64.AppImage /usr/local/bin/linuxdeploy
+        librsvg2-dev libjavascriptcoregtk-4.1-dev libfuse2 \
+    && sudo apt install --reinstall ca-certificates \
+    && sudo update-ca-certificates -f
     
 # Install Rust and Tauri CLI
 RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
