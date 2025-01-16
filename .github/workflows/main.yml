@@ -62,38 +62,41 @@ jobs:
           echo $CONDA\Scripts >> $GITHUB_PATH
           echo $CONDA\Library\bin >> $GITHUB_PATH
         shell: cmd
+
+      - name: Install Conda dependencies (windows only)
+        if: matrix.platform == 'windows-latest'
+        run: |
+          conda install -n venv -c conda-forge gdal -y
+        shell: cmd
       
       - name: Build backend with PyInstaller (windows only)
         if: matrix.platform == 'windows-latest'
         run: |
-          where conda
-          conda install -n venv -c conda-forge gdal -y
           pip install --no-cache-dir -r backend/requirements.txt
           pyinstaller backend/apppy.py -y --distpath backend/ --specpath backend/ --workpath backend/build --name apppy \
-              --add-data "$CONDA/envs/venv/Library/share/proj:Library/share/proj"
+          --add-data "$CONDA/envs/venv/Library/share/proj:Library/share/proj"
         shell: cmd
-      
+
       - name: Build backend with PyInstaller
         if: matrix.platform != 'windows-latest'
         run: |
-          where conda
           conda install -n venv -c conda-forge gdal -y
           pip install --no-cache-dir -r backend/requirements.txt
           pyinstaller backend/apppy.py -y --distpath backend/ --specpath backend/ --workpath backend/build --name apppy \
-              --add-data "$CONDA/envs/venv/share/proj:share/proj"
+          --add-data "$CONDA/envs/venv/share/proj:share/proj"
         shell: bash
-        
+
       - name: Authenticate with Google Cloud
         uses: google-github-actions/auth@v1
         with:
           credentials_json: ${{ secrets.GCS_KEY }}
 
-      - name: 'Set up Cloud SDK'
-        uses: 'google-github-actions/setup-gcloud@v2'
+      - name: "Set up Cloud SDK"
+        uses: "google-github-actions/setup-gcloud@v2"
         with:
-          project_id: 'augmented-vim-442108-f7'
-          version: 'latest'
-      
+          project_id: "augmented-vim-442108-f7"
+          version: "latest"
+
       - name: Unzip backend data
         run: |
           node src-tauri/main.js
@@ -109,7 +112,7 @@ jobs:
           releaseDraft: true
           prerelease: false
           args: ${{ matrix.args }}
-      
+
       - name: Upload Release Artifact
         uses: actions/upload-artifact@v4
         with:
