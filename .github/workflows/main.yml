@@ -41,7 +41,7 @@ jobs:
         if: matrix.platform == 'ubuntu-22.04' # This must match the platform value defined above.
         run: |
           sudo apt-get update
-          sudo apt-get install -y libwebkit2gtk-4.0-dev libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf
+          sudo apt-get install -y libwebkit2gtk-4.0-dev google-cloud-sdk libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf
         # webkitgtk 4.0 is for Tauri v1 - webkitgtk 4.1 is for Tauri v2.
         # You can remove the one that doesn't apply to your app to speed up the workflow a bit.
 
@@ -66,13 +66,16 @@ jobs:
         run: |
           ls backend/apppy
         shell: bash
+
+      - name: Authenticate with Google Cloud
+        uses: google-github-actions/auth@v1
+        with:
+          credentials_json: ${{ secrets.GCS_KEY }}
       
       - name: Unzip backend data
-        env:
-          GITHUB_LINK_PATH: ${{ secrets.GITHUB_LINK_PATH }}
         run: |
           node src-tauri/main.js
-          unzip -o backend/apppy/Jenette_Creek_Watershed.zip -d backend/apppy/_internal/
+          gsutil -m cp -r gs://eccc-imwebs-viewer/Jenette_Creek_Watershed backend/apppy/_internal/
 
       - uses: tauri-apps/tauri-action@v0
         env:
