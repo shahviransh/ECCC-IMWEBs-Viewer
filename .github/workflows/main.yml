@@ -51,12 +51,13 @@ jobs:
       - uses: conda-incubator/setup-miniconda@v3
         with:
           activate-environment: venv
+          auto-update-conda: true
           python-version: 3.12
 
       - name: build backend with PyInstaller
         run: |
+          conda install -n venv -c conda-forge gdal -y
           pip install --no-cache-dir -r backend/requirements.txt
-          conda install -c conda-forge gdal -y
           pyinstaller backend/apppy.py -y --distpath backend/ --specpath backend/ --workpath backend/build --name apppy \
             --add-data "$CONDA/envs/venv/share/proj:share/proj"
         shell: bash
