@@ -36,7 +36,7 @@ FROM node:20 AS tauri-builder
 WORKDIR /app
 
 # Install necessary Linux tools
-RUN apt-get update && apt-get install -y libwebkit2gtk-4.0-dev \
+RUN apt-get update && apt-get install -y libwebkit2gtk-dev \
         build-essential \
         curl \
         wget \
