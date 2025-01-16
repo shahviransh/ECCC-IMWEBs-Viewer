@@ -20,7 +20,7 @@ jobs:
           # - platform: 'macos-latest' # for Intel based macs.
           #   args: '--target x86_64-apple-darwin'
           - platform: "ubuntu-22.04" # for Tauri v1 you could replace this with ubuntu-22.04.
-            args: ""
+            args: "--verbose"
           # - platform: "windows-latest"
           #   args: ""
 
@@ -48,8 +48,7 @@ jobs:
             patchelf build-essential libjavascriptcoregtk-4.1-dev libssl-dev \
             libgtk-3-dev libgdk-pixbuf2.0-dev libfuse2
 
-          sudo apt install --reinstall ca-certificates
-          sudo update-ca-certificates -f
+          export NO_STRIP=true
         # webkitgtk 4.0 is for Tauri v1 - webkitgtk 4.1 is for Tauri v2.
         # You can remove the one that doesn't apply to your app to speed up the workflow a bit.
 
