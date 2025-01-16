@@ -7,6 +7,7 @@ on:
 
 jobs:
   publish-tauri:
+    # Only run if the commit message includes 'release:app'
     permissions:
       contents: write
     strategy:
@@ -67,7 +68,8 @@ jobs:
         if: matrix.platform == 'windows-latest'
         run: |
           conda install -n venv -c conda-forge gdal -y && ^
-          pip install --no-cache-dir -r backend/requirements.txt
+          pip install --no-cache-dir -r backend/requirements.txt && ^
+          tree $CONDA\\envs\\venv
         shell: cmd
 
       - name: Build backend with PyInstaller (windows only)
