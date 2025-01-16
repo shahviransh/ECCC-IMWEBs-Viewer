@@ -9,6 +9,7 @@ RUN apt-get update && apt-get install -y binutils
 
 # Copy Python project files
 COPY backend /app/backend
+COPY backend/requirements.txt /app/backend/requirements.txt
 
 # Define a variable for the Conda environment path
 ENV CONDA_ENV_PATH=/opt/conda
@@ -36,8 +37,8 @@ FROM node:20 AS tauri-builder
 WORKDIR /app
 
 # Install necessary Linux tools
-RUN apt-get update && apt-get install -y libwebkit2gtk-dev build-essential \
-        libssl-dev libgtk-3-dev \
+RUN apt-get update && apt-get install -y libwebkit2gtk-4.0-dev libwebkit2gtk-4.1-dev build-essential \
+        libssl-dev libgtk-3-dev tree \
         libayatana-appindicator3-dev \
         librsvg2-dev libjavascriptcoregtk-4.1-dev
 
@@ -61,7 +62,7 @@ RUN npm install && npm run build
 FROM tauri-builder AS cross-builder
 
 # Copy outputs from Stage 1 (base) and Stage 2 (tauri-builder)
-COPY --from=base /app/backend/apppy /app/backend/apppy
+COPY --from=base /app/backend /app/backend
 COPY --from=tauri-builder /app /app
 
 # Build Tauri for all targets
