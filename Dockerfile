@@ -68,7 +68,7 @@ COPY --from=tauri-builder /app /app
 RUN dpkg -l | grep libxau
 
 # Build Tauri for all targets
-RUN npm run tauri build --verbose
+RUN npm run tauri build - --verbose
 
 # Stage 4: Artifact Collection
 FROM debian:bullseye AS artifact-collector
