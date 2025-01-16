@@ -36,15 +36,10 @@ FROM node:20 AS tauri-builder
 WORKDIR /app
 
 # Install necessary Linux tools
-RUN apt-get update && apt-get install -y libwebkit2gtk-dev \
-        build-essential \
-        curl \
-        wget \
-        file \
-        libssl-dev \
-        libgtk-3-dev \
+RUN apt-get update && apt-get install -y libwebkit2gtk-dev build-essential \
+        libssl-dev libgtk-3-dev \
         libayatana-appindicator3-dev \
-        librsvg2-dev
+        librsvg2-dev libjavascriptcoregtk-4.1-dev
 
 # Install Rust and Tauri CLI
 RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
