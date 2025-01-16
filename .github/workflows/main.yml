@@ -70,13 +70,16 @@ jobs:
       - name: 'Set up Cloud SDK'
         uses: 'google-github-actions/setup-gcloud@v2'
         with:
-          version: '>= 363.0.0'
+          version: 'latest'
 
       - name: Authenticate with Google Cloud
         uses: google-github-actions/auth@v1
         with:
           credentials_json: ${{ secrets.GCS_KEY }}
       
+      - name: 'Verify Authentication'
+        run: gcloud auth list
+        
       - name: Unzip backend data
         run: |
           node src-tauri/main.js
