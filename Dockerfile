@@ -40,9 +40,7 @@ WORKDIR /app
 RUN apt-get update && apt-get install -y libwebkit2gtk-4.0-dev libwebkit2gtk-4.1-dev build-essential \
         libssl-dev libgtk-3-dev tree \
         libayatana-appindicator3-dev libgdk-pixbuf2.0-dev \
-        librsvg2-dev libjavascriptcoregtk-4.1-dev libfuse2 \
-    && apt install --reinstall ca-certificates \
-    && update-ca-certificates -f
+        librsvg2-dev libjavascriptcoregtk-4.1-dev libfuse2 libxau-dev libxau6
     
 # Install Rust and Tauri CLI
 RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
@@ -67,8 +65,10 @@ FROM tauri-builder AS cross-builder
 COPY --from=base /app/backend /app/backend
 COPY --from=tauri-builder /app /app
 
+RUN dpkg -l | grep libxau
+
 # Build Tauri for all targets
-RUN npm run tauri build
+RUN npm run tauri build --verbose
 
 # Stage 4: Artifact Collection
 FROM debian:bullseye AS artifact-collector
