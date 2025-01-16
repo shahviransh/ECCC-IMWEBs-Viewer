@@ -71,14 +71,13 @@ jobs:
 
       - name: Add Conda to PATH (windows only)
         if: matrix.platform == 'windows-latest'
+        env:
+          CONDA: C:\Miniconda\condabin\conda.bat
         run: |
-          echo C:\Miniconda\condabin\conda.bat >> %GITHUB_PATH%
-          echo C:\Miniconda\Scripts\conda.exe >> %GITHUB_PATH%
+          echo "Testing Condabin"
         shell: cmd
 
       - name: Build backend with PyInstaller
-        env: 
-          SHARED_DIR: ${{ runner.workspace }}
         run: |
           conda install -n venv -c conda-forge gdal -y
           pip install --no-cache-dir -r backend/requirements.txt
