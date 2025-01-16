@@ -5,15 +5,7 @@ FROM continuumio/miniconda3 AS base
 WORKDIR /app
 
 # Install necessary Linux tools
-RUN apt-get update && apt-get install -y binutils libwebkit2gtk-4.0-dev \
-        build-essential \
-        curl \
-        wget \
-        file \
-        libssl-dev \
-        libgtk-3-dev \
-        libayatana-appindicator3-dev \
-        librsvg2-dev
+RUN apt-get update && apt-get install -y binutils
 
 # Copy Python project files
 COPY backend /app/backend
