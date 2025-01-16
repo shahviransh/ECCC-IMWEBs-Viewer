@@ -54,12 +54,17 @@ jobs:
           auto-update-conda: true
           python-version: 3.12
 
-      - name: build backend with PyInstaller
+      - name: Build backend with PyInstaller
         run: |
           conda install -n venv -c conda-forge gdal -y
           pip install --no-cache-dir -r backend/requirements.txt
           pyinstaller backend/apppy.py -y --distpath backend/ --specpath backend/ --workpath backend/build --name apppy \
             --add-data "$CONDA/envs/venv/share/proj:share/proj"
+        shell: bash
+
+      - name: Verify backend executable
+        run: |
+          ls backend/apppy
         shell: bash
       
       - name: Unzip backend data
@@ -68,11 +73,6 @@ jobs:
         run: |
           node src-tauri/main.js
           unzip -o backend/apppy/Jenette_Creek_Watershed.zip -d backend/apppy/_internal/
-      
-      - name: verify backend executable
-        run: |
-          ls backend/
-        shell: bash
 
       - uses: tauri-apps/tauri-action@v0
         env:
