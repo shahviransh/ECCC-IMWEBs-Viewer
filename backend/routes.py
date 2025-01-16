@@ -7,7 +7,6 @@ from services import (
     get_table_names,
     export_data_service,
     get_multi_columns_and_time_range,
-    get_dbf_details,
     process_geospatial_data_for_mapbox
 )
 from utils import shutdown_server, clear_cache
@@ -80,24 +79,6 @@ def register_routes(app, cache):
             return jsonify(columns_and_time_range_dict)
 
         return jsonify(columns_and_time_range_dict)
-
-    @app.route("/api/get_dbf_details", methods=["GET"])
-    @cache.cached(
-        timeout=300, query_string=True
-    )
-    def get_dbf_details():
-        """
-        Endpoint to get column names and data types from a DBF file.
-        """
-        data = request.args
-
-        # Fetch the column names and data types from the DBF file
-        dbf_details = get_dbf_details(data)
-
-        if dbf_details.get("error", None):
-            return jsonify(dbf_details)
-
-        return jsonify(dbf_details)
     
     @app.route("/api/mapbox_shapefile", methods=["GET"])
     @cache.cached(
