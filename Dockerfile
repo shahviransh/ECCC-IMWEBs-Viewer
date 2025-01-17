@@ -16,7 +16,7 @@ ENV PATH /opt/conda/bin:$PATH
 
 # Pip install Python dependencies
 RUN pip install --no-cache-dir -r /app/backend/requirements.txt && \
-    conda install -c conda-forge gdal && \
+    conda install -c conda-forge gdal sqlite libsqlite3-dev && \
     conda clean -afy
 
 # Package Python backend using PyInstaller
