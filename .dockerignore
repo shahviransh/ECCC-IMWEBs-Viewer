@@ -3,3 +3,6 @@ node_modules
 **/*.pyc
 .git
 .DS_Store
+dist
+.vscode
+.github

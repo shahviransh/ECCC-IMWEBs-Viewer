@@ -20,7 +20,7 @@ ENV PATH /opt/conda/envs/venv/bin:$PATH
 
 # Create a Conda environment named 'venv' and install dependencies
 RUN pip install --no-cache-dir -r /app/backend/requirements.txt && \
-    conda install -c conda-forge gdal && \
+    conda install -n venv -c conda-forge gdal && \
     conda clean -afy
 
 # Package Python backend using PyInstaller
@@ -51,10 +51,7 @@ ENV PATH=/root/.cargo/bin:$PATH
 RUN npm install -g @tauri-apps/cli
 
 # Copy frontend and Tauri project files
-COPY package.json package-lock.json index.html LICENSE README.md tailwind.config.js vite.config.js postcss.config.cjs .env /app/
-COPY src /app/src
-COPY public /app/public
-COPY src-tauri /app/src-tauri
+COPY . /app/
 
 # Install Node.js dependencies
 RUN npm install
