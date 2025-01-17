@@ -69,6 +69,15 @@ jobs:
           pip install --no-cache-dir -r backend/requirements.txt && ^
           pyinstaller backend/apppy.py -y --distpath backend/ --specpath backend/ --workpath backend/build --name apppy ^
           --add-data "%CONDA%/envs/venv/Library/share/proj;Library/share/proj"
+        shell: cmd
+
+      - name: Build backend with PyInstaller
+        if: matrix.platform != 'windows-latest'
+        run: |
+          conda install -n venv -c conda-forge gdal pillow -y
+          pip install --no-cache-dir -r backend/requirements.txt
+          pyinstaller --collect-all PIL backend/apppy.py -y --distpath backend/ --specpath backend/ --workpath backend/build --name apppy \
+          --add-data "$CONDA/envs/venv/share/proj:share/proj"
           # Directory containing the shared object (.so) files
           TARGET_DIR="/backend/apppy/_internal/pillow.libs"
           
@@ -86,16 +95,6 @@ jobs:
            # Create symbolic links
            echo "Creating symlink: $file -> $symlink"
           done
-        shell: cmd
-
-      - name: Build backend with PyInstaller
-        if: matrix.platform != 'windows-latest'
-        run: |
-          conda install -n venv -c conda-forge gdal pillow -y
-          pip install --no-cache-dir -r backend/requirements.txt
-          pyinstaller --collect-all PIL backend/apppy.py -y --distpath backend/ --specpath backend/ --workpath backend/build --name apppy \
-          --add-data "$CONDA/envs/venv/share/proj:share/proj"
-          ls backend/apppy/_internal/pillow.libs
         shell: bash
 
       - name: Authenticate with Google Cloud
