@@ -15,12 +15,12 @@ COPY backend/requirements.txt /app/backend/requirements.txt
 ENV PATH /opt/conda/bin:$PATH
 
 # Pip install Python dependencies
-RUN pip install --no-cache-dir -r /app/backend/requirements.txt && \
-    conda install -c conda-forge gdal sqlite libsqlite3-dev && \
+RUN conda install -c conda-forge gdal sqlite -y && \
+    pip install --no-cache-dir -r /app/backend/requirements.txt && \
     conda clean -afy
 
 # Package Python backend using PyInstaller
-RUN pyinstaller --clean --collect-all PIL /app/backend/apppy.py -y \
+RUN pyinstaller --collect-all PIL pillow /app/backend/apppy.py -y \
     --distpath /app/backend/ \
     --specpath /app/backend/ \
     --workpath /app/backend/build \
@@ -36,7 +36,8 @@ WORKDIR /app
 # Install necessary Linux tools
 RUN apt-get update && apt-get install -y libwebkit2gtk-4.0-dev libwebkit2gtk-4.1-dev build-essential \
         libssl-dev libgtk-3-dev tree \
-        libayatana-appindicator3-dev libgdk-pixbuf2.0-dev \
+        curl wget file \
+        libappindicator3-dev libgdk-pixbuf2.0-dev \
         librsvg2-dev libjavascriptcoregtk-4.1-dev libfuse2
     
 # Install Rust and Tauri CLI
