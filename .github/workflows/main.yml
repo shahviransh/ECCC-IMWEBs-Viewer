@@ -79,7 +79,7 @@ jobs:
           pyinstaller --collect-all PIL backend/apppy.py -y --distpath backend/ --specpath backend/ --workpath backend/build --name apppy \
           --add-data "$CONDA/envs/venv/share/proj:share/proj"
           # Directory containing the shared object (.so) files
-          TARGET_DIR="/backend/apppy/_internal/pillow.libs"
+          TARGET_DIR="backend/apppy/_internal/pillow.libs"
           
           # Destination directory for symlinks
           DEST_DIR="/usr/lib/x86_64-linux-gnu"
