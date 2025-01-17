@@ -49,7 +49,25 @@ jobs:
             libappindicator3-dev libgdk-pixbuf2.0-dev \
             librsvg2-dev libfuse2 \
             libwebkit2gtk-4.1-dev libjavascriptcoregtk-4.1-dev
-          sudo ln -s /usr/lib/x86_64-linux-gnu/libpng16.so.16 libpng16-2a828d05.so.16.44.0
+          # Directory containing the shared object (.so) files
+          TARGET_DIR="backend/apppy/_internal/pillow.libs"
+
+          # Destination directory for symlinks
+          DEST_DIR="/usr/lib/x86_64-linux-gnu"
+          
+          # Loop through each file
+          for file in "$TARGET_DIR"/*.so.*.*.*; do
+            # Extract base name and major version
+            base_name=$(echo "$file" | sed -E 's/(lib[^-]+).*/\1/')
+            major_version=$(echo "$file" | grep -oE '\.[0-9]+(?=\.)')
+
+            # Define symlink names
+            symlink="${DEST_DIR}/${base_name}${major_version}"
+            
+            # Create symbolic links
+            echo "Creating symlink: $file -> $symlink"
+            ln -sf "$symlink" "$file"
+          done
         # webkitgtk 4.0 is for Tauri v1 - webkitgtk 4.1 is for Tauri v2.
         # You can remove the one that doesn't apply to your app to speed up the workflow a bit. 
 
