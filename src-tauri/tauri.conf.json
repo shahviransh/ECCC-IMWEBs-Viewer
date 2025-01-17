@@ -32,7 +32,7 @@
     "linux": {
       "appimage": {
         "files": {
-          "/usr/_up_/backend/apppy": "../_up_/backend/apppy/**/*"
+          "/usr/_up_/backend/apppy": "src-tauri/target/release/_up_/backend/apppy/**/*"
         }
       }
     },
