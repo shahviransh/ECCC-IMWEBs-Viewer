@@ -19,7 +19,7 @@ jobs:
           #   args: "--target aarch64-apple-darwin"
           # - platform: 'macos-latest' # for Intel based macs.
           #   args: '--target x86_64-apple-darwin'
-          - platform: "ubuntu-20.04" # for Tauri v1 you could replace this with ubuntu-22.04.
+          - platform: "ubuntu-22.04" # for Tauri v1 you could replace this with ubuntu-22.04.
             args: "--verbose"
           # - platform: "windows-latest"
           #   args: ""
@@ -40,16 +40,18 @@ jobs:
           targets: ${{ matrix.platform == 'macos-latest' && 'aarch64-apple-darwin,x86_64-apple-darwin' || '' }}
 
       - name: Install dependencies (ubuntu only)
-        if: matrix.platform == 'ubuntu-20.04' # This must match the platform value defined above.
+        if: matrix.platform == 'ubuntu-22.04' # This must match the platform value defined above.
         run: |
           sudo apt-get update
           sudo apt-get install -y libwebkit2gtk-4.0-dev build-essential \
             libssl-dev libgtk-3-dev tree \
             curl wget file \
             libappindicator3-dev libgdk-pixbuf2.0-dev \
-            librsvg2-dev libfuse2
+            librsvg2-dev libfuse2 \
+            libwebkit2gtk-4.1-dev libjavascriptcoregtk-4.1-dev
+          sudo ln -s libpng16-2a828d05.so.16.44.0 /usr/lib/x86_64-linux-gnu/libpng16.so.16
         # webkitgtk 4.0 is for Tauri v1 - webkitgtk 4.1 is for Tauri v2.
-        # You can remove the one that doesn't apply to your app to speed up the workflow a bit. libwebkit2gtk-4.1-dev libjavascriptcoregtk-4.1-dev
+        # You can remove the one that doesn't apply to your app to speed up the workflow a bit. 
 
       - name: Install frontend dependencies
         run: npm install # change this to npm, pnpm or bun depending on which one you use.
