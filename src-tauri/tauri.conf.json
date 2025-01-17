@@ -29,6 +29,13 @@
     "externalBin": [
       "../backend/apppy/apppy"
     ],
+    "linux": {
+      "appimage": {
+        "files": {
+          "_up_/backend/apppy": "../backend/apppy"
+        }
+      }
+    },
     "icon": [
       "icons/icon.ico",
         "icons/icon_128x128.ico",
