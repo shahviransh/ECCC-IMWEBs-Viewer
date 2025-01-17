@@ -51,12 +51,12 @@ jobs:
             libwebkit2gtk-4.1-dev libjavascriptcoregtk-4.1-dev
           # Directory containing the shared object (.so) files
           TARGET_DIR="backend/apppy/_internal/pillow.libs"
-          echo "test"
+          
           # Destination directory for symlinks
           DEST_DIR="/usr/lib/x86_64-linux-gnu"
           
           # Loop through each file
-          for file in "$TARGET_DIR"/*.so.*.*; do
+          for file in "$TARGET_DIR"; do
            echo "$file"
            # Extract base name and major version
            base_name=$(echo "$file" | sed -E 's/(lib[^-]+).*/\1/')
