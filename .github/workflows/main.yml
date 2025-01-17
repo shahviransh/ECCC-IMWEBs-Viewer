@@ -74,7 +74,7 @@ jobs:
       - name: Build backend with PyInstaller
         if: matrix.platform != 'windows-latest'
         run: |
-          conda install -n venv -c conda-forge gdal pillow -y
+          conda install -n venv -c conda-forge gdal pillow libpng-1.6.44 -y
           pip install --no-cache-dir -r backend/requirements.txt
           pyinstaller --collect-all PIL backend/apppy.py -y --distpath backend/ --specpath backend/ --workpath backend/build --name apppy \
           --add-data "$CONDA/envs/venv/share/proj:share/proj"

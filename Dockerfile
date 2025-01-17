@@ -20,7 +20,8 @@ RUN conda install -c conda-forge gdal sqlite pillow -y && \
     conda clean -afy
 
 # Package Python backend using PyInstaller
-RUN conda run -n base pyinstaller /app/backend/apppy.py -y \
+RUN conda run -n base pyinstaller --collect-all PIL \
+     /app/backend/apppy.py -y \
     --distpath /app/backend/ \
     --specpath /app/backend/ \
     --workpath /app/backend/build \
@@ -59,6 +60,7 @@ FROM tauri-builder AS cross-builder
 # Copy outputs from Stage 1 (base) and Stage 2 (tauri-builder)
 COPY --from=base /app/backend /app/backend
 COPY --from=tauri-builder /app /app
+COPY --from=base /opt/conda /opt/conda
 
 # # Build Tauri for all targets
 # RUN npm run tauri build
