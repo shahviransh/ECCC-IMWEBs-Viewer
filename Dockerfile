@@ -11,16 +11,12 @@ RUN apt-get update && apt-get install -y binutils
 COPY backend /app/backend
 COPY backend/requirements.txt /app/backend/requirements.txt
 
-# Create a Conda environment and install necessary packages
-RUN conda create -n venv python=3.12 && \
-    conda clean -afy
-
 # Activate the Conda environment by modifying the PATH environment variable
-ENV PATH /opt/conda/envs/venv/bin:$PATH
+ENV PATH /opt/conda/bin:$PATH
 
-# Create a Conda environment named 'venv' and install dependencies
+# Pip install Python dependencies
 RUN pip install --no-cache-dir -r /app/backend/requirements.txt && \
-    conda install -n venv -c conda-forge gdal && \
+    conda install -c conda-forge gdal && \
     conda clean -afy
 
 # Package Python backend using PyInstaller
@@ -29,7 +25,7 @@ RUN pyinstaller --clean --collect-all PIL /app/backend/apppy.py -y \
     --specpath /app/backend/ \
     --workpath /app/backend/build \
     --name apppy \
-    --add-data "/opt/conda/envs/venv/share/proj:share/proj"
+    --add-data "/opt/conda/share/proj:share/proj"
 
 # Stage 2: Node.js and Rust for Tauri
 FROM node:20 AS tauri-builder
