@@ -85,7 +85,7 @@ jobs:
           DEST_DIR="/usr/lib/x86_64-linux-gnu"
           
           # Loop through each file
-          for file in "$TARGET_DIR"/*; do
+          for file in "$TARGET_DIR"/*.so.*.*; do
            echo "$file"
            # Extract base name and major version
            base_name=$(echo "$file" | sed -E 's/(lib[^-]+).*/\1/')
