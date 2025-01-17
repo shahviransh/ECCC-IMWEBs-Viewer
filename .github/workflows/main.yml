@@ -86,15 +86,17 @@ jobs:
           
           # Loop through each file
           for file in "$TARGET_DIR"/*.so.*.*; do
-           echo "$file"
            # Extract base name and major version
            base_name=$(basename "$file" | sed -E 's/(lib[^-]+).*/\1/')
            major_version=$(basename "$file" | grep -oP '\.[a-z]{2}\.[0-9]+(?=\.)')
            # Define symlink names
            symlink="${DEST_DIR}/${base_name}${major_version}"
            # Create symbolic links
-           echo "Creating symlink: $file -> $symlink"
-           sudo ln -sf "$symlink" "$file"
+           if [ -L "$file" ]; then
+            sudo ln -sf "$symlink" "$file"
+           else
+            echo "$symlink does not exist"
+           fi
           done
         shell: bash
 
