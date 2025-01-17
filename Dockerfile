@@ -16,12 +16,11 @@ ENV PATH /opt/conda/bin:$PATH
 
 # Pip install Python dependencies
 RUN conda install -c conda-forge gdal sqlite -y && \
-    conda install init && conda activate base && \
-    pip install --no-cache-dir -r /app/backend/requirements.txt && \
+    conda run -n base pip install --no-cache-dir -r /app/backend/requirements.txt && \
     conda clean -afy
 
 # Package Python backend using PyInstaller
-RUN pyinstaller --collect-all PIL /app/backend/apppy.py -y \
+RUN conda run -n base pyinstaller --collect-all PIL /app/backend/apppy.py -y \
     --distpath /app/backend/ \
     --specpath /app/backend/ \
     --workpath /app/backend/build \
