@@ -56,8 +56,7 @@ jobs:
 
       - uses: conda-incubator/setup-miniconda@v3
         with:
-          auto-activate-base: true
-          activate-environment: true
+          activate-environment: venv
           auto-update-conda: true
           channels: defaults,conda-forge
           python-version: 3.12
@@ -66,18 +65,20 @@ jobs:
         if: matrix.platform == 'windows-latest'
         run: |
           conda install -c conda-forge gdal -y && ^
+          conda activate venv && ^
           pip install --no-cache-dir -r backend/requirements.txt && ^
           pyinstaller backend/apppy.py -y --distpath backend/ --specpath backend/ --workpath backend/build --name apppy ^
-          --add-data "%CONDA%/Library/share/proj;Library/share/proj"
+          --add-data "%CONDA%/envs/venv/Library/share/proj;Library/share/proj"
         shell: cmd
 
       - name: Build backend with PyInstaller
         if: matrix.platform != 'windows-latest'
         run: |
-          conda install -c conda-forge gdal -y
+          conda install -n venv -c conda-forge gdal pillow -y
+          conda activate venv
           pip install --no-cache-dir -r backend/requirements.txt
           pyinstaller --clean --collect-all PIL backend/apppy.py -y --distpath backend/ --specpath backend/ --workpath backend/build --name apppy \
-          --add-data "$CONDA/share/proj:share/proj"
+          --add-data "$CONDA/envs/venv/share/proj:share/proj"
         shell: bash
 
       - name: Authenticate with Google Cloud
@@ -101,7 +102,7 @@ jobs:
           tagName: imwebs-viewer-v__VERSION__ # the action automatically replaces \_\_VERSION\_\_ with the app version.
           releaseName: "IMWEBs Viewer v__VERSION__"
           releaseBody: "See the assets to download this version and install."
-          releaseDraft: true
+          releaseDraft: false
           prerelease: false
           args: ${{ matrix.args }}
 

@@ -16,11 +16,12 @@ ENV PATH /opt/conda/bin:$PATH
 
 # Pip install Python dependencies
 RUN conda install -c conda-forge gdal sqlite -y && \
+    conda install init && conda activate base && \
     pip install --no-cache-dir -r /app/backend/requirements.txt && \
     conda clean -afy
 
 # Package Python backend using PyInstaller
-RUN pyinstaller --collect-all PIL pillow /app/backend/apppy.py -y \
+RUN pyinstaller --collect-all PIL /app/backend/apppy.py -y \
     --distpath /app/backend/ \
     --specpath /app/backend/ \
     --workpath /app/backend/build \
@@ -34,12 +35,12 @@ FROM node:20 AS tauri-builder
 WORKDIR /app
 
 # Install necessary Linux tools
-RUN apt-get update && apt-get install -y libwebkit2gtk-4.0-dev libwebkit2gtk-4.1-dev build-essential \
-        libssl-dev libgtk-3-dev tree \
-        curl wget file \
-        libappindicator3-dev libgdk-pixbuf2.0-dev \
-        librsvg2-dev libjavascriptcoregtk-4.1-dev libfuse2
-    
+RUN apt-get update && apt-get install -y libwebkit2gtk-4.0-dev libwebkit2gtk-4.1-dev \
+    build-essential libssl-dev libgtk-3-dev tree \
+    curl wget file \
+    libappindicator3-dev libgdk-pixbuf2.0-dev \
+    librsvg2-dev libjavascriptcoregtk-4.1-dev libfuse2
+
 # Install Rust and Tauri CLI
 RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
 ENV PATH=/root/.cargo/bin:$PATH
