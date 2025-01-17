@@ -51,22 +51,20 @@ jobs:
             libwebkit2gtk-4.1-dev libjavascriptcoregtk-4.1-dev
           # Directory containing the shared object (.so) files
           TARGET_DIR="backend/apppy/_internal/pillow.libs"
-
+          echo "test"
           # Destination directory for symlinks
           DEST_DIR="/usr/lib/x86_64-linux-gnu"
           
           # Loop through each file
           for file in "$TARGET_DIR"/*.so.*.*.*; do
-            # Extract base name and major version
-            base_name=$(echo "$file" | sed -E 's/(lib[^-]+).*/\1/')
-            major_version=$(echo "$file" | grep -oE '\.[0-9]+(?=\.)')
-
-            # Define symlink names
-            symlink="${DEST_DIR}/${base_name}${major_version}"
-            
-            # Create symbolic links
-            echo "Creating symlink: $file -> $symlink"
-            ln -sf "$symlink" "$file"
+           # Extract base name and major version
+           base_name=$(echo "$file" | sed -E 's/(lib[^-]+).*/\1/')
+           major_version=$(echo "$file" | grep -oE '\.[0-9]+(?=\.)')
+           # Define symlink names
+           symlink="${DEST_DIR}/${base_name}${major_version}"
+           # Create symbolic links
+           echo "Creating symlink: $file -> $symlink"
+           sudo ln -sf "$symlink" "$file"
           done
         # webkitgtk 4.0 is for Tauri v1 - webkitgtk 4.1 is for Tauri v2.
         # You can remove the one that doesn't apply to your app to speed up the workflow a bit. 
