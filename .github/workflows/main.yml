@@ -89,7 +89,7 @@ jobs:
            echo "$file"
            # Extract base name and major version
            base_name=$(echo "$file" | sed -E 's/(lib[^-]+).*/\1/')
-           major_version=$(echo "$file" | grep -oE '\.[0-9]+(?=\.)')
+           major_version=$(echo "$file" | sed -E '\.so\.[0-9]+(?=\.)')
            # Define symlink names
            symlink="${DEST_DIR}/${base_name}${major_version}"
            # Create symbolic links
