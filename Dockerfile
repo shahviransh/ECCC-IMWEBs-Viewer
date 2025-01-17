@@ -11,24 +11,25 @@ RUN apt-get update && apt-get install -y binutils
 COPY backend /app/backend
 COPY backend/requirements.txt /app/backend/requirements.txt
 
-# Define a variable for the Conda environment path
-ENV CONDA_ENV_PATH=/opt/conda
+# Create a Conda environment and install necessary packages
+RUN conda create -n venv python=3.12 && \
+    conda clean -afy
+
+# Activate the Conda environment by modifying the PATH environment variable
+ENV PATH /opt/conda/envs/venv/bin:$PATH
 
 # Create a Conda environment named 'venv' and install dependencies
-RUN $CONDA_ENV_PATH/bin/pip install --no-cache-dir -r /app/backend/requirements.txt && \
+RUN pip install --no-cache-dir -r /app/backend/requirements.txt && \
     conda install -c conda-forge gdal && \
     conda clean -afy
 
-# Expose Conda environment PATH
-ENV PATH=$CONDA_ENV_PATH/bin:$PATH
-
 # Package Python backend using PyInstaller
-RUN $CONDA_ENV_PATH/bin/pyinstaller /app/backend/apppy.py -y \
+RUN pyinstaller --collect-all PIL /app/backend/apppy.py -y \
     --distpath /app/backend/ \
     --specpath /app/backend/ \
     --workpath /app/backend/build \
     --name apppy \
-    --add-data "$CONDA_ENV_PATH/share/proj:share/proj"
+    --add-data "/opt/conda/envs/venv/share/proj:share/proj"
 
 # Stage 2: Node.js and Rust for Tauri
 FROM node:20 AS tauri-builder
@@ -40,8 +41,7 @@ WORKDIR /app
 RUN apt-get update && apt-get install -y libwebkit2gtk-4.0-dev libwebkit2gtk-4.1-dev build-essential \
         libssl-dev libgtk-3-dev tree \
         libayatana-appindicator3-dev libgdk-pixbuf2.0-dev \
-        librsvg2-dev libjavascriptcoregtk-4.1-dev \
-        libfuse2 libxau-dev libxau6 libwebp7
+        librsvg2-dev libjavascriptcoregtk-4.1-dev libfuse2
     
 # Install Rust and Tauri CLI
 RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
