@@ -12,16 +12,15 @@ COPY backend /app/backend
 COPY backend/requirements.txt /app/backend/requirements.txt
 
 # Activate the Conda environment by modifying the PATH environment variable
-ENV PATH /opt/conda/bin:$PATH
+ENV PATH=/opt/conda/bin:$PATH
 
 # Pip install Python dependencies
 RUN conda install -c conda-forge gdal sqlite pillow -y && \
-    ls -l /opt/conda/lib | grep libpng && \
     conda run -n base pip install --no-cache-dir -r /app/backend/requirements.txt && \
     conda clean -afy
 
 # Package Python backend using PyInstaller
-RUN conda run -n base pyinstaller --collect-all PIL /app/backend/apppy.py -y \
+RUN conda run -n base pyinstaller /app/backend/apppy.py -y \
     --distpath /app/backend/ \
     --specpath /app/backend/ \
     --workpath /app/backend/build \
@@ -54,15 +53,15 @@ COPY . /app/
 # Install Node.js dependencies
 RUN npm install
 
-# # Stage 3: Compilation with Rust
-# FROM tauri-builder AS cross-builder
+# Stage 3: Compilation with Rust
+FROM tauri-builder AS cross-builder
 
-# # Copy outputs from Stage 1 (base) and Stage 2 (tauri-builder)
-# COPY --from=base /app/backend /app/backend
-# COPY --from=tauri-builder /app /app
+# Copy outputs from Stage 1 (base) and Stage 2 (tauri-builder)
+COPY --from=base /app/backend /app/backend
+COPY --from=tauri-builder /app /app
 
 # # Build Tauri for all targets
-# RUN npm run tauri build -- --bundles
+# RUN npm run tauri build
 
 # # Stage 4: Artifact Collection
 # FROM debian:bullseye AS artifact-collector
@@ -74,4 +73,4 @@ RUN npm install
 # COPY --from=cross-builder /app/src-tauri/target/release/bundle /artifacts/
 # COPY --from=base /app/backend/apppy /artifacts/backend/apppy
 
-# CMD ["ls", "/artifacts"]
+CMD ["npm", "run", "tauri", "build", "--", "--verbose"]

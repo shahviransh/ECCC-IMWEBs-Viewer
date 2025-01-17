@@ -29,13 +29,6 @@
     "externalBin": [
       "../backend/apppy/apppy"
     ],
-    "linux": {
-      "appimage": {
-        "files": {
-          "/usr/_up_/backend/apppy": "src-tauri/target/release/_up_/backend/apppy/**/*"
-        }
-      }
-    },
     "icon": [
       "icons/icon.ico",
         "icons/icon_128x128.ico",
