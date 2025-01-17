@@ -32,7 +32,7 @@
     "linux": {
       "appimage": {
         "files": {
-          "_up_/backend/apppy": "../backend/apppy/**/*"
+          "/usr/_up_/backend/apppy": "../backend/apppy/**/*"
         }
       }
     },
