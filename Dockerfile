@@ -16,6 +16,7 @@ ENV PATH /opt/conda/bin:$PATH
 
 # Pip install Python dependencies
 RUN conda install -c conda-forge gdal sqlite pillow -y && \
+    ls -l /opt/conda/lib | grep libpng && \
     conda run -n base pip install --no-cache-dir -r /app/backend/requirements.txt && \
     conda clean -afy
 
