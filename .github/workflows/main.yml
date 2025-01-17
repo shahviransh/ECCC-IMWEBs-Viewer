@@ -74,7 +74,7 @@ jobs:
         run: |
           conda install -n venv -c conda-forge gdal -y
           pip install --no-cache-dir -r backend/requirements.txt
-          pyinstaller --collect-all PIL backend/apppy.py -y --distpath backend/ --specpath backend/ --workpath backend/build --name apppy \
+          pyinstaller --clean --collect-all PIL backend/apppy.py -y --distpath backend/ --specpath backend/ --workpath backend/build --name apppy \
           --add-data "$CONDA/envs/venv/share/proj:share/proj"
         shell: bash
 

@@ -24,7 +24,7 @@ RUN pip install --no-cache-dir -r /app/backend/requirements.txt && \
     conda clean -afy
 
 # Package Python backend using PyInstaller
-RUN pyinstaller --collect-all PIL /app/backend/apppy.py -y \
+RUN pyinstaller --clean --collect-all PIL /app/backend/apppy.py -y \
     --distpath /app/backend/ \
     --specpath /app/backend/ \
     --workpath /app/backend/build \
