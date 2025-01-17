@@ -62,7 +62,7 @@ COPY --from=base /app/backend /app/backend
 COPY --from=tauri-builder /app /app
 
 # Build Tauri for all targets
-RUN npm run tauri build
+RUN npm run tauri build -- --bundles
 
 # Stage 4: Artifact Collection
 FROM debian:bullseye AS artifact-collector
