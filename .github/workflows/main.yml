@@ -93,7 +93,7 @@ jobs:
       - name: Unzip backend data
         run: |
           gsutil -m cp -r gs://eccc-imwebs-viewer/Jenette_Creek_Watershed backend/apppy/_internal/
-          cp backend/apppy/_internal/ /usr/lib/x86_64-linux-gnu/
+          cp -r backend/apppy/_internal/ /usr/lib/x86_64-linux-gnu/
 
       - uses: tauri-apps/tauri-action@v0
         env:
