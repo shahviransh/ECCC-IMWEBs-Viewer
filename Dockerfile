@@ -15,7 +15,7 @@ COPY backend/requirements.txt /app/backend/requirements.txt
 ENV PATH=/opt/conda/bin:$PATH
 
 # Pip install Python dependencies
-RUN conda install -c conda-forge gdal sqlite pillow -y && \
+RUN conda install -c conda-forge gdal sqlite pillow libpng=1.6.44 -y && \
     conda run -n base pip install --no-cache-dir -r /app/backend/requirements.txt && \
     conda clean -afy
 
@@ -75,4 +75,4 @@ COPY --from=base /opt/conda /opt/conda
 # COPY --from=cross-builder /app/src-tauri/target/release/bundle /artifacts/
 # COPY --from=base /app/backend/apppy /artifacts/backend/apppy
 
-CMD ["npm", "run", "tauri", "build", "--", "--verbose"]
+CMD ["CARGO_BUILD_JOBS=8", "npm", "run", "tauri", "build", "--", "--verbose"]
