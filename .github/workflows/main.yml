@@ -94,6 +94,10 @@ jobs:
       - name: Unzip backend data
         run: gsutil -m cp -r gs://eccc-imwebs-viewer/Jenette_Creek_Watershed backend/apppy/_internal/
 
+      - name: Debug with tmate on failure
+        if: ${{ failure() }}
+        uses: mxschmitt/action-tmate@v3
+
       - uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

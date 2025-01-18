@@ -15,7 +15,7 @@ COPY backend/requirements.txt /app/backend/requirements.txt
 ENV PATH=/opt/conda/bin:$PATH
 
 # Pip install Python dependencies
-RUN conda install -c conda-forge gdal sqlite pillow libpng=1.6.44 -y && \
+RUN conda install -c conda-forge gdal sqlite pillow libpng=1.6.44 libjpeg=8 -y && \
     conda run -n base pip install --no-cache-dir -r /app/backend/requirements.txt && \
     conda clean -afy
 
