@@ -2,12 +2,13 @@ name: "release"
 
 on:
   push:
-    tags:
-      - 'IMWEBs-Viewer-v*'
+    branches:
+      - main
 
 jobs:
   publish-tauri:
     # Only run if the commit message includes 'release:app'
+    if: contains(github.event.head_commit.message, 'release:app')
     permissions:
       contents: write
     strategy:
@@ -93,7 +94,7 @@ jobs:
       - name: Unzip backend data
         run: |
           gsutil -m cp -r gs://eccc-imwebs-viewer/Jenette_Creek_Watershed backend/apppy/_internal/
-          cp -r backend/apppy/_internal/ /usr/lib/x86_64-linux-gnu/
+          sudo cp -r backend/apppy/_internal/ /usr/lib/x86_64-linux-gnu/
 
       - uses: tauri-apps/tauri-action@v0
         env:
