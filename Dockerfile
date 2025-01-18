@@ -62,17 +62,17 @@ COPY --from=base /app/backend /app/backend
 COPY --from=tauri-builder /app /app
 COPY --from=base /opt/conda /opt/conda
 
-# # Build Tauri for all targets
-# RUN npm run tauri build
+# Build Tauri for all targets
+RUN npm run tauri build
 
-# # Stage 4: Artifact Collection
-# FROM debian:bullseye AS artifact-collector
+# Stage 4: Artifact Collection
+FROM debian:bullseye AS artifact-collector
 
-# # Set working directory
-# WORKDIR /artifacts
+# Set working directory
+WORKDIR /artifacts
 
-# # Copy artifacts from previous stages
-# COPY --from=cross-builder /app/src-tauri/target/release/bundle /artifacts/
-# COPY --from=base /app/backend/apppy /artifacts/backend/apppy
+# Copy artifacts from previous stages
+COPY --from=cross-builder /app/src-tauri/target/release/bundle /artifacts/
+COPY --from=base /app/backend/apppy /artifacts/backend/apppy
 
-CMD ["CARGO_BUILD_JOBS=8", "npm", "run", "tauri", "build", "--", "--verbose"]
+CMD ["ls" "/artifacts"]
