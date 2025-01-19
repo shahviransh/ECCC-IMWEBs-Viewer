@@ -67,8 +67,12 @@ fn main() {
       tauri::async_runtime::spawn(async move {
         start_server().await;
       });
-      let window = app.get_webview_window("main").unwrap();
-      window.open_devtools();
+      #[cfg(debug_assertions)] // only include this code on debug builds
+      {
+        let window = app.get_webview_window("main").unwrap();
+        window.open_devtools();
+        window.close_devtools();
+      }
       Ok(())
     })
     .on_window_event(|_app_handle, event| {
