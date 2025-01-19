@@ -61,6 +61,7 @@ FROM tauri-builder AS cross-builder
 COPY --from=base /app/backend /app/backend
 COPY --from=tauri-builder /app /app
 COPY --from=base /opt/conda /opt/conda
+COPY --from=base backend/apppy/_internal/* /usr/lib/
 
 # Build Tauri for all targets
 RUN npm run tauri build
