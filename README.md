@@ -6,10 +6,16 @@ This application is built with Tauri, Vue 3 as the frontend, and Flask as the ba
 
 **Go to the GitHub Releases page: Access all release packages from this [link](https://github.com/shahviransh/ECCC-IMWEBs-Viewer/releases/latest)**.
 
-Download for your platform:
+### Download for your platform:
 
-- Linux: Download the `.deb` or `.rpm` package and install it using your package manager. Run the application using your application launcher or via terminal.
-- Windows: Download and run `.msi` (requires admin privileges) or `.exe`. The application should launch automatically.
-- macOS: Download the `.dmg` or `.app.tar.gz` file. If it’s a `.dmg`, open it and drag the application to your Applications folder. If it’s a `.app.tar.gz`, extract it first, then move the application to your Applications folder. Launch it from the Applications folder or Spotlight Search.
+- **Linux**: Download the `.deb`, `.rpm`, or `.AppImage` package.  
+  - **For `.deb` or `.rpm`**: Install the package using your package manager. Launch the application via your application launcher or terminal.  
+  - **For `.AppImage`**: Make the file executable using `chmod +x <filename>.AppImage` in the terminal, then run it by double-clicking or executing `./<filename>.AppImage`.  
+
+- **Windows**: Download and run the `.msi` (requires admin privileges) or `.exe` file. The application should launch automatically after installation.  
+
+- **macOS**: Download the `.dmg` or `.app.tar.gz` file.  
+  - **For `.dmg`**: Open the file and drag the application to your Applications folder.  
+  - **For `.app.tar.gz`**: Extract the file, then move the application to your Applications folder. Launch the application from the Applications folder or using Spotlight Search.
 
 Launch the Application: The application connects the Vue 3 frontend with the Flask backend and should be ready to use.
