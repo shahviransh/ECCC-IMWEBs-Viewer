@@ -3,9 +3,8 @@
 
 use std::{env, process::Command, time::Duration, thread::sleep};
 use reqwest::Client;
-use tauri::Manager;
 
-#[cfg(target_os = "windows")]
+// #[cfg(target_os = "windows")]
 const CREATE_NO_WINDOW: u32 = 0x08000000;
 
 #[tauri::command]
@@ -40,7 +39,7 @@ async fn start_server() {
   // Spawn the server as a background process
   let mut command = Command::new(server_path);
   // Only apply CREATE_NO_WINDOW on Windows to suppress console
-  #[cfg(target_os = "windows")]
+  // #[cfg(target_os = "windows")]
   {
       use std::os::windows::process::CommandExt;
       command.creation_flags(CREATE_NO_WINDOW);
