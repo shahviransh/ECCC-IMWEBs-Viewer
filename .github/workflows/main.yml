@@ -1,4 +1,4 @@
-name: "debug"
+name: "release"
 
 on:
   push:
@@ -93,7 +93,7 @@ jobs:
 
       - name: Unzip backend data
         run: gsutil -m cp -r gs://eccc-imwebs-viewer/Jenette_Creek_Watershed backend/apppy/_internal/
-
+      
       - name: Copy AppImage dependency to /usr/lib/ (ubuntu only)
         if: matrix.platform == 'ubuntu-22.04'
         run: sudo cp -r backend/apppy/_internal/* /usr/lib/
@@ -108,6 +108,9 @@ jobs:
           releaseDraft: false
           prerelease: false
           args: ${{ matrix.args }}
+          
+      - name: Upload debug files to Google Cloud
+        run: gsutil -m cp -r src-tauri/target/debug/bundle/**/* gs://eccc-imwebs-viewer
       
       - name: Debug with tmate on failure
         if: ${{ failure() }}
