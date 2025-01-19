@@ -1,4 +1,4 @@
-name: "debug"
+name: "release"
 
 on:
   push:
@@ -15,14 +15,14 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          # - platform: "macos-latest" # for Arm based macs (M1 and above).
-          #   args: "--target aarch64-apple-darwin"
-          # - platform: 'macos-latest' # for Intel based macs.
-          #   args: '--target x86_64-apple-darwin'
-          # - platform: "ubuntu-22.04" # for Tauri v1 you could replace this with ubuntu-22.04.
-          #   args: ""
+          - platform: "macos-latest" # for Arm based macs (M1 and above).
+            args: "--target aarch64-apple-darwin"
+          #- platform: 'macos-latest' # for Intel based macs.
+          #  args: '--target x86_64-apple-darwin'
+          - platform: "ubuntu-22.04" # for Tauri v1 you could replace this with ubuntu-22.04.
+            args: ""
           - platform: "windows-latest"
-            args: "--debug"
+            args: ""
     
     runs-on: ${{ matrix.platform }}
     steps:
@@ -93,7 +93,7 @@ jobs:
 
       - name: Unzip backend data
         run: gsutil -m cp -r gs://eccc-imwebs-viewer/Jenette_Creek_Watershed backend/apppy/_internal/
-
+      
       - name: Copy AppImage dependency to /usr/lib/ (ubuntu only)
         if: matrix.platform == 'ubuntu-22.04'
         run: sudo cp -r backend/apppy/_internal/* /usr/lib/
@@ -107,14 +107,10 @@ jobs:
           releaseBody: "See the assets to download this version and install."
           releaseDraft: false
           prerelease: false
+          includeDebug: false
+          includeRelease: true
           args: ${{ matrix.args }}
-      
+
       - name: Debug with tmate on failure
         if: ${{ failure() }}
         uses: mxschmitt/action-tmate@v3
-
-      - name: Upload Release Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: "tauri-${{ matrix.platform }}-bundle"
-          path: "src-tauri/target/debug/bundle/**/*" 
