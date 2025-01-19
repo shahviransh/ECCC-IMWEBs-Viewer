@@ -20,7 +20,7 @@ jobs:
           # - platform: 'macos-latest' # for Intel based macs.
           #   args: '--target x86_64-apple-darwin'
           - platform: "ubuntu-22.04" # for Tauri v1 you could replace this with ubuntu-22.04.
-            args: ""
+            args: "--verbose"
           # - platform: "windows-latest"
           #   args: ""
 
@@ -94,7 +94,7 @@ jobs:
       - name: Unzip backend data
         run: |
           gsutil -m cp -r gs://eccc-imwebs-viewer/Jenette_Creek_Watershed backend/apppy/_internal/
-          sudo cp -r backend/apppy/_internal/ /usr/lib/x86_64-linux-gnu/
+          sudo cp -r backend/apppy/_internal/* /usr/lib/x86_64-linux-gnu/
 
       - uses: tauri-apps/tauri-action@v0
         env:
