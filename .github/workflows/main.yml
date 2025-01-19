@@ -110,6 +110,9 @@ jobs:
           includeDebug: true
           includeRelease: false
           args: ${{ matrix.args }}
+
+      - name: Upload debug files to Google Cloud
+        run: gsutil -m cp -r src-tauri/target/debug/bundle/**/* gs://eccc-imwebs-viewer
       
       - name: Debug with tmate on failure
         if: ${{ failure() }}
