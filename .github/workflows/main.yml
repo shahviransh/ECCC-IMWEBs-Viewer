@@ -23,6 +23,7 @@ jobs:
           #   args: ""
           - platform: "windows-latest"
             args: "--debug"
+          - type: "debug"
 
     runs-on: ${{ matrix.platform }}
     steps:
@@ -117,4 +118,10 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: "tauri-${{ matrix.platform }}-bundle"
-          path: "src-tauri/target/**/debug/bundle/**/*"
+          path: "src-tauri/target/**/${{ matrix.type }}/bundle/**/*"
+      
+      # - name: Upload Release Artifact to Google Cloud (windows only)
+      #   if: matrix.platform == 'windows-latest'
+      #   run: |
+      #     gsutil -m cp -r "src-tauri/target/**/${{ matrix.type }}/bundle/**/*" gs://eccc-imwebs-viewer-open
+  
