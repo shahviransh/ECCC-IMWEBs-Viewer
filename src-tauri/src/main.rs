@@ -3,6 +3,7 @@
 
 use std::{env, process::Command, time::Duration, thread::sleep};
 use reqwest::Client;
+use tauri::Manager;
 
 #[cfg(target_os = "windows")]
 const CREATE_NO_WINDOW: u32 = 0x08000000;
