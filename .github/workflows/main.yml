@@ -5,6 +5,9 @@ on:
     branches:
       - main
 
+env:
+  BUILD_TYPE: debug # Set the default type to release. Change to debug if needed.
+
 jobs:
   publish-tauri:
     # Only run if the commit message includes 'release:app'
@@ -23,8 +26,7 @@ jobs:
           #   args: ""
           - platform: "windows-latest"
             args: "--debug"
-          - type: "debug"
-
+    
     runs-on: ${{ matrix.platform }}
     steps:
       - uses: actions/checkout@v4
@@ -118,10 +120,10 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: "tauri-${{ matrix.platform }}-bundle"
-          path: "src-tauri/target/**/${{ matrix.type }}/bundle/**/*"
+          path: "src-tauri/target/**/${{ env.BUILD_TYPE }}/bundle/**/*"
       
       # - name: Upload Release Artifact to Google Cloud (windows only)
       #   if: matrix.platform == 'windows-latest'
       #   run: |
-      #     gsutil -m cp -r "src-tauri/target/**/${{ matrix.type }}/bundle/**/*" gs://eccc-imwebs-viewer-open
+      #     gsutil -m cp -r "src-tauri/target/**/${{ env.BUILD_TYPE }}/bundle/**/*" gs://eccc-imwebs-viewer-open
   
