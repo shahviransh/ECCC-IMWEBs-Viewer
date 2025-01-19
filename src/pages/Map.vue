@@ -74,8 +74,10 @@ export default {
         selectedColumns() {
             this.ID = this.selectedColumns.filter((column) => column.includes('ID')).join("");
         },
-        selectedGeoFolder() {
-            this.initializeMap();
+        selectedGeoFolder(newFolder) {
+            if (newFolder) {
+                this.initializeMap();
+            }
         },
     },
     computed: {
@@ -100,7 +102,7 @@ export default {
                     }
                 });
 
-                const { geojson, bounds, raster_bounds, center, layers } = response.data;
+                const { geojson, bounds, raster_bounds, center, layers, properties } = response.data;
 
                 // Create the Mapbox map instance
                 this.map = new mapboxgl.Map({
@@ -120,6 +122,46 @@ export default {
                     // Add layers from the backend
                     layers.forEach((layer) => {
                         this.map.addLayer(layer);
+                    });
+
+                    // Initialize popup
+                    const popup = new mapboxgl.Popup({
+                        closeButton: false,
+                        closeOnClick: false,
+                    });
+
+                    // Add hover interaction on "shapefile-fill"
+                    this.map.on("mousemove", "shapefile-fill", (e) => {
+                        this.map.getCanvas().style.cursor = "pointer";
+
+                        const feature = e.features[0];
+
+                        // Dynamically generate popup content from properties
+                        const popupContent = properties
+                            .map((prop) => {
+                                const value = feature.properties[prop];
+                                return `<strong>${prop}:</strong> ${typeof value === "number" ? value.toFixed(4) : value ?? "N/A"
+                                    }`;
+                            })
+                            .join("<br>");
+
+                        popup.setLngLat(e.lngLat).setHTML(popupContent).addTo(this.map);
+
+                        // Highlight the hovered polygon
+                        this.map.setPaintProperty("shapefile-fill", "fill-opacity", [
+                            "case",
+                            ["==", ["get", "OBJECTID_1"], feature.properties.OBJECTID_1],
+                            0.4, // Highlight opacity
+                            0.1,
+                        ]);
+                    });
+
+                    this.map.on("mouseleave", "shapefile-fill", () => {
+                        this.map.getCanvas().style.cursor = "";
+                        popup.remove();
+
+                        // Reset fill-opacity to default
+                        this.map.setPaintProperty("shapefile-fill", "fill-opacity", 0.1);
                     });
 
                     // Fit map to bounds

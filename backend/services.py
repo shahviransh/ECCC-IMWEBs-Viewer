@@ -889,44 +889,6 @@ def get_multi_columns_and_time_range(data):
     except Exception as e:
         return {"error": str(e)}
 
-
-def get_dbf_details(data):
-    """Fetch details from a single DBase file."""
-    directory = os.path.join(Config.PATHFILE, data.get("directory"))
-
-    # Find the .dbf file in the directory
-    dbf_file = None
-    for ext in [".dbf"]:
-        files = [f for f in os.listdir(directory) if f.endswith(ext)]
-        if files:
-            dbf_file = os.path.join(directory, files[0])
-            break
-
-    if not dbf_file:
-        return {"error": "No .dbf file found in the directory."}
-
-    # Open the .dbf file using OGR
-    driver = ogr.GetDriverByName("ESRI Shapefile")
-    dataset = driver.Open(dbf_file, 0)
-    if dataset is None:
-        return {"error": "Failed to open .dbf file."}
-
-    layer = dataset.GetLayer()
-    if not layer:
-        return {"error": "No layer found in the .dbf file."}
-
-    # Get column names
-    layer_defn = layer.GetLayerDefn()
-    column_names = [
-        layer_defn.GetFieldDefn(i).GetName() for i in range(layer_defn.GetFieldCount())
-    ]
-
-    # Close the dataset
-    dataset = None
-
-    return {"columns": column_names}
-
-
 def round_coordinates(geojson_data, decimal_points=4):
     """
     Recursively round all coordinates in the GeoJSON to a specified number of decimal points.
@@ -1006,6 +968,9 @@ def process_geospatial_data_for_mapbox(data):
     layer_defn = layer.GetLayerDefn()
     for i in range(layer_defn.GetFieldCount()):
         reprojected_layer.CreateField(layer_defn.GetFieldDefn(i))
+
+    # Collect properties dynamically
+    properties = [layer_defn.GetFieldDefn(i).GetName() for i in range(layer_defn.GetFieldCount())]
 
     # Reproject each feature
     for feature in layer:
@@ -1093,4 +1058,5 @@ def process_geospatial_data_for_mapbox(data):
         "raster_bounds": raster_bounds,  # Include raster bounds if present
         "center": center,
         "layers": layer_configurations,
+        "properties": properties
     }

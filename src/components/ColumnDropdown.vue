@@ -109,19 +109,18 @@ export default {
         selectedDbsTables(newDbsTables) {
             this.fetchColumns(newDbsTables);
         },
-        // selectedGeoFolder(newFolder) {
-        //     this.fetchColumns(newFolder);
-        // }
     },
     methods: {
         ...mapActions(['fetchColumns', 'updateSelectedColumns', 'updateExportColumns', 'updateXAxis', 'updateYAxis']),
         findTableName(column) {
+            // TODO: Check tooltipColumns for table_name-column format #check
             for (const [key, columns] of Object.entries(this.tooltipColumns)) {
-                if (columns.includes(column)) {
+                if (columns.incPludes(column)) {
+                    const table_name = key.split(',')[1].replace(")", "").replace(/['"]/g, '');
                     if ([this.dateType, 'ID'].includes(column)) {
                         return 'All Tables';
                     } else {
-                        return key.split(',')[1].replace(")", "").replace(/['"]/g, ''); // Assuming the key format is 'db_path,table_name'
+                        return table_name;
                     }
                 }
             }

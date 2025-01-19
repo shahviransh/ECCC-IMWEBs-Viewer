@@ -207,9 +207,12 @@ const store = createStore({
 
       for (let attempt = 1; attempt <= maxRetries; attempt++) {
         try {
-          const response = await axios.get(`${import.meta.env.VITE_APP_API_BASE_URL}/api/list_files`, {
-            params: { folder_path: "Jenette_Creek_Watershed" },
-          });
+          const response = await axios.get(
+            `${import.meta.env.VITE_APP_API_BASE_URL}/api/list_files`,
+            {
+              params: { folder_path: "Jenette_Creek_Watershed" },
+            }
+          );
           if (response.data.error) {
             alert("Error fetching data: " + response.data.error);
             return;
@@ -231,9 +234,12 @@ const store = createStore({
     },
     async fetchTables({ commit }, db) {
       try {
-        const response = await axios.get(`${import.meta.env.VITE_APP_API_BASE_URL}/api/get_tables`, {
-          params: { db_path: db },
-        });
+        const response = await axios.get(
+          `${import.meta.env.VITE_APP_API_BASE_URL}/api/get_tables`,
+          {
+            params: { db_path: db },
+          }
+        );
         if (response.data.error) {
           alert("Error fetching data: " + response.data.error);
           return;
@@ -245,20 +251,14 @@ const store = createStore({
     },
     async fetchColumns({ commit }, dbTables) {
       try {
-        // Fecth based on dbTables or selectedGeoFolder
-        let response;
-        if (typeof dbTables === "object") {
-          // Fetch all columns for all tables selected
-          response = await axios.get(`${import.meta.env.VITE_APP_API_BASE_URL}/api/get_table_details`, {
+        // Fetch all columns for all tables selected
+        const response = await axios.get(
+          `${import.meta.env.VITE_APP_API_BASE_URL}/api/get_table_details`,
+          {
             params: { db_tables: JSON.stringify(dbTables) },
-          });
-        } 
-        // else {
-        //   // Fetch all columns for the selected folder
-        //   response = await axios.get(`${import.meta.env.VITE_APP_API_BASE_URL}/api/get_dbf_details`, {
-        //     params: { directory: JSON.stringify(this.dbTables) },
-        //   });
-        // }
+          }
+        );
+
         if (response.data.error) {
           alert("Error fetching data: " + response.data.error);
           return;
