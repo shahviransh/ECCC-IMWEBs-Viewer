@@ -62,10 +62,12 @@ async fn shutdown_flask() {
 
 fn main() {
   tauri::Builder::default()
-    .setup(|_app| {
+    .setup(|app| {
       tauri::async_runtime::spawn(async move {
         start_server().await;
       });
+      let window = app.get_webview_window("main").unwrap();
+      window.open_devtools();
       Ok(())
     })
     .on_window_event(|_app_handle, event| {
