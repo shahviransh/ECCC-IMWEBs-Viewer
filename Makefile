@@ -22,7 +22,6 @@ python:
 	--add-data "C:/Users/viran/miniconda3/envs/venv/Library/share/proj;Library/share/proj" && \
 	conda deactivate
 	xcopy backend\Jenette_Creek_Watershed backend\apppy\_internal\Jenette_Creek_Watershed /E /I
-	echo F | xcopy backend\apppy\apppy.exe backend\apppy\apppy /Y /F
 
 # Build Electron or Tauri based on argument
 build:
