@@ -213,6 +213,7 @@ const store = createStore({
               params: { folder_path: "Jenette_Creek_Watershed" },
             }
           );
+          consol.log(`${import.meta.env.VITE_APP_API_BASE_URL}`);
           if (response.data.error) {
             alert("Error fetching data: " + response.data.error);
             return;
