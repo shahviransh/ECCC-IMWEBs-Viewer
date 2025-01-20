@@ -86,8 +86,8 @@ export default {
     methods: {
         ...mapActions(["updateSelectedColumns", "updateExportOptions", "pushMessage", "clearMessages"]),
         async initializeMap() {
-            mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_KEY;
-
+            mapboxgl.accessToken = this.decodeToken(import.meta.env.VITE_MAPBOX_KEY);
+            
             // Destroy existing map instance if it exists
             if (this.map) {
                 this.map.remove(); // Properly removes the Mapbox map instance
@@ -175,6 +175,13 @@ export default {
             } catch (error) {
                 console.error("Error loading Mapbox data:", error);
             }
+        },
+        decodeToken(encodedToken) {
+            // Reverse the string back
+            const reversedString = encodedToken.split('').reverse().join('');
+
+            // Base64 decode
+            return atob(reversedString);
         },
         addMapControls() {
             // Fullscreen control
