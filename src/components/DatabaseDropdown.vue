@@ -29,7 +29,7 @@ export default {
     },
     watch: {
         databases() {
-            if (this.treeData.length === 0) {
+            if (this.treeData.length === 0 && Array.isArray(this.databases)) {
                 this.treeData = this.listToTree(this.databases);
             }
         },
