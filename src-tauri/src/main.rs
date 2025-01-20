@@ -4,7 +4,7 @@
 use std::{env, process::Command, time::Duration, thread::sleep};
 use reqwest::Client;
 
-// #[cfg(target_os = "windows")]
+#[cfg(target_os = "windows")]
 const CREATE_NO_WINDOW: u32 = 0x08000000;
 
 #[tauri::command]
@@ -39,10 +39,16 @@ async fn start_server() {
   // Spawn the server as a background process
   let mut command = Command::new(server_path);
   // Only apply CREATE_NO_WINDOW on Windows to suppress console
-  // #[cfg(target_os = "windows")]
+  #[cfg(target_os = "windows")]
   {
       use std::os::windows::process::CommandExt;
       command.creation_flags(CREATE_NO_WINDOW);
+  }
+  #[cfg(target_family = "unix")]
+  {
+      // Redirect output to avoid a visible terminal on Linux/Unix
+      command.stdout(std::process::Stdio::null())
+              .stderr(std::process::Stdio::null());
   }
   command.spawn().expect("Failed to start server");
   
