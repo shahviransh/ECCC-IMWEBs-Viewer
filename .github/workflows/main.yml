@@ -15,12 +15,12 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          # - platform: "macos-latest" # for Arm based macs (M1 and above).
-          #   args: "--target aarch64-apple-darwin"
+          - platform: "macos-latest" # for Arm based macs (M1 and above).
+            args: "--target aarch64-apple-darwin"
           #- platform: 'macos-latest' # for Intel based macs.
           #  args: '--target x86_64-apple-darwin'
-          # - platform: "ubuntu-22.04" # for Tauri v1 you could replace this with ubuntu-22.04.
-          #   args: ""
+          - platform: "ubuntu-22.04" # for Tauri v1 you could replace this with ubuntu-22.04.
+            args: ""
           - platform: "windows-latest"
             args: ""
     
@@ -54,6 +54,14 @@ jobs:
 
       - name: Install frontend dependencies
         run: npm install # change this to npm, pnpm or bun depending on which one you use.
+
+      - name: Set Up .env
+        run: |
+          echo "VITE_API_BASE_URL=$VITE_API_BASE_URL" >> .env
+          echo "VITE_MAPBOX_KEY=$VITE_MAPBOX_KEY" >> .env
+        env:
+          VITE_API_BASE_URL_BASE_URL: ${{ secrets.VITE_API_BASE_URL }}
+          SECRET_KEY: ${{ secrets.VITE_MAPBOX_KEY }}
 
       - uses: conda-incubator/setup-miniconda@v3
         with:
@@ -107,8 +115,8 @@ jobs:
           releaseBody: "See the assets to download this version and install."
           releaseDraft: false
           prerelease: false
-          includeDebug: true
-          includeRelease: false
+          includeDebug: false
+          includeRelease: true
           args: ${{ matrix.args }}
 
       - name: Debug with tmate on failure

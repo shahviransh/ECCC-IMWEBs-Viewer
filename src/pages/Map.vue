@@ -86,7 +86,7 @@ export default {
     methods: {
         ...mapActions(["updateSelectedColumns", "updateExportOptions", "pushMessage", "clearMessages"]),
         async initializeMap() {
-            mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_API;
+            mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_KEY;
 
             // Destroy existing map instance if it exists
             if (this.map) {
@@ -96,7 +96,7 @@ export default {
 
             // Fetch data from the backend
             try {
-                const response = await axios.get(`${import.meta.env.VITE_APP_API_BASE_URL}/api/mapbox_shapefile`, {
+                const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/mapbox_shapefile`, {
                     params: {
                         directory: this.selectedGeoFolder,
                     }
@@ -235,7 +235,7 @@ export default {
         // Fetch data from the API
         async fetchData() {
             try {
-                const response = await axios.get(`${import.meta.env.VITE_APP_API_BASE_URL}/api/get_data`, {
+                const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/get_data`, {
                     params: {
                         db_tables: JSON.stringify(this.selectedDbsTables),
                         columns: JSON.stringify(this.selectedColumns.filter((column) => column !== 'Season')),
@@ -274,7 +274,7 @@ export default {
         // Export data to a file
         async exportData() {
             try {
-                const response = await axios.get(`${import.meta.env.VITE_APP_API_BASE_URL}/api/export_data`, {
+                const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/export_data`, {
                     params: {
                         db_tables: JSON.stringify(this.selectedDbsTables),
                         columns: JSON.stringify(this.exportColumns.filter((column) => column !== 'Season')),

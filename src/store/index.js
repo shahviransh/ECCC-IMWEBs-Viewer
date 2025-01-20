@@ -208,12 +208,11 @@ const store = createStore({
       for (let attempt = 1; attempt <= maxRetries; attempt++) {
         try {
           const response = await axios.get(
-            `${import.meta.env.VITE_APP_API_BASE_URL}/api/list_files`,
+            `${import.meta.env.VITE_API_BASE_URL}/api/list_files`,
             {
               params: { folder_path: "Jenette_Creek_Watershed" },
             }
           );
-          consol.log(`${import.meta.env.VITE_APP_API_BASE_URL}`);
           if (response.data.error) {
             alert("Error fetching data: " + response.data.error);
             return;
@@ -236,7 +235,7 @@ const store = createStore({
     async fetchTables({ commit }, db) {
       try {
         const response = await axios.get(
-          `${import.meta.env.VITE_APP_API_BASE_URL}/api/get_tables`,
+          `${import.meta.env.VITE_API_BASE_URL}/api/get_tables`,
           {
             params: { db_path: db },
           }
@@ -254,7 +253,7 @@ const store = createStore({
       try {
         // Fetch all columns for all tables selected
         const response = await axios.get(
-          `${import.meta.env.VITE_APP_API_BASE_URL}/api/get_table_details`,
+          `${import.meta.env.VITE_API_BASE_URL}/api/get_table_details`,
           {
             params: { db_tables: JSON.stringify(dbTables) },
           }
