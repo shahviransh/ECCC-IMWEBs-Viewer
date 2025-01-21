@@ -60,8 +60,8 @@ jobs:
           echo "VITE_API_BASE_URL=$VITE_API_BASE_URL" >> .env
           echo "VITE_MAPBOX_KEY=\"$VITE_MAPBOX_KEY\"" >> .env
         env:
-          VITE_API_BASE_URL_BASE_URL: ${{ secrets.VITE_API_BASE_URL }}
-          SECRET_KEY: ${{ secrets.VITE_MAPBOX_KEY }}
+          VITE_API_BASE_URL: ${{ secrets.VITE_API_BASE_URL }}
+          VITE_MAPBOX_KEY: ${{ secrets.VITE_MAPBOX_KEY }}
 
       - uses: conda-incubator/setup-miniconda@v3
         with:
