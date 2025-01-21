@@ -23,7 +23,7 @@ jobs:
           #   args: ""
           - platform: "windows-latest"
             args: ""
-    
+
     runs-on: ${{ matrix.platform }}
     steps:
       - uses: actions/checkout@v4
@@ -50,19 +50,16 @@ jobs:
           librsvg2-dev libfuse2 \
           libwebkit2gtk-4.1-dev libjavascriptcoregtk-4.1-dev
         # webkitgtk 4.0 is for Tauri v1 - webkitgtk 4.1 is for Tauri v2.
-        # You can remove the one that doesn't apply to your app to speed up the workflow a bit. 
+        # You can remove the one that doesn't apply to your app to speed up the workflow a bit.
 
       - name: Install frontend dependencies
         run: npm install # change this to npm, pnpm or bun depending on which one you use.
 
       - name: Set Up .env
         run: |
-          echo "VITE_API_BASE_URL=$VITE_API_BASE_URL" >> .env
-          echo "VITE_MAPBOX_KEY=\"$VITE_MAPBOX_KEY\"" >> .env
+          echo "VITE_API_BASE_URL=${{secrets.VITE_API_BASE_URL}}" >> .env
+          echo "VITE_MAPBOX_KEY=\"${{secrets.VITE_MAPBOX_KEY}}\"" >> .env
           cat .env
-        env:
-          VITE_API_BASE_URL: ${{ secrets.VITE_API_BASE_URL }}
-          VITE_MAPBOX_KEY: ${{ secrets.VITE_MAPBOX_KEY }}
 
       - uses: conda-incubator/setup-miniconda@v3
         with:
@@ -102,11 +99,11 @@ jobs:
 
       - name: Unzip backend data
         run: gsutil -m cp -r gs://eccc-imwebs-viewer/Jenette_Creek_Watershed backend/apppy/_internal/
-      
+
       - name: Copy AppImage dependency to /usr/lib/ (ubuntu only)
         if: matrix.platform == 'ubuntu-22.04'
         run: sudo cp -r backend/apppy/_internal/* /usr/lib/
-    
+
       - uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
