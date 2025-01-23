@@ -10,7 +10,9 @@ def validate_request_args(schema, request_args):
     data = {key: request_args.get(key) for key in schema.keys()}
 
     if not validator.validate(data):
-        return {"error": f"Invalid parameters: {validator.errors}"}
+        return {
+            "error": f"Invalid parameters: {getUserValidationError(validator.errors)}"
+        }
 
     # Additional security checks for path traversal and SQL injection
     for key, value in data.items():
@@ -39,7 +41,11 @@ def validate_get_data_args(request_args):
     schema = {
         "db_tables": {"type": "string", "required": True},
         "columns": {"type": "string", "required": True},
-        "id": {"type": "string", "required": True, "regex": r"\[\d+(,\d+)*|\[\]"},
+        "id": {
+            "type": "string",
+            "required": True,
+            "regex": r'\["\d+"(,\s*"\d+")*\]|\[\]',
+        },
         "start_date": {
             "type": "string",
             "required": True,
@@ -50,7 +56,11 @@ def validate_get_data_args(request_args):
             "required": True,
             "regex": r"^\d{4}-\d{2}-\d{2}$",
         },
-        "date_type": {"type": "string", "required": True, "regex": r"^[a-zA-Z]+$"},
+        "date_type": {
+            "type": "string",
+            "required": True,
+            "allowed": ["Time", "Date", "Month", "Year", ""],
+        },
         "interval": {
             "type": "string",
             "required": True,
@@ -68,7 +78,11 @@ def validate_export_data_args(request_args):
     schema = {
         "db_tables": {"type": "string", "required": True},
         "columns": {"type": "string", "required": True},
-        "id": {"type": "string", "required": True, "regex": r"\[\d+(,\d+)*|\[\]"},
+        "id": {
+            "type": "string",
+            "required": True,
+            "regex": r'\["\d+"(,\s*"\d+")*\]|\[\]',
+        },
         "start_date": {
             "type": "string",
             "required": True,
@@ -79,7 +93,11 @@ def validate_export_data_args(request_args):
             "required": True,
             "regex": r"^\d{4}-\d{2}-\d{2}$",
         },
-        "date_type": {"type": "string", "required": True, "regex": r"^[a-zA-Z]+$"},
+        "date_type": {
+            "type": "string",
+            "required": True,
+            "allowed": ["Time", "Date", "Month", "Year", ""],
+        },
         "interval": {
             "type": "string",
             "required": True,
@@ -126,3 +144,34 @@ def validate_get_table_details_args(request_args):
 def validate_mapbox_shapefile_args(request_args):
     schema = {"file_path": {"type": "string", "required": True}}
     return validate_request_args(schema, request_args)
+
+
+def getUserValidationError(errors):
+    """
+    Get user-friendly error messages from Cerberus validation errors.
+    """
+    # Mapping regex patterns to human-readable messages
+    regex_messages = {
+        r"^\d{4}-\d{2}-\d{2}$": "should be in the format YYYY-MM-DD (e.g., 2024-01-01).",
+        r"^[a-zA-Z]+$": "should only contain alphabetic characters.",
+        r'\["\d+"(,\s*"\d+")*\]|\[\]': "should be a numbers quoted and enclosed in square brackets (e.g., ['1','2','3']).",
+    }
+
+    error_messages = []
+    for field, error in errors.items():
+        if isinstance(error, list):
+            for e in error:
+                if "does not match" in e:
+                    # Check if the error is related to regex and map it
+                    for pattern, message in regex_messages.items():
+                        if pattern in e:
+                            error_messages.append(f"{field}: {message}")
+                            break
+                    else:
+                        error_messages.append(f"{field}: {e}")
+                else:
+                    error_messages.append(f"{field}: {e}")
+        else:
+            error_messages.append(f"{field}: {error}")
+
+    return ", ".join(error_messages)
