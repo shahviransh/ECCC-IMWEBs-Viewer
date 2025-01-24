@@ -33,6 +33,8 @@ jobs:
         with: 
           msystem: UCRT64
           update: true
+        env:
+          MSYS2_LOCATION: ${{ steps.msys2.outputs.msys2-location }}
       
       - name: Install pkg-config and glib2 (windows only)
         if: matrix.platform == 'windows-latest'
@@ -44,10 +46,10 @@ jobs:
       - name: Set Environment Variables for MSYS2
         if: matrix.platform == 'windows-latest'
         run: |
-         echo "Adding MSYS2 paths to PATH..."
          set
-         echo "PATH=${{ steps.msys2.outputs.msys2-path }}/ucrt64/bin:%PATH%" >> $GITHUB_ENV
-         echo "PKG_CONFIG_PATH=${{ steps.msys2.outputs.msys2-path }}/ucrt64/lib/pkgconfig" >> $GITHUB_ENV
+         echo "Adding MSYS2 paths to PATH..."
+         echo "PATH=%MSYS2_LOCATION%/ucrt64/bin:%PATH%" >> $GITHUB_ENV
+         echo "PKG_CONFIG_PATH=%MSYS2_LOCATION%/ucrt64/lib/pkgconfig" >> $GITHUB_ENV
         shell: cmd
 
       - name: Setup node
