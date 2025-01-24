@@ -1,6 +1,8 @@
 import sqlite3
 import os
 import pandas as pd
+import numpy as np
+from PIL import Image
 import xlsxwriter
 import matplotlib.pyplot as plt
 from matplotlib.ticker import MaxNLocator, LinearLocator
@@ -535,12 +537,13 @@ def get_files_and_folders(data):
                 dir_rel_path = os.path.join(rel_dir, fdir)
                 # Ensure the relative path starts with the base folder name
                 dir_rel_path = dir_rel_path[dir_rel_path.find(base_folder) :]
-                files_and_folders.append(
-                    {
-                        "type": "folder",
-                        "name": dir_rel_path,
-                    }
-                )
+                if "tiles" not in dir_rel_path:
+                    files_and_folders.append(
+                        {
+                            "type": "folder",
+                            "name": dir_rel_path,
+                        }
+                    )
             # Append files
             for name in files:
                 file_rel_path = os.path.join(rel_dir, name)
@@ -889,6 +892,7 @@ def get_multi_columns_and_time_range(data):
     except Exception as e:
         return {"error": str(e)}
 
+
 def round_coordinates(geojson_data, decimal_points=4):
     """
     Recursively round all coordinates in the GeoJSON to a specified number of decimal points.
@@ -913,150 +917,260 @@ def round_coordinates(geojson_data, decimal_points=4):
     return geojson_data
 
 
+import os
+import json
+from osgeo import gdal, ogr, osr
+
+
 def process_geospatial_data_for_mapbox(data):
     """
-    Process geospatial files (shapefiles, rasters, etc.) in the directory and return GeoJSON, bounds, and default Mapbox layer configurations.
+    Process a geospatial file (shapefile or raster) and return GeoJSON, bounds, and default Mapbox layer configurations.
     """
 
-    directory = os.path.join(Config.PATHFILE, data.get("directory"))
+    file_path = os.path.join(Config.PATHFILE, data.get("file_path"))
 
-    # Required files for a complete shapefile
-    required_files = [".shp"]
-    shapefile = None
+    # Check if the file is a shapefile (.shp)
+    if file_path.endswith(".shp"):
+        # Open shapefile
+        driver = ogr.GetDriverByName("ESRI Shapefile")
+        dataset = driver.Open(file_path, 0)
+        if dataset is None:
+            return {"error": "Failed to open shapefile."}
 
-    # Validate required shapefile components
-    for ext in required_files:
-        files = [f for f in os.listdir(directory) if f.endswith(ext)]
-        if not files:
-            return {"error": f"Missing required file: {ext} in directory {directory}"}
-        if ext == ".shp":
-            shapefile = os.path.join(directory, files[0])  # Get the main .shp file
+        layer = dataset.GetLayer()
 
-    if not shapefile:
-        return {"error": "No shapefile found in the directory."}
+        # Handle Spatial Reference System
+        source_srs = layer.GetSpatialRef()  # Source spatial reference system
+        if not source_srs:
+            return {"error": "Shapefile has no spatial reference system defined."}
 
-    # Open shapefile
-    driver = ogr.GetDriverByName("ESRI Shapefile")
-    dataset = driver.Open(shapefile, 0)
-    if dataset is None:
-        return {"error": "Failed to open shapefile."}
+        target_srs = osr.SpatialReference()
+        target_srs.ImportFromEPSG(4326)  # WGS84 (longitude/latitude)
 
-    layer = dataset.GetLayer()
+        # Ensure the axis order is longitude-latitude
+        if target_srs.SetAxisMappingStrategy:
+            target_srs.SetAxisMappingStrategy(osr.OAMS_TRADITIONAL_GIS_ORDER)
 
-    # Handle Spatial Reference System
-    source_srs = layer.GetSpatialRef()  # Source spatial reference system
-    if not source_srs:
-        return {"error": "Shapefile has no spatial reference system defined."}
+        coord_transform = osr.CoordinateTransformation(source_srs, target_srs)
 
-    target_srs = osr.SpatialReference()
-    target_srs.ImportFromEPSG(4326)  # WGS84 (longitude/latitude)
+        # Create a new memory layer for the reprojected data
+        memory_driver = ogr.GetDriverByName("Memory")
+        memory_ds = memory_driver.CreateDataSource("reprojected")
+        reprojected_layer = memory_ds.CreateLayer(
+            "reprojected_layer", srs=target_srs, geom_type=layer.GetGeomType()
+        )
 
-    # Ensure the axis order is longitude-latitude
-    if target_srs.SetAxisMappingStrategy:
-        target_srs.SetAxisMappingStrategy(osr.OAMS_TRADITIONAL_GIS_ORDER)
+        # Copy fields from the original layer
+        layer_defn = layer.GetLayerDefn()
+        for i in range(layer_defn.GetFieldCount()):
+            reprojected_layer.CreateField(layer_defn.GetFieldDefn(i))
 
-    coord_transform = osr.CoordinateTransformation(source_srs, target_srs)
+        # Collect properties dynamically
+        properties = [
+            layer_defn.GetFieldDefn(i).GetName()
+            for i in range(layer_defn.GetFieldCount())
+        ]
 
-    # Create a new memory layer for the reprojected data
-    memory_driver = ogr.GetDriverByName("Memory")
-    memory_ds = memory_driver.CreateDataSource("reprojected")
-    reprojected_layer = memory_ds.CreateLayer(
-        "reprojected_layer", srs=target_srs, geom_type=layer.GetGeomType()
-    )
+        # Reproject each feature
+        for feature in layer:
+            geom = feature.GetGeometryRef()
+            if geom:
+                geom.Transform(coord_transform)  # Transform geometry to WGS84
+                reprojected_feature = ogr.Feature(reprojected_layer.GetLayerDefn())
+                reprojected_feature.SetGeometry(geom)
+                for i in range(feature.GetFieldCount()):
+                    reprojected_feature.SetField(i, feature.GetField(i))
+                reprojected_layer.CreateFeature(reprojected_feature)
+                reprojected_feature = None
 
-    # Copy fields from the original layer
-    layer_defn = layer.GetLayerDefn()
-    for i in range(layer_defn.GetFieldCount()):
-        reprojected_layer.CreateField(layer_defn.GetFieldDefn(i))
+        # Convert reprojected layer to GeoJSON
+        geojson_driver = ogr.GetDriverByName("GeoJSON")
+        geojson_path = os.path.splitext(file_path)[0] + "_output.geojson"
+        if os.path.exists(geojson_path):
+            os.remove(geojson_path)
 
-    # Collect properties dynamically
-    properties = [layer_defn.GetFieldDefn(i).GetName() for i in range(layer_defn.GetFieldCount())]
+        geojson_dataset = geojson_driver.CreateDataSource(geojson_path)
+        geojson_dataset.CopyLayer(reprojected_layer, "layer")
+        geojson_dataset = None
 
-    # Reproject each feature
-    for feature in layer:
-        geom = feature.GetGeometryRef()
-        if geom:
-            geom.Transform(coord_transform)  # Transform geometry to WGS84
-            reprojected_feature = ogr.Feature(reprojected_layer.GetLayerDefn())
-            reprojected_feature.SetGeometry(geom)
-            for i in range(feature.GetFieldCount()):
-                reprojected_feature.SetField(i, feature.GetField(i))
-            reprojected_layer.CreateFeature(reprojected_feature)
-            reprojected_feature = None
+        with open(geojson_path, "r") as file:
+            geojson_data = json.load(file)
 
-    # Convert reprojected layer to GeoJSON
-    geojson_driver = ogr.GetDriverByName("GeoJSON")
-    geojson_path = os.path.join(directory, "output.geojson")
-    if os.path.exists(geojson_path):
-        os.remove(geojson_path)
+        # Remove the `crs` member if it exists
+        if "crs" in geojson_data:
+            del geojson_data["crs"]
 
-    geojson_dataset = geojson_driver.CreateDataSource(geojson_path)
-    geojson_dataset.CopyLayer(reprojected_layer, "layer")
-    geojson_dataset = None
+        # Save the updated GeoJSON back to the file
+        with open(geojson_path, "w") as file:
+            json.dump(geojson_data, file)
 
-    with open(geojson_path, "r") as file:
-        geojson_data = json.load(file)
+        # Calculate bounds and center in WGS84
+        extent = reprojected_layer.GetExtent()  # (minX, maxX, minY, maxY)
+        bounds = [[extent[0], extent[2]], [extent[1], extent[3]]]
+        center = [
+            (extent[0] + extent[1]) / 2,  # Average longitude
+            (extent[2] + extent[3]) / 2,  # Average latitude
+        ]
 
-    # Remove the `crs` member if it exists
-    if "crs" in geojson_data:
-        del geojson_data["crs"]
-
-    # Save the updated GeoJSON back to the file
-    with open(geojson_path, "w") as file:
-        json.dump(geojson_data, file)
-
-    # Calculate bounds and center in WGS84
-    extent = reprojected_layer.GetExtent()  # (minX, maxX, minY, maxY)
-    bounds = [[extent[0], extent[2]], [extent[1], extent[3]]]
-    center = [
-        (extent[0] + extent[1]) / 2,  # Average longitude
-        (extent[2] + extent[3]) / 2,  # Average latitude
-    ]
-
-    # Handle Raster Files (if .tif exists)
-    raster_files = [f for f in os.listdir(directory) if f.endswith(".tif")]
-    raster_bounds = None
-    if raster_files:
-        raster_file = os.path.join(directory, raster_files[0])
-        raster_dataset = gdal.Open(raster_file)
-        if raster_dataset:
-            geotransform = raster_dataset.GetGeoTransform()
-            raster_bounds = [
-                [geotransform[0], geotransform[3]],  # Top-left
-                [
-                    geotransform[0] + geotransform[1] * raster_dataset.RasterXSize,
-                    geotransform[3] + geotransform[5] * raster_dataset.RasterYSize,
-                ],  # Bottom-right
-            ]
-            raster_dataset = None
-
-    # Default layer configuration
-    layer_configurations = [
-        {
-            "id": "shapefile-fill",
-            "type": "fill",
-            "source": "shapefile",
-            "paint": {
-                "fill-color": "#888888",
-                "fill-opacity": 0.0,
+        # Default layer configuration for shapefiles
+        layer_configurations = [
+            {
+                "id": "shapefile-fill",
+                "type": "fill",
+                "source": "shapefile",
+                "paint": {
+                    "fill-color": "#888888",
+                    "fill-opacity": 0.0,
+                },
             },
-        },
-        {
-            "id": "shapefile-line",
-            "type": "line",
-            "source": "shapefile",
-            "paint": {
-                "line-color": "#000000",
-                "line-width": 2,
+            {
+                "id": "shapefile-line",
+                "type": "line",
+                "source": "shapefile",
+                "paint": {
+                    "line-color": "#000000",
+                    "line-width": 2,
+                },
             },
-        },
-    ]
+        ]
 
-    return {
-        "geojson": round_coordinates(geojson_data),
-        "bounds": bounds,
-        "raster_bounds": raster_bounds,  # Include raster bounds if present
-        "center": center,
-        "layers": layer_configurations,
-        "properties": properties
-    }
+        # Dynamically add layer configurations based on geometry type
+        geom_type = layer.GetGeomType()
+        if geom_type in (ogr.wkbPoint, ogr.wkbMultiPoint):
+            layer_configurations.append(
+                {
+                    "id": "shapefile-point",
+                    "type": "circle",
+                    "source": "shapefile",
+                    "paint": {
+                        "circle-color": "#000000",
+                        "circle-radius": 5,
+                        "circle-opacity": 1.0,
+                    },
+                }
+            )
+
+        return {
+            "geojson": geojson_data,
+            "bounds": bounds,
+            "center": center,
+            "layers": layer_configurations,
+            "properties": properties,
+        }
+    # Handle GeoTIFF files
+    elif file_path.endswith(".tif"):
+        raster_dataset = gdal.Open(file_path)
+        if not raster_dataset:
+            return {"error": "Failed to open raster file."}
+
+        # Ensure raster is in EPSG:4326 (WGS84)
+        source_srs = osr.SpatialReference()
+        source_srs.ImportFromWkt(raster_dataset.GetProjection())
+        target_srs = osr.SpatialReference()
+        target_srs.ImportFromEPSG(4326)
+
+        # Ensure the axis order is longitude-latitude
+        if target_srs.SetAxisMappingStrategy:
+            target_srs.SetAxisMappingStrategy(osr.OAMS_TRADITIONAL_GIS_ORDER)
+
+        if not source_srs.IsSame(target_srs):
+            # Reproject the raster to EPSG:4326
+            reprojected_file_path = os.path.splitext(file_path)[0] + "_reprojected.tif"
+            gdal.Warp(reprojected_file_path, raster_dataset, dstSRS="EPSG:4326")
+            raster_dataset = gdal.Open(reprojected_file_path)
+        else:
+            reprojected_file_path = file_path
+
+        # Get raster metadata
+        geotransform = raster_dataset.GetGeoTransform()
+
+        x_min = geotransform[0]
+        y_max = geotransform[3]
+        x_max = x_min + geotransform[1] * raster_dataset.RasterXSize
+        y_min = y_max + geotransform[5] * raster_dataset.RasterYSize
+
+        # Format bounds for Mapbox
+        bounds = [
+            [x_min, y_min],  # Bottom-left
+            [x_max, y_max],  # Top-right
+        ]
+
+        # Format raster coordinates for Mapbox
+        raster_bounds = [
+            [x_min, y_max],  # Top-left
+            [x_max, y_max],  # Top-right
+            [x_max, y_min],  # Bottom-right
+            [x_min, y_min],  # Bottom-left
+        ]
+
+        # Calculate raster center
+        center = [
+            (x_min + x_max) / 2,  # Average longitude
+            (y_min + y_max) / 2,  # Average latitude
+        ]
+
+        # Default layer configuration for rasters
+        layer_configurations = [
+            {
+                "id": "raster-layer",
+                "type": "raster",
+                "source": "geotiff",
+                "paint": {
+                    "raster-opacity": 1.0,
+                },
+            }
+        ]
+
+        output_image_path = os.path.splitext(file_path)[0] + "_rendered.png"
+        if not os.path.exists(output_image_path):
+            # Read raster data and render to an image
+            band = raster_dataset.GetRasterBand(1)  # Use the first raster band
+            raster_data = band.ReadAsArray()
+
+            # Get the no-data value for the raster
+            no_data_value = band.GetNoDataValue()
+            raster_data = np.ma.masked_equal(
+                raster_data, no_data_value
+            )  # Mask no-data values
+
+            # Normalize the raster data
+            min_value = np.min(raster_data)
+            max_value = np.max(raster_data)
+            raster_normalized = (
+                (raster_data - min_value) / (max_value - min_value) * 255
+            ).astype(np.uint8)
+
+            # Create an RGBA image with transparency
+            rgba_image = np.zeros(
+                (raster_data.shape[0], raster_data.shape[1], 4), dtype=np.uint8
+            )
+
+            # Fill the RGB channels with the normalized raster data
+            rgba_image[..., 0] = raster_normalized  # Red
+            rgba_image[..., 1] = raster_normalized  # Green
+            rgba_image[..., 2] = raster_normalized  # Blue
+
+            # Set the alpha channel to 255 (opaque) for valid data and 0 (transparent) for no-data
+            rgba_image[..., 3] = np.where(raster_data.mask, 0, 255)
+
+            # Convert the RGBA array to an image
+            color_ramp = Image.fromarray(rgba_image, mode="RGBA")
+
+            # Save the rendered image with transparency
+            color_ramp.save(output_image_path, "PNG")
+
+        raster_dataset = None
+
+        # Clean up the temporary files
+        if reprojected_file_path != file_path:
+            os.remove(reprojected_file_path)
+
+        return {
+            "bounds": bounds,
+            "raster_bounds": raster_bounds,
+            "center": center,
+            "layers": layer_configurations,
+            "image_url": f"/geotiff/{output_image_path}",
+        }
+    else:
+        return {"error": "Unsupported file type. Only .shp and .tif are supported."}

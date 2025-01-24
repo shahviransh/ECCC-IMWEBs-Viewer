@@ -123,6 +123,13 @@ def register_routes(app, cache):
 
         return jsonify(mapbox_data)
 
+    @app.route("/geotiff/<path:filename>", methods=["GET"])
+    def serve_tif(filename):
+        """
+        Serve the TIF file from the specified path.
+        """
+        return send_file(filename, mimetype='image/png', as_attachment=True)
+
     @app.route("/health", methods=["GET"])
     def health():
         return "Server is running...", 200
