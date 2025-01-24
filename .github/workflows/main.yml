@@ -59,6 +59,7 @@ jobs:
           
       - name: Install pkg-config and dependencies
         if: matrix.platform == 'windows-latest'
+        shell: msys2 {0}
         run: | 
          pacman -Syu --noconfirm
          pacman -S --noconfirm mingw-w64-x86_64-pkg-config mingw-w64-x86_64-glib2
