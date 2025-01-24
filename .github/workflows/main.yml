@@ -64,12 +64,14 @@ jobs:
          pacman -Syu --noconfirm
          pacman -S --noconfirm mingw-w64-x86_64-pkg-config mingw-w64-x86_64-glib2
 
-      - name: Set Environment Variables Globally
+      - name: Set Environment Variables for ucrt64 
         if: matrix.platform == 'windows-latest'
         run: |
-         setx PKG_CONFIG_PATH /ucrt64/lib/pkgconfig
-         setx PATH /ucrt64/bin;%PATH%
-        shell: cmd
+         echo "Setting PKG_CONFIG_PATH and PATH..."
+         echo PKG_CONFIG_PATH=/ucrt64/lib/pkgconfig >> $GITHUB_ENV
+         echo PATH=/ucrt64/bin:$PATH >> $GITHUB_ENV
+         echo $GITHUB_ENV
+        shell: bash
       
       - name: Install frontend dependencies
         run: npm install # change this to npm, pnpm or bun depending on which one you use.
