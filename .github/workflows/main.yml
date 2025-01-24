@@ -47,12 +47,11 @@ jobs:
 
       - name: Set Environment Variables for MSYS2
         if: matrix.platform == 'windows-latest'
+        shell: bash
         run: |
-         echo "Adding MSYS2 paths to PATH..."
-         echo "PATH=%MSYS2_LOCATION%/ucrt64/bin:%PATH%" >> $GITHUB_ENV
-         echo "PKG_CONFIG_PATH=%MSYS2_LOCATION%/ucrt64/lib/pkgconfig" >> $GITHUB_ENV
-         set
-        shell: cmd
+          echo "Adding MSYS2 paths to PATH..."
+          echo "PATH=${MSYS2_LOCATION}/ucrt64/bin:$PATH" >> $GITHUB_ENV
+          echo "PKG_CONFIG_PATH=${MSYS2_LOCATION}/ucrt64/lib/pkgconfig" >> $GITHUB_ENV
 
       - name: Setup node
         uses: actions/setup-node@v4
