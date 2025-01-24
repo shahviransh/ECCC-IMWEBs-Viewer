@@ -25,6 +25,33 @@ jobs:
     runs-on: ${{ matrix.platform }}
     steps:
       - uses: actions/checkout@v4
+      
+      - name: Set up MSYS2 (windows only)
+        if: matrix.platform == 'windows-latest'
+        uses: msys2/setup-msys2@v2 
+        id: msys2
+        with: 
+          msystem: UCRT64
+          update: true
+      - env: 
+         MSYS2_LOCATION: ${{ steps.msys2.outputs.msys2-location }}
+        run: echo "$env:MSYS2_LOCATION"
+          
+      - name: Install pkg-config and glib2 (windows only)
+        if: matrix.platform == 'windows-latest'
+        shell: msys2 {0}
+        run: | 
+         pacman -Syu --noconfirm
+         pacman -S --noconfirm mingw-w64-x86_64-pkg-config mingw-w64-x86_64-glib2
+
+      - name: Set Environment Variables for ucrt64
+        if: matrix.platform == 'windows-latest'
+        run: |
+         echo "Setting PKG_CONFIG_PATH"
+         echo "PKG_CONFIG_PATH=C:/msys64/ucrt64/lib/pkgconfig" >> $GITHUB_ENV
+         echo "PATH=C:/msys64/ucrt64/bin:$PATH" >> $GITHUB_ENV
+         where pkg-config
+        shell: cmd
 
       - name: Setup node
         uses: actions/setup-node@v4
@@ -49,29 +76,6 @@ jobs:
           libwebkit2gtk-4.1-dev libjavascriptcoregtk-4.1-dev
         # webkitgtk 4.0 is for Tauri v1 - webkitgtk 4.1 is for Tauri v2.
         # You can remove the one that doesn't apply to your app to speed up the workflow a bit.
-
-      - name: Set up MSYS2 (windows only)
-        if: matrix.platform == 'windows-latest'
-        uses: msys2/setup-msys2@v2 
-        with: 
-          msystem: UCRT64
-          update: true
-          
-      - name: Install pkg-config and glib2 (windows only)
-        if: matrix.platform == 'windows-latest'
-        shell: msys2 {0}
-        run: | 
-         pacman -Syu --noconfirm
-         pacman -S --noconfirm mingw-w64-x86_64-pkg-config mingw-w64-x86_64-glib2
-
-      - name: Set Environment Variables for ucrt64
-        if: matrix.platform == 'windows-latest'
-        run: |
-         echo "Setting PKG_CONFIG_PATH"
-         echo "PKG_CONFIG_PATH=C:/msys64/ucrt64/lib/pkgconfig" >> $GITHUB_ENV
-         echo "PATH=C:/msys64/ucrt64/bin:$PATH" >> $GITHUB_ENV
-         where pkg-config
-        shell: cmd
       
       - name: Install frontend dependencies
         run: npm install # change this to npm, pnpm or bun depending on which one you use.
