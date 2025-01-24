@@ -68,9 +68,7 @@ jobs:
         if: matrix.platform == 'windows-latest'
         run: |
          echo "Setting PKG_CONFIG_PATH"
-         echo "PKG_CONFIG_PATH=D:/msys64/ucrt64/lib/pkgconfig" >> $GITHUB_ENV
-         echo "PATH=D:/msys64/ucrt64/bin:$PATH" >> $GITHUB_ENV
-         dir D:/msys64/ucrt64/lib/pkgconfig
+         where pkg-config
         shell: cmd
       
       - name: Install frontend dependencies
