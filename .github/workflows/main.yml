@@ -44,18 +44,10 @@ jobs:
       - name: Set Environment Variables for MSYS2
         if: matrix.platform == 'windows-latest'
         run: |
-         echo "Removing Strawberry Perl from PATH..."
-         echo "PATH=%PATH:C:\\Strawberry\\perl\\bin;%=%" >> $GITHUB_ENV
          echo "Adding MSYS2 paths to PATH..."
-         echo "PATH=${{ steps.msys2.outputs.msys2-path }}/ucrt64/bin:$PATH" >> $GITHUB_ENV
+         set
+         echo "PATH=${{ steps.msys2.outputs.msys2-path }}/ucrt64/bin:%PATH%" >> $GITHUB_ENV
          echo "PKG_CONFIG_PATH=${{ steps.msys2.outputs.msys2-path }}/ucrt64/lib/pkgconfig" >> $GITHUB_ENV
-         echo "$env"
-        shell: cmd
-
-      - name: Validate pkg-config
-        if: matrix.platform == 'windows-latest'
-        run: |
-         where pkg-config
         shell: cmd
 
       - name: Setup node
