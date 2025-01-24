@@ -20,8 +20,8 @@
                 <ExportConfig />
                 <span>
                     <ExportTableStats />
-                    <button @click="fetchData">Fetch Data</button>
-                    <button @click="exportData">Export Data</button>
+                    <button @click="initializeMap">Fetch Map</button>
+                    <button @click="exportData">Export Map</button>
                 </span>
             </div>
 
@@ -66,114 +66,190 @@ export default {
             statsColumns: [],
             data: [],
             ID: [],
-            refreshKey: 0,
             map: null,
+            geojson: null,
+            bounds: null,
+            center: null,
+            layers: null,
+            properties: null,
+            image_url: null,
+            raster_bounds: null,
         };
     },
     watch: {
         selectedColumns() {
-            this.ID = this.selectedColumns.filter((column) => column.includes('ID')).join("");
+            this.ID = this.selectedColumns.find((column) => column.includes('ID')) || "";
         },
         selectedGeoFolder(newFolder) {
             if (newFolder) {
-                this.initializeMap();
+                this.fetchGeoJson();
             }
         },
     },
     computed: {
-        ...mapState(["selectedDbsTables", "selectedGeoFolder", "selectedColumns", "multiGraphType", "currentZoomStart", "currentZoomEnd", "selectedIds", "dateRange", "selectedInterval", "selectedStatistics", "selectedMethod", "exportColumns", "graphType", "exportIds", "exportDate", "exportInterval", "dateType", "exportDateType", "exportPath", "exportFilename", "exportFormat", "exportOptions", "theme"]),
+        ...mapState(["selectedDbsTables", "selectedGeoFolder", "selectedColumns", "multiGraphType", "currentZoomStart", "currentZoomEnd", "selectedIds", "dateRange", "selectedInterval", "selectedStatistics", "selectedMethod", "exportColumns", "exportIds", "exportDate", "exportInterval", "dateType", "exportDateType", "exportPath", "exportFilename", "exportFormat", "exportOptions", "theme"]),
     },
     methods: {
-        ...mapActions(["updateSelectedColumns", "updateExportOptions", "pushMessage", "clearMessages"]),
-        async initializeMap() {
-            mapboxgl.accessToken = this.decodeToken(import.meta.env.VITE_MAPBOX_KEY);
-            
-            // Destroy existing map instance if it exists
-            if (this.map) {
-                this.map.remove(); // Properly removes the Mapbox map instance
-                this.map = null; // Reset the map reference
-            }
-
-            // Fetch data from the backend
+        ...mapActions(["updateSelectedColumns", "updateExportOptions", "updateColumns", "pushMessage", "clearMessages"]),
+        async fetchGeoJson() {
             try {
                 const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/mapbox_shapefile`, {
                     params: {
-                        directory: this.selectedGeoFolder,
+                        file_path: this.selectedGeoFolder,
                     }
                 });
 
-                const { geojson, bounds, raster_bounds, center, layers, properties } = response.data;
+                this.geojson = response.data?.geojson || null;
+                this.bounds = response.data.bounds;
+                this.center = response.data.center;
+                this.layers = response.data.layers;
+                this.raster_bounds = response.data?.raster_bounds || null;
+                this.image_url = response.data?.image_url || null;
+                this.properties = response.data?.properties || [];
 
+                this.updateColumns(this.properties);
+
+                this.pushMessage({ message: `GeoJSON loaded`, type: 'success' });
+            } catch (error) {
+                alert("Error fetching Mapbox data: ", error);
+            }
+        },
+        initializeMap() {
+            mapboxgl.accessToken = this.decodeToken(import.meta.env.VITE_MAPBOX_KEY);
+
+            // Destroy existing map instance if it exists
+            if (this.map) {
+                this.map.remove();
+                this.map = null;
+            }
+
+            if (this.selectedColumns.length === 0 && this.properties) {
+                this.updateSelectedColumns(this.properties);
+            }
+
+            try {
                 // Create the Mapbox map instance
                 this.map = new mapboxgl.Map({
                     container: "map", // ID of the container
-                    style: "mapbox://styles/mapbox/streets-v11", // Mapbox style URL
-                    center: center, // Center of the map
-                    zoom: 4,
+                    style: "mapbox://styles/mapbox/streets-v11",
+                    center: this.center || [0, 0], // Use the center provided by the backend or default to [0, 0]
+                    zoom: this.image_url ? 12 : 4, // Zoom level for the map
                 });
 
                 this.map.on("load", () => {
-                    // Add GeoJSON source
-                    this.map.addSource("shapefile", {
-                        type: "geojson",
-                        data: geojson,
-                    });
+                    // Add GeoJSON source if present
+                    if (this.geojson) {
+                        this.map.addSource("shapefile", {
+                            type: "geojson",
+                            data: this.geojson,
+                        });
+                    }
 
-                    // Add layers from the backend
-                    layers.forEach((layer) => {
+                    // Fit map to bounds
+                    if (this.bounds) {
+                        this.map.fitBounds(this.bounds, { padding: 20 });
+                    }
+
+                    // Add geotiff layer if present
+                    if (this.image_url) {
+                        // Add the rendered PNG as a raster layer
+                        this.map.addSource("geotiff", {
+                            type: "image",
+                            url: `${import.meta.env.VITE_API_BASE_URL}${this.image_url}`,
+                            coordinates: this.raster_bounds,
+                        });
+                    }
+
+                    // Add vector or raster layers from the backend
+                    this.layers.forEach((layer) => {
                         this.map.addLayer(layer);
                     });
 
-                    // Initialize popup
+                    // Initialize popup for vector layers
                     const popup = new mapboxgl.Popup({
                         closeButton: false,
                         closeOnClick: false,
                     });
 
-                    // Add hover interaction on "shapefile-fill"
-                    this.map.on("mousemove", "shapefile-fill", (e) => {
-                        this.map.getCanvas().style.cursor = "pointer";
+                    this.layers.forEach((layer) => {
+                        // Add hover interaction for vector layers
+                        if (layer.type !== "raster") {
+                            this.map.on("mousemove", layer.id, (e) => {
+                                this.map.getCanvas().style.cursor = "pointer";
 
-                        const feature = e.features[0];
+                                const feature = e.features[0];
 
-                        // Dynamically generate popup content from properties
-                        const popupContent = properties
-                            .map((prop) => {
-                                const value = feature.properties[prop];
-                                return `<strong>${prop}:</strong> ${typeof value === "number" ? value.toFixed(4) : value ?? "N/A"
-                                    }`;
-                            })
-                            .join("<br>");
+                                // Dynamically generate popup content from properties
+                                const popupContent = this.properties
+                                    .map((prop) => {
+                                        if (this.selectedColumns.includes(prop)) {
+                                            const value = feature.properties[prop];
+                                            return `<strong>${prop}:</strong> ${typeof value === "number" ? value.toFixed(4) : value ?? "N/A"
+                                                }`;
+                                        }
+                                    })
+                                    .join("<br>");
 
-                        popup.setLngLat(e.lngLat).setHTML(popupContent).addTo(this.map);
+                                popup.setLngLat(e.lngLat).setHTML(popupContent).addTo(this.map);
 
-                        // Highlight the hovered polygon
-                        this.map.setPaintProperty("shapefile-fill", "fill-opacity", [
-                            "case",
-                            ["==", ["get", "OBJECTID_1"], feature.properties.OBJECTID_1],
-                            0.4, // Highlight opacity
-                            0.1,
-                        ]);
+                                const conditions = this.selectedColumns.map((column) => [
+                                    "==",
+                                    ["get", column],
+                                    feature.properties[column] || null,
+                                ]);
+
+                                const filter = ["all", ...conditions];
+
+                                // Apply specific hover effects based on layer type
+                                if (layer.type === "fill") {
+                                    // Highlight hovered polygon
+                                    this.map.setPaintProperty(layer.id, "fill-opacity", [
+                                        "case",
+                                        filter, // Highlight if conditions are met
+                                        0.4, // Highlight opacity
+                                        0.0, // Default opacity
+                                    ]);
+                                } else if (layer.type === "circle") {
+                                    // Highlight hovered point
+                                    this.map.setPaintProperty(layer.id, "circle-color", [
+                                        "case",
+                                        filter,
+                                        "#FF0000",
+                                        "#000000",
+                                    ]);
+                                } else if (layer.type === "line") {
+                                    // Highlight hovered line (optional, example for line opacity)
+                                    this.map.setPaintProperty(layer.id, "line-opacity", 0.7);
+                                }
+                            });
+
+                            // Add mouseleave interaction to reset styles
+                            this.map.on("mouseleave", layer.id, () => {
+                                this.map.getCanvas().style.cursor = "";
+                                popup.remove();
+
+                                // Reset styles based on layer type
+                                if (layer.type === "fill") {
+                                    this.map.setPaintProperty(layer.id, "fill-opacity", 0.1);
+                                } else if (layer.type === "circle") {
+                                    this.map.setPaintProperty(layer.id, "circle-color", "#000000");
+                                } else if (layer.type === "line") {
+                                    this.map.setPaintProperty(layer.id, "line-opacity", 1.0);
+                                }
+                            });
+                        }
                     });
-
-                    this.map.on("mouseleave", "shapefile-fill", () => {
-                        this.map.getCanvas().style.cursor = "";
-                        popup.remove();
-
-                        // Reset fill-opacity to default
-                        this.map.setPaintProperty("shapefile-fill", "fill-opacity", 0.1);
-                    });
-
-                    // Fit map to bounds
-                    this.map.fitBounds(bounds, { padding: 20 });
                 });
 
                 // Add Mapbox controls
                 this.addMapControls();
                 const mapDirectory = this.selectedGeoFolder.split("/");
-                this.pushMessage({ message: `${mapDirectory[mapDirectory.length - 1]} map loaded`, type: "success" });
+                this.pushMessage({
+                    message: `${mapDirectory[mapDirectory.length - 1]} map loaded`,
+                    type: "success",
+                });
             } catch (error) {
-                console.error("Error loading Mapbox data:", error);
+                alert("Error loading Mapbox data: ", error);
             }
         },
         decodeToken(encodedToken) {
@@ -221,24 +297,6 @@ export default {
             const isTauri = window.isTauri !== undefined;
             return isTauri ? "calc(100vh - 14vh)" : "calc(100vh - 16vh)";
         },
-        getTitle() {
-            // Set the title based on the first three letters of selected columns names
-            return this.selectedColumns.length ? this.selectedColumns.filter(column => column !== this.dateType && column !== this.ID).map(col => col.slice(0, 3)).join(" - ") : "Graph";
-        },
-        getType(column) {
-            // Use the Vuex state multiGraphType, which updates dynamically
-            if (this.multiGraphType?.length > 0) {
-                const multiGraph = this.multiGraphType.find(col => col.name === column);
-                if (multiGraph) {
-                    return multiGraph.type;
-                }
-            }
-            // Handle cases where graphType contains a dash ('-')
-            if (this.graphType.includes('-')) {
-                return this.graphType.split('-')[0];
-            }
-            return this.graphType;
-        },
         // Fetch data from the API
         async fetchData() {
             try {
@@ -256,7 +314,7 @@ export default {
                     }
                 });
                 if (response.data.error) {
-                    alert('Error fetching data:' + response.data.error);
+                    alert('Error fetching data: ' + response.data.error);
                     return;
                 }
                 if (this.selectedInterval === 'seasonally' && !this.selectedMethod.includes('Equal') && !this.selectedColumns.includes('Season')) {
@@ -267,7 +325,6 @@ export default {
                 this.data = response.data.data;
                 this.stats = response.data.stats;
                 this.statsColumns = response.data.statsColumns;
-                this.refreshKey += 1;
 
                 this.$nextTick(() => {
                     this.pushMessage({ message: `Graph Loaded ${this.selectedColumns.length} columns x ${this.data.length} rows`, type: 'success' });
@@ -302,7 +359,7 @@ export default {
                     }
                 });
                 if (response.data.error) {
-                    alert('Error fetching data:' + response.data.error);
+                    alert('Error fetching data: ' + response.data.error);
                     return;
                 }
                 this.pushMessage({ message: `Exported ${this.exportColumns.length} columns x ${this.data.length} rows`, type: 'info' });

@@ -142,7 +142,6 @@ const store = createStore({
     SET_SELECTED_COLUMNS(state, columns) {
       state.selectedColumns = columns;
       state.exportColumns = columns;
-      console.log(columns);
     },
     SET_SELECTED_IDS(state, ids) {
       state.selectedIds = ids;
@@ -292,11 +291,15 @@ const store = createStore({
       }
     },
     // Add similar actions for other components
+    updateColumns({ commit }, columns) {
+      commit("SET_COLUMNS", { columns });
+    },
     updateSelectedDbsTables({ commit }, { db, table }) {
       commit("SET_SELECTED_DBS_TABLES", { db, table });
     },
     updateSelectedGeoFolder({ commit }, folder) {
       commit("SET_SELECTED_GEO_FOLDER", folder);
+      commit("SET_COLUMNS", { columns: [] });
     },
     updateTheme({ commit }, theme) {
       commit("SET_THEME", theme);

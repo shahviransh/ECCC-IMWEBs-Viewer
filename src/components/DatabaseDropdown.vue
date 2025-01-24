@@ -122,13 +122,16 @@ export default {
                         table: this.selectedTable
                     });
                 } else if (node.type === 'file') {
-                    this.selectedFolder = node.path.substring(0, node.path.lastIndexOf(this.separator));
+                    // this.selectedFolder = node.path.substring(0, node.path.lastIndexOf(this.separator));
+                    this.selectedFolder = node.path;
                     this.updateSelectedGeoFolder(this.selectedFolder);
                 }
             } else {
                 // Unselect table
                 this.removeSelectedDbTable(this.selectedTable);
                 this.selectedTable = null;
+                this.selectedFolder = null;
+                this.updateSelectedGeoFolder(null);
             }
         }
     },

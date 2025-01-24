@@ -144,7 +144,7 @@ export default {
                     }
                 });
                 if (response.data.error) {
-                    alert('Error fetching data:' + response.data.error);
+                    alert('Error fetching data: ' + response.data.error);
                     return;
                 }
                 if (this.selectedInterval === 'seasonally' && !this.selectedMethod.includes('Equal') && !this.selectedColumns.includes('Season')) {
@@ -192,7 +192,7 @@ export default {
                     }
                 });
                 if (response.data.error) {
-                    alert('Error fetching data:' + response.data.error);
+                    alert('Error fetching data: ' + response.data.error);
                     return;
                 }
                 this.pushMessage({ message: `Exported ${this.exportColumns.length} columns x ${this.data.length} rows`, type: 'success' });

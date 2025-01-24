@@ -72,7 +72,6 @@ export default {
             },
             set(value) {
                 this.updateSelectedColumns(value); // Update Vuex state on change
-                this.updateExportColumns(this.selectedColumns); // Update export columns based on selected columns
             }
         },
         expColumns: {
@@ -107,7 +106,9 @@ export default {
     },
     watch: {
         selectedDbsTables(newDbsTables) {
-            this.fetchColumns(newDbsTables);
+            if (newDbsTables.length !== 0) {
+                this.fetchColumns(newDbsTables);
+            }
         },
     },
     methods: {
@@ -115,7 +116,7 @@ export default {
         findTableName(column) {
             // TODO: Check tooltipColumns for table_name-column format #check
             for (const [key, columns] of Object.entries(this.tooltipColumns)) {
-                if (columns.incPludes(column)) {
+                if (columns.includes(column)) {
                     const table_name = key.split(',')[1].replace(")", "").replace(/['"]/g, '');
                     if ([this.dateType, 'ID'].includes(column)) {
                         return 'All Tables';
@@ -152,7 +153,6 @@ export default {
 
                 if (['Project', 'Table', 'Map'].includes(this.pageTitle)) {
                     this.updateSelectedColumns(modelArray);
-                    this.updateExportColumns(this.selectedColumns);
                 } else if (this.pageTitle === 'Graph') {
                     this.updateYAxis(modelArray);
                 }
