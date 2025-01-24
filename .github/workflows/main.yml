@@ -54,7 +54,7 @@ jobs:
         if: matrix.platform == 'windows-latest'
         uses: msys2/setup-msys2@v2 
         with: 
-          msystem: MINGW64
+          msystem: UCRT64
           update: true
           
       - name: Install pkg-config and glib2 (windows only)
@@ -64,11 +64,13 @@ jobs:
          pacman -Syu --noconfirm
          pacman -S --noconfirm mingw-w64-x86_64-pkg-config mingw-w64-x86_64-glib2
 
-      - name: Set Environment Variables for mingw64 
+      - name: Set Environment Variables for ucrt64 
         if: matrix.platform == 'windows-latest'
         run: |
          echo "Setting PKG_CONFIG_PATH"
-         echo PKG_CONFIG_PATH=/mingw64/lib/pkgconfig >> $GITHUB_ENV
+         echo "PKG_CONFIG_PATH=$GITHUB_WORKSPACE/ucrt64/lib/pkgconfig" >> $GITHUB_ENV
+         echo "PATH=$GITHUB_WORKSPACE/ucrt64/bin:$PATH" >> $GITHUB_ENV
+         echo "$GITHUB_ENV"
         shell: bash
       
       - name: Install frontend dependencies
