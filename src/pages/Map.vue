@@ -109,7 +109,7 @@ export default {
 
                 this.updateColumns(this.properties);
 
-                this.pushMessage({ message: `GeoJSON loaded`, type: 'success' });
+                this.pushMessage({ message: this.image_url ? 'GeoTIFF loaded' : 'GeoJSON loaded', type: 'success' });
             } catch (error) {
                 alert("Error fetching Mapbox data: ", error);
             }
