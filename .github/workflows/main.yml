@@ -50,13 +50,16 @@ jobs:
         # webkitgtk 4.0 is for Tauri v1 - webkitgtk 4.1 is for Tauri v2.
         # You can remove the one that doesn't apply to your app to speed up the workflow a bit.
 
-      - name: Set up MSYS2 and install pkg-config and glib2
+      - name: Set up MSYS2
         if: matrix.platform == 'windows-latest'
         uses: msys2/setup-msys2@v2 
         with: 
           msystem: UCRT64
           update: true
-      - shell: msys2 {0}
+          
+      - name: Install pkg-config and dependencies
+        if: matrix.platform == 'windows-latest'
+        shell: msys2 {0}
         run: | 
          pacman -Syu --noconfirm
          pacman -S --noconfirm mingw-w64-x86_64-pkg-config mingw-w64-x86_64-glib2
