@@ -67,7 +67,7 @@ jobs:
       - name: Set Environment Variables for ucrt64 
         if: matrix.platform == 'windows-latest'
         run: |
-         echo "Setting PKG_CONFIG_PATH and PATH..."
+         echo "Setting PKG_CONFIG_PATH"
          echo PKG_CONFIG_PATH=/ucrt64/lib/pkgconfig >> $GITHUB_ENV
         shell: bash
       
