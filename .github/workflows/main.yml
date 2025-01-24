@@ -36,9 +36,7 @@ jobs:
       
       - name: Set MSYS2_LOCATION (windows only)
         if: matrix.platform == 'windows-latest'
-        env:
-          MSYS2_LOCATION: ${{ steps.msys2.outputs.msys2-location }}
-        run: echo "MSYS2_LOCATION=$env:MSYS2_LOCATION" >> $GITHUB_ENV
+        run: echo "MSYS2_LOCATION=${{ steps.msys2.outputs.msys2-location }}" >> $GITHUB_ENV
       
       - name: Install pkg-config and glib2 (windows only)
         if: matrix.platform == 'windows-latest'
@@ -50,10 +48,10 @@ jobs:
       - name: Set Environment Variables for MSYS2
         if: matrix.platform == 'windows-latest'
         run: |
-         set
          echo "Adding MSYS2 paths to PATH..."
          echo "PATH=%MSYS2_LOCATION%/ucrt64/bin:%PATH%" >> $GITHUB_ENV
          echo "PKG_CONFIG_PATH=%MSYS2_LOCATION%/ucrt64/lib/pkgconfig" >> $GITHUB_ENV
+         set
         shell: cmd
 
       - name: Setup node
