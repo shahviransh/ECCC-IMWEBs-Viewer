@@ -64,7 +64,7 @@ jobs:
          pacman -Syu --noconfirm
          pacman -S --noconfirm mingw-w64-x86_64-pkg-config mingw-w64-x86_64-glib2
 
-      - name: Set Environment Variables for ucrt64 
+      - name: Set Environment Variables for mingw64 
         if: matrix.platform == 'windows-latest'
         run: |
          echo "Setting PKG_CONFIG_PATH"
