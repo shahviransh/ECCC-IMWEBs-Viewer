@@ -50,6 +50,21 @@ jobs:
         # webkitgtk 4.0 is for Tauri v1 - webkitgtk 4.1 is for Tauri v2.
         # You can remove the one that doesn't apply to your app to speed up the workflow a bit.
 
+      - name: Set up MSYS2
+        if: matrix.platform == 'windows-latest'
+        uses: msys2/setup-msys2@v2 
+        with: 
+          msystem: mingw64
+          update: true
+          
+      - name: Install pkg-config and dependencies
+        if: matrix.platform == 'windows-latest'
+        run: | 
+         pacman -Syu --noconfirm
+         pacman -S --noconfirm mingw-w64-x86_64-pkg-config mingw-w64-x86_64-glib2
+         set PKG_CONFIG_PATH=/mingw64/lib/pkgconfig
+         set PATH=/mingw64/bin:$PATH
+      
       - name: Install frontend dependencies
         run: npm install # change this to npm, pnpm or bun depending on which one you use.
 
