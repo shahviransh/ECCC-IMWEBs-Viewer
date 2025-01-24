@@ -68,6 +68,8 @@ jobs:
         if: matrix.platform == 'windows-latest'
         run: |
          echo "Setting PKG_CONFIG_PATH"
+         echo "PKG_CONFIG_PATH=C:/msys64/ucrt64/lib/pkgconfig" >> $GITHUB_ENV
+         echo "PATH=C:/msys64/ucrt64/bin:$PATH" >> $GITHUB_ENV
          where pkg-config
         shell: cmd
       
