@@ -230,7 +230,7 @@ export default {
 
                                 // Reset styles based on layer type
                                 if (layer.type === "fill") {
-                                    this.map.setPaintProperty(layer.id, "fill-opacity", 0.1);
+                                    this.map.setPaintProperty(layer.id, "fill-opacity", 0.0);
                                 } else if (layer.type === "circle") {
                                     this.map.setPaintProperty(layer.id, "circle-color", "#000000");
                                 } else if (layer.type === "line") {

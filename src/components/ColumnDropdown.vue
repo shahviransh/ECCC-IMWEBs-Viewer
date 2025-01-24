@@ -114,15 +114,20 @@ export default {
     methods: {
         ...mapActions(['fetchColumns', 'updateSelectedColumns', 'updateExportColumns', 'updateXAxis', 'updateYAxis']),
         findTableName(column) {
-            // TODO: Check tooltipColumns for table_name-column format #check
             for (const [key, columns] of Object.entries(this.tooltipColumns)) {
-                if (columns.includes(column)) {
+                const table_name = key.split(',')[1].replace(")", "").replace(/['"]/g, '').trim();
+                if (column.includes(table_name)) {
+                    return table_name;
+                } else if (columns.includes(column)) {
                     const table_name = key.split(',')[1].replace(")", "").replace(/['"]/g, '');
                     if ([this.dateType, 'ID'].includes(column)) {
                         return 'All Tables';
-                    } else {
+                    } 
+                    else {
                         return table_name;
                     }
+                } else if (column.includes(table_name)){
+                    return table_name;
                 }
             }
             return 'Unknown'; // Fallback if no table is found
