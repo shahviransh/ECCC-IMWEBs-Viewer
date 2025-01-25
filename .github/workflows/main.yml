@@ -32,6 +32,7 @@ jobs:
           /c/msys64/usr/bin/bash -lc "pacman -Syu --noconfirm"
           /c/msys64/usr/bin/bash -lc "pacman -S --noconfirm mingw-w64-x86_64-pkg-config mingw-w64-x86_64-glib2"
           echo "/c/msys64/mingw64/bin:/c/msys64/mingw64/lib/pkgconfig:$PATH" >> $GITHUB_PATH
+          echo $PATH
         shell: bash  
 
       - name: Setup node
