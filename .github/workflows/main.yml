@@ -13,12 +13,12 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - platform: "macos-latest" # for Arm based macs (M1 and above).
-            args: "--target aarch64-apple-darwin"
+          # - platform: "macos-latest" # for Arm based macs (M1 and above).
+          #   args: "--target aarch64-apple-darwin"
           #- platform: 'macos-latest' # for Intel based macs.
           #  args: '--target x86_64-apple-darwin'
-          - platform: "ubuntu-22.04" # for Tauri v1 you could replace this with ubuntu-22.04.
-            args: ""
+          # - platform: "ubuntu-22.04" # for Tauri v1 you could replace this with ubuntu-22.04.
+          #   args: ""
           - platform: "windows-latest"
             args: ""
 
@@ -31,12 +31,8 @@ jobs:
         uses: msys2/setup-msys2@v2 
         id: msys2
         with: 
-          msystem: UCRT64
+          msystem: MINGW64
           update: true
-      
-      - name: Set MSYS2_LOCATION (windows only)
-        if: matrix.platform == 'windows-latest'
-        run: echo "MSYS2_LOCATION=${{ steps.msys2.outputs.msys2-location }}" >> $GITHUB_ENV
       
       - name: Install pkg-config and glib2 (windows only)
         if: matrix.platform == 'windows-latest'
@@ -44,14 +40,6 @@ jobs:
         run: | 
          pacman -Syu --noconfirm
          pacman -S --noconfirm mingw-w64-x86_64-pkg-config mingw-w64-x86_64-glib2
-
-      - name: Set Environment Variables for MSYS2
-        if: matrix.platform == 'windows-latest'
-        shell: bash
-        run: |
-          echo "Adding MSYS2 paths to PATH..."
-          echo "PATH=${MSYS2_LOCATION}/ucrt64/bin:$PATH" >> $GITHUB_ENV
-          echo "PKG_CONFIG_PATH=${MSYS2_LOCATION}/ucrt64/lib/pkgconfig" >> $GITHUB_ENV
 
       - name: Setup node
         uses: actions/setup-node@v4
