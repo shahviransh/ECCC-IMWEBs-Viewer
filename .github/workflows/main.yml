@@ -13,12 +13,12 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - platform: "macos-latest" # for Arm based macs (M1 and above).
-            args: "--target aarch64-apple-darwin"
+          # - platform: "macos-latest" # for Arm based macs (M1 and above).
+          #   args: "--target aarch64-apple-darwin"
           #- platform: 'macos-latest' # for Intel based macs.
           #  args: '--target x86_64-apple-darwin'
-          - platform: "ubuntu-22.04" # for Tauri v1 you could replace this with ubuntu-22.04.
-            args: ""
+          # - platform: "ubuntu-22.04" # for Tauri v1 you could replace this with ubuntu-22.04.
+          #   args: ""
           - platform: "windows-latest"
             args: ""
 
@@ -31,7 +31,14 @@ jobs:
         run: |
           /c/msys64/usr/bin/bash -lc "pacman -Syu --noconfirm"
           /c/msys64/usr/bin/bash -lc "pacman -S --noconfirm mingw-w64-x86_64-pkg-config mingw-w64-x86_64-glib2"
+          echo $PATH
           echo "PATH=/c/msys64/mingw64/bin:/c/msys64/mingw64/lib/pkgconfig:$PATH" >> $GITHUB_ENV
+        shell: bash  
+
+      - name: See PATH (windows only)
+        if: matrix.platform == 'windows-latest'
+        run: |
+          echo $PATH
         shell: bash  
 
       - name: Setup node
@@ -59,9 +66,7 @@ jobs:
         # You can remove the one that doesn't apply to your app to speed up the workflow a bit.
       
       - name: Install frontend dependencies
-        run: |
-          echo $PATH
-          npm install # change this to npm, pnpm or bun depending on which one you use.
+        run: npm install # change this to npm, pnpm or bun depending on which one you use.
 
       - uses: conda-incubator/setup-miniconda@v3
         with:
