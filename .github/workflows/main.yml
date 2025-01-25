@@ -32,7 +32,7 @@ jobs:
           /c/msys64/usr/bin/bash -lc "pacman -Syu --noconfirm"
           /c/msys64/usr/bin/bash -lc "pacman -S --noconfirm mingw-w64-x86_64-pkg-config mingw-w64-x86_64-glib2"
           echo $PATH
-          echo "PATH=/c/msys64/mingw64/bin:/c/msys64/mingw64/lib/pkgconfig:$PATH" >> $GITHUB_ENV
+          echo "export PATH=/c/msys64/mingw64/bin:/c/msys64/mingw64/lib/pkgconfig:$PATH" >> /etc/profile
         shell: bash  
 
       - name: See PATH (windows only)
