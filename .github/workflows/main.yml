@@ -25,21 +25,6 @@ jobs:
     runs-on: ${{ matrix.platform }}
     steps:
       - uses: actions/checkout@v4
-      
-      - name: Set up MSYS2 (windows only)
-        if: matrix.platform == 'windows-latest'
-        uses: msys2/setup-msys2@v2 
-        id: msys2
-        with: 
-          msystem: UCRT64
-          update: true
-      
-      - name: Install pkg-config and glib2 (windows only)
-        if: matrix.platform == 'windows-latest'
-        shell: msys2 {0}
-        run: | 
-         pacman -Syu --noconfirm
-         pacman -S --noconfirm mingw-w64-x86_64-pkg-config mingw-w64-x86_64-glib2
 
       - name: Setup node
         uses: actions/setup-node@v4
@@ -111,13 +96,11 @@ jobs:
         if: matrix.platform == 'ubuntu-22.04'
         run: sudo cp -r backend/apppy/_internal/* /usr/lib/
 
-      - name: Set Environment Variables for MSYS2 (permanent)
-        if: matrix.platform == 'windows-latest'
-        shell: bash
+      - name: Install MSYS2 pkg-config and glib2 (windows only)
         run: |
-          echo "Adding MSYS2 paths to PATH..."
-          echo "PATH=/d/a/_temp/msys64/ucrt64/bin:$PATH" >> $GITHUB_ENV
-          echo "PKG_CONFIG_PATH=/d/a/_temp/msys64/ucrt64/lib/pkgconfig:$PKG_CONFIG_PATH" >> $GITHUB_ENV
+          C:\msys64\usr\bin\bash -lc "pacman -Syu --noconfirm"
+          C:\msys64\usr\bin\bash -lc "pacman -S --noconfirm mingw-w64-x86_64-pkg-config mingw-w64-x86_64-glib2"
+        shell: bash     
 
       - uses: tauri-apps/tauri-action@v0
         env:
