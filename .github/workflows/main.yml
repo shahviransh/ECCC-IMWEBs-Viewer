@@ -31,8 +31,12 @@ jobs:
         uses: msys2/setup-msys2@v2 
         id: msys2
         with: 
-          msystem: MINGW64
+          msystem: UCRT64
           update: true
+      
+      - name: Set MSYS2_LOCATION (windows only)
+        if: matrix.platform == 'windows-latest'
+        run: Set 'MSYS2_LOCATION="${{ steps.msys2.outputs.msys2-location }}"'
       
       - name: Install pkg-config and glib2 (windows only)
         if: matrix.platform == 'windows-latest'
@@ -40,6 +44,15 @@ jobs:
         run: | 
          pacman -Syu --noconfirm
          pacman -S --noconfirm mingw-w64-x86_64-pkg-config mingw-w64-x86_64-glib2
+
+      - name: Set Environment Variables for MSYS2
+        if: matrix.platform == 'windows-latest'
+        shell: cmd
+        run: |
+          echo "Adding MSYS2 paths to PATH..."
+          Set 'PATH="%MSYS2_LOCATION%/ucrt64/bin:%PATH%"'
+          Set 'PKG_CONFIG_PATH="%MSYS2_LOCATION%/ucrt64/lib/pkgconfig"'
+          set
 
       - name: Setup node
         uses: actions/setup-node@v4
