@@ -31,8 +31,7 @@ jobs:
         run: |
           /c/msys64/usr/bin/bash -lc "pacman -Syu --noconfirm"
           /c/msys64/usr/bin/bash -lc "pacman -S --noconfirm mingw-w64-x86_64-pkg-config mingw-w64-x86_64-glib2"
-          echo "/c/msys64/mingw64/bin:/c/msys64/mingw64/lib/pkgconfig:$PATH" >> $GITHUB_PATH
-          echo $PATH
+          echo "PATH=/c/msys64/mingw64/bin:/c/msys64/mingw64/lib/pkgconfig:$PATH" >> $GITHUB_ENV
         shell: bash  
 
       - name: Setup node
@@ -60,7 +59,9 @@ jobs:
         # You can remove the one that doesn't apply to your app to speed up the workflow a bit.
       
       - name: Install frontend dependencies
-        run: npm install # change this to npm, pnpm or bun depending on which one you use.
+        run: |
+          echo $PATH
+          npm install # change this to npm, pnpm or bun depending on which one you use.
 
       - uses: conda-incubator/setup-miniconda@v3
         with:
