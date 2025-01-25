@@ -41,13 +41,13 @@ jobs:
          pacman -Syu --noconfirm
          pacman -S --noconfirm mingw-w64-x86_64-pkg-config mingw-w64-x86_64-glib2
 
-      - name: Set Environment Variables for MSYS2
+      - name: Set Environment Variables for MSYS2 (permanent)
         if: matrix.platform == 'windows-latest'
-        shell: cmd
+        shell: bash
         run: |
           echo "Adding MSYS2 paths to PATH..."
-          setx PATH "D:\a\_temp\msys64\ucrt64\bin;%PATH%"
-          setx PKG_CONFIG_PATH "D:\a\_temp\msys64\ucrt64\lib\pkgconfig"
+          echo "PATH=D:/a/_temp/msys64/ucrt64/bin:$PATH" >> $GITHUB_ENV
+          echo "PKG_CONFIG_PATH=D:/a/_temp/msys64/ucrt64/lib/pkgconfig" >> $GITHUB_ENV
 
       - name: Setup node
         uses: actions/setup-node@v4
