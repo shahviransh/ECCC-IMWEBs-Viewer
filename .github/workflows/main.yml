@@ -97,9 +97,10 @@ jobs:
         run: sudo cp -r backend/apppy/_internal/* /usr/lib/
 
       - name: Install MSYS2 pkg-config and glib2 (windows only)
+        if: matrix.platform == 'windows-latest'
         run: |
-          C:\msys64\usr\bin\bash -lc "pacman -Syu --noconfirm"
-          C:\msys64\usr\bin\bash -lc "pacman -S --noconfirm mingw-w64-x86_64-pkg-config mingw-w64-x86_64-glib2"
+          /c/msys64/usr/bin/bash -lc "pacman -Syu --noconfirm"
+          /c/msys64/usr/bin/bash -lc "pacman -S --noconfirm mingw-w64-x86_64-pkg-config mingw-w64-x86_64-glib2"
         shell: bash     
 
       - uses: tauri-apps/tauri-action@v0
