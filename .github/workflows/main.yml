@@ -46,8 +46,8 @@ jobs:
         shell: cmd
         run: |
           echo "Adding MSYS2 paths to PATH..."
-          setx "PATH=D:\a\_temp\msys64\ucrt64\bin:%PATH%"
-          setx "PKG_CONFIG_PATH=D:\a\_temp\msys64\ucrt64\lib\pkgconfig"
+          setx PATH "D:\a\_temp\msys64\ucrt64\bin;%PATH%"
+          setx PKG_CONFIG_PATH "D:\a\_temp\msys64\ucrt64\lib\pkgconfig"
 
       - name: Setup node
         uses: actions/setup-node@v4
