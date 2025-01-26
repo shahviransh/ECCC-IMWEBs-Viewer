@@ -26,14 +26,21 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install MSYS2 pkg-config and glib2 (windows only)
-        if: matrix.platform == 'windows-latest'
+      # Install MSYS2 and pkg-config
+      - name: Install MSYS2 and dependencies
         run: |
-          /c/msys64/usr/bin/bash -lc "pacman -Syu --noconfirm"
-          /c/msys64/usr/bin/bash -lc "pacman -S --noconfirm mingw-w64-x86_64-pkg-config mingw-w64-x86_64-glib2"
-          echo "/c/msys64/usr/bin:/c/msys64/usr/lib/pkgconfig" >> $GITHUB_PATH
-          echo "PKG_CONFIG_PATH=/c/msys64/usr/lib/pkgconfig" >> $GITHUB_ENV
-        shell: bash
+          choco install -y msys2
+          refreshenv
+          # Update MSYS2 and install pkg-config and glib2
+          C:\msys64\usr\bin\bash -lc "pacman -Syu --noconfirm"
+          C:\msys64\usr\bin\bash -lc "pacman -S --noconfirm mingw-w64-x86_64-pkg-config mingw-w64-x86_64-glib2"
+
+      # Add MSYS2 paths to PATH
+      - name: Add MSYS2 paths to PATH
+        run: |
+          echo "C:\msys64\mingw64\bin" >> $GITHUB_PATH
+          echo "C:\msys64\usr\bin" >> $GITHUB_PATH
+          echo "PKG_CONFIG_PATH=C:\msys64\usr\lib\pkgconfig" >> $GITHUB_ENV
 
       - name: Setup node
         uses: actions/setup-node@v4
@@ -61,6 +68,11 @@ jobs:
       
       - name: Install frontend dependencies
         run: npm install # change this to npm, pnpm or bun depending on which one you use.
+
+      - name: Set Up .env
+        run: |
+          echo "VITE_API_BASE_URL=${{secrets.VITE_API_BASE_URL}}" >> .env
+          echo "VITE_MAPBOX_KEY=${{secrets.VITE_MAPBOX_KEY}}" >> .env
 
       - uses: conda-incubator/setup-miniconda@v3
         with:
