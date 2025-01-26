@@ -28,10 +28,11 @@ jobs:
 
       - name: Install MSYS2 and dependencies
         if: matrix.platform == 'windows-latest'
+        shell: bash
         run: |
           /c/msys64/usr/bin/bash -lc "pacman -Syu --noconfirm"
           /c/msys64/usr/bin/bash -lc "pacman -S --noconfirm mingw-w64-x86_64-pkg-config mingw-w64-x86_64-glib2"
-          echo "/c/msys64/mingw64/bin" >> $GITHUB_PATH
+          echo "/c/msys64/usr/bin:/c/msys64/mingw64/bin" >> $GITHUB_PATH
           echo "PKG_CONFIG_PATH=/c/msys64/mingw64/lib/pkgconfig" >> $GITHUB_ENV
           sudo cp -r /c/msys64/mingw64/lib/pkgconfig/* /usr/lib/pkgconfig/
 
