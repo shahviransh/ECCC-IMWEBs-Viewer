@@ -26,15 +26,14 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install MSYS2 and dependencies
+      - name: Install MSYS2 and dependencies (windows only)
         if: matrix.platform == 'windows-latest'
-        shell: bash
         run: |
-          /c/msys64/usr/bin/bash -lc "pacman -Syu --noconfirm"
-          /c/msys64/usr/bin/bash -lc "pacman -S --noconfirm mingw-w64-x86_64-pkg-config mingw-w64-x86_64-glib2"
-          echo "/c/msys64/usr/bin:/c/msys64/mingw64/bin" >> $GITHUB_PATH
-          echo "PKG_CONFIG_PATH=/c/msys64/mingw64/lib/pkgconfig" >> $GITHUB_ENV
-          sudo cp -r /c/msys64/mingw64/lib/pkgconfig/* /usr/lib/pkgconfig/
+          C:\msys64\usr\bin\bash -lc "pacman -Syu --noconfirm"
+          C:\msys64\usr\bin\bash -lc "pacman -S --noconfirm mingw-w64-x86_64-pkg-config mingw-w64-x86_64-glib2"
+          echo "C:\msys64\usr\bin;C:\msys64\mingw64\bin" >> $GITHUB_PATH
+          echo "PKG_CONFIG_PATH=C:\msys64\mingw64\lib\pkgconfig" >> $GITHUB_ENV
+          xcopy /e /i /y C:\msys64\mingw64\lib\pkgconfig\* C:\msys64\usr\lib\pkgconfig\
 
       - name: Setup node
         uses: actions/setup-node@v4
@@ -109,7 +108,7 @@ jobs:
 
       - name: Copy AppImage dependency to /usr/lib/ (ubuntu only)
         if: matrix.platform == 'ubuntu-22.04'
-        run: sudo cp -r backend/apppy/_internal/* /usr/lib/   
+        run: sudo cp -r backend/apppy/_internal/* /usr/lib/
 
       - uses: tauri-apps/tauri-action@v0
         env:
