@@ -26,21 +26,14 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # Install MSYS2 and pkg-config
       - name: Install MSYS2 and dependencies
+        if: matrix.platform == 'windows-latest'
         run: |
-          choco install -y msys2
-          refreshenv
-          # Update MSYS2 and install pkg-config and glib2
-          C:\msys64\usr\bin\bash -lc "pacman -Syu --noconfirm"
-          C:\msys64\usr\bin\bash -lc "pacman -S --noconfirm mingw-w64-x86_64-pkg-config mingw-w64-x86_64-glib2"
-
-      # Add MSYS2 paths to PATH
-      - name: Add MSYS2 paths to PATH
-        run: |
-          echo "C:\msys64\mingw64\bin" >> $GITHUB_PATH
-          echo "C:\msys64\usr\bin" >> $GITHUB_PATH
-          echo "PKG_CONFIG_PATH=C:\msys64\usr\lib\pkgconfig" >> $GITHUB_ENV
+          /c/msys64/usr/bin/bash -lc "pacman -Syu --noconfirm"
+          /c/msys64/usr/bin/bash -lc "pacman -S --noconfirm mingw-w64-x86_64-pkg-config mingw-w64-x86_64-glib2"
+          echo "/c/msys64/mingw64/bin" >> $GITHUB_PATH
+          echo "PKG_CONFIG_PATH=/c/msys64/mingw64/lib/pkgconfig" >> $GITHUB_ENV
+          sudo cp -r /c/msys64/mingw64/lib/pkgconfig/* /usr/lib/pkgconfig/
 
       - name: Setup node
         uses: actions/setup-node@v4
