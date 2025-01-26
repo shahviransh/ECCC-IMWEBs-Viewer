@@ -26,15 +26,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install MSYS2 and dependencies (windows only)
-        if: matrix.platform == 'windows-latest'
-        run: |
-          C:\msys64\usr\bin\bash -lc "pacman -Syu --noconfirm"
-          C:\msys64\usr\bin\bash -lc "pacman -S --noconfirm mingw-w64-x86_64-pkg-config mingw-w64-x86_64-glib2"
-          echo C:\msys64\mingw64\bin >> %GITHUB_PATH%
-          echo PKG_CONFIG_PATH=C:\msys64\mingw64\lib\pkgconfig >> %GITHUB_ENV%
-          xcopy /e /i /y C:\msys64\mingw64\lib\pkgconfig\* C:\msys64\usr\lib\pkgconfig\
-
       - name: Setup node
         uses: actions/setup-node@v4
         with:
@@ -92,19 +83,19 @@ jobs:
           --add-data "$CONDA/envs/venv/share/proj:share/proj"
         shell: bash
 
-      # - name: Authenticate with Google Cloud
-      #   uses: google-github-actions/auth@v1
-      #   with:
-      #     credentials_json: ${{ secrets.GCS_KEY }}
+      - name: Authenticate with Google Cloud
+        uses: google-github-actions/auth@v1
+        with:
+          credentials_json: ${{ secrets.GCS_KEY }}
 
-      # - name: "Set up Cloud SDK"
-      #   uses: "google-github-actions/setup-gcloud@v2"
-      #   with:
-      #     project_id: "augmented-vim-442108-f7"
-      #     version: "latest"
+      - name: "Set up Cloud SDK"
+        uses: "google-github-actions/setup-gcloud@v2"
+        with:
+          project_id: "augmented-vim-442108-f7"
+          version: "latest"
 
-      # - name: Unzip backend data
-      #   run: gsutil -m cp -r gs://eccc-imwebs-viewer/Jenette_Creek_Watershed backend/apppy/_internal/
+      - name: Unzip backend data
+        run: gsutil -m cp -r gs://eccc-imwebs-viewer/Jenette_Creek_Watershed backend/apppy/_internal/
 
       - name: Copy AppImage dependency to /usr/lib/ (ubuntu only)
         if: matrix.platform == 'ubuntu-22.04'
