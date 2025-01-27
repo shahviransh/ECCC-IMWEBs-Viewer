@@ -98,7 +98,7 @@ jobs:
         uses: actions/cache@v3
         with:
           path: backend/apppy/_internal/Jenette_Creek_Watershed
-          key: Jenette_Creek_Watershed-${{ runner.os }}-v1 # Change "v1" to "v2" manually if you want to refresh the cache
+          key: Jenette_Creek_Watershed-v1 # Change "v1" to "v2" manually if you want to refresh the cache
 
       - name: Check Cache Status
         run: |
@@ -114,7 +114,7 @@ jobs:
         uses: actions/cache@v3
         with:
           path: backend/apppy/_internal/Jenette_Creek_Watershed
-          key: Jenette_Creek_Watershed-${{ runner.os }}-v1
+          key: Jenette_Creek_Watershed-v1
 
       - name: Copy AppImage dependency to /usr/lib/ (ubuntu only)
         if: matrix.platform == 'ubuntu-22.04'
