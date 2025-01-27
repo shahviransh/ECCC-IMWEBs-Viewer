@@ -37,16 +37,15 @@ try {
     fs.copyFileSync(oldPath, newPath);
     console.log(`Copied sidecar to ${newPath}`);
     if (targetTriple === "aarch64-apple-darwin") {
-      fs.chmodSync(
-        oldPath,
-        path.resolve(
-          __dirname,
-          "..",
-          "backend",
-          "apppy",
-          `apppy-x86_64-apple-darwin${ext}`
-        )
+      const extraPath = path.resolve(
+        __dirname,
+        "..",
+        "backend",
+        "apppy",
+        `apppy-x86_64-apple-darwin${ext}`
       );
+      fs.copyFileSync(oldPath, extraPath);
+      console.log(`Copied sidecar to ${extraPath}`);
     }
   } else {
     console.error(`File ${oldPath} does not exist`);
