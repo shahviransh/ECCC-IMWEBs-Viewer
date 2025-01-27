@@ -322,7 +322,7 @@ const store = createStore({
     updateXAxis({ commit }, xAxis) {
       commit("SET_XAXIS", xAxis);
     },
-    pushMessage({ commit }, { message, type, duration = 1000 }) {
+    pushMessage({ commit }, { message, type, duration = 5000 }) {
       commit("PUSH_MESSAGE", { message, type, duration });
     },
     sliceMessage({ commit }, index) {
