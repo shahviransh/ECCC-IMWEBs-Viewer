@@ -13,14 +13,14 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - platform: "macos-latest" # for Arm based macs (M1 and above).
-            args: "--target aarch64-apple-darwin"
-          #- platform: 'macos-latest' # for Intel based macs.
-          #  args: '--target x86_64-apple-darwin'
-          - platform: "ubuntu-22.04" # for Tauri v1 you could replace this with ubuntu-22.04.
-            args: ""
-          - platform: "windows-latest"
-            args: ""
+          # - platform: "macos-latest" # for Arm based macs (M1 and above).
+          #   args: "--target aarch64-apple-darwin"
+          - platform: 'macos-latest' # for Intel based macs.
+           args: '--target x86_64-apple-darwin'
+          # - platform: "ubuntu-22.04" # for Tauri v1 you could replace this with ubuntu-22.04.
+          #   args: ""
+          # - platform: "windows-latest"
+          #   args: ""
 
     runs-on: ${{ matrix.platform }}
     steps:
@@ -94,8 +94,27 @@ jobs:
           project_id: "augmented-vim-442108-f7"
           version: "latest"
 
-      - name: Unzip backend data
-        run: gsutil -m cp -r gs://eccc-imwebs-viewer/Jenette_Creek_Watershed backend/apppy/_internal/
+      - name: Restore Cache
+        uses: actions/cache@v3
+        with:
+          path: backend/apppy/_internal/Jenette_Creek_Watershed
+          key: Jenette_Creek_Watershed-${{ runner.os }}-v1 # Change "v1" to "v2" manually if you want to refresh the cache
+
+      - name: Check Cache Status
+        run: |
+          if [ -d "backend/apppy/_internal/Jenette_Creek_Watershed" ]; then
+            echo "Cache hit! Skipping download."
+          else
+            echo "Cache miss! Downloading data."
+            gsutil -m cp -r gs://eccc-imwebs-viewer/Jenette_Creek_Watershed backend/apppy/_internal/
+          fi
+
+      - name: Save to Cache
+        if: always()
+        uses: actions/cache@v3
+        with:
+          path: backend/apppy/_internal/Jenette_Creek_Watershed
+          key: Jenette_Creek_Watershed-${{ runner.os }}-v1
 
       - name: Copy AppImage dependency to /usr/lib/ (ubuntu only)
         if: matrix.platform == 'ubuntu-22.04'
