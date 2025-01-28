@@ -8,14 +8,39 @@ This application is built with Tauri, Vue 3 as the frontend, and Flask as the ba
 
 ### Download for your platform:
 
-- **Linux**: Download the `.deb`, `.rpm`, or `.AppImage` package.  
-  - **For `.deb` or `.rpm`**: Install the package using your package manager. Launch the application via your application launcher or terminal.  
-  - **For `.AppImage`**: Make the file executable using `chmod +x <filename>.AppImage` in the terminal, then run it by double-clicking or executing `./<filename>.AppImage`.  
+#### **Linux**:
+- **Available Packages**: `.deb`, `.rpm`, or `.AppImage`
+  - **`.deb`**: Suitable for Debian-based distributions like **Ubuntu**, **Linux Mint**, or **Pop!_OS**. Install with:
+    ```bash
+    sudo apt install ./<filename>.deb
+    ```
+  - **`.rpm`**: Suitable for RPM-based distributions like **Fedora**, **Red Hat Enterprise Linux (RHEL)**, or **openSUSE**. Install with:
+    ```bash
+    sudo rpm -i <filename>.rpm
+    ```
+  - **`.AppImage`**: Universal package for most distributions. Make it executable using:
+    ```bash
+    chmod +x <filename>.AppImage
+    ./<filename>.AppImage
+    ```
+- Once installed, you can launch the application from your application menu or terminal.
 
-- **Windows**: Download and run the `.msi` (requires admin privileges) or `.exe` file. The application should launch automatically after installation.  
+#### **Windows**:
+- **Available Packages**: `.msi` or `.exe`
+  - **`.msi`**: Requires admin privileges for installation. Double-click the file and follow the setup instructions. The application will launch automatically after installation.
+  - **`.exe`**: Suitable for users without admin rights. Run the `.exe` file, and the application will launch immediately.
+- After installation, you can find the application in your Start Menu or Desktop.
 
-- **macOS**: Download the `.dmg` or `.app.tar.gz` file.  
-  - **For `.dmg`**: Open the file and drag the application to your Applications folder.  
-  - **For `.app.tar.gz`**: Extract the file, then move the application to your Applications folder. Launch the application from the Applications folder or using Spotlight Search.
+#### **macOS**:
+- **Available Packages**: `.dmg` or `.app.tar.gz`
+  - **Intel vs ARM**: Check your Mac's architecture before downloading.  
+    - **Intel Macs**: Download the **x64** package.  
+    - **Apple Silicon (M1/M2)**: Download the **aarch64** package.
+  - **`.dmg`**: Open the `.dmg` file, then drag and drop the application into your **Applications** folder. Launch the application from the Applications folder or via Spotlight Search.
+  - **`.app.tar.gz`**: Extract the file using:
+    ```bash
+    tar -xzf <filename>.app.tar.gz
+    ```
+    Then move the extracted application to your **Applications** folder. Launch the application as usual.
 
 Launch the Application: The application connects the Vue 3 frontend with the Flask backend and should be ready to use.
