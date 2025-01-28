@@ -10,7 +10,6 @@ Jenette_Creek_Watershed
 *.exe
 .venv
 .env
-update.js
 
 node_modules
 
