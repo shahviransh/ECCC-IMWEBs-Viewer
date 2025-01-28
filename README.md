@@ -10,7 +10,7 @@ This application is built with Tauri, Vue 3 as the frontend, and Flask as the ba
 
 #### **Linux**:
 - **Available Packages**: `.deb`, `.rpm`, or `.AppImage`
-  - **`.deb`**: Suitable for Debian-based distributions like **Ubuntu**, **Linux Mint**, or **Pop!_OS**. Install with:
+  - **`.deb`**: Suitable for Debian-based distributions like **Ubuntu**, **Linux Mint**, or **Kali**. Install with:
     ```bash
     sudo apt install ./<filename>.deb
     ```
