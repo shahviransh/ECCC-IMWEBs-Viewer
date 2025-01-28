@@ -4,7 +4,7 @@ This application is built with Tauri, Vue 3 as the frontend, and Flask as the ba
 
 ## Installation
 
-**Go to the GitHub Releases page: Access all release packages from this [link](https://github.com/shahviransh/ECCC-IMWEBs-Viewer/releases/latest)**.
+**Go to the GitHub Releases page: Access the latest release package from this [link](https://github.com/shahviransh/ECCC-IMWEBs-Viewer/releases/latest)**.
 
 ### Download for your platform:
 
