@@ -15,7 +15,7 @@
     <nav class="taskbar">
       <div class="taskbar-left">
         <button @click="selectFolder">📁 Select Folder</button>
-        <span class="folder-path">{{ folderPath }}</span>
+        <span class="folder-path">{{ modelFolder }}</span>
         <!-- Placeholder for additional tools components -->
         <span v-if="activePage === 'Graph'">
           <button @click="handleZoomIn">Zoom In</button>
@@ -38,6 +38,7 @@
 <script>
 import { mapState, mapActions } from "vuex";
 import MessageBox from "./components/MessageBox.vue";
+import { open } from "@tauri-apps/plugin-dialog";
 
 export default {
   name: "App",
@@ -53,21 +54,33 @@ export default {
         "Tools",
         "Help",
       ],
-      folderPath: "",
       activePage: "Project", // Set default page here
     };
   },
   computed: {
-    ...mapState(["theme", "currentZoomStart", "currentZoomEnd"]),
+    ...mapState(["theme", "currentZoomStart", "modelFolder", "currentZoomEnd"]),
   },
   components: {
     MessageBox,
   },
   methods: {
-    ...mapActions(["updateTheme", "updatePageTitle", "updateCurrentZoom"]),
-    selectFolder() {
-      // Placeholder for selecting a folder, could be integrated with backend logic
-      this.folderPath = "Jenette_Creek_Watershed";
+    ...mapActions(["updateTheme", "updatePageTitle", "updateCurrentZoom", "updateModelFolder"]),
+    async selectFolder() {
+      try {
+        const folderPath = await open({
+          directory: true, // Open only folders
+          multiple: false, // Only allow one folder selection
+        });
+
+        if (folderPath) {
+          // Convert folder path to universal style (replace backslashes with forward slashes)
+          const universalPath = folderPath.replace(/\\/g, "/");
+
+          this.updateModelFolder(universalPath);
+        }
+      } catch (error) {
+        console.error("Error selecting folder: ", error);
+      }
     },
     navigateTo(page) {
       this.activePage = page; // Update active page

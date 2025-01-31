@@ -23,6 +23,7 @@
 </template>
 
 <script>
+import { mapState } from 'vuex'; // Import Vuex helpers
 export default {
     name: 'FolderTree',
     props: {
@@ -48,13 +49,16 @@ export default {
             }
         }
     },
+    computed: {
+        ...mapState(['modelFolder']),
+    },
     methods: {
         toggleNode(node) {
             if (node.type === 'folder' || node.type === 'database') {
                 // Toggle the expanded state directly
                 node.expanded = !node.expanded;
                 this.$emit('select', node); // Emit the folder node
-            } else if (node.type === 'table' || node.type === 'file'){
+            } else if (node.type === 'table' || node.type === 'file') {
                 node.selected = !node.selected; // Toggle selection state
                 this.$emit('select', node.selected ? node : null); // Emit selected node or null if unselected
             }
@@ -65,18 +69,20 @@ export default {
             this.$emit('select', node);
         },
         expandNodesBasedOnPage(page) {
-            if (page === 'Table') {
-                // Automatically expand the database node folder
-                this.expandSpecificNode(this.treeData, 'database');
-            } else if (page === 'Project') {
-                // Automatically expand the Model01\Output\Scenario_2 folder
-                this.expandSpecificNode(this.treeData, 'model');
-            } else if (page === 'Graph') {
-                // Automatically expand the Model01\Output\Scenario_2 folder
-                this.expandSpecificNode(this.treeData, 'model');
-            } else if (page === 'Map') {
-                // Automatically expand the Geospatial folder
-                this.expandSpecificNode(this.treeData, 'geospatial');
+            if (this.modelFolder.includes('Jenette_Creek_Watershed')) {
+                if (page === 'Table') {
+                    // Automatically expand the database node folder
+                    this.expandSpecificNode(this.treeData, 'database');
+                } else if (page === 'Project') {
+                    // Automatically expand the Model01\Output\Scenario_2 folder
+                    this.expandSpecificNode(this.treeData, 'model');
+                } else if (page === 'Graph') {
+                    // Automatically expand the Model01\Output\Scenario_2 folder
+                    this.expandSpecificNode(this.treeData, 'model');
+                } else if (page === 'Map') {
+                    // Automatically expand the Geospatial folder
+                    this.expandSpecificNode(this.treeData, 'geospatial');
+                }
             }
         },
         expandSpecificNode(nodes, targetName) {
@@ -132,6 +138,7 @@ export default {
     border-radius: 4px;
     user-select: none;
     font-size: 16px;
+    word-break: break-word;
 }
 
 /* Adjust padding for first-level nodes */

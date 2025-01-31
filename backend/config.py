@@ -3,7 +3,7 @@ import sys
 
 
 class Config:
-    PATHFILE = (
+    PATHFILE_EXPORT = PATHFILE = (
         sys._MEIPASS
         if getattr(sys, "frozen", False)
         else os.path.dirname(os.path.realpath(__file__))
@@ -20,5 +20,4 @@ class Config:
         if getattr(sys, "frozen", False)
         else os.path.join(conda_prefix, lib, "share/gdal")
     )
-    EXPORT_PATH = os.getenv("EXPORT_PATH", "dataExport")
     LOOKUP = "Jenette_Creek_Watershed/Database/lookup.db3"

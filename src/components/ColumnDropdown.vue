@@ -122,11 +122,11 @@ export default {
                     const table_name = key.split(',')[1].replace(")", "").replace(/['"]/g, '');
                     if ([this.dateType, 'ID'].includes(column)) {
                         return 'All Tables';
-                    } 
+                    }
                     else {
                         return table_name;
                     }
-                } else if (column.includes(table_name)){
+                } else if (column.includes(table_name)) {
                     return table_name;
                 }
             }

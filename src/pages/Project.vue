@@ -155,7 +155,6 @@ export default {
                 this.data = response.data.data;
                 this.stats = response.data.stats;
                 this.statsColumns = response.data.statsColumns;
-                this.pushMessage({ message: `Fetching ${this.selectedColumns.length} columns x ${this.data.length} rows`, type: 'info' });
                 this.loadInitialRows();
 
                 // Wait until the table has rendered, then trigger messages
