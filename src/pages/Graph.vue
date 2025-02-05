@@ -299,10 +299,6 @@ export default {
                         method: JSON.stringify(this.selectedMethod),
                     }
                 });
-                if (response.data.error) {
-                    alert('Error fetching data: ' + response.data.error);
-                    return;
-                }
                 if (this.selectedInterval === 'seasonally' && !this.selectedMethod.includes('Equal') && !this.selectedColumns.includes('Season')) {
                     this.updateSelectedColumns(this.selectedColumns.concat(['Season']));
                 } else {
@@ -312,12 +308,16 @@ export default {
                 this.stats = response.data.stats;
                 this.statsColumns = response.data.statsColumns;
                 this.refreshKey += 1;
+                if (response.data.error) {
+                    alert('Error fetching data: ' + response.data.error);
+                    return;
+                } else {
+                    this.$nextTick(() => {
+                        this.pushMessage({ message: `Graph Loaded ${this.selectedColumns.length} columns x ${this.data.length} rows`, type: 'success' });
+                    });
 
-                this.$nextTick(() => {
-                    this.pushMessage({ message: `Graph Loaded ${this.selectedColumns.length} columns x ${this.data.length} rows`, type: 'success' });
-                });
-
-                this.pushMessage({ message: `Graph Loading ${this.selectedColumns.length} columns x ${this.data.length} rows`, type: 'info' });
+                    this.pushMessage({ message: `Graph Loading ${this.selectedColumns.length} columns x ${this.data.length} rows`, type: 'info' });
+                }
             } catch (error) {
                 alert('Error fetching data: ' + error.message);
             }
@@ -348,8 +348,7 @@ export default {
                 if (response.data.error) {
                     alert('Error fetching data: ' + response.data.error);
                     return;
-                }
-                this.pushMessage({ message: `Exported ${this.exportColumns.length} columns x ${this.data.length} rows`, type: 'info' });
+                } else { this.pushMessage({ message: `Exported ${this.exportColumns.length} columns x ${this.data.length} rows`, type: 'info' }); }
                 if (this.selectedInterval === 'seasonally' && !this.selectedMethod.includes('Equal') && !this.selectedColumns.includes('Season')) {
                     this.updateSelectedColumns(this.selectedColumns.concat(['Season']));
                 } else {

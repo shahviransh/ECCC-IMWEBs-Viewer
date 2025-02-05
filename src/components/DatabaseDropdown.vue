@@ -22,25 +22,30 @@ export default {
         FolderTree
     },
     computed: {
-        ...mapState(['databases', 'tables', 'pageTitle']),
+        ...mapState(['folderTree', 'tables', 'modelFolder', 'pageTitle']),
     },
     mounted() {
-        this.fetchDatabases();
+        this.fetchFolderTree();
     },
     watch: {
-        databases() {
-            if (this.treeData.length === 0 && Array.isArray(this.databases)) {
-                this.treeData = this.listToTree(this.databases);
+        folderTree() {
+            if (this.treeData.length === 0 && Array.isArray(this.folderTree)) {
+                this.treeData = this.listToTree(this.folderTree);
             }
         },
         tables() {
             if (this.selectedDb) {
                 this.addTablesToTree();
             }
+        },
+        modelFolder() {
+            if (this.modelFolder) {
+                this.fetchFolderTree();
+            }
         }
     },
     methods: {
-        ...mapActions(['fetchDatabases', 'fetchTables', 'updateSelectedDbsTables', 'removeSelectedDbTable', 'updateSelectedGeoFolder']),
+        ...mapActions(['fetchFolderTree', 'fetchTables', 'removeSelectedGeoFolder', 'updateSelectedDbsTables', 'removeSelectedDbTable', 'updateSelectedGeoFolders']),
         listToTree(list) {
             let idCounter = 1;
             const tree = [];
@@ -124,14 +129,14 @@ export default {
                 } else if (node.type === 'file') {
                     // this.selectedFolder = node.path.substring(0, node.path.lastIndexOf(this.separator));
                     this.selectedFolder = node.path;
-                    this.updateSelectedGeoFolder(this.selectedFolder);
+                    this.updateSelectedGeoFolders(this.selectedFolder);
                 }
             } else {
                 // Unselect table
                 this.removeSelectedDbTable(this.selectedTable);
+                this.removeSelectedGeoFolder(this.selectedFolder);
                 this.selectedTable = null;
                 this.selectedFolder = null;
-                this.updateSelectedGeoFolder(null);
             }
         }
     },

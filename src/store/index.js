@@ -5,7 +5,7 @@ const store = createStore({
   state: {
     selectedDbsTables: [],
     selectedColumns: [],
-    selectedGeoFolder: null,
+    selectedGeoFolders: [],
     selectedIds: [],
     dateRange: {
       start: null,
@@ -14,7 +14,7 @@ const store = createStore({
     tooltipColumns: {},
     theme: "light",
     pageTitle: "",
-    databases: [],
+    folderTree: [],
     tables: [],
     columns: [],
     ids: [],
@@ -26,6 +26,7 @@ const store = createStore({
       start: null,
       end: null,
     },
+    modelFolder: "Jenette_Creek_Watershed",
     dateType: null,
     exportDateType: null,
     selectedMethod: ["Equal"],
@@ -34,7 +35,7 @@ const store = createStore({
     exportInterval: "daily",
     exportPath: "dataExport",
     exportFilename: "exported_data",
-    exportFormat: "csv",
+    exportFormat: "",
     graphType: "scatter",
     multiGraphType: [],
     exportOptions: { data: false, stats: false },
@@ -46,8 +47,11 @@ const store = createStore({
     yAxis: [],
   },
   mutations: {
-    SET_DATABASES(state, databases) {
-      state.databases = databases;
+    SET_PROJECT_FOLDER(state, folder) {
+      state.modelFolder = folder;
+    },
+    SET_FOLDER_TREE(state, folderTree) {
+      state.folderTree = folderTree;
     },
     SET_TABLES(state, tables) {
       state.tables = tables;
@@ -114,8 +118,17 @@ const store = createStore({
       const temp = state.selectedDbsTables;
       state.selectedDbsTables = [...temp];
     },
-    SET_SELECTED_GEO_FOLDER(state, folder) {
-      state.selectedGeoFolder = folder;
+    SET_SELECTED_GEO_FOLDERS(state, folder) {
+      if (!state.selectedGeoFolders.includes(folder)) {
+        state.selectedGeoFolders.push(folder);
+      }
+      const temp = state.selectedGeoFolders;
+      state.selectedGeoFolders = [...temp];
+    },
+    SET_SELECTED_GEO_FOLDER_REMOVE(state, folder) {
+      state.selectedGeoFolders = state.selectedGeoFolders.filter(
+        (f) => f !== folder
+      );
     },
     SET_XAXIS(state, xAxis) {
       state.xAxis = xAxis;
@@ -200,7 +213,7 @@ const store = createStore({
     },
   },
   actions: {
-    async fetchDatabases({ commit }) {
+    async fetchFolderTree({ commit }) {
       const maxRetries = 5; // Maximum number of retry attempts
       const retryDelay = 2000; // Delay between retries in milliseconds
 
@@ -209,22 +222,18 @@ const store = createStore({
           const response = await axios.get(
             `${import.meta.env.VITE_API_BASE_URL}/api/list_files`,
             {
-              params: { folder_path: "Jenette_Creek_Watershed" },
+              params: { folder_path: this.state.modelFolder },
             }
           );
           if (response.data.error) {
-            alert("Error fetching data: " + response.data.error);
+            alert("Error fetching data: ", response.data.error);
             return;
           }
-          commit("SET_DATABASES", response.data);
+          commit("SET_FOLDER_TREE", response.data);
           return; // Exit the function if the request is successful
         } catch (error) {
-          alert(
-            `Attempt ${attempt} - Error fetching databases:`,
-            error.message
-          );
           if (attempt === maxRetries) {
-            alert("Max retries reached. Failed to fetch databases.");
+            alert("Max retries reached. Failed to fetch folder.");
             throw error; // Re-throw the error after the last attempt
           }
           await new Promise((resolve) => setTimeout(resolve, retryDelay)); // Wait before retrying
@@ -240,7 +249,7 @@ const store = createStore({
           }
         );
         if (response.data.error) {
-          alert("Error fetching data: " + response.data.error);
+          alert("Error fetching data: ", response.data.error);
           return;
         }
         commit("SET_TABLES", response.data);
@@ -259,7 +268,7 @@ const store = createStore({
         );
 
         if (response.data.error) {
-          alert("Error fetching data: " + response.data.error);
+          alert("Error fetching data: ", response.data.error);
           return;
         }
         commit("SET_COLUMNS", {
@@ -291,15 +300,24 @@ const store = createStore({
       }
     },
     // Add similar actions for other components
+    updateModelFolder({ commit }, folder) {
+      commit("SET_PROJECT_FOLDER", folder);
+    },
     updateColumns({ commit }, columns) {
       commit("SET_COLUMNS", { columns });
+    },
+    updateToolTipColumns({ commit }, columns) {
+      commit("SET_TOOLTIP_COLUMNS", columns);
     },
     updateSelectedDbsTables({ commit }, { db, table }) {
       commit("SET_SELECTED_DBS_TABLES", { db, table });
     },
-    updateSelectedGeoFolder({ commit }, folder) {
-      commit("SET_SELECTED_GEO_FOLDER", folder);
+    updateSelectedGeoFolders({ commit }, folder) {
+      commit("SET_SELECTED_GEO_FOLDERS", folder);
       commit("SET_COLUMNS", { columns: [] });
+    },
+    removeSelectedGeoFolder({ commit }, folder) {
+      commit("SET_SELECTED_GEO_FOLDER_REMOVE", folder);
     },
     updateTheme({ commit }, theme) {
       commit("SET_THEME", theme);

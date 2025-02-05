@@ -137,7 +137,7 @@ export default {
     padding: 2px 0px;
     border-radius: 4px;
     user-select: none;
-    font-size: 16px;
+    font-size: 14px;
     word-break: break-word;
 }
 

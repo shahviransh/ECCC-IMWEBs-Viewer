@@ -21,10 +21,8 @@ pipreq:
 
 python:
 	@echo "Building Python backend..."
-	@call conda activate venv && \
-	pyinstaller backend/apppy.py -y --distpath backend/ --specpath backend/ --workpath backend/build --name apppy \
-	--add-data "C:/Users/viran/miniconda3/envs/venv/Library/share/proj;Library/share/proj" && \
-	conda deactivate
+	@call pyinstaller backend/apppy.py -y --distpath backend/ --specpath backend/ --workpath backend/build --name apppy \
+	--add-data "C:/Users/viran/miniconda3/envs/venv/Library/share/proj;Library/share/proj"
 	xcopy backend\Jenette_Creek_Watershed backend\apppy\_internal\Jenette_Creek_Watershed /E /I
 
 # Build Electron or Tauri based on argument

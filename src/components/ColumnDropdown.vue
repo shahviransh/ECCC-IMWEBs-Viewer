@@ -98,7 +98,7 @@ export default {
                 this.updateYAxis(value);
             }
         },
-        ...mapState(['columns', 'ids', 'selectedColumns', 'selectedGeoFolder', 'dateType', 'tooltipColumns', 'exportColumns', 'pageTitle', 'xAxis', 'yAxis', 'dateType'])
+        ...mapState(['columns', 'ids', 'selectedColumns', 'selectedGeoFolders', 'dateType', 'tooltipColumns', 'exportColumns', 'pageTitle', 'xAxis', 'yAxis', 'dateType'])
     },
     data() {
         return {
@@ -169,7 +169,7 @@ export default {
 <style src="vue-multiselect/dist/vue-multiselect.css"></style>
 <style scoped>
 .parameter-heading {
-    font-size: 16px;
+    font-size: 14px;
     font-weight: 600;
     margin: 0px 0px 0px 0px;
     color: #333;

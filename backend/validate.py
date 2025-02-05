@@ -1,6 +1,7 @@
 from cerberus import Validator
 import re
-
+import os
+from config import Config
 
 def validate_request_args(schema, request_args):
     """
@@ -36,7 +37,7 @@ def validate_request_args(schema, request_args):
     return validator.document
 
 
-# Example usage for the /api/get_data endpoint
+# Usage for the /api/get_data endpoint
 def validate_get_data_args(request_args):
     schema = {
         "db_tables": {"type": "string", "required": True},
@@ -73,7 +74,7 @@ def validate_get_data_args(request_args):
     return validate_request_args(schema, request_args)
 
 
-# Example usage for the /api/export_data endpoint
+# Usage for the /api/export_data endpoint
 def validate_export_data_args(request_args):
     schema = {
         "db_tables": {"type": "string", "required": True},
@@ -109,7 +110,7 @@ def validate_export_data_args(request_args):
         "export_filename": {
             "type": "string",
             "required": True,
-            "regex": r"^[a-zA-Z]+$",
+            "regex": r"^[\w,\s-]+$",
         },
         "export_format": {
             "type": "string",
@@ -122,28 +123,54 @@ def validate_export_data_args(request_args):
     return validate_request_args(schema, request_args)
 
 
-# Example usage for the /api/get_tables endpoint
+# Usage for the /api/get_tables endpoint
 def validate_get_tables_args(request_args):
     schema = {"db_path": {"type": "string", "required": True}}
     return validate_request_args(schema, request_args)
 
 
-# Example usage for /api/list_files endpoint
+# Usage for /api/list_files endpoint
 def validate_list_files_args(request_args):
     schema = {"folder_path": {"type": "string", "required": True}}
     return validate_request_args(schema, request_args)
 
 
-# Example usage for /api/get_table_details endpoint
+# Usage for /api/get_table_details endpoint
 def validate_get_table_details_args(request_args):
     schema = {"db_tables": {"type": "string", "required": True}}
     return validate_request_args(schema, request_args)
 
 
-# Example usage for /api/mapbox_shapefile endpoint
-def validate_mapbox_shapefile_args(request_args):
-    schema = {"file_path": {"type": "string", "required": True}}
+# Usage for /api/geospatial endpoint
+def validate_geospatial_args(request_args):
+    schema = {"file_paths": {"type": "string", "required": True}}
     return validate_request_args(schema, request_args)
+
+
+# Usage for /api/export_map endpoint
+def validate_export_map_args(image, form_data):
+    if not image.mimetype.startswith("image/"):
+        return {"error": "Invalid image file format"}
+    schema = {
+        "export_format": {
+            "type": "string",
+            "required": True,
+            "allowed": ["png", "jpg", "jpeg", "pdf"],
+        },
+        "export_path": {"type": "string", "required": True},
+        "export_filename": {
+            "type": "string",
+            "required": True,
+            "regex": r"^[\w,\s-]+$",
+        },
+    }
+    return validate_request_args(schema, form_data)
+
+
+def validate_serve_tif_args(filename):
+    if os.path.commonpath([Config.PATHFILE, filename]) != Config.PATHFILE:
+        return {"error": "Invalid path specified for the GeoTIFF file."}
+    return {"filename": filename}
 
 
 def getUserValidationError(errors):
@@ -153,7 +180,7 @@ def getUserValidationError(errors):
     # Mapping regex patterns to human-readable messages
     regex_messages = {
         r"^\d{4}-\d{2}-\d{2}$": "should be in the format YYYY-MM-DD (e.g., 2024-01-01).",
-        r"^[a-zA-Z]+$": "should only contain alphabetic characters.",
+        r"^[\w,\s-]+$$": "should contain only letters, numbers, spaces, commas, underscore and hyphens.",
         r'\["\d+"(,\s*"\d+")*\]|\[\]': "should be a numbers quoted and enclosed in square brackets (e.g., ['1','2','3']).",
     }
 

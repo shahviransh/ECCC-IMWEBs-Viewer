@@ -14,8 +14,10 @@
         <div class="export-field">
             <label for="export-format" class="export-label">Export Format:</label>
             <select id="export-format" v-model="expFormat" class="export-select">
-                <option value="csv">CSV</option>
-                <option value="txt">Text</option>
+                <template v-if="['Project', 'Table', 'Graph'].includes(pageTitle)">
+                    <option value="csv">CSV</option>
+                    <option value="txt">Text</option>
+                </template>
                 <!-- Conditional Graph Export Options -->
                 <template v-if="pageTitle === 'Graph'">
                     <option value="xlsx">Graph In Excel</option>
@@ -24,6 +26,12 @@
                     <option value="jpeg">Graph As JPEG</option>
                     <option value="svg">Graph As SVG</option>
                     <option value="pdf">Graph As PDF</option>
+                </template>
+                <template v-if="pageTitle === 'Map'">
+                    <option value="png">Map As PNG</option>
+                    <option value="jpg">Map As JPG</option>
+                    <option value="jpeg">Map As JPEG</option>
+                    <option value="pdf">Map As PDF</option>
                 </template>
             </select>
         </div>

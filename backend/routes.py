@@ -7,7 +7,8 @@ from services import (
     get_table_names,
     export_data_service,
     get_multi_columns_and_time_range,
-    process_geospatial_data_for_mapbox,
+    process_geospatial_data,
+    export_map_service,
 )
 from utils import shutdown_server, clear_cache
 from validate import (
@@ -16,7 +17,9 @@ from validate import (
     validate_get_tables_args,
     validate_list_files_args,
     validate_get_table_details_args,
-    validate_mapbox_shapefile_args,
+    validate_geospatial_args,
+    validate_export_map_args,
+    validate_serve_tif_args
 )
 
 
@@ -106,29 +109,52 @@ def register_routes(app, cache):
 
         return jsonify(columns_and_time_range_dict)
 
-    @app.route("/api/mapbox_shapefile", methods=["GET"])
+    @app.route("/api/geospatial", methods=["GET"])
     @cache.cached(timeout=300, query_string=True)
-    def mapbox_shapefile():
+    def geospatial():
         """
-        API endpoint to return GeoJSON, bounds, and layer configurations for Mapbox.
+        API endpoint to return GeoJSON/Tiff Image Url, bounds, and center.
         """
         data = request.args
 
         # Validate the request arguments
-        validation_response = validate_mapbox_shapefile_args(data)
+        validation_response = validate_geospatial_args(data)
         if validation_response.get("error", None):
             return jsonify(validation_response)
 
-        mapbox_data = process_geospatial_data_for_mapbox(data)
+        geo_data = process_geospatial_data(data)
 
-        return jsonify(mapbox_data)
+        return jsonify(geo_data)
 
     @app.route("/geotiff/<path:filename>", methods=["GET"])
     def serve_tif(filename):
         """
         Serve the TIF file from the specified path.
         """
+
+        # Validate the file path
+        validation_response = validate_serve_tif_args(filename)
+        if validation_response.get("error", None):
+            return jsonify(validation_response)
+
         return send_file(filename, mimetype='image/png', as_attachment=True)
+    
+    @app.route('/api/export_map', methods=['POST'])
+    def export_map():
+        """
+        API endpoint to export the map image.
+        """
+        image = request.files.get('image')
+        form_data = request.form.to_dict()
+
+        # Validate the request arguments
+        validation_response = validate_export_map_args(image, form_data)
+        if validation_response.get("error", None):
+            return jsonify(validation_response)
+
+        image_path = export_map_service(image, form_data)
+
+        return jsonify(image_path)
 
     @app.route("/health", methods=["GET"])
     def health():

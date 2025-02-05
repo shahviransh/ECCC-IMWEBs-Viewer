@@ -143,10 +143,6 @@ export default {
                         method: JSON.stringify(this.selectedMethod),
                     }
                 });
-                if (response.data.error) {
-                    alert('Error fetching data: ' + response.data.error);
-                    return;
-                }
                 if (this.selectedInterval === 'seasonally' && !this.selectedMethod.includes('Equal') && !this.selectedColumns.includes('Season')) {
                     this.updateSelectedColumns(this.selectedColumns.concat(['Season']));
                 } else {
@@ -156,15 +152,19 @@ export default {
                 this.stats = response.data.stats;
                 this.statsColumns = response.data.statsColumns;
                 this.loadInitialRows();
-
-                // Wait until the table has rendered, then trigger messages
-                this.$nextTick(() => {
-                    this.pushMessage({ message: `Fetched ${this.selectedColumns.length} columns x ${this.data.length} rows`, type: 'success' });
-                    this.pushMessage({ message: `Loaded ${this.rowLimit} rows`, type: 'success' });
-                    if (this.statsColumns.length > 0) {
-                        this.pushMessage({ message: `Fetched ${this.statsColumns.length} statistics columns for ${this.selectedMethod || this.selectedStatistics}`, type: 'success' });
-                    }
-                });
+                if (response.data.error) {
+                    alert('Error fetching data: ' + response.data.error);
+                    return;
+                } else {
+                    // Wait until the table has rendered, then trigger messages
+                    this.$nextTick(() => {
+                        this.pushMessage({ message: `Fetched ${this.selectedColumns.length} columns x ${this.data.length} rows`, type: 'success' });
+                        this.pushMessage({ message: `Loaded ${this.rowLimit} rows`, type: 'success' });
+                        if (this.statsColumns.length > 0) {
+                            this.pushMessage({ message: `Fetched ${this.statsColumns.length} statistics columns for ${this.selectedMethod || this.selectedStatistics}`, type: 'success' });
+                        }
+                    });
+                }
             } catch (error) {
                 alert('Error fetching data: ' + error.message);
             }
@@ -194,7 +194,7 @@ export default {
                     alert('Error fetching data: ' + response.data.error);
                     return;
                 }
-                this.pushMessage({ message: `Exported ${this.exportColumns.length} columns x ${this.data.length} rows`, type: 'success' });
+                else { this.pushMessage({ message: `Exported ${this.exportColumns.length} columns x ${this.data.length} rows`, type: 'success' }); }
                 if (this.selectedInterval === 'seasonally' && !this.selectedMethod.includes('Equal') && !this.selectedColumns.includes('Season')) {
                     this.updateSelectedColumns(this.selectedColumns.concat(['Season']));
                 } else {
