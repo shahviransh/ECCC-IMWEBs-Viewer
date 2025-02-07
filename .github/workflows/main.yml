@@ -100,6 +100,7 @@ jobs:
           key: Jenette_Creek_Watershed-v1 # Change "v1" to "v2" manually if you want to refresh the cache
 
       - name: Check Cache Status
+        if: matrix.platform != 'windows-latest'
         run: |
           if [ -d "backend/apppy/_internal/Jenette_Creek_Watershed" ]; then
             echo "Cache hit! Skipping download."
@@ -107,6 +108,17 @@ jobs:
             echo "Cache miss! Downloading data."
             gsutil -m cp -r gs://eccc-imwebs-viewer/Jenette_Creek_Watershed backend/apppy/_internal/
           fi
+      
+      - name: Check Cache Status (windows only)
+        if: matrix.platform == 'windows-latest'
+        run: |
+          if (Test-Path "backend/apppy/_internal/Jenette_Creek_Watershed") {
+            echo "Cache hit! Skipping download."
+          } else {
+            echo "Cache miss! Downloading data."
+            gsutil -m cp -r gs://eccc-imwebs-viewer/Jenette_Creek_Watershed backend/apppy/_internal/
+          }
+        shell: pwsh
 
       - name: Save to Cache
         if: always()
