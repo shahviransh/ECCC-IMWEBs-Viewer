@@ -56,6 +56,7 @@
 
 <script>
 import { mapState, mapActions } from 'vuex'; // Import Vuex helpers
+import _ from 'lodash';
 
 export default {
     props: {
@@ -105,10 +106,14 @@ export default {
         };
     },
     watch: {
-        selectedDbsTables(newDbsTables) {
-            if (newDbsTables.length !== 0) {
-                this.fetchColumns(newDbsTables);
-            }
+        selectedDbsTables: {
+            // Debounce is used to prevent multiple API calls in quick succession
+            handler: _.debounce(function (newDbsTables) {
+                if (newDbsTables.length > 0) {
+                    this.fetchColumns(newDbsTables);
+                }
+            }, 3000), // Adjust debounce delay as needed
+            deep: true
         },
     },
     methods: {

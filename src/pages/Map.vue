@@ -50,6 +50,7 @@ import L from 'leaflet';
 import 'leaflet.fullscreen';
 import 'leaflet.fullscreen/Control.FullScreen.css';
 import domtoimage from 'dom-to-image-more';
+import _ from 'lodash';
 
 export default {
     name: "Map",
@@ -81,25 +82,31 @@ export default {
         selectedColumns() {
             this.ID = this.selectedColumns.find((column) => column.includes('ID')) || "";
         },
-        selectedGeoFolders(newFolders) {
-            if (newFolders.length > 0) {
-                this.fetchGeoJson();
-            }
+        selectedGeoFolders: {
+            // Debounce is used to prevent multiple API calls in quick succession
+            handler: _.debounce(function (newFolders) {
+                if (newFolders.length > 0) {
+                    this.fetchGeoJson();
+                }
+            }, 3000), // Adjust debounce delay as needed
+            deep: true
         },
     },
     computed: {
         ...mapState(["selectedGeoFolders", "selectedColumns", "selectedIds", "dateRange", "selectedInterval", "selectedStatistics", "selectedMethod", "exportColumns", "exportIds", "exportDate", "exportInterval", "dateType", "exportDateType", "exportPath", "exportFilename", "exportFormat", "exportOptions", "theme"]),
     },
     methods: {
-        ...mapActions(["updateSelectedColumns", "updateColumns", "pushMessage", "clearMessages"]),
+        ...mapActions(["updateSelectedColumns", "updateToolTipColumns", "updateColumns", "pushMessage", "clearMessages"]),
         async fetchGeoJson() {
             try {
+                // Fetch GeoTIFF and GeoJSON data from the backend
                 const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/geospatial`, {
                     params: {
                         file_paths: JSON.stringify(this.selectedGeoFolders),
                     }
                 });
 
+                // Update the map with the fetched GeoTIFF and GeoJSON data
                 this.geojson = response.data.geojson;
                 this.bounds = response.data.bounds;
                 this.center = response.data.center;
@@ -112,7 +119,13 @@ export default {
 
                 if (response.data.error) {
                     alert("Error fetching Leaflet data: ", response.data.error);
-                } else { this.pushMessage({ message: this.image_urls.length > 0 ? 'GeoTIFF loaded' : 'GeoJSON loaded', type: 'success' }); }
+                } else {
+                    this.pushMessage({
+                        message: this.image_urls.length > 0
+                            ? (this.geojson ? 'GeoTIFF and GeoJSON loaded' : 'GeoTIFF loaded')
+                            : 'GeoJSON loaded', type: 'success'
+                    });
+                }
             } catch (error) {
                 alert("Error fetching Leaflet data: ", error);
             }
@@ -182,7 +195,7 @@ export default {
 
                                 // Generate popup content dynamically
                                 const popupContent = Object.entries(feature.properties)
-                                    .filter(([key]) => this.selectedColumns.includes(key)) // Only process selected columns
+                                    .filter(([key, value]) => this.selectedColumns.includes(key) && value !== null) // Only process selected columns and non-null values
                                     .map(([key, value]) => {
                                         return `<strong>${key}:</strong> ${typeof value === 'number' ? value.toFixed(4) : value ?? 'N/A'}`;
                                     })
@@ -216,7 +229,7 @@ export default {
                     this.map.fitBounds(this.bounds, { padding: [20, 20] });
                 }
 
-                if (this.image_urls) {
+                if (this.image_urls.length > 0) {
                     // Add raster images layer using Leaflet ImageOverlay
                     this.image_urls.forEach((url) => {
                         L.imageOverlay(import.meta.env.VITE_API_BASE_URL + url, this.bounds,
@@ -235,9 +248,9 @@ export default {
                     forceSeparateButton: true,
                 }).addTo(this.map);
 
-                const mapDirectory = this.selectedGeoFolders.split('/');
+                const mapDirectories = this.selectedGeoFolders.map((folder) => folder.split('/').pop());
                 this.pushMessage({
-                    message: `${mapDirectory[mapDirectory.length - 1]} map loaded`,
+                    message: `${mapDirectories.join(", ")} map loaded`,
                     type: 'success',
                 });
             } catch (error) {
