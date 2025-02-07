@@ -3,7 +3,7 @@
   "private": true,
   "description": "A brief description of your app.",
   "author": "Viransh Shah",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "type": "module",
   "scripts": {
     "prestart": "node convert-package.js",
