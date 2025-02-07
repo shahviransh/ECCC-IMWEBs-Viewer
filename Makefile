@@ -29,6 +29,8 @@ python:
 build:
 ifeq ($(ARG), tauri)
 	@echo "Building Tauri app..."
+	del /F /Q "$(USERPROFILE)\OneDrive - McMaster University\Co-op 1st Work Term - ECCC\release\Imwebs-Viewer_*.msi"
+	del /F /Q "$(USERPROFILE)\OneDrive - McMaster University\Co-op 1st Work Term - ECCC\release\Imwebs-Viewer_*.exe"
 	npm run tauri:build
 	xcopy src-tauri\target\release "$(USERPROFILE)\OneDrive - McMaster University\Co-op 1st Work Term - ECCC\release" /Y /E /I /D
 else ifeq ($(ARG), electron)
