@@ -40,6 +40,7 @@ export default {
         },
         modelFolder() {
             if (this.modelFolder) {
+                this.treeData = [];
                 this.fetchFolderTree();
             }
         }
