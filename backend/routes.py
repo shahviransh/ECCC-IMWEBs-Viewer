@@ -26,8 +26,8 @@ from validate import (
 def register_routes(app, cache):
     @app.route("/api/get_data", methods=["GET"])
     @cache.cached(
-        timeout=300, query_string=True
-    )  # Cache this endpoint for 5 minutes (300 seconds)
+        timeout=120, query_string=True
+    )
     def get_data():
         data = request.args
 
@@ -56,8 +56,8 @@ def register_routes(app, cache):
 
     @app.route("/api/get_tables", methods=["GET"])
     @cache.cached(
-        timeout=300, query_string=True
-    )  # Cache this endpoint for 5 minutes (300 seconds)
+        timeout=120, query_string=True
+    )
     def get_tables():
         data = request.args
 
@@ -72,9 +72,6 @@ def register_routes(app, cache):
         return jsonify(tables.get("tables"))
 
     @app.route("/api/list_files", methods=["GET"])
-    @cache.cached(
-        timeout=300, query_string=True
-    )  # Cache this endpoint for 5 minutes (300 seconds)
     def list_files():
         """
         Endpoint to list all files and directories in the specified path.
@@ -92,8 +89,8 @@ def register_routes(app, cache):
 
     @app.route("/api/get_table_details", methods=["GET"])
     @cache.cached(
-        timeout=300, query_string=True
-    )  # Cache this endpoint for 5 minutes (300 seconds)
+        timeout=120, query_string=True
+    )  # Cache this endpoint for 2 minutes (120 seconds)
     def get_table_details():
         """
         Endpoint to get table column names, time start, time end, and ID list, date type, and default interval.
@@ -110,7 +107,7 @@ def register_routes(app, cache):
         return jsonify(columns_and_time_range_dict)
 
     @app.route("/api/geospatial", methods=["GET"])
-    @cache.cached(timeout=300, query_string=True)
+    @cache.cached(timeout=120, query_string=True)
     def geospatial():
         """
         API endpoint to return GeoJSON/Tiff Image Url, bounds, and center.
@@ -140,6 +137,7 @@ def register_routes(app, cache):
         return send_file(filename, mimetype='image/png', as_attachment=True)
     
     @app.route('/api/export_map', methods=['POST'])
+    @cache.cached(timeout=120, query_string=True)
     def export_map():
         """
         API endpoint to export the map image.

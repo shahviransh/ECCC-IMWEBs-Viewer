@@ -542,6 +542,7 @@ def get_files_and_folders(data):
 
     try:
         files_and_folders = []
+        lookup_found = False
 
         for dirpath, dirs, files in os.walk(folder_path):
             # Construct the relative path from the base folder
@@ -570,6 +571,7 @@ def get_files_and_folders(data):
                         folder_tree.add(os.path.join(Config.PATHFILE, file_rel_path))
                     elif file_rel_path.endswith(".db3") and "lookup" in file_rel_path:
                         Config.LOOKUP = file_rel_path
+                        lookup_found = True
                     files_and_folders.append(
                         {
                             "type": (
@@ -581,7 +583,7 @@ def get_files_and_folders(data):
         # Load alias mapping for each database
         (
             alias_mapping.update(load_alias_mapping(folder_tree))
-            if not alias_mapping
+            if not alias_mapping and lookup_found
             else None
         )
 

@@ -130,6 +130,9 @@ body,
   color: #2c3e50;
   text-align: center;
   font-size: 14px;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
 }
 
 /* Apply theme variables */
