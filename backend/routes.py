@@ -137,7 +137,6 @@ def register_routes(app, cache):
         return send_file(filename, mimetype='image/png', as_attachment=True)
     
     @app.route('/api/export_map', methods=['POST'])
-    @cache.cached(timeout=120, query_string=True)
     def export_map():
         """
         API endpoint to export the map image.
