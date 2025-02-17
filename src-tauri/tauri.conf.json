@@ -33,8 +33,7 @@
       "icons/**/*"
     ],
     "resources": [
-      "../backend/apppy/**/*",
-      "../backend/requirements.txt"
+      "../backend/apppy/**/*"
     ]
   }
 }
