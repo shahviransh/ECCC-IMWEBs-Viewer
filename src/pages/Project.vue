@@ -68,7 +68,6 @@
 
 <script>
 import { mapState, mapActions } from "vuex";
-import { nextTick } from "vue";
 import DatabaseDropdown from "../components/DatabaseDropdown.vue";
 import ColumnDropdown from "../components/ColumnDropdown.vue";
 import Selection from "../components/Selection.vue";

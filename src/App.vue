@@ -39,6 +39,7 @@
 import { mapState, mapActions } from "vuex";
 import MessageBox from "./components/MessageBox.vue";
 import { open } from "@tauri-apps/plugin-dialog";
+import { dirname } from "@tauri-apps/api/path";
 
 export default {
   name: "App",
@@ -67,13 +68,15 @@ export default {
     ...mapActions(["updateTheme", "updatePageTitle", "updateCurrentZoom", "updateModelFolder"]),
     async selectFolder() {
       try {
-        const folderPath = await open({
-          directory: true, // Open only folders
-          multiple: false, // Only allow one folder selection
+        const selectedPath = await open({
+          directory: false, // Allow both files and folders
+          multiple: false, // Only allow one selection
         });
 
-        if (folderPath) {
-          // Convert folder path to universal style (replace backslashes with forward slashes)
+        if (selectedPath) {
+          const folderPath = selectedPath.endsWith("/") ? selectedPath : await dirname(selectedPath);
+
+          // Convert folder path to universal style
           const universalPath = folderPath.replace(/\\/g, "/");
 
           this.updateModelFolder(universalPath);

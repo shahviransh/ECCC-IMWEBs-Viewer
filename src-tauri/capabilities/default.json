@@ -21,7 +21,7 @@
         }
       ]
     },
-    "dialog:allow-open",
-    "dialog:default"
+    "dialog:default",
+    "core:path:allow-dirname"
   ]
 }
