@@ -179,7 +179,7 @@ export default {
     gap: 5px;
     margin: 0px auto;
     min-width: 45%;
-    justify-content: left;
+    justify-content: space-between;
     overflow-y: auto;
 }
 
