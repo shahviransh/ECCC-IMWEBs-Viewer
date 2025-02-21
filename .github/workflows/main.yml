@@ -67,7 +67,7 @@ jobs:
       - name: Build backend with PyInstaller (windows only)
         if: matrix.platform == 'windows-latest'
         run: |
-          conda install -n venv -c conda-forge gdal -y && ^
+          conda install -n venv -c conda-forge gdal geopandas -y && ^
           conda run -n venv pip install --no-cache-dir -r backend/requirements.txt && ^
           conda run -n venv pyinstaller backend/apppy.py -y --distpath backend/ --specpath backend/ --workpath backend/build --name apppy ^
           --add-data "%CONDA%/envs/venv/Library/share/proj;Library/share/proj"
@@ -76,10 +76,10 @@ jobs:
       - name: Build backend with PyInstaller
         if: matrix.platform != 'windows-latest'
         run: |
-          conda install -n venv -c conda-forge gdal -y
+          conda install -n venv -c conda-forge gdal geopandas -y
           conda run -n venv pip install --no-cache-dir -r backend/requirements.txt
           conda run -n venv pyinstaller backend/apppy.py -y --distpath backend/ --specpath backend/ --workpath backend/build --name apppy \
-          --add-data "$CONDA/envs/venv/share/proj:share/proj" --strip
+          --add-data "$CONDA/envs/venv/share/proj:share/proj"
         shell: bash
 
       - name: Authenticate with Google Cloud
