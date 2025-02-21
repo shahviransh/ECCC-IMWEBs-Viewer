@@ -79,7 +79,7 @@ jobs:
           conda install -n venv -c conda-forge gdal -y
           conda run -n venv pip install --no-cache-dir -r backend/requirements.txt
           conda run -n venv pyinstaller backend/apppy.py -y --distpath backend/ --specpath backend/ --workpath backend/build --name apppy \
-          --add-data "$CONDA/envs/venv/share/proj:share/proj"
+          --add-data "$CONDA/envs/venv/share/proj:share/proj" --strip
         shell: bash
 
       - name: Authenticate with Google Cloud
