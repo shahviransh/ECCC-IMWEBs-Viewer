@@ -8,7 +8,6 @@
     --table-header-bg: #9e3203;
     --table-header-text: #ffffff;
     --button-bg: linear-gradient(to bottom right, #8B5CF6, #3B82F6);
-    /* from-purple-600 to-blue-500 */
     --button-text: #1F2937;
     --top-bar-bg: #b85b14;
     --top-bar-text: #fff;
@@ -58,7 +57,6 @@ html {
 }
 
 .multiselect {
-    /* Set the desired width */
     font-size: 14px;
 }
 
@@ -111,13 +109,13 @@ label {
 .settings-panel {
     width: 99%;
     /* Takes 2/4 of the horizontal space */
-    height: 30%;
+    height: auto;
     /* Ensure full height */
     margin: 0px;
     padding: 5px;
     display: flex;
     flex-direction: row;
-    justify-content: left;
+    justify-content: space-between;
     gap: 5px;
 }
 
@@ -192,5 +190,4 @@ button:hover {
 button:focus {
     outline: none;
     box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.5);
-    /* Optional, adjust for better contrast */
 }

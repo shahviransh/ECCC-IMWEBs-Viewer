@@ -3,8 +3,10 @@ import os
 import pandas as pd
 import numpy as np
 from PIL import Image
+import geopandas as gpd
 import xlsxwriter
 import matplotlib.pyplot as plt
+import matplotlib.colors as mcolors
 from matplotlib.ticker import MaxNLocator, LinearLocator
 from cycler import cycler
 from config import Config
@@ -45,7 +47,7 @@ def fetch_data_service(data):
             try:
                 table_key = f'{(table["db"], table["table"])}'
                 global_columns = global_dbs_tables_columns.get(table_key)
-                ID = ['ID'] if global_columns and 'ID' in global_columns else []
+                ID = ["ID"] if global_columns and "ID" in global_columns else []
                 duplicate_columns = []
 
                 if not global_columns:
@@ -275,8 +277,7 @@ def save_to_file(
         else export_path
     )
 
-    if not os.path.exists(file_path):
-        os.makedirs(file_path)
+    os.makedirs(file_path, exist_ok=True)
     file_path = os.path.join(file_path, filename)
 
     # Map graph types to Matplotlib Axes methods
@@ -1001,6 +1002,81 @@ def bounds_overlap_or_similar(bounds1, bounds2, tolerance=0.0001):
     return False, bounds1
 
 
+def get_raster_normalized(band):
+    """
+    Normalize a raster band by computing the min and max values while ignoring NoData values.
+    """
+    # Read raster data as a NumPy array
+    raster_data = band.ReadAsArray()
+
+    # Get the NoData value
+    no_data_value = band.GetNoDataValue()
+
+    # Mask NoData values if present
+    if no_data_value is not None:
+        raster_data = np.ma.masked_equal(raster_data, no_data_value)
+
+    # Compute min and max while ignoring NoData
+    raster_min = (
+        np.min(raster_data) if np.ma.is_masked(raster_data) else np.nanmin(raster_data)
+    )
+    raster_max = (
+        np.max(raster_data) if np.ma.is_masked(raster_data) else np.nanmax(raster_data)
+    )
+
+    # Normalize the raster while avoiding division by zero
+    if raster_max - raster_min == 0:
+        raster_normalized = np.zeros_like(
+            raster_data
+        )  # If constant values, return all zeros
+    else:
+        raster_normalized = (raster_data - raster_min) / (raster_max - raster_min)
+
+    return raster_data, raster_normalized, raster_min, raster_max
+
+
+def get_raster_color_levels(band, colormap, num_classes=5):
+    """
+    Generate color levels for a raster band, using its native color mapping.
+    """
+    _, _, min_value, max_value = get_raster_normalized(band)
+
+    if min_value == max_value:
+        return []  # Avoid division by zero for constant rasters
+
+    # Define classification breakpoints
+    levels = np.linspace(min_value, max_value, num_classes + 1)
+
+    # Get color values from the colormap
+    cmap = plt.get_cmap(colormap, num_classes)
+    colors = [mcolors.to_hex(cmap(i / (num_classes - 1))) for i in range(num_classes)]
+
+    # Create the color level mapping
+    color_levels = [
+        {
+            "min": round(levels[i].item(), 2),
+            "max": round(levels[i + 1].item(), 2),
+            "color": colors[i],
+        }
+        for i in range(num_classes)
+    ]
+
+    return color_levels
+
+
+def get_metadata_colormap(band):
+    """
+    Determine an appropriate colormap based on raster metadata.
+    """
+    metadata = band.GetMetadata()
+    colormap_name = metadata.get("COLOR_MAP", "gray")  # Default to "gray" if missing
+
+    if colormap_name not in plt.colormaps():
+        colormap_name = "gray"  # Fallback to terrain if unknown
+
+    return plt.get_cmap(colormap_name)
+
+
 def process_geospatial_data(data):
     """
     Process a geospatial file (shapefile or raster) and return GeoJSON/Tiff Image Url, bounds, and center.
@@ -1011,6 +1087,7 @@ def process_geospatial_data(data):
     )
     combined_geojson = {}
     combined_bounds = None
+    raster_color_levels = []
     combined_properties = []
     tool_tip = {}
     image_urls = []
@@ -1167,35 +1244,21 @@ def process_geospatial_data(data):
             ]
 
             output_image_path = os.path.splitext(file_path)[0] + "_rendered.png"
+
+            # Read raster data and render to an image
+            band = raster_dataset.GetRasterBand(1)  # Use the first raster band
+            # Get colormap based on metadata
+            cmap = get_metadata_colormap(band)
+
             if not os.path.exists(output_image_path):
-                # Read raster data and render to an image
-                band = raster_dataset.GetRasterBand(1)  # Use the first raster band
-                raster_data = band.ReadAsArray()
+                raster_data, raster_normalized = get_raster_normalized(band)
 
-                # Get the no-data value for the raster
-                no_data_value = band.GetNoDataValue()
-                raster_data = np.ma.masked_equal(
-                    raster_data, no_data_value
-                )  # Mask no-data values
+                rgba_colored = cmap(raster_normalized)  # Apply colormap (RGBA values)
 
-                # Normalize the raster data
-                min_value = np.min(raster_data)
-                max_value = np.max(raster_data)
-                raster_normalized = (
-                    (raster_data - min_value) / (max_value - min_value) * 255
-                ).astype(np.uint8)
+                # Convert to uint8 format (0-255)
+                rgba_image = (rgba_colored[:, :, :4] * 255).astype(np.uint8)
 
-                # Create an RGBA image with transparency
-                rgba_image = np.zeros(
-                    (raster_data.shape[0], raster_data.shape[1], 4), dtype=np.uint8
-                )
-
-                # Fill the RGB channels with the normalized raster data
-                rgba_image[..., 0] = raster_normalized  # Red
-                rgba_image[..., 1] = raster_normalized  # Green
-                rgba_image[..., 2] = raster_normalized  # Blue
-
-                # Set the alpha channel to 255 (opaque) for valid data and 0 (transparent) for no-data
+                # Set the alpha channel for transparency (No-data = Transparent)
                 rgba_image[..., 3] = np.where(raster_data.mask, 0, 255)
 
                 # Convert the RGBA array to an image
@@ -1203,6 +1266,9 @@ def process_geospatial_data(data):
 
                 # Save the rendered image with transparency
                 color_ramp.save(output_image_path, "PNG", quality=95)
+
+            # Get color levels for the raster band
+            raster_color_levels = get_raster_color_levels(band, cmap)
 
             raster_dataset = None
 
@@ -1220,6 +1286,23 @@ def process_geospatial_data(data):
                 image_urls.append(f"/geotiff/{output_image_path}")
         else:
             return {"error": "Unsupported file type. Only .shp and .tif are supported."}
+
+    # Define a function to get a sorting key based on geometry type
+    def get_geometry_order(feature):
+        geometry_type = feature["geometry"]["type"]
+        order = {
+            "Polygon": 1,
+            "MultiPolygon": 1,
+            "LineString": 2,
+            "MultiLineString": 2,
+            "Point": 3,
+            "MultiPoint": 3,
+        }
+        return order.get(geometry_type, 4)  # Default to last if unknown type
+
+    # Sort combined GeoJSON features by geometry type
+    if combined_geojson:
+        combined_geojson["features"].sort(key=get_geometry_order)
     return {
         "geojson": combined_geojson,
         "bounds": combined_bounds,
@@ -1231,6 +1314,7 @@ def process_geospatial_data(data):
             if combined_bounds
             else None
         ),
+        "raster_levels": raster_color_levels,
         "properties": combined_properties,
         "image_urls": image_urls,
         "tooltip": tool_tip,
@@ -1242,23 +1326,82 @@ def export_map_service(image, form_data):
         output_format = form_data.get("export_format")
         output_path = form_data.get("export_path")
         output_filename = form_data.get("export_filename")
+        file_paths = map(
+            lambda x: os.path.join(Config.PATHFILE, x),
+            json.loads(form_data.get("file_paths")),
+        )
 
         valid_formats = ["png", "jpg", "jpeg", "pdf"]
         if output_format not in valid_formats:
             return {"error": "Unsupported export format"}
 
-        image_path = os.path.join(Config.PATHFILE_EXPORT, output_path)
+        export_dir = os.path.join(Config.PATHFILE_EXPORT, output_path)
+        os.makedirs(export_dir, exist_ok=True)
+        image_path = os.path.join(export_dir, f"{output_filename}.{output_format}")
 
-        if not os.path.exists(image_path):
-            os.makedirs(image_path)
-
-        image_path = os.path.join(image_path, f"{output_filename}.{output_format}")
-
-        # Convert image to requested output_format if needed
-        if output_format in ["jpg", "jpeg", "png", "pdf"]:
+        # Export image formats
+        if output_format in ["jpg", "jpeg", "png", "pdf"] and image:
             img = Image.open(image)
             img.convert("RGB").save(image_path, output_format.upper(), quality=95)
 
-        return {"image_path": image_path}
+        # Export shapefiles or raster datasets as images
+        exported_images = []
+        fig, ax = plt.subplots(figsize=(10, 8))
+        raster_data = None
+
+        for file_path in file_paths:
+            fig, ax = plt.subplots(figsize=(10, 8))  # Create a new figure for each file
+            
+            if file_path.endswith(".shp"):
+                gdf = gpd.read_file(file_path)
+                gdf.plot(ax=ax, edgecolor="black")
+            elif file_path.endswith(".tif"):
+                dataset = gdal.Open(file_path)
+                band = dataset.GetRasterBand(1)
+                cmap = get_metadata_colormap(band)
+                raster_data, _, raster_min, raster_max = get_raster_normalized(band)
+                # Normalize raster values
+                norm = mcolors.Normalize(vmin=raster_min, vmax=raster_max)
+                # Display raster
+                ax.imshow(raster_data, cmap=cmap, norm=norm, alpha=1)
+                # Add raster legend (Colorbar)
+                cbar = plt.colorbar(
+                    plt.cm.ScalarMappable(norm=norm, cmap=cmap),
+                    ax=ax,
+                    fraction=0.03,
+                    pad=0.04,
+                )
+                cbar.set_label("Raster Classification", fontsize=12)
+
+            # Add north arrow
+            ax.annotate(
+                "N",
+                xy=(0.05, 0.9),
+                xycoords="axes fraction",
+                fontsize=14,
+                fontweight="bold",
+                ha="center",
+            )
+            ax.arrow(
+                0.05,
+                0.75,
+                0,
+                0.1,
+                transform=ax.transAxes,
+                color="black",
+                head_width=0.02,
+                head_length=0.03,
+                lw=2,
+            )
+
+            # Save plot
+            file_name = os.path.basename(file_path).split(".")[0]
+            image_path = os.path.join(export_dir, f"{output_filename}_{file_name}.{output_format}")
+            plt.savefig(image_path, dpi=300)
+            plt.close(fig)
+
+            exported_images.append(image_path)
+
+        return {"exported_images": exported_images}
     except Exception as e:
         return {"error": str(e)}

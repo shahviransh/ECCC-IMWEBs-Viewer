@@ -4,7 +4,7 @@
 use reqwest::Client;
 use std::{ env, process::Command, thread::sleep, time::Duration };
 use std::fs;
-use std::path::{ Path };
+use std::path::Path;
 
 #[cfg(target_os = "windows")]
 const CREATE_NO_WINDOW: u32 = 0x08000000;
@@ -22,10 +22,38 @@ fn copy_dir_recursive(src: &Path, dst: &Path) -> std::io::Result<()> {
         if entry_path.is_dir() {
             copy_dir_recursive(&entry_path, &dest_path)?;
         } else {
-            fs::copy(&entry_path, &dest_path)?;
+            // Copy only if the file is new or modified
+            if should_copy(&entry_path, &dest_path)? {
+                fs::copy(&entry_path, &dest_path)?;
+            }
         }
     }
     Ok(())
+}
+
+fn should_copy(src: &Path, dst: &Path) -> std::io::Result<bool> {
+    if !dst.exists() {
+        return Ok(true); // Destination file doesn't exist, so copy
+    }
+
+    let src_metadata = fs::metadata(src)?;
+    let dst_metadata = fs::metadata(dst)?;
+
+    // Compare modification times
+    let src_modified = src_metadata.modified()?;
+    let dst_modified = dst_metadata.modified()?;
+
+    Ok(src_modified > dst_modified) // Copy if source is newer
+}
+
+fn are_paths_equal(path1: &Path, path2: &Path) -> bool {
+    let canon1 = fs::canonicalize(path1);
+    let canon2 = fs::canonicalize(path2);
+    
+    match (canon1, canon2) {
+        (Ok(p1), Ok(p2)) => p1 == p2,
+        _ => false, // If any path is invalid or inaccessible
+    }
 }
 
 #[tauri::command]
@@ -39,8 +67,8 @@ async fn start_server() {
     let local_appdata = env::var("LOCALAPPDATA").expect("Failed to get LOCALAPPDATA");
     let mut backend_dir = std::path::Path::new(&local_appdata).join("Imwebs-Viewer").join("_up_");
 
-    // Copy _up_ folder to AppData\Local if it doesn't exist
-    if !backend_dir.exists() {
+    // Copy _up_ folder to AppData\Local if itis different from the exe directory
+    if !are_paths_equal(&up_folder, &backend_dir) {
         copy_dir_recursive(&up_folder, &backend_dir).expect(
             "Failed to copy _up_ folder recursively"
         );
@@ -97,16 +125,6 @@ async fn shutdown_flask() {
         println!("Flask server shutdown request success.");
     } else {
         println!("Flask server shutdown request failed.");
-    }
-}
-
-fn remove_appdata_folder() {
-    if let Ok(local_appdata) = env::var("LOCALAPPDATA") {
-        let appdata_path = std::path::Path::new(&local_appdata).join("IMWEBs-Viewer");
-        if appdata_path.exists() {
-            fs::remove_dir_all(&appdata_path).expect("Failed to remove AppData folder");
-            println!("Removed AppData folder: {:?}", appdata_path);
-        }
     }
 }
 

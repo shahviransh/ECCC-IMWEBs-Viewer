@@ -66,6 +66,19 @@ const store = createStore({
       state.exportColumns = state.exportColumns.filter((column) =>
         columns.includes(column)
       );
+
+      if (columns.includes(state.dateType)) {
+        state.selectedColumns = state.exportColumns = [
+          state.dateType,
+          ...state.selectedColumns,
+        ];
+      }
+      if (columns.includes("ID")) {
+        state.selectedColumns = state.exportColumns = [
+          "ID",
+          ...state.selectedColumns,
+        ];
+      }
     },
     SET_SELECTED_DB_TABLE_REMOVE(state, table) {
       state.selectedDbsTables = state.selectedDbsTables.filter(
@@ -271,9 +284,6 @@ const store = createStore({
           alert("Error fetching data: ", response.data.error);
           return;
         }
-        commit("SET_COLUMNS", {
-          columns: response.data.columns,
-        });
         commit("SET_OPTIONS", {
           ids: response.data.ids,
           dateRange: {
@@ -288,6 +298,9 @@ const store = createStore({
           exportDateType: response.data.date_type,
           selectedInterval: response.data.interval,
           exportInterval: response.data.interval,
+        });
+        commit("SET_COLUMNS", {
+          columns: response.data.columns,
         });
         commit("SET_DEFAULT_SELECTIONS", {
           defaultInterval: response.data.interval,

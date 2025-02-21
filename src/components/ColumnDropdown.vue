@@ -17,7 +17,7 @@
             <div class="form-group">
                 <label for="export-column-select">Export Select Columns:</label>
                 <select id="export-column-select" class="dropdown" v-model="expColumns" multiple
-                    :style="{ height: heightVar() }" @mousedown.prevent="toggleSelection($event, expColumns)">
+                    :style="{ height: heightVar() }" @mousedown.prevent="toggleSelection($event, expColumns, true)">
                     <option v-for="column in columns" :key="column" :value="column" :title="findTableName(column)"
                         @click.stop>
                         {{ column }}
@@ -143,7 +143,7 @@ export default {
             isYAxis = isYAxis !== undefined || isYAxis;
             return isXAxis ? '5vh' : isYAxis ? isTauri ? '66vh' : '62vh' : isTauri ? '36vh' : '34vh';
         },
-        toggleSelection(event, modelArray) {
+        toggleSelection(event, modelArray, exportColumns = false) {
             const option = event.target;
             if (option.tagName === 'OPTION') {
                 const optionValue = option.value;
@@ -153,6 +153,7 @@ export default {
                 } else {
                     modelArray.push(optionValue); // Add if not selected
                 }
+
                 // Prevent default and stop propagation to avoid native behavior
                 event.preventDefault();
                 event.stopPropagation();
@@ -161,7 +162,10 @@ export default {
                     this.$forceUpdate(); // Force update to reflect changes
                 });
 
-                if (['Project', 'Table', 'Map'].includes(this.pageTitle)) {
+                // Update Vuex state based on the page title and exportColumns flag
+                if (exportColumns) {
+                    this.updateExportColumns(modelArray);
+                } else if (['Project', 'Table', 'Map'].includes(this.pageTitle)) {
                     this.updateSelectedColumns(modelArray);
                 } else if (this.pageTitle === 'Graph') {
                     this.updateYAxis(modelArray);
@@ -190,7 +194,7 @@ div.form-container {
     background-color: #f9f9f9;
     border-radius: 8px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    height: 40%;
+    height: 50%;
 }
 
 .form-group {
