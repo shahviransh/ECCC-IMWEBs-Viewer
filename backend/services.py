@@ -1397,7 +1397,7 @@ def export_map_service(image, form_data):
             # Save plot
             file_name = os.path.basename(file_path).split(".")[0]
             image_path = os.path.join(export_dir, f"{output_filename}_{file_name}.{output_format}")
-            plt.savefig(image_path, dpi=300)
+            plt.savefig(image_path, dpi=300, format=output_format)
             plt.close(fig)
 
             exported_images.append(image_path)
