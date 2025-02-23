@@ -129,6 +129,10 @@ jobs:
           key: Jenette_Creek_Watershed-v1
           enableCrossOsArchive: true
 
+      - name: Test
+        run: |
+          ls backend/_internal/Jenette_Creek_Watershed
+
       - name: Copy AppImage dependency to /usr/lib/ (ubuntu only)
         if: matrix.platform == 'ubuntu-22.04'
         run: sudo cp -r backend/apppy/_internal/* /usr/lib/
