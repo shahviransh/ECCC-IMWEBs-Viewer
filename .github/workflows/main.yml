@@ -13,7 +13,7 @@ jobs:
         id: check_cache
         uses: actions/cache/restore@v3
         with:
-          path: backend/Jenette_Creek_Watershed
+          path: backend/_internal/Jenette_Creek_Watershed
           key: Jenette_Creek_Watershed-v1 # Change "v1" to "v2" manually if you want to refresh the cache
       
       - name: Authenticate with Google Cloud
@@ -31,13 +31,15 @@ jobs:
 
       - name: Check Cache Status
         if: steps.check_cache.outputs.cache-hit != 'true'
-        run: gsutil -m cp -r gs://eccc-imwebs-viewer/Jenette_Creek_Watershed backend/
+        run: |
+          mkdir -p backend/_internal  
+          gsutil -m cp -r gs://eccc-imwebs-viewer/Jenette_Creek_Watershed backend/_internal/
 
       - name: Save to Cache
         uses: actions/cache/save@v3
         if: steps.check_cache.outputs.cache-hit != 'true'
         with:
-          path: backend/Jenette_Creek_Watershed
+          path: backend/_internal/Jenette_Creek_Watershed
           key: Jenette_Creek_Watershed-v1
 
   publish-tauri:
