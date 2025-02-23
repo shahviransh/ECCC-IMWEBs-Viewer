@@ -15,6 +15,19 @@ jobs:
         with:
           path: backend/Jenette_Creek_Watershed
           key: Jenette_Creek_Watershed-v1 # Change "v1" to "v2" manually if you want to refresh the cache
+      
+      - name: Authenticate with Google Cloud
+        if: steps.check_cache.outputs.cache-hit != 'true'
+        uses: google-github-actions/auth@v1
+        with:
+          credentials_json: ${{ secrets.GCS_KEY }}
+
+      - name: "Set up Cloud SDK"
+        if: steps.check_cache.outputs.cache-hit != 'true'
+        uses: "google-github-actions/setup-gcloud@v2"
+        with:
+          project_id: "augmented-vim-442108-f7"
+          version: "latest"
 
       - name: Check Cache Status
         run: |
@@ -112,17 +125,6 @@ jobs:
           --add-data "$CONDA/envs/venv/share/proj:share/proj"
           cp -r backend/Jenette_Creek_Watershed backend/apppy/_internal/Jenette_Creek_Watershed
         shell: bash  
-
-      - name: Authenticate with Google Cloud
-        uses: google-github-actions/auth@v1
-        with:
-          credentials_json: ${{ secrets.GCS_KEY }}
-
-      - name: "Set up Cloud SDK"
-        uses: "google-github-actions/setup-gcloud@v2"
-        with:
-          project_id: "augmented-vim-442108-f7"
-          version: "latest"
 
       - name: Copy AppImage dependency to /usr/lib/ (ubuntu only)
         if: matrix.platform == 'ubuntu-22.04'
