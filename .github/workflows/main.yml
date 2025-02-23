@@ -4,7 +4,36 @@ on:
     branches:
       - main
 jobs:
+  prepare-cache:
+    runs-on: ubuntu-22.04  # Run on one platform to create the cache first
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Restore Cache
+        id: check_cache
+        uses: actions/cache/restore@v3
+        with:
+          path: backend/apppy/_internal/Jenette_Creek_Watershed
+          key: Jenette_Creek_Watershed-v1 # Change "v1" to "v2" manually if you want to refresh the cache
+
+      - name: Check Cache Status
+        run: |
+          if [ -d "backend/apppy/_internal/Jenette_Creek_Watershed" ]; then
+            echo "Cache hit! Skipping download."
+          else
+            echo "Cache miss! Downloading data."
+            gsutil -m cp -r gs://eccc-imwebs-viewer/Jenette_Creek_Watershed backend/apppy/_internal/
+          fi
+
+      - name: Save to Cache
+        uses: actions/cache/save@v3
+        if: steps.check_cache.outputs.cache-hit != 'true'
+        with:
+          path: backend/apppy/_internal/Jenette_Creek_Watershed
+          key: Jenette_Creek_Watershed-v1
+
   publish-tauri:
+    needs: prepare-cache # Wait for the cache to be ready
     # Only run if the commit message includes 'release:app'
     if: contains(github.event.head_commit.message, 'release:app')
     permissions:
@@ -92,39 +121,6 @@ jobs:
         with:
           project_id: "augmented-vim-442108-f7"
           version: "latest"
-
-      - name: Restore Cache
-        uses: actions/cache/restore@v3
-        with:
-          path: backend/apppy/_internal/Jenette_Creek_Watershed
-          key: Jenette_Creek_Watershed-v1 # Change "v1" to "v2" manually if you want to refresh the cache
-
-      - name: Check Cache Status
-        if: matrix.platform != 'windows-latest'
-        run: |
-          if [ -d "backend/apppy/_internal/Jenette_Creek_Watershed" ]; then
-            echo "Cache hit! Skipping download."
-          else
-            echo "Cache miss! Downloading data."
-            gsutil -m cp -r gs://eccc-imwebs-viewer/Jenette_Creek_Watershed backend/apppy/_internal/
-          fi
-      
-      - name: Check Cache Status (windows only)
-        if: matrix.platform == 'windows-latest'
-        run: |
-          if (Test-Path "backend/apppy/_internal/Jenette_Creek_Watershed") {
-            echo "Cache hit! Skipping download."
-          } else {
-            echo "Cache miss! Downloading data."
-            gsutil -m cp -r gs://eccc-imwebs-viewer/Jenette_Creek_Watershed backend/apppy/_internal/
-          }
-        shell: pwsh
-
-      - name: Save to Cache
-        uses: actions/cache/save@v3
-        with:
-          path: backend/apppy/_internal/Jenette_Creek_Watershed
-          key: Jenette_Creek_Watershed-v1
 
       - name: Copy AppImage dependency to /usr/lib/ (ubuntu only)
         if: matrix.platform == 'ubuntu-22.04'
