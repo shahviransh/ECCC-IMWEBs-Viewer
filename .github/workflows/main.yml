@@ -65,6 +65,15 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Test
+        run: mkdir -p backend/_internal
+
+      - name: Restore Cache
+        uses: actions/cache/restore@v3
+        with:
+          path: backend/_internal/Jenette_Creek_Watershed
+          key: Jenette_Creek_Watershed-v1 # Change "v1" to "v2" manually if you want to refresh the cache 
+
       - name: Setup node
         uses: actions/setup-node@v4
         with:
@@ -120,12 +129,6 @@ jobs:
           conda run -n venv pyinstaller backend/apppy.py -y --distpath backend/ --specpath backend/ --workpath backend/build --name apppy \
           --add-data "$CONDA/envs/venv/share/proj:share/proj"
         shell: bash
-      
-      - name: Restore Cache
-        uses: actions/cache/restore@v3
-        with:
-          path: backend/_internal/Jenette_Creek_Watershed
-          key: Jenette_Creek_Watershed-v1 # Change "v1" to "v2" manually if you want to refresh the cache 
 
       - name: Copy AppImage dependency to /usr/lib/ (ubuntu only)
         if: matrix.platform == 'ubuntu-22.04'
