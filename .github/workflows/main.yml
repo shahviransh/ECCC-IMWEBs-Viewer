@@ -103,14 +103,14 @@ jobs:
           channels: defaults,conda-forge
           python-version: 3.12
 
-      - name: Build backend with PyInstaller (windows only)
+      - name: Build backend with PyInstaller (Windows only)
         if: matrix.platform == 'windows-latest'
+        shell: pwsh
         run: |
-          conda install -n venv -c conda-forge gdal geopandas pyogrio -y && ^
-          conda run -n venv pip install --no-cache-dir -r backend/requirements.txt && ^
-          conda run -n venv pyinstaller backend/apppy.py -y --distpath backend/ --specpath backend/ --workpath backend/build --name apppy ^
-          --add-data "%CONDA%/envs/venv/Library/share/proj;Library/share/proj" && ^
-        shell: cmd
+          conda install -n venv -c conda-forge gdal geopandas pyogrio -y;
+          conda run -n venv pip install --no-cache-dir -r backend/requirements.txt;
+          conda run -n venv pyinstaller backend/apppy.py -y --distpath backend/ --specpath backend/ --workpath backend/build --name apppy `
+            --add-data "$env:CONDA/envs/venv/Library/share/proj;Library/share/proj"        
   
       - name: Build backend with PyInstaller
         if: matrix.platform != 'windows-latest'
