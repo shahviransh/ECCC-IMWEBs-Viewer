@@ -121,7 +121,6 @@ jobs:
         shell: pwsh
 
       - name: Save to Cache
-        if: always()
         uses: actions/cache/save@v3
         with:
           path: backend/apppy/_internal/Jenette_Creek_Watershed

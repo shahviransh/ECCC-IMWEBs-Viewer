@@ -67,7 +67,7 @@ async fn start_server() {
     let local_appdata = env::var("LOCALAPPDATA").expect("Failed to get LOCALAPPDATA");
     let mut backend_dir = std::path::Path::new(&local_appdata).join("Imwebs-Viewer").join("_up_");
 
-    // Copy _up_ folder to AppData\Local if itis different from the exe directory
+    // Copy _up_ folder to AppData\Local if it is different from the exe directory
     if !are_paths_equal(&up_folder, &backend_dir) {
         copy_dir_recursive(&up_folder, &backend_dir).expect(
             "Failed to copy _up_ folder recursively"
