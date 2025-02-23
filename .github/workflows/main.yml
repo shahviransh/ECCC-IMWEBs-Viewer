@@ -6,6 +6,8 @@ on:
 jobs:
   prepare-cache:
     runs-on: ubuntu-22.04  # Run on one platform to create the cache first
+    # Only run if the commit message includes 'release:app'
+    if: contains(github.event.head_commit.message, 'release:app')
     steps:
       - uses: actions/checkout@v4
 
@@ -44,7 +46,6 @@ jobs:
 
   publish-tauri:
     needs: prepare-cache # Wait for the cache to be ready
-    # Only run if the commit message includes 'release:app'
     if: contains(github.event.head_commit.message, 'release:app')
     permissions:
       contents: write
