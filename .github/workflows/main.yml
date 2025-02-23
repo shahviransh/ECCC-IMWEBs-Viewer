@@ -15,7 +15,7 @@ jobs:
         id: check_cache
         uses: actions/cache/restore@v3
         with:
-          path: backend/_internal/Jenette_Creek_Watershed
+          path: backend/apppy/_internal/Jenette_Creek_Watershed
           key: Jenette_Creek_Watershed-v1 # Change "v1" to "v2" manually if you want to refresh the cache
       
       - name: Authenticate with Google Cloud
@@ -34,14 +34,14 @@ jobs:
       - name: Check Cache Status
         if: steps.check_cache.outputs.cache-hit != 'true'
         run: |
-          mkdir -p backend/_internal  
-          gsutil -m cp -r gs://eccc-imwebs-viewer/Jenette_Creek_Watershed backend/_internal/
+          mkdir -p backend/apppy/_internal  
+          gsutil -m cp -r gs://eccc-imwebs-viewer/Jenette_Creek_Watershed backend/apppy/_internal/
 
       - name: Save to Cache
         uses: actions/cache/save@v3
         if: steps.check_cache.outputs.cache-hit != 'true'
         with:
-          path: backend/_internal/Jenette_Creek_Watershed
+          path: backend/apppy/_internal/Jenette_Creek_Watershed
           key: Jenette_Creek_Watershed-v1
 
   publish-tauri:
@@ -125,13 +125,9 @@ jobs:
       - name: Restore Cache
         uses: actions/cache/restore@v3
         with:
-          path: backend/_internal/Jenette_Creek_Watershed
+          path: backend/apppy/_internal/Jenette_Creek_Watershed
           key: Jenette_Creek_Watershed-v1
           enableCrossOsArchive: true
-
-      - name: Test
-        run: |
-          ls backend/_internal/Jenette_Creek_Watershed
 
       - name: Copy AppImage dependency to /usr/lib/ (ubuntu only)
         if: matrix.platform == 'ubuntu-22.04'
