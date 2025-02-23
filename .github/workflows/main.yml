@@ -30,13 +30,8 @@ jobs:
           version: "latest"
 
       - name: Check Cache Status
-        run: |
-          if [ -d "backend/Jenette_Creek_Watershed" ]; then
-            echo "Cache hit! Skipping download."
-          else
-            echo "Cache miss! Downloading data."
-            gsutil -m cp -r gs://eccc-imwebs-viewer/Jenette_Creek_Watershed backend/
-          fi
+        if: steps.check_cache.outputs.cache-hit != 'true'
+        run: gsutil -m cp -r gs://eccc-imwebs-viewer/Jenette_Creek_Watershed backend/
 
       - name: Save to Cache
         uses: actions/cache/save@v3
