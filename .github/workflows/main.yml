@@ -13,23 +13,23 @@ jobs:
         id: check_cache
         uses: actions/cache/restore@v3
         with:
-          path: backend/apppy/_internal/Jenette_Creek_Watershed
+          path: backend/Jenette_Creek_Watershed
           key: Jenette_Creek_Watershed-v1 # Change "v1" to "v2" manually if you want to refresh the cache
 
       - name: Check Cache Status
         run: |
-          if [ -d "backend/apppy/_internal/Jenette_Creek_Watershed" ]; then
+          if [ -d "backend/Jenette_Creek_Watershed" ]; then
             echo "Cache hit! Skipping download."
           else
             echo "Cache miss! Downloading data."
-            gsutil -m cp -r gs://eccc-imwebs-viewer/Jenette_Creek_Watershed backend/apppy/_internal/
+            gsutil -m cp -r gs://eccc-imwebs-viewer/Jenette_Creek_Watershed backend/
           fi
 
       - name: Save to Cache
         uses: actions/cache/save@v3
         if: steps.check_cache.outputs.cache-hit != 'true'
         with:
-          path: backend/apppy/_internal/Jenette_Creek_Watershed
+          path: backend/Jenette_Creek_Watershed
           key: Jenette_Creek_Watershed-v1
 
   publish-tauri:
@@ -99,9 +99,10 @@ jobs:
           conda install -n venv -c conda-forge gdal geopandas pyogrio -y && ^
           conda run -n venv pip install --no-cache-dir -r backend/requirements.txt && ^
           conda run -n venv pyinstaller backend/apppy.py -y --distpath backend/ --specpath backend/ --workpath backend/build --name apppy ^
-          --add-data "%CONDA%/envs/venv/Library/share/proj;Library/share/proj"
+          --add-data "%CONDA%/envs/venv/Library/share/proj;Library/share/proj" && ^
+          xcopy backend/Jenette_Creek_Watershed backend/apppy/_internal/Jenette_Creek_Watershed /E /I
         shell: cmd
-
+  
       - name: Build backend with PyInstaller
         if: matrix.platform != 'windows-latest'
         run: |
@@ -109,7 +110,8 @@ jobs:
           conda run -n venv pip install --no-cache-dir -r backend/requirements.txt
           conda run -n venv pyinstaller backend/apppy.py -y --distpath backend/ --specpath backend/ --workpath backend/build --name apppy \
           --add-data "$CONDA/envs/venv/share/proj:share/proj"
-        shell: bash
+          cp -r backend/Jenette_Creek_Watershed backend/apppy/_internal/Jenette_Creek_Watershed
+        shell: bash  
 
       - name: Authenticate with Google Cloud
         uses: google-github-actions/auth@v1
