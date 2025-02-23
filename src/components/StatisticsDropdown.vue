@@ -1,5 +1,5 @@
 <template>
-    <div class="statistics-container">
+    <div :class="[theme, 'statistics-container']">
         <label for="method-select" class="method-label">Method Conversion:</label>
         <Multiselect id="method-select" v-model="selectedMethod" :options="options" :multiple="true" :close-on-select="false"
             :clear-on-select="false" :preserve-search="true"
@@ -31,7 +31,8 @@ export default {
         },
         tagClassMethod() {
             return this.selectedMethod.length > 4 ? 'small-tags' : 'normal-tags';
-        }
+        },
+        ...mapState(["theme"]),
     },
     components: {
         Multiselect,
@@ -72,6 +73,19 @@ export default {
 }
 </style>
 <style scoped>
+/* Theme variables */
+.light {
+    --text-color: #333;
+    --bg-color: antiquewhite;
+    --box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.dark {
+    --text-color: #f9f9f9;
+    --bg-color: #444;
+    --box-shadow: 0 2px 5px rgba(255, 255, 255, 0.1);
+}
+
 .statistics-container {
     display: flex;
     flex-direction: column;
@@ -79,21 +93,21 @@ export default {
     margin: 0px 0px;
     padding: 5px;
     border-radius: 4px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    background-color: antiquewhite;
+    box-shadow: var(--box-shadow);
+    background-color: var(--bg-color);
 }
 
 .statistics-label {
     font-weight: 600;
     margin-bottom: 0px;
     font-size: 14px;
-    color: #333;
+    color: var(--text-color);
 }
 
 .method-label {
     font-weight: 600;
     font-size: 14px;
-    color: #333;
+    color: var(--text-color);
     margin-bottom: 0px;
 }
 </style>

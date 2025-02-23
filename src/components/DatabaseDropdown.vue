@@ -128,7 +128,6 @@ export default {
                         table: this.selectedTable
                     });
                 } else if (node.type === 'file') {
-                    // this.selectedFolder = node.path.substring(0, node.path.lastIndexOf(this.separator));
                     this.selectedFolder = node.path;
                     this.updateSelectedGeoFolders(this.selectedFolder);
                 }

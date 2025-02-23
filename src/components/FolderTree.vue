@@ -1,5 +1,5 @@
 <template>
-    <div class="folder-tree">
+    <div :class="[theme, 'folder-tree']">
         <ul class="list-group">
             <li v-for="(node, index) in treeData" :key="node.id">
                 <div :class="['node', {
@@ -50,7 +50,7 @@ export default {
         }
     },
     computed: {
-        ...mapState(['modelFolder']),
+        ...mapState(['modelFolder', 'theme']),
     },
     methods: {
         toggleNode(node) {
@@ -119,6 +119,19 @@ export default {
 
 
 <style scoped>
+/* Theme variables */
+.light {
+    --text-color: #333;
+    --selected-bg: #d0e8ff;
+    --hover-bg: #f0f0f0;
+}
+
+.dark {
+    --text-color: #f9f9f9;
+    --selected-bg: #555;
+    --hover-bg: #666;
+}
+
 .folder-tree {
     list-style-type: none;
     padding-left: 10px;
@@ -139,21 +152,21 @@ export default {
     user-select: none;
     font-size: 14px;
     word-break: break-word;
+    color: var(--text-color);
 }
 
 /* Adjust padding for first-level nodes */
 .top-level-node .node {
     padding-left: 0;
-    padding-left: 0px;
 }
 
 .selected-node {
-    background-color: #d0e8ff;
+    background-color: var(--selected-bg);
 }
 
 .folder-node:hover,
 .file-node:hover {
-    background-color: #f0f0f0;
+    background-color: var(--hover-bg);
 }
 
 /* Use data attribute for expanded state */

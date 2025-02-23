@@ -1,5 +1,5 @@
 <template>
-  <div class="message-container">
+  <div :class="[theme, 'message-container']">
     <transition-group name="fade" tag="div">
       <div v-for="(msg, index) in messages" :key="index" :class="['message-box', msg.type]">
         <div class="message-content">
@@ -18,7 +18,7 @@ import { mapState, mapActions } from 'vuex'; // Import Vuex helpers
 export default {
   name: 'MessageBox',
   computed: {
-    ...mapState(["messages"]),
+    ...mapState(["messages", "theme"]),
   },
   methods: {
     ...mapActions(["pushMessage", "sliceMessage"]),
@@ -54,20 +54,35 @@ export default {
 </script>
 
 <style scoped>
+/* Theme variables */
+.light {
+  --info-bg: #2196f3;
+  --success-bg: #4caf50;
+  --warning-bg: #ff9800;
+  --error-bg: #f44336;
+}
+
+.dark {
+  --info-bg: #1976d2;
+  --success-bg: #388e3c;
+  --warning-bg: #f57c00;
+  --error-bg: #d32f2f;
+}
+
 .message-box.info {
-  background-color: #2196f3;
+  background-color: var(--info-bg);
 }
 
 .message-box.success {
-  background-color: #4caf50;
+  background-color: var(--success-bg);
 }
 
 .message-box.warning {
-  background-color: #ff9800;
+  background-color: var(--warning-bg);
 }
 
 .message-box.error {
-  background-color: #f44336;
+  background-color: var(--error-bg);
 }
 
 .message-container {

@@ -1,54 +1,57 @@
 <template>
-    <h5 class="parameter-heading">Parameters:</h5>
-    <div v-if="['Project', 'Table', 'Map'].includes(pageTitle)">
-        <div class="form-container">
-            <div class="form-group">
-                <label for="column-select">Select Columns:</label>
-                <select id="column-select" class="dropdown" v-model="selectColumns" multiple
-                    :style="{ height: heightVar() }" @mousedown.prevent="toggleSelection($event, selectColumns)">
-                    <option v-for="column in columns" :key="column" :value="column" :title="findTableName(column)"
-                        @click.stop>
-                        {{ column }}
-                    </option>
-                </select>
+    <div :class="theme">
+        <h5 class="parameter-heading">Parameters:</h5>
+        <div v-if="['Project', 'Table', 'Map'].includes(pageTitle)">
+            <div class="form-container">
+                <div class="form-group">
+                    <label for="column-select">Select Columns:</label>
+                    <select id="column-select" class="dropdown" v-model="selectColumns" multiple
+                        :style="{ height: heightVar() }" @mousedown.prevent="toggleSelection($event, selectColumns)">
+                        <option v-for="column in columns" :key="column" :value="column" :title="findTableName(column)"
+                            @click.stop>
+                            {{ column }}
+                        </option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-container">
+                <div class="form-group">
+                    <label for="export-column-select">Export Select Columns:</label>
+                    <select id="export-column-select" class="dropdown" v-model="expColumns" multiple
+                        :style="{ height: heightVar() }" @mousedown.prevent="toggleSelection($event, expColumns, true)">
+                        <option v-for="column in columns" :key="column" :value="column" :title="findTableName(column)"
+                            @click.stop>
+                            {{ column }}
+                        </option>
+                    </select>
+                </div>
             </div>
         </div>
-        <div class="form-container">
-            <div class="form-group">
-                <label for="export-column-select">Export Select Columns:</label>
-                <select id="export-column-select" class="dropdown" v-model="expColumns" multiple
-                    :style="{ height: heightVar() }" @mousedown.prevent="toggleSelection($event, expColumns, true)">
-                    <option v-for="column in columns" :key="column" :value="column" :title="findTableName(column)"
-                        @click.stop>
-                        {{ column }}
-                    </option>
-                </select>
+        <!-- Conditional Axes Dropdowns -->
+        <div v-if="pageTitle === 'Graph'">
+            <div class="form-container">
+                <div class="form-group">
+                    <label for="x-axis-select">X-Axis:</label>
+                    <select id="x-axis-select" class="dropdown" v-model="xaxis" :style="{ height: heightVar(true) }">
+                        <option v-for="column in columns.filter(col => col === dateType)" :key="column" :value="column"
+                            :title="findTableName(column)">
+                            {{ column }}
+                        </option>
+                    </select>
+                </div>
             </div>
-        </div>
-    </div>
-    <!-- Conditional Axes Dropdowns -->
-    <div v-if="pageTitle === 'Graph'">
-        <div class="form-container">
-            <div class="form-group">
-                <label for="x-axis-select">X-Axis:</label>
-                <select id="x-axis-select" class="dropdown" v-model="xaxis" :style="{ height: heightVar(true) }">
-                    <option v-for="column in columns.filter(col => col === dateType)" :key="column" :value="column"
-                        :title="findTableName(column)">
-                        {{ column }}
-                    </option>
-                </select>
-            </div>
-        </div>
-        <div class="form-container">
-            <div class="form-group">
-                <label for="y-axis-select">Y-Axis:</label>
-                <select id="y-axis-select" class="dropdown" v-model="yaxis" multiple
-                    :style="{ height: heightVar(undefined, true) }" @mousedown.prevent="toggleSelection($event, yaxis)">
-                    <option v-for="column in columns.filter(col => col !== dateType)" :key="column" :value="column"
-                        :title="findTableName(column)" @click.stop>
-                        {{ column }}
-                    </option>
-                </select>
+            <div class="form-container">
+                <div class="form-group">
+                    <label for="y-axis-select">Y-Axis:</label>
+                    <select id="y-axis-select" class="dropdown" v-model="yaxis" multiple
+                        :style="{ height: heightVar(undefined, true) }"
+                        @mousedown.prevent="toggleSelection($event, yaxis)">
+                        <option v-for="column in columns.filter(col => col !== dateType)" :key="column" :value="column"
+                            :title="findTableName(column)" @click.stop>
+                            {{ column }}
+                        </option>
+                    </select>
+                </div>
             </div>
         </div>
     </div>
@@ -99,7 +102,7 @@ export default {
                 this.updateYAxis(value);
             }
         },
-        ...mapState(['columns', 'ids', 'selectedColumns', 'selectedGeoFolders', 'dateType', 'tooltipColumns', 'exportColumns', 'pageTitle', 'xAxis', 'yAxis', 'dateType'])
+        ...mapState(['columns', 'ids', 'selectedColumns', 'theme', 'selectedGeoFolders', 'dateType', 'tooltipColumns', 'exportColumns', 'pageTitle', 'xAxis', 'yAxis', 'dateType'])
     },
     data() {
         return {
@@ -177,11 +180,28 @@ export default {
 </script>
 <style src="vue-multiselect/dist/vue-multiselect.css"></style>
 <style scoped>
+/* Theme variables */
+.light {
+    --text-color: #333;
+    --bg-color: #f9f9f9;
+    --border-color: #ccc;
+    --dropdown-bg: #fff;
+    --box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.dark {
+    --text-color: #f9f9f9;
+    --bg-color: #333;
+    --border-color: #666;
+    --dropdown-bg: #444;
+    --box-shadow: 0 4px 10px rgba(255, 255, 255, 0.1);
+}
+
 .parameter-heading {
     font-size: 14px;
     font-weight: 600;
     margin: 0px 0px 0px 0px;
-    color: #333;
+    color: var(--text-color);
 }
 
 div.form-container {
@@ -191,9 +211,9 @@ div.form-container {
     max-width: 500px;
     margin: 0px auto;
     padding: 10px;
-    background-color: #f9f9f9;
+    background-color: var(--bg-color);
     border-radius: 8px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    box-shadow: var(--box-shadow);
     height: 50%;
 }
 
@@ -207,13 +227,14 @@ label {
     font-weight: 600;
     margin: 0px 0px 0px 0px;
     font-size: 14px;
+    color: var(--text-color);
 }
 
 .dropdown {
     padding: 10px;
-    border: 1px solid #ccc;
+    border: 1px solid var(--border-color);
     border-radius: 5px;
-    background-color: #fff;
+    background-color: var(--dropdown-bg);
     font-size: 14px;
     width: 100%;
 }

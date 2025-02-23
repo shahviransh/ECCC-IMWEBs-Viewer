@@ -138,7 +138,6 @@ body,
   min-height: 100vh;
 }
 
-/* Apply theme variables */
 .top-bar {
   background-color: var(--top-bar-bg);
   color: var(--top-bar-text);

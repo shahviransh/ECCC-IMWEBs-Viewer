@@ -1,5 +1,5 @@
 <template>
-    <div class="select-container">
+    <div :class="[theme, 'select-container']">
         <div class="form-container-ref">
             <div v-if="['Time'].includes(daType)">
                 <div class="form-group">
@@ -154,7 +154,7 @@ export default {
         expDateType() {
             return this.exportDateType; // Get the date type from Vuex (no need to set this directly)
         },
-        ...mapState(['columns', 'ids', 'selectedIds', 'dateRange', 'dateType', 'exportIds', 'exportDate', 'exportDateType', 'defaultStartDate', 'defaultEndDate', 'defaultInterval']),
+        ...mapState(['columns', 'ids', 'selectedIds', 'dateRange', 'theme', 'dateType', 'exportIds', 'exportDate', 'exportDateType', 'defaultStartDate', 'defaultEndDate', 'defaultInterval']),
     },
     data() {
         return {
@@ -173,6 +173,21 @@ export default {
 </script>
 <style src="vue-multiselect/dist/vue-multiselect.css"></style>
 <style scoped>
+/* Theme variables */
+.light {
+    --text-color: #333;
+    --bg-color: antiquewhite;
+    --border-color: #ccc;
+    --box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.dark {
+    --text-color: #f9f9f9;
+    --bg-color: #444;
+    --border-color: #666;
+    --box-shadow: 0 2px 5px rgba(255, 255, 255, 0.1);
+}
+
 .select-container {
     display: flex;
     flex-direction: row;
@@ -183,7 +198,6 @@ export default {
     overflow-y: auto;
 }
 
-
 .form-container,
 .form-container-ref {
     display: flex;
@@ -192,15 +206,15 @@ export default {
     margin: 0px 0px;
     padding: 5px;
     border-radius: 4px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    box-shadow: var(--box-shadow);
 }
 
 .form-container-ref {
-    background-color: aliceblue;
+    background-color: var(--bg-color);
 }
 
 .form-container {
-    background-color: antiquewhite;
+    background-color: var(--bg-color);
 }
 
 .form-group {
@@ -214,12 +228,13 @@ label {
     font-weight: 600;
     margin-bottom: 5px;
     font-size: 14px;
+    color: var(--text-color);
 }
 
 .input-field {
     padding: 8px;
     font-size: 14px;
-    border: 1px solid #ccc;
+    border: 1px solid var(--border-color);
     border-radius: 5px;
     width: 100%;
     margin-bottom: 2px;

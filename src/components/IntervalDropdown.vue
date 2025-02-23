@@ -1,5 +1,5 @@
 <template>
-    <div class="interval-container">
+    <div :class="[theme, 'interval-container']">
         <label for="interval-select" class="interval-label">Select Interval:</label>
         <select id="interval-select" v-model="selectInterval" class="interval-dropdown">
             <option value="daily">Daily</option>
@@ -44,7 +44,7 @@ export default {
                 this.updateExportInterval(value);
             }
         },
-        ...mapState(["selectedInterval", "exportInterval"]),
+        ...mapState(["selectedInterval", "exportInterval", "theme"]),
     },
     methods: {
         ...mapActions(["updateSelectedInterval", "updateExportInterval"]),
@@ -65,6 +65,23 @@ export default {
 </script>
 
 <style scoped>
+/* Theme variables */
+.light {
+    --text-color: #333;
+    --bg-color: antiquewhite;
+    --border-color: #ccc;
+    --box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    --focus-border: #555;
+}
+
+.dark {
+    --text-color: #f9f9f9;
+    --bg-color: #444;
+    --border-color: #666;
+    --box-shadow: 0 2px 5px rgba(255, 255, 255, 0.1);
+    --focus-border: #888;
+}
+
 .interval-container {
     display: flex;
     flex-direction: column;
@@ -72,35 +89,36 @@ export default {
     max-width: 200px;
     margin: 0px 0px;
     padding: 5px;
-    background-color: antiquewhite;
+    background-color: var(--bg-color);
     border-radius: 4px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    box-shadow: var(--box-shadow);
 }
 
 .interval-label {
     font-weight: 600;
     margin-bottom: 5px;
     font-size: 14px;
+    color: var(--text-color);
 }
 
 .interval-dropdown {
     padding: 5px;
-    border: 1px solid #ccc;
+    border: 1px solid var(--border-color);
     border-radius: 4px;
     background-color: #fff;
     font-size: 14px;
-    color: #333;
+    color: var(--text-color);
     cursor: pointer;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    box-shadow: var(--box-shadow);
     transition: border-color 0.2s ease-in-out;
 }
 
 .interval-dropdown:hover {
-    border-color: #888;
+    border-color: var(--focus-border);
 }
 
 .interval-dropdown:focus {
-    border-color: #555;
+    border-color: var(--focus-border);
     outline: none;
 }
 </style>
