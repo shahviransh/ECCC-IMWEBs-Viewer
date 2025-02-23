@@ -71,8 +71,9 @@ jobs:
       - name: Restore Cache
         uses: actions/cache/restore@v3
         with:
-          path: backend\_internal\Jenette_Creek_Watershed
+          path: backend/_internal/Jenette_Creek_Watershed
           key: Jenette_Creek_Watershed-v1
+          enableCrossOsArchive: true
 
       - name: Setup node
         uses: actions/setup-node@v4
