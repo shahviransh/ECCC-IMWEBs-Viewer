@@ -113,7 +113,6 @@ jobs:
           conda run -n venv pip install --no-cache-dir -r backend/requirements.txt && ^
           conda run -n venv pyinstaller backend/apppy.py -y --distpath backend/ --specpath backend/ --workpath backend/build --name apppy ^
           --add-data "%CONDA%/envs/venv/Library/share/proj;Library/share/proj" && ^
-          xcopy backend/Jenette_Creek_Watershed backend/apppy/_internal/Jenette_Creek_Watershed /E /I
         shell: cmd
   
       - name: Build backend with PyInstaller
@@ -123,8 +122,14 @@ jobs:
           conda run -n venv pip install --no-cache-dir -r backend/requirements.txt
           conda run -n venv pyinstaller backend/apppy.py -y --distpath backend/ --specpath backend/ --workpath backend/build --name apppy \
           --add-data "$CONDA/envs/venv/share/proj:share/proj"
-          cp -r backend/Jenette_Creek_Watershed backend/apppy/_internal/Jenette_Creek_Watershed
-        shell: bash  
+        shell: bash
+      
+      - name: Restore Cache
+        id: check_cache
+        uses: actions/cache/restore@v3
+        with:
+          path: backend/_internal/Jenette_Creek_Watershed
+          key: Jenette_Creek_Watershed-v1 # Change "v1" to "v2" manually if you want to refresh the cache
 
       - name: Copy AppImage dependency to /usr/lib/ (ubuntu only)
         if: matrix.platform == 'ubuntu-22.04'
