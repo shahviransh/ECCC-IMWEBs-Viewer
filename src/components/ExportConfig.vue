@@ -1,5 +1,5 @@
 <template>
-    <div class="export-container">
+    <div :class="[theme, 'export-container']">
         <div class="export-field">
             <label for="export-path" class="export-label">Export Path:</label>
             <input type="text" id="export-path" v-model="expPath" class="export-input" />
@@ -147,7 +147,7 @@ export default {
         filteredOptions5() {
             return this.allOptions.filter(option => !this.selectedColumns2.includes(option) && !this.selectedColumns1.includes(option));
         },
-        ...mapState(['exportPath', 'exportFilename', 'exportFormat', "pageTitle", "graphType", "selectedColumns", "dateType"]),
+        ...mapState(['exportPath', 'exportFilename', 'exportFormat', "theme", "pageTitle", "graphType", "selectedColumns", "dateType"]),
     },
     methods: {
         ...mapActions(["updateExportPath", "updateExportFilename", "updateExportFormat", "updateGraphType", "updateMultiGraphType", "pushMessage"]),
@@ -189,11 +189,35 @@ export default {
         selectedColumns() {
             this.allOptions = this.selectedColumns.filter(option => option !== this.dateType && !option.includes("ID"));
         },
+        pageTitle() {
+            if (['Project', 'Table'].includes(this.pageTitle)) {
+                this.updateExportFormat("csv");
+            } else {
+                this.updateExportFormat("png");
+            }
+        },
     },
 };
 </script>
 
 <style scoped>
+/* Theme variables */
+.light {
+    --text-color: #333;
+    --bg-color: antiquewhite;
+    --border-color: #ccc;
+    --box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    --focus-border: #555;
+}
+
+.dark {
+    --text-color: #f9f9f9;
+    --bg-color: #444;
+    --border-color: #666;
+    --box-shadow: 0 2px 5px rgba(255, 255, 255, 0.1);
+    --focus-border: #888;
+}
+
 .export-container {
     display: flex;
     flex-direction: column;
@@ -201,28 +225,28 @@ export default {
     margin: 0px 0px;
     padding: 5px;
     border-radius: 4px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    background-color: antiquewhite;
+    box-shadow: var(--box-shadow);
+    background-color: var(--bg-color);
     overflow-y: auto;
 }
 
 label {
     font-weight: 600;
     font-size: 14px;
-    color: #333;
+    color: var(--text-color);
     margin-bottom: 5px;
 }
 
 .export-label {
     font-weight: bold;
     font-size: 14px;
-    color: #333;
+    color: var(--text-color);
     margin-bottom: 5px;
 }
 
 .export-input {
     padding: 5px;
-    border: 1px solid #ccc;
+    border: 1px solid var(--border-color);
     border-radius: 4px;
     font-size: 14px;
     width: 100%;
@@ -231,13 +255,13 @@ label {
 }
 
 .export-input:focus {
-    border-color: #555;
+    border-color: var(--focus-border);
     outline: none;
 }
 
 .export-select {
     padding: 5px;
-    border: 1px solid #ccc;
+    border: 1px solid var(--border-color);
     border-radius: 4px;
     font-size: 14px;
     cursor: pointer;
@@ -245,7 +269,7 @@ label {
 }
 
 .export-select:focus {
-    border-color: #555;
+    border-color: var(--focus-border);
     outline: none;
 }
 

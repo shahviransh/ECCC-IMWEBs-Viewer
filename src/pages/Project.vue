@@ -24,44 +24,8 @@
                     <button @click="exportData">Export Data</button>
                 </span>
             </div>
-
             <!-- Component 4: Main View (Table and Stats Display) -->
-            <div class="main-view">
-                <!-- Table Container with Scrollable Body -->
-                <div class="table-container">
-                    <table class="styled-table">
-                        <thead>
-                            <tr>
-                                <th v-for="column in selectedColumns" :key="column">{{ column }}</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr v-for="(row, index) in visibleData" :key="index">
-                                <td v-for="column in selectedColumns" :key="column">{{ row[column] }}</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                    <!-- Load More Button -->
-                    <div v-if="canLoadMore" class="load-more-container">
-                        <button class="load-more-button" @click="loadMoreRows">Load More</button>
-                    </div>
-                </div>
-                <!-- Stats Container with Scrollable Body -->
-                <div class="stats-container">
-                    <table class="styled-table">
-                        <thead>
-                            <tr>
-                                <th v-for="column in statsColumns" :key="column">{{ column }}</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr v-for="(row, index) in stats" :key="index">
-                                <td v-for="column in statsColumns" :key="column">{{ row[column] }}</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+            <TableStatsDisplay :data="data" :stats="stats" :statsColumns="statsColumns" :selectedColumns="selectedColumns" :id="null"  :ID="ID" :rowLimit="rowLimit" />
         </div>
     </div>
 </template>
@@ -75,6 +39,7 @@ import IntervalDropdown from "../components/IntervalDropdown.vue";
 import StatisticsDropdown from "../components/StatisticsDropdown.vue";
 import ExportConfig from "../components/ExportConfig.vue";
 import ExportTableStats from "../components/ExportTableStats.vue";
+import TableStatsDisplay from "../components/TableStatsDisplay.vue";
 import axios from 'axios';
 import Multiselect from "vue-multiselect";
 
@@ -88,51 +53,42 @@ export default {
         StatisticsDropdown,
         ExportConfig,
         ExportTableStats,
+        TableStatsDisplay,
         Multiselect,
     },
     data() {
         return {
             stats: [],
             statsColumns: [],
-            visibleData: [],
-            rowLimit: 100,
-            canLoadMore: true,
             data: [],
+            ID: '',
+            rowLimit: 100,
         };
     },
     computed: {
-        ...mapState(["selectedDbsTables", "selectedColumns", "selectedIds", "dateRange", "selectedInterval", "selectedStatistics", "selectedMethod", "exportColumns", "exportIds", "exportDate", "exportInterval", "dateType", "exportDateType", "exportPath", "exportFilename", "exportFormat", "exportOptions", "theme"]),
+        ...mapState(["selectedDbsTables", "selectedColumns", "allSelectedColumns", "selectedIds", "dateRange", "selectedInterval", "selectedStatistics", "selectedMethod", "exportColumns", "exportIds", "exportDate", "exportInterval", "dateType", "exportDateType", "exportPath", "exportFilename", "exportFormat", "exportOptions", "theme"]),
     },
     methods: {
-        ...mapActions(["updateSelectedColumns", "updateExportOptions", "pushMessage", "clearMessages"]),
+        ...mapActions(["updateSelectedColumns", "updateExportOptions", "updateAllSelectedColumns", "pushMessage", "clearMessages"]),
         heightVar() {
             // Set the height based on the environment
             const isTauri = window.isTauri !== undefined;
             return isTauri ? "calc(100vh - 14vh)" : "calc(100vh - 16vh)";
         },
-        // Load initial rows when the data is loaded
-        loadInitialRows() {
-            this.visibleData = this.data.slice(0, this.rowLimit);
-            this.canLoadMore = this.data.length > this.rowLimit;
-        },
-        // Load more rows when the load more button is clicked
-        loadMoreRows() {
-            const nextRowLimit = this.visibleData.length + this.rowLimit;
-            const nextRows = this.data.slice(this.visibleData.length, nextRowLimit);
-            // Append the next rows to the visible data
-            this.visibleData = [...this.visibleData, ...nextRows];
-            // Check if we can load more rows
-            if (this.visibleData.length >= this.data.length) {
-                this.canLoadMore = false; // Hide the load more button
-            }
-        },
         // Fetch data from the API
         async fetchData() {
             try {
+                // Choose all the columns if they are not selected
+                if (this.selectedColumns.length === 0) {
+                    this.updateSelectedColumns(this.columns);
+                    this.updateAllSelectedColumns(true);
+                }
+
+                // Fetch the data for the map
                 const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/get_data`, {
                     params: {
                         db_tables: JSON.stringify(this.selectedDbsTables),
-                        columns: JSON.stringify(this.selectedColumns.filter((column) => column !== 'Season')),
+                        columns: JSON.stringify(this.allSelectedColumns ? "All" : this.selectedColumns.filter((column) => column !== 'Season')),
                         id: JSON.stringify(this.selectedIds),
                         start_date: this.dateRange.start,
                         end_date: this.dateRange.end,
@@ -144,15 +100,15 @@ export default {
                 });
                 if (this.selectedInterval === 'seasonally' && !this.selectedMethod.includes('Equal') && !this.selectedColumns.includes('Season')) {
                     this.updateSelectedColumns(this.selectedColumns.concat(['Season']));
-                } else {
+                } else if (this.selectedColumns.includes('Season')) {
                     this.updateSelectedColumns(this.selectedColumns.filter((column) => column !== 'Season'));
                 }
                 this.data = response.data.data;
                 this.stats = response.data.stats;
                 this.statsColumns = response.data.statsColumns;
-                this.loadInitialRows();
+                this.ID = this.selectedColumns.find((column) => column.includes('ID'));
                 if (response.data.error) {
-                    alert('Error fetching data: ' + response.data.error);
+                    alert('Error fetching data: ', response.data.error);
                     return;
                 } else {
                     // Wait until the table has rendered, then trigger messages
@@ -165,7 +121,7 @@ export default {
                     });
                 }
             } catch (error) {
-                alert('Error fetching data: ' + error.message);
+                console.error('Error fetching data: ',  error.message);
             }
         },
         // Export data to a file
@@ -174,7 +130,7 @@ export default {
                 const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/export_data`, {
                     params: {
                         db_tables: JSON.stringify(this.selectedDbsTables),
-                        columns: JSON.stringify(this.exportColumns.filter((column) => column !== 'Season')),
+                        columns: JSON.stringify(this.allSelectedColumns ? "All" : this.exportColumns.filter((column) => column !== 'Season')),
                         id: JSON.stringify(this.exportIds),
                         start_date: this.exportDate.start,
                         end_date: this.exportDate.end,
@@ -190,17 +146,17 @@ export default {
                     }
                 });
                 if (response.data.error) {
-                    alert('Error fetching data: ' + response.data.error);
+                    alert('Error fetching data: ', response.data.error);
                     return;
                 }
                 else { this.pushMessage({ message: `Exported ${this.exportColumns.length} columns x ${this.data.length} rows`, type: 'success' }); }
                 if (this.selectedInterval === 'seasonally' && !this.selectedMethod.includes('Equal') && !this.selectedColumns.includes('Season')) {
                     this.updateSelectedColumns(this.selectedColumns.concat(['Season']));
-                } else {
+                } else if (this.selectedColumns.includes('Season')) {
                     this.updateSelectedColumns(this.selectedColumns.filter((column) => column !== 'Season'));
                 }
             } catch (error) {
-                alert('Error exporting data: ' + error.message);
+                console.error('Error exporting data: ',  error.message);
             }
         },
     },

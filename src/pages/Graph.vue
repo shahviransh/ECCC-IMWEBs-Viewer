@@ -28,7 +28,7 @@
             <!-- Component 4: Main View -->
             <div class="main-view">
                 <!-- Graph Display -->
-                <v-chart :option="chartOptions" :key="refreshKey"></v-chart>
+                <v-chart :option="chartOptions" :theme="theme" :key="refreshKey"></v-chart>
             </div>
         </div>
     </div>
@@ -76,11 +76,6 @@ export default {
             refreshKey: 0,
         };
     },
-    watch: {
-        selectedColumns() {
-            this.ID = this.selectedColumns.filter((column) => column.includes('ID')).join("");
-        },
-    },
     computed: {
         chartOptions() {
             const xAxisData = this.data.map(row => row[this.dateType]);
@@ -106,7 +101,7 @@ export default {
                     textStyle: {
                         fontSize: 16,
                         fontWeight: 'bold',
-                        color: 'black',
+                        color: this.theme === 'dark' ? 'white' : 'black',
                     }
                 },
                 tooltip: {
@@ -153,15 +148,15 @@ export default {
                     nameTextStyle: {
                         fontSize: 14,
                         padding: 10,
-                        color: 'black',
+                        color: this.theme === 'dark' ? 'white' : 'black',
                     },
                     axisLabel: {
                         fontSize: 14,
-                        color: 'black',
+                        color: this.theme === 'dark' ? 'white' : 'black',
                     },
                     axisLine: {
                         lineStyle: {
-                            color: 'black',
+                            color: this.theme === 'dark' ? 'white' : 'black',
                             width: 2
                         }
                     },
@@ -177,16 +172,16 @@ export default {
                         nameTextStyle: {
                             fontSize: 14,
                             padding: 15,
-                            color: 'black',
+                            color: this.theme === 'dark' ? 'white' : 'black',
                         },
                         axisLabel: {
                             fontSize: 14,
-                            color: 'black',
+                            color: this.theme === 'dark' ? 'white' : 'black',
                         },
                         axisLine: {
                             show: true,
                             lineStyle: {
-                                color: 'black',
+                                color: this.theme === 'dark' ? 'white' : 'black',
                                 width: 2
                             }
                         },
@@ -196,7 +191,7 @@ export default {
                         splitLine: {
                             lineStyle: {
                                 type: 'dashed',
-                                color: '#ccc',
+                                color: this.theme === 'dark' ? '#333' : '#ccc',
                             },
                         },
                         alignTicks: true,
@@ -208,16 +203,16 @@ export default {
                         nameTextStyle: {
                             fontSize: 14,
                             padding: 10,
-                            color: 'black',
+                            color: this.theme === 'dark' ? 'white' : 'black',
                         },
                         axisLabel: {
                             fontSize: 14,
-                            color: 'black',
+                            color: this.theme === 'dark' ? 'white' : 'black',
                         },
                         axisLine: {
                             show: true,
                             lineStyle: {
-                                color: 'black',
+                                color: this.theme === 'dark' ? 'white' : 'black',
                                 width: 2
                             }
                         },
@@ -252,10 +247,10 @@ export default {
                         }))
             };
         },
-        ...mapState(["selectedDbsTables", "selectedColumns", "multiGraphType", "currentZoomStart", "currentZoomEnd", "selectedIds", "dateRange", "selectedInterval", "selectedStatistics", "selectedMethod", "exportColumns", "graphType", "exportIds", "exportDate", "exportInterval", "dateType", "exportDateType", "exportPath", "exportFilename", "exportFormat", "exportOptions", "theme"]),
+        ...mapState(["selectedDbsTables", "selectedColumns", "allSelectedColumns", "multiGraphType", "currentZoomStart", "currentZoomEnd", "selectedIds", "dateRange", "selectedInterval", "selectedStatistics", "selectedMethod", "exportColumns", "graphType", "exportIds", "exportDate", "exportInterval", "dateType", "exportDateType", "exportPath", "exportFilename", "exportFormat", "exportOptions", "theme"]),
     },
     methods: {
-        ...mapActions(["updateSelectedColumns", "updateExportOptions", "pushMessage", "clearMessages"]),
+        ...mapActions(["updateSelectedColumns", "updateExportOptions", "updateAllSelectedColumns", "pushMessage", "clearMessages"]),
         columnNeedsSecondaryAxis(column) {
             // Adjust logic based on actual data thresholds
             return this.data.some(row => row[column] > 100);
@@ -286,10 +281,17 @@ export default {
         // Fetch data from the API
         async fetchData() {
             try {
+                // Choose all the columns if they are not selected
+                if (this.selectedColumns.length === 0) {
+                    this.updateSelectedColumns(this.columns);
+                    this.updateAllSelectedColumns(true);
+                }
+
+                // Fetch the data for the map
                 const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/get_data`, {
                     params: {
                         db_tables: JSON.stringify(this.selectedDbsTables),
-                        columns: JSON.stringify(this.selectedColumns.filter((column) => column !== 'Season')),
+                        columns: JSON.stringify(this.allSelectedColumns ? "All" : this.selectedColumns.filter((column) => column !== 'Season')),
                         id: JSON.stringify(this.selectedIds),
                         start_date: this.dateRange.start,
                         end_date: this.dateRange.end,
@@ -301,15 +303,16 @@ export default {
                 });
                 if (this.selectedInterval === 'seasonally' && !this.selectedMethod.includes('Equal') && !this.selectedColumns.includes('Season')) {
                     this.updateSelectedColumns(this.selectedColumns.concat(['Season']));
-                } else {
+                } else if (this.selectedColumns.includes('Season')) {
                     this.updateSelectedColumns(this.selectedColumns.filter((column) => column !== 'Season'));
                 }
                 this.data = response.data.data;
                 this.stats = response.data.stats;
                 this.statsColumns = response.data.statsColumns;
+                this.ID = this.selectedColumns.find((column) => column.includes('ID'));
                 this.refreshKey += 1;
                 if (response.data.error) {
-                    alert('Error fetching data: ' + response.data.error);
+                    alert('Error fetching data: ', response.data.error);
                     return;
                 } else {
                     this.$nextTick(() => {
@@ -319,7 +322,7 @@ export default {
                     this.pushMessage({ message: `Graph Loading ${this.selectedColumns.length} columns x ${this.data.length} rows`, type: 'info' });
                 }
             } catch (error) {
-                alert('Error fetching data: ' + error.message);
+                console.error('Error fetching data: ', error.message);
             }
         },
         // Export data to a file
@@ -328,7 +331,7 @@ export default {
                 const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/export_data`, {
                     params: {
                         db_tables: JSON.stringify(this.selectedDbsTables),
-                        columns: JSON.stringify(this.exportColumns.filter((column) => column !== 'Season')),
+                        columns: JSON.stringify(this.allSelectedColumns ? "All" : this.exportColumns.filter((column) => column !== 'Season')),
                         id: JSON.stringify(this.exportIds),
                         start_date: this.exportDate.start,
                         end_date: this.exportDate.end,
@@ -346,16 +349,16 @@ export default {
                     }
                 });
                 if (response.data.error) {
-                    alert('Error fetching data: ' + response.data.error);
+                    alert('Error fetching data: ', response.data.error);
                     return;
                 } else { this.pushMessage({ message: `Exported ${this.exportColumns.length} columns x ${this.data.length} rows`, type: 'info' }); }
                 if (this.selectedInterval === 'seasonally' && !this.selectedMethod.includes('Equal') && !this.selectedColumns.includes('Season')) {
                     this.updateSelectedColumns(this.selectedColumns.concat(['Season']));
-                } else {
+                } else if (this.selectedColumns.includes('Season')) {
                     this.updateSelectedColumns(this.selectedColumns.filter((column) => column !== 'Season'));
                 }
             } catch (error) {
-                alert('Error exporting data: ' + error.message);
+                console.error('Error exporting data: ', error.message);
             }
         },
     },
