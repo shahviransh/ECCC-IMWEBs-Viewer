@@ -1,5 +1,5 @@
 <template>
-    <div class="export-field">
+    <div :class="[theme, 'export-field']">
         <label for="export-stats">Export Table and/or Stats:</label>
         <Multiselect id="export-stats" v-model="selectedOptions" :options="filteredExportOptions" :multiple="true"
             :close-on-select="false" :clear-on-select="false" :preserve-search="true" placeholder="Select"
@@ -29,7 +29,7 @@ export default {
         tagClass() {
             return this.selectedOptions.length > 4 ? 'small-tags' : 'normal-tags';
         },
-        ...mapState(["selectedStatistics", "selectedMethod"]),
+        ...mapState(["selectedStatistics", "selectedMethod", "theme"]),
     },
     methods: {
         ...mapActions(["updateExportOptions"]),
@@ -54,15 +54,27 @@ export default {
 }
 </style>
 <style scoped>
+/* Theme variables */
+.light {
+    color: #333;
+}
+
+/* Dark Theme */
+.dark {
+    color: #f0f0f0;
+}
+
 .export-field {
     display: flex;
     flex-direction: column;
     cursor: pointer;
+    color: var(--color);
 }
 
 label {
     font-weight: 600;
     margin-bottom: 5px;
     font-size: 14px;
+    color: var(--color);
 }
 </style>

@@ -105,7 +105,7 @@ export default {
     padding: 5px;
     border: 1px solid var(--border-color);
     border-radius: 4px;
-    background-color: #fff;
+    background-color: var(--bg-color);
     font-size: 14px;
     color: var(--text-color);
     cursor: pointer;

@@ -251,6 +251,8 @@ label {
     font-size: 14px;
     width: 100%;
     box-sizing: border-box;
+    background-color: var(--bg-color);
+    color: var(--text-color);
     transition: border-color 0.3s ease-in-out;
 }
 
@@ -262,6 +264,8 @@ label {
 .export-select {
     padding: 5px;
     border: 1px solid var(--border-color);
+    background-color: var(--bg-color);
+    color: var(--text-color);
     border-radius: 4px;
     font-size: 14px;
     cursor: pointer;

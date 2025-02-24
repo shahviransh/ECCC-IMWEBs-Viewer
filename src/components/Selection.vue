@@ -177,12 +177,14 @@ export default {
 .light {
     --text-color: #333;
     --bg-color: antiquewhite;
+    --bg-color-ref: #f9f9f9;
     --border-color: #ccc;
     --box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
 .dark {
     --text-color: #f9f9f9;
+    --bg-color-ref: #333;
     --bg-color: #444;
     --border-color: #666;
     --box-shadow: 0 2px 5px rgba(255, 255, 255, 0.1);
@@ -210,10 +212,18 @@ export default {
 }
 
 .form-container-ref {
-    background-color: var(--bg-color);
+    background-color: var(--bg-color-ref);
+}
+
+.form-container-ref .form-group .input-field {
+    background-color: var(--bg-color-ref);
 }
 
 .form-container {
+    background-color: var(--bg-color);
+}
+
+.form-container .form-group .input-field {
     background-color: var(--bg-color);
 }
 
@@ -235,6 +245,7 @@ label {
     padding: 8px;
     font-size: 14px;
     border: 1px solid var(--border-color);
+    color: var(--text-color);
     border-radius: 5px;
     width: 100%;
     margin-bottom: 2px;
