@@ -15,7 +15,8 @@
     "electron": "npx electron . && vite",
     "electron:build": "vite build && electron-builder",
     "tauri": "node src-tauri/main.js && tauri",
-    "tauri:build": "node src-tauri/main.js && tauri build && node src-tauri/move.js"
+    "tauri:build": "node src-tauri/main.js && tauri build && node src-tauri/move.js",
+    "sync-version": "node sync-version.js"
   },
   "dependencies": {
     "@tauri-apps/api": "^2.2.0",

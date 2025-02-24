@@ -11,6 +11,7 @@ prestart:
 	npm run prestart
 	@echo "Installing dependencies..."
 	npm install
+	npm run sync-version
 
 pipreq:
 	@echo "Freezing Python dependencies..."
