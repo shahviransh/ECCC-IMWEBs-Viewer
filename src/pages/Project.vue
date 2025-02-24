@@ -41,7 +41,6 @@ import ExportConfig from "../components/ExportConfig.vue";
 import ExportTableStats from "../components/ExportTableStats.vue";
 import TableStatsDisplay from "../components/TableStatsDisplay.vue";
 import axios from 'axios';
-import Multiselect from "vue-multiselect";
 
 export default {
     name: "Project",
@@ -54,7 +53,6 @@ export default {
         ExportConfig,
         ExportTableStats,
         TableStatsDisplay,
-        Multiselect,
     },
     data() {
         return {
@@ -162,5 +160,4 @@ export default {
     },
 };
 </script>
-<style src="vue-multiselect/dist/vue-multiselect.css"></style>
 <style src="../assets/pages.css"></style>

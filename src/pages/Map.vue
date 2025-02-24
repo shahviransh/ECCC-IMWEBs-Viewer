@@ -84,7 +84,7 @@
                 <div class="modal">
                     <button class="close-button" @click="showTableStatsPopup = false">&times;</button>
                     <TableStatsDisplay :data="data" :stats="stats" :statsColumns="statsColumns" :properties="properties"
-                        :selectedColumns="selectedColumns" :id="selectedFeatureId" :ID="ID" :rowLimit="100" />
+                        :selectedColumns="selectedColumns" :id="selectedFeatureId" :ID="ID" :rowLimit="rowLimit" />
                 </div>
             </div>
         </div>
@@ -102,7 +102,6 @@ import ExportConfig from "../components/ExportConfig.vue";
 import ExportTableStats from "../components/ExportTableStats.vue";
 import TableStatsDisplay from "../components/TableStatsDisplay.vue";
 import axios from 'axios';
-import Multiselect from "vue-multiselect";
 import 'leaflet/dist/leaflet.css';
 import * as L from 'leaflet';
 import 'leaflet.fullscreen';
@@ -122,7 +121,6 @@ export default {
         StatisticsDropdown,
         ExportConfig,
         ExportTableStats,
-        Multiselect,
         TableStatsDisplay,
     },
     data() {
@@ -148,6 +146,7 @@ export default {
             opacitySteps: Array.from({ length: 11 }, (_, i) => (i * 0.1).toFixed(1)),
             showTableStatsPopup: false,
             selectedFeatureId: null,
+            rowLimit: 100,
         };
     },
     watch: {
@@ -537,7 +536,6 @@ export default {
     },
 };
 </script>
-<style src="vue-multiselect/dist/vue-multiselect.css"></style>
 <style src="../assets/pages.css"></style>
 
 <style scoped>
@@ -580,7 +578,7 @@ export default {
     background: var(--background-color);
     padding: 20px;
     border-radius: 10px;
-    width: 300px;
+    width: 25%;
     text-align: center;
     color: var(--text-color);
 }

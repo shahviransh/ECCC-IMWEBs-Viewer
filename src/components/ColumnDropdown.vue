@@ -112,7 +112,6 @@ export default {
         selectedDbsTables: {
             // Debounce is used to prevent multiple API calls in quick succession
             handler: _.debounce(function (newDbsTables) {
-                console.log('New tables selected:', newDbsTables);
                 if (newDbsTables.length > 0) {
                     this.fetchColumns(newDbsTables);
                 }

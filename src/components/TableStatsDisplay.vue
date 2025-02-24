@@ -61,13 +61,12 @@ export default {
     },
     computed: {
         selectedColumnsFilter() {
-            return this.properties ? this.selectedColumns.filter(c => !properties.includes(c)) : this.selectedColumns
+            return this.properties ? this.selectedColumns.filter(c => !this.properties.includes(c)) : this.selectedColumns
         },
     },
     methods: {
         // Load initial rows when the data is loaded
         loadInitialRows() {
-            this.filteredData = this.data.filter(row => row.id === this.id);
             this.visibleData = this.filteredData.slice(0, this.rowLimit);
             this.canLoadMore = this.filteredData.length > this.rowLimit;
         },
@@ -87,6 +86,7 @@ export default {
         data: {
             immediate: true,
             handler() {
+                this.filteredData = this.id ? this.data.filter(row => row[this.ID] === this.id) : this.data;
                 this.loadInitialRows();
             }
         }

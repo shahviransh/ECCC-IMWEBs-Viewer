@@ -44,7 +44,6 @@ import StatisticsDropdown from "../components/StatisticsDropdown.vue";
 import ExportConfig from "../components/ExportConfig.vue";
 import ExportTableStats from "../components/ExportTableStats.vue";
 import axios from 'axios';
-import Multiselect from "vue-multiselect";
 import { use } from 'echarts/core';
 import { LineChart, ScatterChart, BarChart } from 'echarts/charts';
 import { GridComponent, TooltipComponent, TitleComponent, LegendComponent, DataZoomComponent } from 'echarts/components';
@@ -64,7 +63,6 @@ export default {
         StatisticsDropdown,
         ExportConfig,
         ExportTableStats,
-        Multiselect,
         VChart,
     },
     data() {
@@ -350,5 +348,4 @@ export default {
     },
 };
 </script>
-<style src="vue-multiselect/dist/vue-multiselect.css"></style>
 <style src="../assets/pages.css"></style>
