@@ -80,7 +80,7 @@ export default {
             try {
                 // Choose all the columns if they are not selected
                 if (this.selectedColumns.length === 0) {
-                    this.updateSelectedColumns(this.columns);
+                    this.updateSelectedColumns("All");
                     this.updateAllSelectedColumns(true);
                 }
 
