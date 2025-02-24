@@ -1,17 +1,14 @@
 # Makefile for Tauri and Electron builds
 
-.PHONY: all prestart install build run python clean
+.PHONY: all prestart build run python clean
 
 # Default target
-all: prestart install python
+all: prestart python
 
 # Prestart script
 prestart:
 	@echo "Running prestart script..."
 	npm run prestart
-
-# Install dependencies
-install:
 	@echo "Installing dependencies..."
 	npm install
 

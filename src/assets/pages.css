@@ -110,7 +110,8 @@ label {
     width: 99%;
     /* Takes 2/4 of the horizontal space */
     height: auto;
-    /* Ensure full height */
+    min-height: 180px;
+    max-height: 15%;
     margin: 0px;
     padding: 5px;
     display: flex;
@@ -122,8 +123,7 @@ label {
 .main-view {
     width: 99%;
     /* Takes 2/4 of the horizontal space */
-    height: 75%;
-    /* Ensure full height */
+    height: calc(100% - max(180px, 15%));  /* Takes remaining space */
     margin: 0px;
     padding: 5px;
     overflow: auto;

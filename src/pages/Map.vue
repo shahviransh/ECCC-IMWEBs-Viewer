@@ -32,7 +32,7 @@
             </div>
 
             <!-- Style Settings Modal -->
-            <div v-if="showStylePopup" class="modal-overlay">
+            <div v-if="showStylePopup" class="modal-overlay-select">
                 <div class="modal">
                     <h3>Customize Map Style</h3>
 
@@ -80,6 +80,13 @@
                     </div>
                 </div>
             </div>
+            <div v-if="showTableStatsPopup" class="modal-overlay">
+                <div class="modal">
+                    <button class="close-button" @click="showTableStatsPopup = false">&times;</button>
+                    <TableStatsDisplay :data="data" :stats="stats" :statsColumns="statsColumns"
+                        :selectedColumns="selectedColumns" :id="selectedFeatureId" :ID="ID" :rowLimit="100" />
+                </div>
+            </div>
         </div>
     </div>
 </template>
@@ -93,6 +100,7 @@ import IntervalDropdown from "../components/IntervalDropdown.vue";
 import StatisticsDropdown from "../components/StatisticsDropdown.vue";
 import ExportConfig from "../components/ExportConfig.vue";
 import ExportTableStats from "../components/ExportTableStats.vue";
+import TableStatsDisplay from "../components/TableStatsDisplay.vue";
 import axios from 'axios';
 import Multiselect from "vue-multiselect";
 import 'leaflet/dist/leaflet.css';
@@ -102,6 +110,7 @@ import 'leaflet.fullscreen/Control.FullScreen.css';
 import domtoimage from 'dom-to-image-more';
 import _ from 'lodash';
 import northarrow from "../assets/north-arrow.png";
+import northarrowwhite from "../assets/north-arrow-white.png";
 
 export default {
     name: "Map",
@@ -114,13 +123,14 @@ export default {
         ExportConfig,
         ExportTableStats,
         Multiselect,
+        TableStatsDisplay,
     },
     data() {
         return {
             stats: [],
             statsColumns: [],
             data: [],
-            ID: [],
+            ID: '',
             map: null,
             geojson: {},
             bounds: [],
@@ -129,19 +139,18 @@ export default {
             image_urls: [],
             raster_levels: [],
             showStylePopup: false,
-            polygonColor: "#3388ff",
+            polygonColor: this.theme === 'light' ? "#3388ff" : "#ff9800",
             polygonOpacity: 0.0,
-            lineColor: "#ff0000",
+            lineColor: this.theme === 'light' ? "#ff0000" : "#03A9F4",
             lineOpacity: 0.7,
-            pointColor: "#000000",
+            pointColor: this.theme === 'light' ? "#000000" : "#ff5722",
             pointOpacity: 0.8,
             opacitySteps: Array.from({ length: 11 }, (_, i) => (i * 0.1).toFixed(1)),
+            showTableStatsPopup: false,
+            selectedFeatureId: null,
         };
     },
     watch: {
-        selectedColumns() {
-            this.ID = this.selectedColumns.find((column) => column.includes('ID')) || "";
-        },
         selectedGeoFolders: {
             // Debounce is used to prevent multiple API calls in quick succession
             handler: _.debounce(function (newFolders) {
@@ -153,13 +162,69 @@ export default {
         },
     },
     computed: {
-        ...mapState(["selectedGeoFolders", "selectedColumns", "selectedIds", "dateRange", "selectedInterval", "selectedStatistics", "selectedMethod", "exportColumns", "exportIds", "exportDate", "exportInterval", "dateType", "exportDateType", "exportPath", "exportFilename", "exportFormat", "exportOptions", "theme"]),
+        ...mapState(["selectedDbsTables", "selectedGeoFolders", "selectedColumns", "allSelectedColumns", "selectedIds", "dateRange", "selectedInterval", "selectedStatistics", "selectedMethod", "exportColumns", "exportIds", "exportDate", "exportInterval", "dateType", "exportDateType", "exportPath", "exportFilename", "exportFormat", "exportOptions", "theme"]),
     },
     methods: {
-        ...mapActions(["updateSelectedColumns", "updateToolTipColumns", "updateColumns", "pushMessage", "clearMessages"]),
+        ...mapActions(["updateSelectedColumns", "addColumns", "updateToolTipColumns", "updateAllSelectedColumns", "updateColumns", "pushMessage", "clearMessages"]),
+        arraysAreEqual(arr1, arr2) {
+            if (arr1.length !== arr2.length) return false; // Different lengths → Not equal
+
+            const sorted1 = [...arr1].sort();
+            const sorted2 = [...arr2].sort();
+
+            // Compare every element in both arrays
+            return sorted1.every((value, index) => value === sorted2[index]);
+        },
         confirmStyleAndInitialize() {
             this.showStylePopup = false;
+            // Choose all the columns if they are not selected
+            if (this.selectedColumns.length === 0 || this.arraysAreEqual(this.selectedColumns, this.properties)) {
+                this.updateSelectedColumns("All");
+                this.updateAllSelectedColumns(true);
+            }
+
+            if (this.selectedDbsTables.length > 0) {
+                this.fetchData();
+            }
             this.initializeMap(); // Initialize the map with the new styles
+        },
+        async fetchData() {
+            // Fetch the API data for the map
+            const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/get_data`, {
+                params: {
+                    db_tables: JSON.stringify(this.selectedDbsTables),
+                    columns: JSON.stringify(this.allSelectedColumns ? "All" : this.selectedColumns.filter((column) => column !== 'Season' && !this.properties.includes(column))),
+                    id: JSON.stringify(this.selectedIds),
+                    start_date: this.dateRange.start,
+                    end_date: this.dateRange.end,
+                    date_type: this.dateType,
+                    interval: this.selectedInterval,
+                    statistics: JSON.stringify(this.selectedStatistics),
+                    method: JSON.stringify(this.selectedMethod),
+                }
+            });
+            if (this.selectedInterval === 'seasonally' && !this.selectedMethod.includes('Equal') && !this.selectedColumns.includes('Season')) {
+                this.updateSelectedColumns(this.selectedColumns.concat(['Season']));
+            } else if (this.selectedColumns.includes('Season')) {
+                this.updateSelectedColumns(this.selectedColumns.filter((column) => column !== 'Season'));
+            }
+            this.data = response.data.data;
+            this.stats = response.data.stats;
+            this.statsColumns = response.data.statsColumns;
+            this.ID = this.selectedColumns.find((column) => column.includes('ID'));
+            if (response.data.error) {
+                alert('Error fetching data: ', response.data.error);
+                return;
+            } else {
+                // Wait until the table has rendered, then trigger messages
+                this.$nextTick(() => {
+                    this.pushMessage({ message: `Fetched ${this.selectedColumns.length} columns x ${this.data.length} rows`, type: 'success' });
+                    this.pushMessage({ message: `Loaded ${this.rowLimit} rows`, type: 'success' });
+                    if (this.statsColumns.length > 0) {
+                        this.pushMessage({ message: `Fetched ${this.statsColumns.length} statistics columns for ${this.selectedMethod || this.selectedStatistics}`, type: 'success' });
+                    }
+                });
+            }
         },
         fetchMap() {
             // Destroy existing map instance if it exists
@@ -188,7 +253,7 @@ export default {
 
                 this.updateToolTipColumns(response.data.tooltip);
 
-                this.updateColumns(this.properties);
+                this.addColumns(this.properties);
 
                 if (response.data.error) {
                     alert("Error fetching Leaflet data: ", response.data.error);
@@ -200,20 +265,16 @@ export default {
                     });
                 }
             } catch (error) {
-                alert("Error fetching Leaflet data: ", error);
+                console.error("Error fetching Leaflet data: ", error);
             }
         },
         initializeMap() {
-            if (this.selectedColumns.length === 0 && this.properties) {
-                this.updateSelectedColumns(this.properties);
-            }
-
             try {
                 // Create the Leaflet map instance
                 this.map = L.map('map').setView(this.center || [0, 0], 4);
 
                 // Add a tile layer (equivalent to Leaflet styles)
-                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                L.tileLayer(this.theme === 'light' ? 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png' : 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
                     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
                     crossOrigin: true
                 }).addTo(this.map);
@@ -252,7 +313,18 @@ export default {
                             });
                         },
                         onEachFeature: (feature, layer) => {
-                            // Bind hover and click events
+                            // Bind click events to open table statistics popup
+                            layer.on("click", () => {
+                                const featureId = Object.entries(feature.properties)
+                                    .filter(([key, value]) => key.toLowerCase().includes(this.ID.toLowerCase()) && value !== null)
+                                    .map(([, value]) => value)?.[0] ?? null;
+                                if (featureId) {
+                                    this.selectedFeatureId = featureId;
+                                    this.showTableStatsPopup = true;
+                                }
+                            });
+
+                            // Bind hover events to display popup
                             layer.on('mouseover', (e) => {
                                 e.target.setStyle({
                                     fillOpacity: 0.4,
@@ -347,7 +419,7 @@ export default {
                             title.style.textAlign = "center";
                             title.style.fontSize = "16px";
                             title.style.fontWeight = "bold";
-                            title.style.color = "#333";
+                            title.style.color = this.options.theme === 'light' ? "#333" : "#fff";
                             title.style.marginBottom = "8px";
                             title.style.marginTop = "0";
 
@@ -371,7 +443,7 @@ export default {
                                 text.innerText = `${level.min} - ${level.max}`;
                                 text.style.whiteSpace = "nowrap";
                                 text.style.flex = "1";
-                                text.style.color = "#333";
+                                text.style.color = this.options.theme === 'light' ? "#333" : "#fff";
                             });
 
                             return div;
@@ -382,7 +454,7 @@ export default {
                     L.control.rasterLegend = (opts) => new L.Control.RasterLegend(opts)
 
                     // Add the legend to the map (Position: Bottom Left)
-                    L.control.rasterLegend({ position: 'bottomleft', raster_levels: this.raster_levels }).addTo(this.map);
+                    L.control.rasterLegend({ position: 'bottomleft', raster_levels: this.raster_levels, theme: this.theme }).addTo(this.map);
                 }
 
                 const mapDirectories = this.selectedGeoFolders.map((folder) => folder.split('/').pop());
@@ -391,7 +463,7 @@ export default {
                     type: 'success',
                 });
             } catch (error) {
-                alert('Error loading Leaflet data: ', error);
+                console.error('Error loading Leaflet data: ', error);
             }
         },
         heightVar() {
@@ -426,7 +498,7 @@ export default {
             L.control.northArrow = (opts) => new L.Control.NorthArrow(opts);
 
             // Add it to the map
-            const northArrow = L.control.northArrow({ position: 'topright', northarrow });
+            const northArrow = L.control.northArrow({ position: 'topright', northarrow: this.theme === 'light' ? northarrow : northarrowwhite });
             northArrow.addTo(this.map);
 
             // Wait for the north arrow to load before capturing the map
@@ -469,13 +541,31 @@ export default {
 <style src="../assets/pages.css"></style>
 
 <style scoped>
-.modal-overlay {
+/* Theme variables */
+.light {
+    --background-color: white;
+    --text-color: black;
+    --button-primary: green;
+    --button-danger: red;
+    --overlay-background: rgba(0, 0, 0, 0.5);
+}
+
+.dark {
+    --background-color: #222;
+    --text-color: white;
+    --button-primary: #28a745;
+    --button-danger: #dc3545;
+    --overlay-background: rgba(0, 0, 0, 0.8);
+}
+
+.modal-overlay,
+.modal-overlay-select {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.5);
+    background: var(--overlay-background);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -487,6 +577,7 @@ export default {
     border-radius: 10px;
     width: 300px;
     text-align: center;
+    color: var(--text-color);
 }
 
 .modal-buttons {
@@ -498,16 +589,26 @@ export default {
     padding: 5px 10px;
     border: none;
     cursor: pointer;
+    color: white;
 }
 
 .modal-buttons button:first-child {
-    background: green;
-    color: white;
+    background: var(--button-primary);
 }
 
 .modal-buttons button:last-child {
-    background: red;
-    color: white;
+    background: var(--button-danger);
+}
+
+.close-button {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: none;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+    color: var(--text-color);
 }
 
 .style-settings {

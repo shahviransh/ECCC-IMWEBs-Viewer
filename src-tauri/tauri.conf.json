@@ -1,7 +1,5 @@
 {
   "$schema": "../node_modules/@tauri-apps/cli/config.schema.json",
-  "productName": "Imwebs-Viewer",
-  "version": "0.2.2",
   "identifier": "ca.eccc.imwebs-viewer",
   "build": {
     "frontendDist": "../dist",

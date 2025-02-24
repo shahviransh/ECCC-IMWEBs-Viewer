@@ -6,6 +6,7 @@ const store = createStore({
     selectedDbsTables: [],
     selectedColumns: [],
     selectedGeoFolders: [],
+    geoColumsSet: false,
     selectedIds: [],
     dateRange: {
       start: null,
@@ -35,7 +36,7 @@ const store = createStore({
     exportInterval: "daily",
     exportPath: "dataExport",
     exportFilename: "exported_data",
-    exportFormat: "",
+    exportFormat: "csv",
     graphType: "scatter",
     multiGraphType: [],
     exportOptions: { data: false, stats: false },
@@ -45,6 +46,7 @@ const store = createStore({
     messages: [],
     xAxis: "",
     yAxis: [],
+    allSelectedColumns: false,
   },
   mutations: {
     SET_PROJECT_FOLDER(state, folder) {
@@ -56,8 +58,20 @@ const store = createStore({
     SET_TABLES(state, tables) {
       state.tables = tables;
     },
+    SET_ALL_SELECTED_COLUMNS(state, value) {
+      state.allSelectedColumns = value;
+    },
     SET_COLUMNS(state, { columns }) {
-      state.columns = columns;
+      if (state.pageTitle !== 'Map'){
+        state.geoColumsSet = false;
+      }
+
+      state.columns = state.geoColumsSet
+        ? [
+            ...state.columns,
+            ...columns.filter((c) => !state.columns.includes(c)),
+          ]
+        : columns;
 
       // Remove the selected/export columns that are not in the new columns
       state.selectedColumns = state.selectedColumns.filter((column) =>
@@ -67,18 +81,17 @@ const store = createStore({
         columns.includes(column)
       );
 
-      if (columns.includes(state.dateType)) {
-        state.selectedColumns = state.exportColumns = [
-          state.dateType,
-          ...state.selectedColumns,
-        ];
-      }
-      if (columns.includes("ID")) {
-        state.selectedColumns = state.exportColumns = [
-          "ID",
-          ...state.selectedColumns,
-        ];
-      }
+      state.selectedColumns = state.exportColumns = [
+        ...(columns.includes(state.dateType) ? [state.dateType] : []),
+        ...(columns.includes("ID") ? ["ID"] : []),
+        ...state.selectedColumns,
+      ];
+
+    },
+    ADD_COLUMNS(state, { columns }) {
+      state.geoColumsSet = true;
+      state.columns = [...state.columns, ...columns];
+      console.log(state.columns);
     },
     SET_SELECTED_DB_TABLE_REMOVE(state, table) {
       state.selectedDbsTables = state.selectedDbsTables.filter(
@@ -147,7 +160,7 @@ const store = createStore({
       state.xAxis = xAxis;
     },
     SET_YAXIS(state, yAxis) {
-      state.yAxis = yAxis;
+      state.yAxis = yAxis.includes("ID") ? yAxis : ["ID", ...yAxis];
       state.selectedColumns = [state.xAxis, ...yAxis];
       state.exportColumns = [...state.selectedColumns];
     },
@@ -166,8 +179,7 @@ const store = createStore({
       state.messages = [];
     },
     SET_SELECTED_COLUMNS(state, columns) {
-      state.selectedColumns = columns;
-      state.exportColumns = columns;
+      state.selectedColumns = columns === 'All' ? state.exportColumns = state.columns : state.exportColumns = columns;
     },
     SET_SELECTED_IDS(state, ids) {
       state.selectedIds = ids;
@@ -267,7 +279,7 @@ const store = createStore({
         }
         commit("SET_TABLES", response.data);
       } catch (error) {
-        alert("Error fetching tables: ", error.message);
+        console.error("Error fetching tables: ", error.message);
       }
     },
     async fetchColumns({ commit }, dbTables) {
@@ -309,15 +321,15 @@ const store = createStore({
         });
         commit("SET_TOOLTIP_COLUMNS", response.data.global_columns);
       } catch (error) {
-        alert("Error fetching columns: ", error.message);
+        console.error("Error fetching columns: ", error.message);
       }
     },
     // Add similar actions for other components
     updateModelFolder({ commit }, folder) {
       commit("SET_PROJECT_FOLDER", folder);
     },
-    updateColumns({ commit }, columns) {
-      commit("SET_COLUMNS", { columns });
+    addColumns({ commit }, columns) {
+      commit("ADD_COLUMNS", { columns });
     },
     updateToolTipColumns({ commit }, columns) {
       commit("SET_TOOLTIP_COLUMNS", columns);
@@ -328,6 +340,9 @@ const store = createStore({
     updateSelectedGeoFolders({ commit }, folder) {
       commit("SET_SELECTED_GEO_FOLDERS", folder);
       commit("SET_COLUMNS", { columns: [] });
+    },
+    updateAllSelectedColumns({ commit }, value) {
+      commit("SET_ALL_SELECTED_COLUMNS", value);
     },
     removeSelectedGeoFolder({ commit }, folder) {
       commit("SET_SELECTED_GEO_FOLDER_REMOVE", folder);
