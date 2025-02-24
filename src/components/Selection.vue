@@ -196,7 +196,7 @@ export default {
     gap: 5px;
     margin: 0px auto;
     min-width: 45%;
-    justify-content: space-between;
+    align-items: stretch;
     overflow-y: auto;
 }
 

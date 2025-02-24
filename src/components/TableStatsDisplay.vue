@@ -5,12 +5,14 @@
             <table class="styled-table">
                 <thead>
                     <tr>
-                        <th v-for="column in selectedColumns" :key="column">{{ column }}</th>
+                        <th v-for="column in selectedColumns.filter(c => !properties.includes(c))" :key="column">{{
+                            column }}</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr v-for="(row, index) in visibleData" :key="index">
-                        <td v-for="column in selectedColumns" :key="column">{{ row[column] }}</td>
+                        <td v-for="column in selectedColumns.filter(c => !properties.includes(c))" :key="column">{{
+                            row[column] }}</td>
                     </tr>
                 </tbody>
             </table>
@@ -45,7 +47,8 @@ export default {
         stats: Array,
         selectedColumns: Array,
         statsColumns: Array,
-        id: [String, null],
+        properties: Array,
+        id: [Number, null],
         ID: String,
         rowLimit: [Number],
     },
@@ -53,30 +56,26 @@ export default {
         return {
             visibleData: [],
             canLoadMore: true,
+            filteredData: [],
         };
     },
-    computed: {
-        filteredData() {
-            if (!this.id) {
-                return this.data;
-            }
-            return this.data.filter(row => row[this.ID] === this.id);
-        },
+    mounted() {
+        this.filteredData = this.id ? this.data.filter(row => row[this.ID] === this.id) : this.data;
     },
     methods: {
         // Load initial rows when the data is loaded
         loadInitialRows() {
-            this.visibleData = this.data.slice(0, this.rowLimit);
-            this.canLoadMore = this.data.length > this.rowLimit;
+            this.visibleData = this.filteredData.slice(0, this.rowLimit);
+            this.canLoadMore = this.filteredData.length > this.rowLimit;
         },
         // Load more rows when the load more button is clicked
         loadMoreRows() {
             const nextRowLimit = this.visibleData.length + this.rowLimit;
-            const nextRows = this.data.slice(this.visibleData.length, nextRowLimit);
+            const nextRows = this.filteredData.slice(this.visibleData.length, nextRowLimit);
             // Append the next rows to the visible data
             this.visibleData = [...this.visibleData, ...nextRows];
             // Check if we can load more rows
-            if (this.visibleData.length >= this.data.length) {
+            if (this.visibleData.length >= this.filteredData.length) {
                 this.canLoadMore = false;
             }
         },

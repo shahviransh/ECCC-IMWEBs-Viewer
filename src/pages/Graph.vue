@@ -94,16 +94,6 @@ export default {
 
             // Create the chart options
             return {
-                title: {
-                    text: this.getTitle(),
-                    left: 'center',
-                    top: '0%',
-                    textStyle: {
-                        fontSize: 16,
-                        fontWeight: 'bold',
-                        color: this.theme === 'dark' ? 'white' : 'black',
-                    }
-                },
                 tooltip: {
                     trigger: 'axis',
                 },
@@ -259,10 +249,6 @@ export default {
             // Set the height based on the environment
             const isTauri = window.isTauri !== undefined;
             return isTauri ? "calc(100vh - 14vh)" : "calc(100vh - 16vh)";
-        },
-        getTitle() {
-            // Set the title based on the first three letters of selected columns names
-            return this.selectedColumns.length ? this.selectedColumns.filter(column => column !== this.dateType && column !== this.ID).map(col => col.slice(0, 3)).join(" - ") : "Graph";
         },
         getType(column) {
             // Use the Vuex state multiGraphType, which updates dynamically

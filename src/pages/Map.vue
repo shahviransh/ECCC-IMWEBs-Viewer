@@ -9,7 +9,7 @@
 
         <!-- Component 2: Column Navigation -->
         <div class="column-navigation">
-            <ColumnDropdown />
+            <ColumnDropdown :selectedDbsTables="selectedDbsTables"/>
         </div>
         <div class="right-panel">
             <!-- Component 3: Selection, Interval, Aggregation, and Export Config -->
@@ -83,7 +83,7 @@
             <div v-if="showTableStatsPopup" class="modal-overlay">
                 <div class="modal">
                     <button class="close-button" @click="showTableStatsPopup = false">&times;</button>
-                    <TableStatsDisplay :data="data" :stats="stats" :statsColumns="statsColumns"
+                    <TableStatsDisplay :data="data" :stats="stats" :statsColumns="statsColumns" :properties="properties"
                         :selectedColumns="selectedColumns" :id="selectedFeatureId" :ID="ID" :rowLimit="100" />
                 </div>
             </div>
@@ -157,7 +157,7 @@ export default {
                 if (newFolders.length > 0) {
                     this.fetchGeoJson();
                 }
-            }, 3000), // Adjust debounce delay as needed
+            }, 1000), // Adjust debounce delay as needed
             deep: true
         },
     },
@@ -565,13 +565,18 @@ export default {
     left: 0;
     width: 100%;
     height: 100%;
-    background: var(--overlay-background);
     display: flex;
     justify-content: center;
     align-items: center;
+    z-index: 1000;
+}
+
+.modal-overlay-select {
+    background: var(--overlay-background);
 }
 
 .modal {
+    position: relative;
     background: var(--background-color);
     padding: 20px;
     border-radius: 10px;
@@ -602,13 +607,14 @@ export default {
 
 .close-button {
     position: absolute;
-    top: 10px;
-    right: 10px;
+    top: 0px;
+    right: 0px;
     background: none;
     border: none;
     font-size: 20px;
     cursor: pointer;
     color: var(--text-color);
+    z-index: 1100;
 }
 
 .style-settings {

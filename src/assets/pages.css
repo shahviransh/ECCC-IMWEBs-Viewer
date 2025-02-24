@@ -125,7 +125,7 @@ label {
     /* Takes 2/4 of the horizontal space */
     height: calc(100% - max(180px, 15%));  /* Takes remaining space */
     margin: 0px;
-    padding: 5px;
+    padding: 0px;
     overflow: auto;
 }
 

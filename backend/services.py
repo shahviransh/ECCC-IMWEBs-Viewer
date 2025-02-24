@@ -286,11 +286,6 @@ def save_to_file(
         "bar": "column",
         "scatter": "scatter",
     }
-    graph_title = (
-        "".join(list(map(lambda x: x["name"][:4], multi_graph_type)))
-        if multi_graph_type != []
-        else ""
-    )
 
     # Check if the dataframe contains an ID column
     ID = next((col for col in dataframe1.columns if "ID" in col), None)
@@ -402,7 +397,6 @@ def save_to_file(
                     "num_font": {"rotation": -45},
                 }
             )
-            chart.set_title({"name": graph_title})
             chart.set_y_axis({"name": "Values (Smaller Values)"})
             chart.set_y2_axis({"name": "Values (Larger Values)"})  # Add second y-axis
 
@@ -475,8 +469,6 @@ def save_to_file(
         ax1.legend(loc="upper left")
         if ax2_has_data:
             ax2.legend(loc="upper right")
-
-        ax1.set_title(f"{graph_title}")
 
         # Rotate x-axis labels (explicitly for ax1 and ax2 if shared x-axis is used)
         for tick in ax1.get_xticklabels():
