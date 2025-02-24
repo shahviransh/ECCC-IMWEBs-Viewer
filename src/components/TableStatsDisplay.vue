@@ -5,13 +5,13 @@
             <table class="styled-table">
                 <thead>
                     <tr>
-                        <th v-for="column in selectedColumns.filter(c => !properties.includes(c))" :key="column">{{
+                        <th v-for="column in selectedColumnsFilter" :key="column">{{
                             column }}</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr v-for="(row, index) in visibleData" :key="index">
-                        <td v-for="column in selectedColumns.filter(c => !properties.includes(c))" :key="column">{{
+                        <td v-for="column in selectedColumnsFilter" :key="column">{{
                             row[column] }}</td>
                     </tr>
                 </tbody>
@@ -48,7 +48,7 @@ export default {
         selectedColumns: Array,
         statsColumns: Array,
         properties: Array,
-        id: [Number, null],
+        id: Number,
         ID: String,
         rowLimit: [Number],
     },
@@ -59,12 +59,15 @@ export default {
             filteredData: [],
         };
     },
-    mounted() {
-        this.filteredData = this.id ? this.data.filter(row => row[this.ID] === this.id) : this.data;
+    computed: {
+        selectedColumnsFilter() {
+            return this.properties ? this.selectedColumns.filter(c => !properties.includes(c)) : this.selectedColumns
+        },
     },
     methods: {
         // Load initial rows when the data is loaded
         loadInitialRows() {
+            this.filteredData = this.data.filter(row => row.id === this.id);
             this.visibleData = this.filteredData.slice(0, this.rowLimit);
             this.canLoadMore = this.filteredData.length > this.rowLimit;
         },

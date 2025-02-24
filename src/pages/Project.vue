@@ -25,7 +25,7 @@
                 </span>
             </div>
             <!-- Component 4: Main View (Table and Stats Display) -->
-            <TableStatsDisplay :data="data" :stats="stats" :statsColumns="statsColumns" :selectedColumns="selectedColumns" :id="null"  :ID="ID" :rowLimit="rowLimit" />
+            <TableStatsDisplay :data="data" :stats="stats" :statsColumns="statsColumns" :selectedColumns="selectedColumns" :ID="ID" :rowLimit="rowLimit" />
         </div>
     </div>
 </template>
