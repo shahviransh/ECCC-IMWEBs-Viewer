@@ -15,8 +15,8 @@ from flask import abort
 import sys
 import json
 import threading
-from osgeo import ogr, osr, gdal
 import pyogrio
+from osgeo import ogr, osr, gdal
 
 alias_mapping = {}
 global_dbs_tables_columns = {}
