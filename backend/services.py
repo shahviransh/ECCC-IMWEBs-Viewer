@@ -16,6 +16,7 @@ import sys
 import json
 import threading
 from osgeo import ogr, osr, gdal
+import pyogrio
 
 alias_mapping = {}
 global_dbs_tables_columns = {}
