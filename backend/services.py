@@ -1337,7 +1337,7 @@ def export_map_service(image, form_data):
             img.convert("RGB").save(image_path, output_format.upper(), quality=95)
 
         # Export shapefiles or raster datasets as images
-        exported_images = []
+        exported_images = [image_path]
         fig, ax = plt.subplots(figsize=(10, 8))
         raster_data = None
 
