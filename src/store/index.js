@@ -90,7 +90,8 @@ const store = createStore({
     },
     ADD_COLUMNS(state, { columns }) {
       state.geoColumsSet = true;
-      state.columns = [...state.columns, ...columns];
+      const temp = columns.filter((c) => !state.columns.includes(c));
+      state.columns = [...state.columns, ...temp];
     },
     SET_SELECTED_DB_TABLE_REMOVE(state, table) {
       state.selectedDbsTables = state.selectedDbsTables.filter(

@@ -394,6 +394,8 @@ export default {
                 // Add Scale Control
                 L.control.scale({ position: "bottomleft", metric: true, imperial: true }).addTo(this.map);
 
+                const mapDirectories = this.selectedGeoFolders.map((folder) => folder.split('/').pop());
+
                 if (this.raster_levels.length > 0) {
                     // Create a custom legend control
                     L.Control.RasterLegend = L.Control.extend({
@@ -414,7 +416,7 @@ export default {
 
                             // Legend title
                             const title = L.DomUtil.create("h4", "", div);
-                            title.innerText = "Raster Legend";
+                            title.innerText = `${this.options.tifFiles} Legend`;
                             title.style.textAlign = "center";
                             title.style.fontSize = "16px";
                             title.style.fontWeight = "bold";
@@ -453,10 +455,9 @@ export default {
                     L.control.rasterLegend = (opts) => new L.Control.RasterLegend(opts)
 
                     // Add the legend to the map (Position: Bottom Left)
-                    L.control.rasterLegend({ position: 'bottomleft', raster_levels: this.raster_levels, theme: this.theme }).addTo(this.map);
+                    L.control.rasterLegend({ position: 'bottomleft', raster_levels: this.raster_levels, theme: this.theme, tifFiles: mapDirectories.filter(c => c.includes('.tif')).join(",") }).addTo(this.map);
                 }
 
-                const mapDirectories = this.selectedGeoFolders.map((folder) => folder.split('/').pop());
                 this.pushMessage({
                     message: `${mapDirectories.join(", ")} map loaded`,
                     type: 'success',
