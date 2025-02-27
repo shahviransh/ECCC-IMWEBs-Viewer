@@ -1070,6 +1070,44 @@ def get_metadata_colormap(band):
     return plt.get_cmap(colormap_name)
 
 
+def get_geojson_metadata(geojson_path):
+    """Extract metadata from an existing GeoJSON file."""
+    if not os.path.exists(geojson_path):
+        return None
+
+    with open(geojson_path, "r") as file:
+        geojson_data = json.load(file)
+
+    features = geojson_data.get("features", [])
+    feature_count = len(features)
+
+    x_min = y_min = float("inf")
+    x_max = y_max = float("-inf")
+
+    field_names = []
+
+    for feature in features:
+        geom = feature.get("geometry", {})
+        props = feature.get("properties", {})
+
+        # Update bounding box
+        bbox = feature.get("bbox", [])
+        if bbox:
+            x_min = min(x_min, bbox[0])
+            y_min = min(y_min, bbox[1])
+            x_max = max(x_max, bbox[2])
+            y_max = max(y_max, bbox[3])
+
+        # Collect property field names
+        field_names.extend(list(props.keys()))
+
+    return {
+        "feature_count": feature_count,
+        "extent": (round(x_min, 6), round(x_max, 6), round(y_min, 6), round(y_max, 6)),
+        "field_names": list(dict.fromkeys(field_names)),
+    }
+
+
 def process_geospatial_data(data):
     """
     Process a geospatial file (shapefile or raster) and return GeoJSON/Tiff Image Url, bounds, and center.
@@ -1098,9 +1136,10 @@ def process_geospatial_data(data):
             layer = dataset.GetLayer()
 
             # Handle Spatial Reference System
-            source_srs = layer.GetSpatialRef()  # Source spatial reference system
+            source_srs = layer.GetSpatialRef()
             if not source_srs:
-                continue
+                source_srs = osr.SpatialReference()
+                source_srs.ImportFromEPSG(26917)  # Default UTM Zone 17N if unspecified
 
             target_srs = osr.SpatialReference()
             target_srs.ImportFromEPSG(4326)  # WGS84 (longitude/latitude)
@@ -1129,40 +1168,36 @@ def process_geospatial_data(data):
                 for i in range(layer_defn.GetFieldCount())
             ]
 
-            # Reproject each feature
+            # Reproject features in batches if needed
+            feature_buffer = []
+            BATCH_SIZE = 1000
             for feature in layer:
                 geom = feature.GetGeometryRef()
                 if geom:
                     geom.Transform(coord_transform)  # Transform geometry to WGS84
-                    reprojected_feature = ogr.Feature(reprojected_layer.GetLayerDefn())
-                    reprojected_feature.SetGeometry(geom)
-                    for i in range(feature.GetFieldCount()):
-                        reprojected_feature.SetField(i, feature.GetField(i))
-                    reprojected_layer.CreateFeature(reprojected_feature)
-                    reprojected_feature = None
 
-            # Convert reprojected layer to GeoJSON
-            geojson_driver = ogr.GetDriverByName("GeoJSON")
-            geojson_path = os.path.splitext(file_path)[0] + "_output.geojson"
+                # Create a new feature and store in buffer
+                reprojected_feature = ogr.Feature(reprojected_layer.GetLayerDefn())
+                reprojected_feature.SetGeometry(geom)
+                for i in range(feature.GetFieldCount()):
+                    reprojected_feature.SetField(i, feature.GetField(i))
 
-            # Remove existing GeoJSON file if it exists
-            if os.path.exists(geojson_path):
-                os.remove(geojson_path)
+                feature_buffer.append(reprojected_feature)
 
-            geojson_dataset = geojson_driver.CreateDataSource(geojson_path)
-            geojson_dataset.CopyLayer(reprojected_layer, "layer")
-            geojson_dataset = None
+                # Bulk insert when buffer reaches batch size
+                if len(feature_buffer) >= BATCH_SIZE:
+                    reprojected_layer.StartTransaction()
+                    for f in feature_buffer:
+                        reprojected_layer.CreateFeature(f)
+                    reprojected_layer.CommitTransaction()
+                    feature_buffer.clear()
 
-            with open(geojson_path, "r") as file:
-                geojson_data = json.load(file)
-
-            # Remove the `crs` member if it exists
-            if "crs" in geojson_data:
-                del geojson_data["crs"]
-
-            # Save the updated GeoJSON back to the file
-            with open(geojson_path, "w") as file:
-                json.dump(geojson_data, file)
+            # Insert remaining features
+            if feature_buffer:
+                reprojected_layer.StartTransaction()
+                for f in feature_buffer:
+                    reprojected_layer.CreateFeature(f)
+                reprojected_layer.CommitTransaction()
 
             # Calculate bounds in WGS84
             extent = reprojected_layer.GetExtent()  # (minX, maxX, minY, maxY)
@@ -1178,6 +1213,33 @@ def process_geospatial_data(data):
                 [y_max, x_max],
             ]
 
+            shp_metadata = {
+                "feature_count": reprojected_layer.GetFeatureCount(),
+                "extent": (round(x_min, 6), round(x_max, 6), round(y_min, 6), round(y_max, 6)),
+                "field_names": properties,
+            }
+            geojson_metadata = {}
+            geojson_path = os.path.splitext(file_path)[0] + "_output.geojson"
+
+            # Check if a GeoJSON file already exists and extract metadata
+            if os.path.exists(geojson_path):
+                geojson_metadata = get_geojson_metadata(geojson_path)
+
+            if shp_metadata != geojson_metadata:
+                # Convert reprojected layer to GeoJSON
+                geojson_driver = ogr.GetDriverByName("GeoJSON")
+
+                geojson_dataset = geojson_driver.CreateDataSource(geojson_path)
+                geojson_dataset.CopyLayer(
+                    reprojected_layer,
+                    "layer",
+                    ["RFC7946=YES", "WRITE_BBOX=YES"],
+                )
+                geojson_dataset = None
+
+            with open(geojson_path, "r") as file:
+                geojson_data = json.load(file)
+
             # Update the combined bounds
             (overlap, combined_bounds) = bounds_overlap_or_similar(
                 combined_bounds, bounds
@@ -1186,7 +1248,15 @@ def process_geospatial_data(data):
             # Add GeoJSON data/properties to the combined GeoJSON/properties only if the combined bounds are not far apart
             if overlap:
                 if combined_geojson:
-                    combined_geojson["features"].extend(geojson_data["features"])
+
+                    def append_features(geojson_data):
+                        """Efficiently append features to GeoJSON."""
+                        for feature in geojson_data["features"]:
+                            yield feature
+
+                    # Append features to the combined GeoJSON using generator
+                    for feature in append_features(geojson_data):
+                        combined_geojson["features"].append(feature)
                 else:
                     combined_geojson = geojson_data
                 if combined_properties:
@@ -1244,7 +1314,7 @@ def process_geospatial_data(data):
             cmap = get_metadata_colormap(band)
 
             if not os.path.exists(output_image_path):
-                raster_data, raster_normalized = get_raster_normalized(band)
+                raster_data, raster_normalized, _, _ = get_raster_normalized(band)
 
                 rgba_colored = cmap(raster_normalized)  # Apply colormap (RGBA values)
 
@@ -1293,9 +1363,16 @@ def process_geospatial_data(data):
         }
         return order.get(geometry_type, 4)  # Default to last if unknown type
 
-    # Sort combined GeoJSON features by geometry type
+    def sorted_merge(*iterables, key=None):
+        import heapq
+
+        """Efficiently merge sorted iterables."""
+        return heapq.merge(*iterables, key=key)
+
     if combined_geojson:
-        combined_geojson["features"].sort(key=get_geometry_order)
+        combined_geojson["features"] = list(
+            sorted_merge(combined_geojson["features"], key=get_geometry_order)
+        )
     return {
         "geojson": combined_geojson,
         "bounds": combined_bounds,
@@ -1344,7 +1421,7 @@ def export_map_service(image, form_data):
 
         for file_path in file_paths:
             fig, ax = plt.subplots(figsize=(10, 8))  # Create a new figure for each file
-            
+
             if file_path.endswith(".shp"):
                 gdf = gpd.read_file(file_path)
                 gdf.plot(ax=ax, edgecolor="black")
@@ -1389,7 +1466,9 @@ def export_map_service(image, form_data):
 
             # Save plot
             file_name = os.path.basename(file_path).split(".")[0]
-            image_path = os.path.join(export_dir, f"{output_filename}_{file_name}.{output_format}")
+            image_path = os.path.join(
+                export_dir, f"{output_filename}_{file_name}.{output_format}"
+            )
             plt.savefig(image_path, dpi=300, format=output_format)
             plt.close(fig)
 
