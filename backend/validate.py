@@ -3,6 +3,7 @@ import re
 import os
 from config import Config
 
+
 def validate_request_args(schema, request_args):
     """
     Validates the request arguments using Cerberus and applies additional security checks.
@@ -68,8 +69,19 @@ def validate_get_data_args(request_args):
             "default": "daily",
             "regex": r"^[a-zA-Z]+$",
         },
-        "method": {"type": "string", "required": True, "default": "[Equal]"},
-        "statistics": {"type": "string", "required": True, "default": "[None]"},
+        "method": {"type": "string", "required": True, "default": "['Equal']"},
+        "statistics": {"type": "string", "required": True, "default": "['None']"},
+        "data": {"type": "string", "required": False},
+        "month": {
+            "type": "string",
+            "required": False,
+            "allowed": ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"],
+        },
+        "season": {
+            "type": "string",
+            "required": False,
+            "allowed": ["summer", "winter", "fall", "spring"],
+        },
     }
     return validate_request_args(schema, request_args)
 
@@ -105,8 +117,8 @@ def validate_export_data_args(request_args):
             "default": "daily",
             "regex": r"^[a-zA-Z]+$",
         },
-        "method": {"type": "string", "required": True, "default": "[Equal]"},
-        "statistics": {"type": "string", "required": True, "default": "[None]"},
+        "method": {"type": "string", "required": True, "default": "['Equal']"},
+        "statistics": {"type": "string", "required": True, "default": "['None']"},
         "export_filename": {
             "type": "string",
             "required": True,
