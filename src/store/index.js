@@ -34,6 +34,8 @@ const store = createStore({
     selectedStatistics: ["None"],
     selectedInterval: "daily",
     exportInterval: "daily",
+    selectedSeason: "",
+    selectedMonth: "",
     exportPath: "dataExport",
     exportFilename: "exported_data",
     exportFormat: "csv",
@@ -223,6 +225,12 @@ const store = createStore({
     },
     SET_EXPORT_INTERVAL(state, interval) {
       state.exportInterval = interval;
+    },
+    SET_SELECTED_SEASON(state, season) {
+      state.selectedSeason = season;
+    },
+    SET_SELECTED_MONTH(state, month) {
+      state.selectedMonth = month;
     },
     SET_EXPORT_PATH(state, path) {
       state.exportPath = path;
@@ -421,6 +429,12 @@ const store = createStore({
     },
     updateExportInterval({ commit }, interval) {
       commit("SET_EXPORT_INTERVAL", interval);
+    },
+    updateSelectedSeason({ commit }, season) {
+      commit("SET_SELECTED_SEASON", season);
+    },
+    updateSelectedMonth({ commit }, month) {
+      commit("SET_SELECTED_MONTH", month);
     },
     updateExportPath({ commit }, path) {
       commit("SET_EXPORT_PATH", path);

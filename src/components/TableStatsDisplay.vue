@@ -21,7 +21,6 @@
                 <button class="load-more-button" @click="loadMoreRows">Load More</button>
             </div>
         </div>
-        <h2 v-if="stats.length > 0">Stats for all selected IDs:</h2>
         <!-- Stats Container with Scrollable Body -->
         <div class="stats-container">
             <table class="styled-table">
@@ -48,7 +47,7 @@ export default {
         selectedColumns: Array,
         statsColumns: Array,
         properties: Array,
-        id: Number,
+        id: [Number, null],
         ID: String,
         rowLimit: [Number],
     },
