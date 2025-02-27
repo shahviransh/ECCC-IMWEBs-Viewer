@@ -98,7 +98,7 @@ export default {
                 });
                 if (this.selectedInterval === 'seasonally' && !this.selectedMethod.includes('Equal') && !this.selectedColumns.includes('Season')) {
                     this.updateSelectedColumns(this.selectedColumns.concat(['Season']));
-                } else if (this.selectedColumns.includes('Season')) {
+                } else if (this.selectedColumns.includes('Season') && this.selectedInterval !== 'seasonally'){
                     this.updateSelectedColumns(this.selectedColumns.filter((column) => column !== 'Season'));
                 }
                 this.data = response.data.data;
@@ -150,7 +150,7 @@ export default {
                 else { this.pushMessage({ message: `Exported ${this.exportColumns.length} columns x ${this.data.length} rows`, type: 'success' }); }
                 if (this.selectedInterval === 'seasonally' && !this.selectedMethod.includes('Equal') && !this.selectedColumns.includes('Season')) {
                     this.updateSelectedColumns(this.selectedColumns.concat(['Season']));
-                } else if (this.selectedColumns.includes('Season')) {
+                } else if (this.selectedColumns.includes('Season') && this.selectedInterval !== 'seasonally'){
                     this.updateSelectedColumns(this.selectedColumns.filter((column) => column !== 'Season'));
                 }
             } catch (error) {
