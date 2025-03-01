@@ -47,15 +47,12 @@ export default {
         selectedColumns: Array,
         statsColumns: Array,
         properties: Array,
-        id: [Number, null],
-        ID: String,
         rowLimit: [Number],
     },
     data() {
         return {
             visibleData: [],
             canLoadMore: true,
-            filteredData: [],
         };
     },
     computed: {
@@ -66,17 +63,17 @@ export default {
     methods: {
         // Load initial rows when the data is loaded
         loadInitialRows() {
-            this.visibleData = this.filteredData.slice(0, this.rowLimit);
-            this.canLoadMore = this.filteredData.length > this.rowLimit;
+            this.visibleData = this.data.slice(0, this.rowLimit);
+            this.canLoadMore = this.data.length > this.rowLimit;
         },
         // Load more rows when the load more button is clicked
         loadMoreRows() {
             const nextRowLimit = this.visibleData.length + this.rowLimit;
-            const nextRows = this.filteredData.slice(this.visibleData.length, nextRowLimit);
+            const nextRows = this.data.slice(this.visibleData.length, nextRowLimit);
             // Append the next rows to the visible data
             this.visibleData = [...this.visibleData, ...nextRows];
             // Check if we can load more rows
-            if (this.visibleData.length >= this.filteredData.length) {
+            if (this.visibleData.length >= this.data.length) {
                 this.canLoadMore = false;
             }
         },
@@ -85,7 +82,6 @@ export default {
         data: {
             immediate: true,
             handler() {
-                this.filteredData = this.id ? this.data.filter(row => row[this.ID] === this.id) : this.data;
                 this.loadInitialRows();
             }
         }

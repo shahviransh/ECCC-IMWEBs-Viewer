@@ -128,6 +128,9 @@ def register_routes(app, cache):
         """
         Serve the TIF file from the specified path.
         """
+        # Ensure the file has a .tif or .tiff extension
+        if not (filename.lower().endswith(".tif") or filename.lower().endswith(".tiff")):
+            return jsonify({"error": "Only .tif or .tiff files are allowed"})
 
         # Validate the file path
         validation_response = validate_serve_tif_args(filename)
