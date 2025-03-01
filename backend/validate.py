@@ -71,7 +71,6 @@ def validate_get_data_args(request_args):
         },
         "method": {"type": "string", "required": True, "default": "['Equal']"},
         "statistics": {"type": "string", "required": True, "default": "['None']"},
-        "data": {"type": "string", "required": False},
         "month": {
             "type": "string",
             "required": False,
