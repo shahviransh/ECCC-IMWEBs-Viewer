@@ -25,7 +25,8 @@
                 </span>
             </div>
             <!-- Component 4: Main View (Table and Stats Display) -->
-            <TableStatsDisplay :data="data" :stats="stats" :statsColumns="statsColumns" :selectedColumns="selectedColumns" :rowLimit="rowLimit" />
+            <TableStatsDisplay :data="data" :stats="stats" :statsColumns="statsColumns"
+                :selectedColumns="selectedColumns" :rowLimit="rowLimit" />
         </div>
     </div>
 </template>
@@ -98,7 +99,7 @@ export default {
                 });
                 if (this.selectedInterval === 'seasonally' && !this.selectedMethod.includes('Equal') && !this.selectedColumns.includes('Season')) {
                     this.updateSelectedColumns(this.selectedColumns.concat(['Season']));
-                } else if (this.selectedColumns.includes('Season') && this.selectedInterval !== 'seasonally'){
+                } else if (this.selectedColumns.includes('Season') && this.selectedInterval !== 'seasonally') {
                     this.updateSelectedColumns(this.selectedColumns.filter((column) => column !== 'Season'));
                 }
                 this.data = response.data.data;
@@ -114,12 +115,12 @@ export default {
                         this.pushMessage({ message: `Fetched ${this.selectedColumns.length} columns x ${this.data.length} rows`, type: 'success' });
                         this.pushMessage({ message: `Loaded ${this.rowLimit} rows`, type: 'success' });
                         if (this.statsColumns.length > 0) {
-                            this.pushMessage({ message: `Fetched ${this.statsColumns.length} statistics columns for ${this.selectedMethod || this.selectedStatistics}`, type: 'success' });
+                            this.pushMessage({ message: `Fetched ${this.statsColumns.length - 1} statistics columns for ${(this.selectedMethod.length >= this.selectedStatistics.length ? this.selectedMethod : this.selectedStatistics).join(", ")}`, type: 'success' });
                         }
                     });
                 }
             } catch (error) {
-                console.error('Error fetching data: ',  error.message);
+                console.error('Error fetching data: ', error.message);
             }
         },
         // Export data to a file
@@ -150,11 +151,11 @@ export default {
                 else { this.pushMessage({ message: `Exported ${this.exportColumns.length} columns x ${this.data.length} rows`, type: 'success' }); }
                 if (this.selectedInterval === 'seasonally' && !this.selectedMethod.includes('Equal') && !this.selectedColumns.includes('Season')) {
                     this.updateSelectedColumns(this.selectedColumns.concat(['Season']));
-                } else if (this.selectedColumns.includes('Season') && this.selectedInterval !== 'seasonally'){
+                } else if (this.selectedColumns.includes('Season') && this.selectedInterval !== 'seasonally') {
                     this.updateSelectedColumns(this.selectedColumns.filter((column) => column !== 'Season'));
                 }
             } catch (error) {
-                console.error('Error exporting data: ',  error.message);
+                console.error('Error exporting data: ', error.message);
             }
         },
     },

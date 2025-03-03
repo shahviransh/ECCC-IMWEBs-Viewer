@@ -26,7 +26,7 @@ from validate import (
 def register_routes(app, cache):
     @app.route("/api/get_data", methods=["GET"])
     @cache.cached(
-        timeout=120, query_string=True
+        timeout=300, query_string=True
     )
     def get_data():
         data = request.args
@@ -56,7 +56,7 @@ def register_routes(app, cache):
 
     @app.route("/api/get_tables", methods=["GET"])
     @cache.cached(
-        timeout=120, query_string=True
+        timeout=300, query_string=True
     )
     def get_tables():
         data = request.args
@@ -89,7 +89,7 @@ def register_routes(app, cache):
 
     @app.route("/api/get_table_details", methods=["GET"])
     @cache.cached(
-        timeout=120, query_string=True
+        timeout=300, query_string=True
     )  # Cache this endpoint for 2 minutes (120 seconds)
     def get_table_details():
         """
@@ -107,7 +107,7 @@ def register_routes(app, cache):
         return jsonify(columns_and_time_range_dict)
 
     @app.route("/api/geospatial", methods=["GET"])
-    @cache.cached(timeout=120, query_string=True)
+    @cache.cached(timeout=300, query_string=True)
     def geospatial():
         """
         API endpoint to return GeoJSON/Tiff Image Url, bounds, and center.

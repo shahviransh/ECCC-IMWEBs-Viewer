@@ -264,7 +264,7 @@ export default {
                     this.pushMessage({ message: `Fetched ${this.selectedColumns.length} columns x ${this.data.length} rows`, type: 'success' });
                     this.pushMessage({ message: `Loaded ${this.rowLimit} rows`, type: 'success' });
                     if (this.statsColumns.length > 0) {
-                        this.pushMessage({ message: `Fetched ${this.statsColumns.length} statistics columns for ${this.selectedMethod || this.selectedStatistics}`, type: 'success' });
+                        this.pushMessage({ message: `Fetched ${this.statsColumns.length - 1} statistics columns for ${(this.selectedMethod.length >= this.selectedStatistics.length ? this.selectedMethod : this.selectedStatistics).join(", ")}`, type: 'success' });
                     }
                 });
             }
