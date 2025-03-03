@@ -74,12 +74,12 @@ def validate_get_data_args(request_args):
         "month": {
             "type": "string",
             "required": False,
-            "allowed": ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"],
+            "allowed": ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "null"],
         },
         "season": {
             "type": "string",
             "required": False,
-            "allowed": ["summer", "winter", "fall", "spring"],
+            "allowed": ["summer", "winter", "fall", "spring", "null"],
         },
     }
     return validate_request_args(schema, request_args)

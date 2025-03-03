@@ -36,8 +36,10 @@ def fetch_data_service(data):
         end_date = data.get("end_date")
         date_type = data.get("date_type")
         interval = data.get("interval", "daily")
-        method = json.loads(data.get("method", "[Equal]"))
-        statistics = json.loads(data.get("statistics", "[None]"))
+        method = json.loads(data.get("method", "['Equal']"))
+        statistics = json.loads(data.get("statistics", "['None']"))
+        month = json.loads(data.get("month", None))
+        season = json.loads(data.get("season", None))
         stats_df = None
 
         # Initialize DataFrame to store the merged data
@@ -122,13 +124,15 @@ def fetch_data_service(data):
             return {"error": "No data found for the specified filters."}
 
         # Perform time conversion and aggregation if necessary
-        if "Equal" not in method and interval != "daily":
+        if method != ["Equal"] and interval != "daily":
             if not date_type:
                 return {
                     "error": "Time conversion and statistics cannot be performed for non-time series data"
                 }
-            df, stats_df = aggregate_data(df, interval, method, date_type)
-        elif "None" not in statistics:
+            df, stats_df = aggregate_data(
+                df, interval, method, date_type, month, season
+            )
+        elif statistics != ["None"]:
             if not date_type:
                 return {
                     "error": "Time conversion and statistics cannot be performed for non-time series data"
@@ -560,7 +564,9 @@ def get_files_and_folders(data):
                 file_rel_path = file_rel_path[file_rel_path.find(base_folder) :]
 
                 # Only include .shp, .db3, and .tif files
-                if file_rel_path.endswith((".shp", ".db3", ".tif")):
+                if file_rel_path.endswith(
+                    (".shp", ".db3", ".tif", ".tiff")
+                ) and not file_rel_path.endswith("reprojected.tif"):
                     if file_rel_path.endswith(".db3") and "lookup" not in file_rel_path:
                         folder_tree.add(os.path.join(Config.PATHFILE, file_rel_path))
                     elif file_rel_path.endswith(".db3") and "lookup" in file_rel_path:
@@ -586,7 +592,6 @@ def get_files_and_folders(data):
         return {"error": str(e)}
 
 
-# Example function to map date strings to seasons
 def get_season_from_date(date_str):
     """Map date strings to seasons."""
     month = date_str.month
@@ -601,7 +606,7 @@ def get_season_from_date(date_str):
 
 
 # Helper function to apply time interval aggregation
-def aggregate_data(df, interval, method, date_type):
+def aggregate_data(df, interval, method, date_type, month, season):
     """Aggregate data based on the specified interval and method."""
     # Convert the date_type column to datetime
     df[date_type] = pd.to_datetime(df[date_type])
@@ -611,12 +616,16 @@ def aggregate_data(df, interval, method, date_type):
     # Resample the data based on the specified interval
     if interval == "monthly":
         resampled_df = df.groupby(ID).resample("ME").first()
+        if month:
+            resampled_df = resampled_df[resampled_df[date_type].dt.month == int(month)]
     elif interval == "seasonally":
         # Custom resampling for seasons
         df.reset_index(inplace=True)
         df["Season"] = df[date_type].apply(lambda x: get_season_from_date(x))
         df.set_index(date_type, inplace=True)
         resampled_df = df
+        if season:
+            resampled_df = resampled_df[resampled_df["Season"] == season.title()]
     elif interval == "yearly":
         resampled_df = df.groupby(ID).resample("YE").first()
     else:
@@ -1081,23 +1090,18 @@ def get_geojson_metadata(geojson_path):
     features = geojson_data.get("features", [])
     feature_count = len(features)
 
-    x_min = y_min = float("inf")
-    x_max = y_max = float("-inf")
+    bbox = geojson_data.get("bbox", [])
+
+    x_min, x_max, y_min, y_max = None, None, None, None
+
+    if bbox:
+        x_min, x_max, y_min, y_max = bbox[0], bbox[2], bbox[1], bbox[3]
 
     field_names = []
 
     for feature in features:
         geom = feature.get("geometry", {})
         props = feature.get("properties", {})
-
-        # Update bounding box
-        bbox = feature.get("bbox", [])
-        if bbox:
-            x_min = min(x_min, bbox[0])
-            y_min = min(y_min, bbox[1])
-            x_max = max(x_max, bbox[2])
-            y_max = max(y_max, bbox[3])
-
         # Collect property field names
         field_names.extend(list(props.keys()))
 
@@ -1267,7 +1271,7 @@ def process_geospatial_data(data):
             # Save properties for each shapefile path
             tool_tip[toolTipKey] = properties
         # Handle GeoTIFF files
-        elif file_path.endswith(".tif"):
+        elif file_path.endswith(".tif") or file_path.endswith(".tiff"):
             raster_dataset = gdal.Open(file_path)
             if not raster_dataset:
                 continue
@@ -1287,7 +1291,11 @@ def process_geospatial_data(data):
                 reprojected_file_path = (
                     os.path.splitext(file_path)[0] + "_reprojected.tif"
                 )
-                gdal.Warp(reprojected_file_path, raster_dataset, dstSRS="EPSG:4326")
+                (
+                    gdal.Warp(reprojected_file_path, raster_dataset, dstSRS="EPSG:4326")
+                    if not os.path.exists(reprojected_file_path)
+                    else None
+                )
                 raster_dataset = gdal.Open(reprojected_file_path)
             else:
                 reprojected_file_path = file_path
@@ -1335,10 +1343,6 @@ def process_geospatial_data(data):
 
             raster_dataset = None
 
-            # Clean up the temporary files
-            if reprojected_file_path != file_path:
-                os.remove(reprojected_file_path)
-
             # Update the combined bounds
             (overlap, combined_bounds) = bounds_overlap_or_similar(
                 combined_bounds, bounds
@@ -1348,7 +1352,9 @@ def process_geospatial_data(data):
             if overlap:
                 image_urls.append(f"/geotiff/{output_image_path}")
         else:
-            return {"error": "Unsupported file type. Only .shp and .tif are supported."}
+            return {
+                "error": "Unsupported file type. Only .shp and .tif/.tiff are supported."
+            }
 
     # Define a function to get a sorting key based on geometry type
     def get_geometry_order(feature):
@@ -1425,7 +1431,7 @@ def export_map_service(image, form_data):
             if file_path.endswith(".shp"):
                 gdf = gpd.read_file(file_path)
                 gdf.plot(ax=ax, edgecolor="black")
-            elif file_path.endswith(".tif"):
+            elif file_path.endswith(".tif") or file_path.endswith(".tiff"):
                 dataset = gdal.Open(file_path)
                 band = dataset.GetRasterBand(1)
                 cmap = get_metadata_colormap(band)

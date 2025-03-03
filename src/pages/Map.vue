@@ -9,7 +9,7 @@
 
         <!-- Component 2: Column Navigation -->
         <div class="column-navigation">
-            <ColumnDropdown :selectedDbsTables="selectedDbsTables"/>
+            <ColumnDropdown :selectedDbsTables="selectedDbsTables" />
         </div>
         <div class="right-panel">
             <!-- Component 3: Selection, Interval, Aggregation, and Export Config -->
@@ -81,10 +81,11 @@
                 </div>
             </div>
             <div v-if="showTableStatsPopup" class="modal-overlay">
-                <div class="modal">
+                <div class="modal" @mousedown="startDrag" :style="{ top: modalPosition.top, left: modalPosition.left }"
+                    :key="modalKey">
                     <button class="close-button" @click="showTableStatsPopup = false">&times;</button>
                     <TableStatsDisplay :data="data" :stats="stats" :statsColumns="statsColumns" :properties="properties"
-                        :selectedColumns="selectedColumns" :id="selectedFeatureId" :ID="ID" :rowLimit="rowLimit" />
+                        :selectedColumns="selectedColumns" :rowLimit="rowLimit" />
                 </div>
             </div>
         </div>
@@ -106,7 +107,6 @@ import 'leaflet/dist/leaflet.css';
 import * as L from 'leaflet';
 import 'leaflet.fullscreen';
 import 'leaflet.fullscreen/Control.FullScreen.css';
-import domtoimage from 'dom-to-image-more';
 import _ from 'lodash';
 import northarrow from "../assets/north-arrow.png";
 import northarrowwhite from "../assets/north-arrow-white.png";
@@ -137,16 +137,21 @@ export default {
             image_urls: [],
             raster_levels: [],
             showStylePopup: false,
-            polygonColor: this.theme === 'light' ? "#3388ff" : "#ff9800",
             polygonOpacity: 0.0,
-            lineColor: this.theme === 'light' ? "#ff0000" : "#03A9F4",
             lineOpacity: 0.7,
-            pointColor: this.theme === 'light' ? "#000000" : "#ff5722",
             pointOpacity: 0.8,
             opacitySteps: Array.from({ length: 11 }, (_, i) => (i * 0.1).toFixed(1)),
             showTableStatsPopup: false,
             selectedFeatureId: null,
             rowLimit: 100,
+            modalKey: 0,
+            modalPosition: {
+                top: "50%",
+                left: "50%",
+                transform: "translate(-50%, -50%)"
+            },
+            dragging: false,
+            offset: { x: 0, y: 0 },
         };
     },
     watch: {
@@ -161,10 +166,19 @@ export default {
         },
     },
     computed: {
-        ...mapState(["selectedDbsTables", "selectedGeoFolders", "selectedColumns", "allSelectedColumns", "selectedIds", "dateRange", "selectedInterval", "selectedStatistics", "selectedMethod", "exportColumns", "exportIds", "exportDate", "exportInterval", "dateType", "exportDateType", "exportPath", "exportFilename", "exportFormat", "exportOptions", "theme"]),
+        ...mapState(["selectedDbsTables", "selectedGeoFolders", "selectedMonth", "selectedSeason", "selectedColumns", "allSelectedColumns", "selectedIds", "dateRange", "selectedInterval", "selectedStatistics", "selectedMethod", "exportColumns", "exportIds", "exportDate", "exportInterval", "dateType", "exportDateType", "exportPath", "exportFilename", "exportFormat", "exportOptions", "theme"]),
+        polygonColor() {
+            return this.theme === 'light' ? "#3388ff" : "#ff9800";
+        },
+        lineColor() {
+            return this.theme === 'light' ? "#ff0000" : "#03A9F4";
+        },
+        pointColor() {
+            return this.theme === 'light' ? "#000000" : "#ff5722";
+        },
     },
     methods: {
-        ...mapActions(["updateSelectedColumns", "addColumns", "updateToolTipColumns", "updateAllSelectedColumns", "updateColumns", "pushMessage", "clearMessages"]),
+        ...mapActions(["updateSelectedColumns", "addColumns", "updateToolTipColumns", "updateAllSelectedColumns", "updateSelectedIds", "updateColumns", "pushMessage", "clearMessages"]),
         arraysAreEqual(arr1, arr2) {
             if (arr1.length !== arr2.length) return false; // Different lengths → Not equal
 
@@ -174,6 +188,32 @@ export default {
             // Compare every element in both arrays
             return sorted1.every((value, index) => value === sorted2[index]);
         },
+        openModal() {
+            this.modalKey++; // Change key to re-mount modal
+            this.showTableStatsPopup = true;
+        },
+        startDrag(event) {
+            this.dragging = true;
+            this.offset = {
+                x: event.clientX - event.target.closest('.modal').offsetLeft,
+                y: event.clientY - event.target.closest('.modal').offsetTop,
+            };
+            document.addEventListener("mousemove", this.onDrag);
+            document.addEventListener("mouseup", this.stopDrag);
+        },
+        onDrag(event) {
+            if (!this.dragging) return;
+            this.modalPosition = {
+                top: `${event.clientY - this.offset.y}px`,
+                left: `${event.clientX - this.offset.x}px`,
+                transform: "none" // Disable centering after drag starts
+            };
+        },
+        stopDrag() {
+            this.dragging = false;
+            document.removeEventListener("mousemove", this.onDrag);
+            document.removeEventListener("mouseup", this.stopDrag);
+        },
         confirmStyleAndInitialize() {
             this.showStylePopup = false;
             // Choose all the columns if they are not selected
@@ -182,29 +222,33 @@ export default {
                 this.updateAllSelectedColumns(true);
             }
 
-            if (this.selectedDbsTables.length > 0) {
-                this.fetchData();
-            }
             this.initializeMap(); // Initialize the map with the new styles
         },
         async fetchData() {
+            // Clear data before setting new data
+            this.data = [];
+            this.statsColumns = [];
+            this.stats = [];
+
             // Fetch the API data for the map
             const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/get_data`, {
                 params: {
                     db_tables: JSON.stringify(this.selectedDbsTables),
                     columns: JSON.stringify(this.allSelectedColumns ? "All" : this.selectedColumns.filter((column) => column !== 'Season' && !this.properties.includes(column))),
-                    id: JSON.stringify(this.selectedIds),
+                    id: JSON.stringify([this.selectedFeatureId.toString()]),
                     start_date: this.dateRange.start,
                     end_date: this.dateRange.end,
                     date_type: this.dateType,
                     interval: this.selectedInterval,
                     statistics: JSON.stringify(this.selectedStatistics),
                     method: JSON.stringify(this.selectedMethod),
+                    month: JSON.stringify(this.selectedMonth),
+                    season: JSON.stringify(this.selectedSeason),
                 }
             });
             if (this.selectedInterval === 'seasonally' && !this.selectedMethod.includes('Equal') && !this.selectedColumns.includes('Season')) {
                 this.updateSelectedColumns(this.selectedColumns.concat(['Season']));
-            } else if (this.selectedColumns.includes('Season')) {
+            } else if (this.selectedColumns.includes('Season') && this.selectedInterval !== 'seasonally') {
                 this.updateSelectedColumns(this.selectedColumns.filter((column) => column !== 'Season'));
             }
             this.data = response.data.data;
@@ -212,7 +256,7 @@ export default {
             this.statsColumns = response.data.statsColumns;
             this.ID = this.selectedColumns.find((column) => column.includes('ID'));
             if (response.data.error) {
-                alert('Error fetching data: ', response.data.error);
+                console.error('Error fetching data: ', response.data.error);
                 return;
             } else {
                 // Wait until the table has rendered, then trigger messages
@@ -270,7 +314,7 @@ export default {
         initializeMap() {
             try {
                 // Create the Leaflet map instance
-                this.map = L.map('map').setView(this.center || [0, 0], 4);
+                this.map = L.map('map').setView(this.center || [0, 0], 12);
 
                 // Add a tile layer (equivalent to Leaflet styles)
                 L.tileLayer(this.theme === 'light' ? 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png' : 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
@@ -317,10 +361,17 @@ export default {
                                 const featureId = Object.entries(feature.properties)
                                     .filter(([key, value]) => key.toLowerCase().includes(this.ID.toLowerCase()) && value !== null)
                                     .map(([, value]) => value)?.[0] ?? null;
-                                if (featureId) {
-                                    this.selectedFeatureId = featureId;
-                                    this.showTableStatsPopup = true;
+                                if (!featureId) {
+                                    return;
                                 }
+                                this.selectedFeatureId = featureId;
+                                if (this.selectedDbsTables.length > 0) {
+                                    this.fetchData();
+                                }
+
+                                setTimeout(() => {
+                                    this.openModal();
+                                }, 100);
                             });
 
                             // Bind hover events to display popup
@@ -367,9 +418,6 @@ export default {
                             });
                         },
                     }).addTo(this.map);
-
-                    // Fit map to GeoJSON bounds
-                    this.map.fitBounds(this.bounds, { padding: [20, 20] });
                 }
 
                 if (this.image_urls.length > 0) {
@@ -378,10 +426,9 @@ export default {
                         L.imageOverlay(import.meta.env.VITE_API_BASE_URL + url, this.bounds,
                             { opacity: 1.0 }).addTo(this.map);
                     });
-
-                    // Fit map to raster image bounds
-                    this.map.fitBounds(this.bounds, { padding: [20, 20] });
                 }
+
+                this.map.fitBounds(this.bounds);
 
                 // Add Fullscreen Control
                 L.control.fullscreen({
@@ -505,6 +552,7 @@ export default {
             await new Promise((resolve) => setTimeout(resolve, 500));
 
             try {
+                const domtoimage = await import("dom-to-image-more");
                 const blob = await domtoimage.toBlob(mapElement);
 
                 // Convert to File and Send to Backend
@@ -575,7 +623,7 @@ export default {
 }
 
 .modal {
-    position: relative;
+    position: absolute;
     background: var(--background-color);
     padding: 20px;
     border-radius: 10px;

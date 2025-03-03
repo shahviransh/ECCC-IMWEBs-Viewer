@@ -15,6 +15,32 @@
             <option value="yearly">Yearly</option>
             <option value="seasonally">Seasonally</option>
         </select>
+        <template v-if="[selectInterval, expInterval].includes('monthly') && pageTiltle === 'Map'">
+            <label for="month-interval-select" class="interval-label">Select Month:</label>
+            <select id="month-interval-select" v-model="monInterval" class="interval-dropdown">
+                <option value="1">January</option>
+                <option value="2">February</option>
+                <option value="3">March</option>
+                <option value="4">April</option>
+                <option value="5">May</option>
+                <option value="6">June</option>
+                <option value="7">July</option>
+                <option value="8">August</option>
+                <option value="9">September</option>
+                <option value="10">October</option>
+                <option value="11">November</option>
+                <option value="12">December</option>
+            </select>
+        </template>
+        <template v-if="[selectInterval, expInterval].includes('seasonally') && pageTiltle === 'Map'">
+            <label for="season-interval-select" class="interval-label">Select Season:</label>
+            <select id="season-interval-select" v-model="seaInterval" class="interval-dropdown">
+                <option value="summer">Summer</option>
+                <option value="fall">Fall</option>
+                <option value="winter">Winter</option>
+                <option value="spring">Spring</option>
+            </select>
+        </template>
     </div>
 </template>
 
@@ -44,10 +70,26 @@ export default {
                 this.updateExportInterval(value);
             }
         },
-        ...mapState(["selectedInterval", "exportInterval", "theme"]),
+        monInterval: {
+            get() {
+                return this.selectedMonth;
+            },
+            set(value) {
+                this.updateSelectedMonth(value);
+            }
+        },
+        seaInterval: {
+            get() {
+                return this.selectedSeason;
+            },
+            set(value) {
+                this.updateSelectedSeason(value);
+            }
+        },
+        ...mapState(["selectedInterval", "exportInterval", "selectedSeason", "selectedMonth", "theme", "pageTitle"]),
     },
     methods: {
-        ...mapActions(["updateSelectedInterval", "updateExportInterval"]),
+        ...mapActions(["updateSelectedInterval", "updateExportInterval", "updateSelectedMonth", "updateSelectedSeason"]),
         onExportChange() {
             if (this.isValidExportInterval(this.selectedInterval, this.exportInterval)) {
                 this.updateExportInterval(this.exportInterval);
