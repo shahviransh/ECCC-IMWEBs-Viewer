@@ -38,8 +38,8 @@ def fetch_data_service(data):
         interval = data.get("interval", "daily")
         method = json.loads(data.get("method", "['Equal']"))
         statistics = json.loads(data.get("statistics", "['None']"))
-        month = json.loads(data.get("month", None))
-        season = json.loads(data.get("season", None))
+        month = json.loads(data.get("month", 'null'))
+        season = json.loads(data.get("season", 'null'))
         stats_df = None
 
         # Initialize DataFrame to store the merged data

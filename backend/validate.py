@@ -9,7 +9,7 @@ def validate_request_args(schema, request_args):
     Validates the request arguments using Cerberus and applies additional security checks.
     """
     validator = Validator(schema)
-    data = {key: request_args.get(key) for key in schema.keys()}
+    data = {key: request_args.get(key) for key in schema.keys() if key in request_args}
 
     if not validator.validate(data):
         return {

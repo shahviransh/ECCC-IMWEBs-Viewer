@@ -296,7 +296,7 @@ export default {
                 this.ID = this.selectedColumns.find((column) => column.includes('ID'));
                 this.refreshKey += 1;
                 if (response.data.error) {
-                    alert('Error fetching data: ', response.data.error);
+                    alert('Error fetching data: ' + response.data.error);
                     return;
                 } else {
                     this.$nextTick(() => {
@@ -333,7 +333,7 @@ export default {
                     }
                 });
                 if (response.data.error) {
-                    alert('Error fetching data: ', response.data.error);
+                    alert('Error fetching data: ' + response.data.error);
                     return;
                 } else { this.pushMessage({ message: `Exported ${this.exportColumns.length} columns x ${this.data.length} rows`, type: 'info' }); }
                 if (this.selectedInterval === 'seasonally' && !this.selectedMethod.includes('Equal') && !this.selectedColumns.includes('Season')) {

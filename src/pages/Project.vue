@@ -106,7 +106,7 @@ export default {
                 this.statsColumns = response.data.statsColumns;
                 this.ID = this.selectedColumns.find((column) => column.includes('ID'));
                 if (response.data.error) {
-                    alert('Error fetching data: ', response.data.error);
+                    alert('Error fetching data: ' + response.data.error);
                     return;
                 } else {
                     // Wait until the table has rendered, then trigger messages
@@ -144,7 +144,7 @@ export default {
                     }
                 });
                 if (response.data.error) {
-                    alert('Error fetching data: ', response.data.error);
+                    alert('Error fetching data: ' + response.data.error);
                     return;
                 }
                 else { this.pushMessage({ message: `Exported ${this.exportColumns.length} columns x ${this.data.length} rows`, type: 'success' }); }

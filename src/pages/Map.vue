@@ -256,7 +256,7 @@ export default {
             this.statsColumns = response.data.statsColumns;
             this.ID = this.selectedColumns.find((column) => column.includes('ID'));
             if (response.data.error) {
-                console.error('Error fetching data: ', response.data.error);
+                alert('Error fetching data: ' + response.data.error);
                 return;
             } else {
                 // Wait until the table has rendered, then trigger messages
