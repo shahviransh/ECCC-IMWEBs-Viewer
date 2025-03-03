@@ -25,6 +25,9 @@ export const ExportTableStats = defineAsyncComponent(() =>
 export const TableStatsDisplay = defineAsyncComponent(() =>
   import(/* webpackPrefetch: true */ "../components/TableStatsDisplay.vue")
 );
+export const GraphDisplay = defineAsyncComponent(() =>
+  import(/* webpackPrefetch: true */ "../components/GraphDisplay.vue")
+);
 export const FolderTree = defineAsyncComponent(() =>
   import(/* webpackPrefetch: true */ "../components/FolderTree.vue")
 );
