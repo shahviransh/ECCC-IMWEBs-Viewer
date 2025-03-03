@@ -33,8 +33,8 @@
 
             <!-- Style Settings Modal -->
             <div v-if="showStylePopup" class="modal-overlay-select">
-                <div class="modal">
-                    <h3>Customize Map Style</h3>
+                <div class="modal-select">
+                    <h4>Customize Map Style</h4>
 
                     <div class="style-settings">
                         <label>Polygon Color: <input type="color" v-model="polygonColor"></label>
@@ -622,6 +622,7 @@ export default {
     background: var(--overlay-background);
 }
 
+.modal-select,
 .modal {
     position: absolute;
     background: var(--background-color);
@@ -630,6 +631,11 @@ export default {
     width: 25%;
     text-align: center;
     color: var(--text-color);
+}
+
+.modal {
+    height: 50%;
+    overflow-y: auto;
 }
 
 .modal-buttons {
