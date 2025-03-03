@@ -15,24 +15,17 @@
             <option value="yearly">Yearly</option>
             <option value="seasonally">Seasonally</option>
         </select>
-        <template v-if="[selectInterval, expInterval].includes('monthly') && pageTiltle === 'Map'">
+        <!-- Use v-show instead of v-if -->
+        <div v-show="shouldShowMonth">
             <label for="month-interval-select" class="interval-label">Select Month:</label>
             <select id="month-interval-select" v-model="monInterval" class="interval-dropdown">
-                <option value="1">January</option>
-                <option value="2">February</option>
-                <option value="3">March</option>
-                <option value="4">April</option>
-                <option value="5">May</option>
-                <option value="6">June</option>
-                <option value="7">July</option>
-                <option value="8">August</option>
-                <option value="9">September</option>
-                <option value="10">October</option>
-                <option value="11">November</option>
-                <option value="12">December</option>
+                <option v-for="month in months" :key="month.value" :value="month.value">
+                    {{ month.label }}
+                </option>
             </select>
-        </template>
-        <template v-if="[selectInterval, expInterval].includes('seasonally') && pageTiltle === 'Map'">
+        </div>
+
+        <div v-show="shouldShowSeason">
             <label for="season-interval-select" class="interval-label">Select Season:</label>
             <select id="season-interval-select" v-model="seaInterval" class="interval-dropdown">
                 <option value="summer">Summer</option>
@@ -40,7 +33,7 @@
                 <option value="winter">Winter</option>
                 <option value="spring">Spring</option>
             </select>
-        </template>
+        </div>
     </div>
 </template>
 
@@ -86,6 +79,28 @@ export default {
                 this.updateSelectedSeason(value);
             }
         },
+        shouldShowMonth() {
+            return [this.selectInterval, this.expInterval].includes("monthly") && this.pageTitle === "Map";
+        },
+        shouldShowSeason() {
+            return [this.selectInterval, this.expInterval].includes("seasonally") && this.pageTitle === "Map";
+        },
+        months() {
+            return [
+                { value: "1", label: "January" },
+                { value: "2", label: "February" },
+                { value: "3", label: "March" },
+                { value: "4", label: "April" },
+                { value: "5", label: "May" },
+                { value: "6", label: "June" },
+                { value: "7", label: "July" },
+                { value: "8", label: "August" },
+                { value: "9", label: "September" },
+                { value: "10", label: "October" },
+                { value: "11", label: "November" },
+                { value: "12", label: "December" },
+            ];
+        },
         ...mapState(["selectedInterval", "exportInterval", "selectedSeason", "selectedMonth", "theme", "pageTitle"]),
     },
     methods: {
@@ -128,7 +143,7 @@ export default {
     display: flex;
     flex-direction: column;
     gap: 5px;
-    max-width: 200px;
+    min-height: fit-content;
     margin: 0px 0px;
     padding: 5px;
     background-color: var(--bg-color);
@@ -138,7 +153,7 @@ export default {
 
 .interval-label {
     font-weight: 600;
-    margin-bottom: 5px;
+    margin-bottom: 0px;
     font-size: 14px;
     color: var(--text-color);
 }
