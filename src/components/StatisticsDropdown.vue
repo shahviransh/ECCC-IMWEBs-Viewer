@@ -27,10 +27,10 @@ export default {
     },
     computed: {
         tagClass() {
-            return this.selectedStatistics.length > 4 ? 'small-tags' : 'normal-tags';
+            return this.selectedStatistics.length > 3 ? 'small-tags' : 'normal-tags';
         },
         tagClassMethod() {
-            return this.selectedMethod.length > 4 ? 'small-tags' : 'normal-tags';
+            return this.selectedMethod.length > 3 ? 'small-tags' : 'normal-tags';
         },
         ...mapState(["theme"]),
     },
@@ -95,6 +95,7 @@ export default {
     border-radius: 4px;
     box-shadow: var(--box-shadow);
     background-color: var(--bg-color);
+    z-index: 1000;
 }
 
 .statistics-label {

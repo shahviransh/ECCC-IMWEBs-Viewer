@@ -242,8 +242,8 @@ export default {
                     interval: this.selectedInterval,
                     statistics: JSON.stringify(this.selectedStatistics),
                     method: JSON.stringify(this.selectedMethod),
-                    month: JSON.stringify(this.selectedMonth),
-                    season: JSON.stringify(this.selectedSeason),
+                    month: this.selectedMonth,
+                    season: this.selectedSeason,
                 }
             });
             if (this.selectedInterval === 'seasonally' && !this.selectedMethod.includes('Equal') && !this.selectedColumns.includes('Season')) {
@@ -625,7 +625,7 @@ export default {
 .modal {
     position: absolute;
     background: var(--background-color);
-    padding: 20px;
+    padding: 15px;
     border-radius: 10px;
     width: 25%;
     text-align: center;

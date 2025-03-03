@@ -38,8 +38,10 @@ def fetch_data_service(data):
         interval = data.get("interval", "daily")
         method = json.loads(data.get("method", "['Equal']"))
         statistics = json.loads(data.get("statistics", "['None']"))
-        month = json.loads(data.get("month", 'null'))
-        season = json.loads(data.get("season", 'null'))
+        month = data.get("month", 'null')
+        season = data.get("season", 'null')
+        month = json.loads(month) if month == 'null' else month
+        season = json.loads(season) if season == 'null' else season
         stats_df = None
 
         # Initialize DataFrame to store the merged data
@@ -617,7 +619,7 @@ def aggregate_data(df, interval, method, date_type, month, season):
     if interval == "monthly":
         resampled_df = df.groupby(ID).resample("ME").first()
         if month:
-            resampled_df = resampled_df[resampled_df[date_type].dt.month == int(month)]
+            resampled_df = resampled_df[resampled_df.index.get_level_values(date_type).month == int(month)]
     elif interval == "seasonally":
         # Custom resampling for seasons
         df.reset_index(inplace=True)
