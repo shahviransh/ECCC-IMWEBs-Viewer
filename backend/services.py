@@ -1094,10 +1094,10 @@ def get_geojson_metadata(geojson_path):
 
     bbox = geojson_data.get("bbox", [])
 
-    x_min, x_max, y_min, y_max = None, None, None, None
-
     if bbox:
         x_min, x_max, y_min, y_max = bbox[0], bbox[2], bbox[1], bbox[3]
+    else:
+        x_min, x_max, y_min, y_max = float("inf"), float("-inf"), float("inf"), float("-inf")
 
     field_names = []
 

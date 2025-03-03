@@ -33,7 +33,7 @@
 
             <!-- Style Settings Modal -->
             <div v-if="showStylePopup" class="modal-overlay-select">
-                <div class="modal-select">
+                <div class="modal">
                     <h4>Customize Map Style</h4>
 
                     <div class="style-settings">
@@ -146,9 +146,8 @@ export default {
             rowLimit: 100,
             modalKey: 0,
             modalPosition: {
-                top: "50%",
-                left: "50%",
-                transform: "translate(-50%, -50%)"
+                top: "25%",
+                left: "25%",
             },
             dragging: false,
             offset: { x: 0, y: 0 },
@@ -622,7 +621,6 @@ export default {
     background: var(--overlay-background);
 }
 
-.modal-select,
 .modal {
     position: absolute;
     background: var(--background-color);
@@ -631,10 +629,6 @@ export default {
     width: 25%;
     text-align: center;
     color: var(--text-color);
-}
-
-.modal {
-    height: 50%;
     overflow-y: auto;
 }
 

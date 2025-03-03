@@ -11,6 +11,7 @@
                 }]" @click="toggleNode(node)">
                     <span v-if="node.type === 'folder'">{{ node.expanded ? '📂' : '📁' }}</span>
                     <span v-else-if="node.type === 'database'">🗄️</span>
+                    <span v-else-if="node.type === 'table'">📑</span>
                     <span v-else>📄</span>
                     {{ node.name }}
                 </div>
