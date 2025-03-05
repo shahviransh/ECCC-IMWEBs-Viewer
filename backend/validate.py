@@ -81,6 +81,15 @@ def validate_get_data_args(request_args):
             "required": False,
             "allowed": ["summer", "winter", "fall", "spring", "null"],
         },
+        "feature": {
+            "type": "string",
+            "required": False,
+        },
+        "feature_statictic": {
+            "type": "string",
+            "required": False,
+            "allowed": ["Average", "Sum", "Maximum", "Minimum", "null"],
+        }
     }
     return validate_request_args(schema, request_args)
 
@@ -130,6 +139,7 @@ def validate_export_data_args(request_args):
         },
         "export_path": {"type": "string", "required": True},
         "options": {"type": "string", "required": True},
+        "geojson_data": {"type": "string", "required": False},
     }
     return validate_request_args(schema, request_args)
 

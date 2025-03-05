@@ -28,6 +28,7 @@
                     <option value="pdf">Graph As PDF</option>
                 </template>
                 <template v-if="pageTitle === 'Map'">
+                    <option value="shp">Map As Shapefiles</option>
                     <option value="png">Map As PNG</option>
                     <option value="jpg">Map As JPG</option>
                     <option value="jpeg">Map As JPEG</option>
