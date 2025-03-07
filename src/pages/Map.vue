@@ -182,7 +182,7 @@ export default {
             lineOpacity: 0.8,
             pointOpacity: 0.5,
             selectedFeature: null,
-            selectedFeatureStatistic: null,
+            selectedFeatureStatistic: "mean",
             geojson_color_levels: {},
             geojson_colors: [],
             opacitySteps: Array.from({ length: 11 }, (_, i) => (i * 0.1).toFixed(1)),
@@ -543,7 +543,7 @@ export default {
 
                             // Legend title
                             const title = L.DomUtil.create("h4", "", div);
-                            title.innerText = `${this.options.tifFiles} Legend`;
+                            title.innerText = `${this.options.tifFiles}`;
                             title.style.textAlign = "center";
                             title.style.fontSize = "16px";
                             title.style.fontWeight = "bold";
