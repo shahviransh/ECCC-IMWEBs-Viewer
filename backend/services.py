@@ -494,7 +494,55 @@ def save_to_file(
 
         # Save the plot
         plt.savefig(file_path, format=file_format)
+    elif file_format == "shp":
+        # Load the GeoJSON dictionary into a GeoDataFrame
+        gdf = gpd.GeoDataFrame.from_features(geojson_data["features"])
 
+        # List of geometry types
+        geometry_types = [
+            "Point",
+            "LineString",
+            "Polygon",
+            "MultiPolygon",
+            "MultiPoint",
+            "MultiLineString",
+        ]
+
+        # Find the first column containing "id" (case-insensitive)
+        id_column = next((col for col in gdf.columns if "id" in col.lower()), None)
+
+        # Find the first column containing "id" (case-insensitive)
+        if id_column:
+            # Rename 'ID' in dataframe1 to match the found id_column in gdf
+            dataframe1 = dataframe1.rename(columns={"ID": id_column})
+
+            # Merge the Shapefile data with the attribute DataFrame using the correct ID column
+            # Left join to keep all geometries in the Shapefile
+            merged_gdf = gdf.merge(dataframe1, on=id_column, how="left")
+        else:
+            # If no ID column is found, use the original GeoDataFrame
+            merged_gdf = gdf
+
+        # Use a dictionary to store the filtered GeoDataFrames by geometry type
+        gdf_dict = {
+            geom: merged_gdf[merged_gdf.geom_type == geom] for geom in geometry_types
+        }
+
+        # Get the base filename (without .shp extension)
+        base_filename = os.path.splitext(file_path)[0]
+
+        # List of GeoDataFrames and their corresponding suffixes
+        geometry_and_suffixes = [
+            (gdf_geom, f"_{gdf_geom.geom_type.iloc[0].lower()}")
+            for gdf_geom in gdf_dict.values()
+        ]
+
+        # Iterate through each geometry type and save it if it's not empty
+        for gdf_geom, suffix in geometry_and_suffixes:
+            if not gdf_geom.empty:
+                gdf_geom.to_file(
+                    f"{base_filename}{suffix}.shp", driver="ESRI Shapefile"
+                )
     return file_path
 
 

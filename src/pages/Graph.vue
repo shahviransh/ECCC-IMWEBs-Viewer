@@ -28,7 +28,11 @@
             <!-- Component 4: Main View -->
             <div class="main-view">
                 <!-- Graph Display -->
-                <v-chart :option="chartOptions" :theme="theme" :key="refreshKey"></v-chart>
+                <GraphDisplay :data="data" :selectedColumns="selectedColumns" :selectedIds="selectedIds"
+                    :dateType="dateType" :ID="ID" :theme="theme" :refreshKey="refreshKey"
+                    :currentZoomStart="currentZoomStart" :currentZoomEnd="currentZoomEnd"
+                    :multiGraphType="multiGraphType" :graphType="graphType" />
+
             </div>
         </div>
     </div>
@@ -43,15 +47,8 @@ import IntervalDropdown from "../components/IntervalDropdown.vue";
 import StatisticsDropdown from "../components/StatisticsDropdown.vue";
 import ExportConfig from "../components/ExportConfig.vue";
 import ExportTableStats from "../components/ExportTableStats.vue";
+import GraphDisplay from "../components/GraphDisplay.vue";
 import axios from 'axios';
-import { use } from 'echarts/core';
-import { LineChart, ScatterChart, BarChart } from 'echarts/charts';
-import { GridComponent, TooltipComponent, TitleComponent, LegendComponent, DataZoomComponent } from 'echarts/components';
-import { CanvasRenderer } from 'echarts/renderers';
-import VChart from 'vue-echarts';
-
-use([LineChart, BarChart, ScatterChart, GridComponent, TooltipComponent, TitleComponent, DataZoomComponent, LegendComponent, CanvasRenderer]);
-
 
 export default {
     name: "Graph",
@@ -63,7 +60,7 @@ export default {
         StatisticsDropdown,
         ExportConfig,
         ExportTableStats,
-        VChart,
+        GraphDisplay,
     },
     data() {
         return {
@@ -75,192 +72,14 @@ export default {
         };
     },
     computed: {
-        chartOptions() {
-            const xAxisData = this.data.map(row => row[this.dateType]);
-
-            // Preprocess `this.data` to create a lookup table for each ID and Date/Month
-            const dataLookup = {};
-            this.data.forEach(row => {
-                const id = row[this.ID];
-                const date = row[this.dateType];
-
-                if (!dataLookup[id]) {
-                    dataLookup[id] = {};
-                }
-                dataLookup[id][date] = row;
-            });
-
-            // Create the chart options
-            return {
-                tooltip: {
-                    trigger: 'axis',
-                },
-                legend: {
-                    top: 'bottom',
-                    type: 'scroll',
-                    orient: 'horizontal',
-                    // Exclude Date/Month from the legend
-                    data: this.selectedIds.length
-                        ? this.selectedColumns
-                            .filter(column => column !== this.dateType && column !== this.ID)
-                            .flatMap(column =>
-                                this.selectedIds.map(id => `${column} - ${this.ID}: ${id}`)
-                            ) // Legend entries in the format "Col - ID"
-                        : this.selectedColumns.filter(column => column !== this.dateType)
-                },
-                grid: {
-                    left: '2%',
-                    right: '2%',
-                    bottom: '10%',
-                    top: '10%',
-                    containLabel: true
-                },
-                dataZoom: [
-                    {
-                        type: 'slider',
-                        start: this.currentZoomStart,
-                        end: this.currentZoomEnd,
-                        height: 20
-                    },
-                    {
-                        type: 'inside',
-                        start: this.currentZoomStart,
-                        end: this.currentZoomEnd
-                    }
-                ],
-                xAxis: {
-                    type: 'category',
-                    data: xAxisData,
-                    name: this.dateType,
-                    nameLocation: 'middle',
-                    nameTextStyle: {
-                        fontSize: 14,
-                        padding: 10,
-                        color: this.theme === 'dark' ? 'white' : 'black',
-                    },
-                    axisLabel: {
-                        fontSize: 14,
-                        color: this.theme === 'dark' ? 'white' : 'black',
-                    },
-                    axisLine: {
-                        lineStyle: {
-                            color: this.theme === 'dark' ? 'white' : 'black',
-                            width: 2
-                        }
-                    },
-                    splitLine: {
-                        show: false
-                    }
-                },
-                yAxis: [
-                    {
-                        type: 'value',
-                        name: 'Values',
-                        nameLocation: 'middle',
-                        nameTextStyle: {
-                            fontSize: 14,
-                            padding: 15,
-                            color: this.theme === 'dark' ? 'white' : 'black',
-                        },
-                        axisLabel: {
-                            fontSize: 14,
-                            color: this.theme === 'dark' ? 'white' : 'black',
-                        },
-                        axisLine: {
-                            show: true,
-                            lineStyle: {
-                                color: this.theme === 'dark' ? 'white' : 'black',
-                                width: 2
-                            }
-                        },
-                        axisTick: {
-                            alignWithLabel: true,
-                        },
-                        splitLine: {
-                            lineStyle: {
-                                type: 'dashed',
-                                color: this.theme === 'dark' ? '#333' : '#ccc',
-                            },
-                        },
-                        alignTicks: true,
-                        scale: true,
-                    },
-                    {
-                        type: 'value',
-                        nameLocation: 'middle',
-                        nameTextStyle: {
-                            fontSize: 14,
-                            padding: 10,
-                            color: this.theme === 'dark' ? 'white' : 'black',
-                        },
-                        axisLabel: {
-                            fontSize: 14,
-                            color: this.theme === 'dark' ? 'white' : 'black',
-                        },
-                        axisLine: {
-                            show: true,
-                            lineStyle: {
-                                color: this.theme === 'dark' ? 'white' : 'black',
-                                width: 2
-                            }
-                        },
-                        splitLine: {
-                            show: false
-                        },
-                    }
-                ],
-                series: this.selectedIds.length
-                    ? this.selectedColumns // Exclude Date/Month from the series
-                        .filter(column => column !== this.dateType && column !== this.ID)
-                        // Create a series for each ID and Date/Month
-                        .flatMap(column =>
-                            this.selectedIds.map(id => ({
-                                name: `${column} - ${this.ID}: ${id}`,
-                                type: this.getType(column),
-                                yAxisIndex: this.columnNeedsSecondaryAxis(column) ? 1 : 0, // Dynamically assign y-axis
-                                data: xAxisData.map(date => {
-                                    const row = dataLookup[id] && dataLookup[id][date];
-                                    return row ? row[column] : null;
-                                })
-                            }))
-                        )
-                    : this.selectedColumns
-                        .filter(column => column !== this.dateType)
-                        // Create a series for each column
-                        .map(column => ({
-                            name: column,
-                            type: this.getType(column),
-                            yAxisIndex: this.columnNeedsSecondaryAxis(column) ? 1 : 0, // Dynamically assign y-axis
-                            data: this.data.map(row => row[column])
-                        }))
-            };
-        },
         ...mapState(["selectedDbsTables", "selectedColumns", "allSelectedColumns", "multiGraphType", "currentZoomStart", "currentZoomEnd", "selectedIds", "dateRange", "selectedInterval", "selectedStatistics", "selectedMethod", "exportColumns", "graphType", "exportIds", "exportDate", "exportInterval", "dateType", "exportDateType", "exportPath", "exportFilename", "exportFormat", "exportOptions", "theme"]),
     },
     methods: {
         ...mapActions(["updateSelectedColumns", "updateExportOptions", "updateAllSelectedColumns", "pushMessage", "clearMessages"]),
-        columnNeedsSecondaryAxis(column) {
-            // Adjust logic based on actual data thresholds
-            return this.data.some(row => row[column] > 100);
-        },
         heightVar() {
             // Set the height based on the environment
             const isTauri = window.isTauri !== undefined;
             return isTauri ? "calc(100vh - 14vh)" : "calc(100vh - 16vh)";
-        },
-        getType(column) {
-            // Use the Vuex state multiGraphType, which updates dynamically
-            if (this.multiGraphType?.length > 0) {
-                const multiGraph = this.multiGraphType.find(col => col.name === column);
-                if (multiGraph) {
-                    return multiGraph.type;
-                }
-            }
-            // Handle cases where graphType contains a dash ('-')
-            if (this.graphType.includes('-')) {
-                return this.graphType.split('-')[0];
-            }
-            return this.graphType;
         },
         // Fetch data from the API
         async fetchData() {
@@ -287,7 +106,7 @@ export default {
                 });
                 if (this.selectedInterval === 'seasonally' && !this.selectedMethod.includes('Equal') && !this.selectedColumns.includes('Season')) {
                     this.updateSelectedColumns(this.selectedColumns.concat(['Season']));
-                } else if (this.selectedColumns.includes('Season') && this.selectedInterval !== 'seasonally'){
+                } else if (this.selectedColumns.includes('Season') && this.selectedInterval !== 'seasonally') {
                     this.updateSelectedColumns(this.selectedColumns.filter((column) => column !== 'Season'));
                 }
                 this.data = response.data.data;
@@ -338,7 +157,7 @@ export default {
                 } else { this.pushMessage({ message: `Exported ${this.exportColumns.length} columns x ${this.data.length} rows`, type: 'info' }); }
                 if (this.selectedInterval === 'seasonally' && !this.selectedMethod.includes('Equal') && !this.selectedColumns.includes('Season')) {
                     this.updateSelectedColumns(this.selectedColumns.concat(['Season']));
-                } else if (this.selectedColumns.includes('Season') && this.selectedInterval !== 'seasonally'){
+                } else if (this.selectedColumns.includes('Season') && this.selectedInterval !== 'seasonally') {
                     this.updateSelectedColumns(this.selectedColumns.filter((column) => column !== 'Season'));
                 }
             } catch (error) {

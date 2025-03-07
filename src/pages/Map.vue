@@ -266,12 +266,6 @@ export default {
                 this.updateAllSelectedColumns(true);
             }
             if (this.selectedDbsTables.length > 0) {
-                await this.fetchColors();
-            }
-            this.initializeMap();// Initialize the map with the new styles
-        },
-        async fetchColors() {
-            try {
                 // Fetch GeoJSON data color information
                 const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/get_geojson_colors`, {
                     params: {
@@ -295,11 +289,10 @@ export default {
                 this.geojson_color_levels = response.data.geojson_color_levels;
 
                 if (response.data.error) {
-                    alert("Error fetching Leaflet data: " + response.data.error);
+                    alert("Error fetching Leaflet colors: " + response.data.error);
                 }
-            } catch (error) {
-                console.error("Error fetching Leaflet data: ", error);
             }
+            this.initializeMap(); // Initialize the map with the new styles
         },
         async fetchData() {
             // Clear data before setting new data
