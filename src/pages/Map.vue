@@ -72,6 +72,23 @@
                                 </div>
                             </div>
                         </div>
+                        <div class="column">
+                            <label>Selected Feature:</label>
+                            <select v-model="selectedFeature" class="dropdown">
+                                <option
+                                    v-for="feature in selectedColumns.filter(col => !this.properties.includes(col) && col !== dateType && col !== 'ID')"
+                                    :key="feature" :value="feature">{{ feature
+                                    }}</option>
+                            </select>
+
+                            <label>Selected Feature Statistic:</label>
+                            <select v-model="selectedFeatureStatistic" class="dropdown">
+                                <option value="mean">Average</option>
+                                <option value="min">Minimum</option>
+                                <option value="max">Maximum</option>
+                                <option value="sum">Sum</option>
+                            </select>
+                        </div>
                     </div>
 
                     <div class="modal-buttons">
@@ -80,14 +97,35 @@
                     </div>
                 </div>
             </div>
+            <!-- Table Stats Graph Popup -->
             <div v-if="showTableStatsPopup" class="modal-overlay">
                 <div class="modal" @mousedown="startDrag" :style="{ top: modalPosition.top, left: modalPosition.left }"
                     :key="modalKey">
                     <button class="close-button" @click="showTableStatsPopup = false">&times;</button>
-                    <TableStatsDisplay :data="data" :stats="stats" :statsColumns="statsColumns" :properties="properties"
-                        :selectedColumns="selectedColumns" :rowLimit="rowLimit" />
+
+                    <!-- Tab navigation -->
+                    <div class="tab-header">
+                        <button :class="{ active: activeTab === 'table' }" @click="activeTab = 'table'">Table</button>
+                        <button :class="{ active: activeTab === 'graph' }" @click="activeTab = 'graph'">Graph</button>
+                    </div>
+
+                    <!-- Tab content -->
+                    <div class="tab-content">
+                        <div v-if="activeTab === 'table'">
+                            <TableStatsDisplay :data="data" :stats="stats" :statsColumns="statsColumns"
+                                :properties="properties" :selectedColumns="selectedColumns" :rowLimit="rowLimit" />
+                        </div>
+                        <div v-if="activeTab === 'graph'">
+                            <GraphDisplay :data="data" :selectedColumns="selectedColumns"
+                                :selectedIds="[selectedFeatureId.toString()]" :dateType="dateType" :ID="ID"
+                                :theme="theme" :refreshKey="refreshKey" :currentZoomStart="currentZoomStart"
+                                :currentZoomEnd="currentZoomEnd" :multiGraphType="multiGraphType"
+                                :graphType="graphType" />
+                        </div>
+                    </div>
                 </div>
             </div>
+
         </div>
     </div>
 </template>
@@ -102,6 +140,7 @@ import StatisticsDropdown from "../components/StatisticsDropdown.vue";
 import ExportConfig from "../components/ExportConfig.vue";
 import ExportTableStats from "../components/ExportTableStats.vue";
 import TableStatsDisplay from "../components/TableStatsDisplay.vue";
+import GraphDisplay from "../components/GraphDisplay.vue";
 import axios from 'axios';
 import 'leaflet/dist/leaflet.css';
 import * as L from 'leaflet';
@@ -122,6 +161,7 @@ export default {
         ExportConfig,
         ExportTableStats,
         TableStatsDisplay,
+        GraphDisplay
     },
     data() {
         return {
@@ -129,6 +169,7 @@ export default {
             statsColumns: [],
             data: [],
             ID: '',
+            activeTab: 'table',
             map: null,
             geojson: {},
             bounds: [],
@@ -137,9 +178,13 @@ export default {
             image_urls: [],
             raster_levels: [],
             showStylePopup: false,
-            polygonOpacity: 0.0,
-            lineOpacity: 0.7,
-            pointOpacity: 0.8,
+            polygonOpacity: 0.8,
+            lineOpacity: 0.8,
+            pointOpacity: 0.5,
+            selectedFeature: null,
+            selectedFeatureStatistic: null,
+            geojson_color_levels: {},
+            geojson_colors: [],
             opacitySteps: Array.from({ length: 11 }, (_, i) => (i * 0.1).toFixed(1)),
             showTableStatsPopup: false,
             selectedFeatureId: null,
@@ -165,7 +210,7 @@ export default {
         },
     },
     computed: {
-        ...mapState(["selectedDbsTables", "selectedGeoFolders", "selectedMonth", "selectedSeason", "selectedColumns", "allSelectedColumns", "selectedIds", "dateRange", "selectedInterval", "selectedStatistics", "selectedMethod", "exportColumns", "exportIds", "exportDate", "exportInterval", "dateType", "exportDateType", "exportPath", "exportFilename", "exportFormat", "exportOptions", "theme"]),
+        ...mapState(["selectedDbsTables", "selectedGeoFolders", "selectedMonth", "columns", "selectedSeason", "selectedColumns", "allSelectedColumns", "selectedIds", "dateRange", "selectedInterval", "selectedStatistics", "selectedMethod", "exportColumns", "exportIds", "exportDate", "exportInterval", "dateType", "exportDateType", "exportPath", "exportFilename", "exportFormat", "exportOptions", "theme"]),
         polygonColor() {
             return this.theme === 'light' ? "#3388ff" : "#ff9800";
         },
@@ -213,15 +258,48 @@ export default {
             document.removeEventListener("mousemove", this.onDrag);
             document.removeEventListener("mouseup", this.stopDrag);
         },
-        confirmStyleAndInitialize() {
+        async confirmStyleAndInitialize() {
             this.showStylePopup = false;
             // Choose all the columns if they are not selected
-            if (this.selectedColumns.length === 0 || this.arraysAreEqual(this.selectedColumns, this.properties)) {
+            if (this.selectedColumns.length === 0 || this.arraysAreEqual(this.columns, this.properties)) {
                 this.updateSelectedColumns("All");
                 this.updateAllSelectedColumns(true);
             }
+            if (this.selectedDbsTables.length > 0) {
+                await this.fetchColors();
+            }
+            this.initializeMap();// Initialize the map with the new styles
+        },
+        async fetchColors() {
+            try {
+                // Fetch GeoJSON data color information
+                const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/get_geojson_colors`, {
+                    params: {
+                        db_tables: JSON.stringify(this.selectedDbsTables),
+                        columns: JSON.stringify(this.allSelectedColumns ? "All" : this.selectedColumns.filter((column) => column !== 'Season' && !this.properties.includes(column))),
+                        id: JSON.stringify(this.selectedIds),
+                        start_date: this.dateRange.start,
+                        end_date: this.dateRange.end,
+                        date_type: this.dateType,
+                        interval: this.selectedInterval,
+                        statistics: JSON.stringify(this.selectedStatistics),
+                        method: JSON.stringify(this.selectedMethod),
+                        month: this.selectedMonth,
+                        season: this.selectedSeason,
+                        feature: this.selectedFeature,
+                        feature_statictic: this.selectedFeatureStatictic,
+                    }
+                });
 
-            this.initializeMap(); // Initialize the map with the new styles
+                this.geojson_colors = response.data.geojson_colors;
+                this.geojson_color_levels = response.data.geojson_color_levels;
+
+                if (response.data.error) {
+                    alert("Error fetching Leaflet data: " + response.data.error);
+                }
+            } catch (error) {
+                console.error("Error fetching Leaflet data: ", error);
+            }
         },
         async fetchData() {
             // Clear data before setting new data
@@ -298,7 +376,7 @@ export default {
                 this.addColumns(this.properties);
 
                 if (response.data.error) {
-                    alert("Error fetching Leaflet data: ", response.data.error);
+                    alert("Error fetching Leaflet data: " + response.data.error);
                 } else {
                     this.pushMessage({
                         message: this.image_urls.length > 0
@@ -325,23 +403,33 @@ export default {
                 if (Object.keys(this.geojson).length > 0) {
                     L.geoJSON(this.geojson, {
                         style: (feature) => {
-                            // Apply dynamic styles based on geometry type or properties
+                            // Default style
+                            let style = {
+                                weight: 2,
+                                opacity: 1,
+                                fillOpacity: this.polygonOpacity,
+                            };
+
+                            // Check if geojson_colors has a color for this feature's id
+                            const featureId = Object.entries(feature.properties)
+                                .filter(([key, value]) => key.toLowerCase().includes('id') && value !== null)
+                                .map(([, value]) => value)?.[0] ?? null;
+
+                            const featureColor = this.geojson_colors[featureId?.toFixed(1).toString()];
+
                             if (feature.geometry.type === 'Polygon' || feature.geometry.type === 'MultiPolygon') {
-                                return {
-                                    color: this.polygonColor,
-                                    weight: 2,
-                                    fillColor: this.polygonColor,
-                                    fillOpacity: this.polygonOpacity,
-                                };
+                                // Apply color from geojson_colors based on feature's id
+                                style.fillColor = featureColor || this.polygonColor; // Default to polygonColor if no match
+                                style.color = featureColor || this.polygonColor;
                             } else if (feature.geometry.type === 'LineString' || feature.geometry.type === 'MultiLineString') {
-                                return {
-                                    color: this.lineColor,
-                                    weight: 2,
-                                    opacity: this.lineOpacity,
-                                };
+                                style.color = this.lineColor;
+                                style.fillColor = this.lineColor;
+                                style.weight = 2;
+                                style.opacity = 1;
+                                style.fillOpacity = this.lineOpacity;
                             }
-                            // Return default styles for unsupported geometry types
-                            return {};
+
+                            return style;
                         },
                         pointToLayer: (feature, latlng) => {
                             // Customize the style for points
@@ -376,7 +464,7 @@ export default {
                             // Bind hover events to display popup
                             layer.on('mouseover', (e) => {
                                 e.target.setStyle({
-                                    fillOpacity: 0.4,
+                                    fillOpacity: e.target.options.fillOpacity > 0.5 ? 0 : 1,
                                     opacity: 1,
                                     weight: 3,
                                 });
@@ -409,7 +497,7 @@ export default {
                                     });
                                 } else {
                                     layer.setStyle({
-                                        opacity: this.lineOpacity,
+                                        fillOpacity: this.lineOpacity,
                                         weight: 2,
                                     });
                                 }
@@ -442,7 +530,7 @@ export default {
 
                 const mapDirectories = this.selectedGeoFolders.map((folder) => folder.split('/').pop());
 
-                if (this.raster_levels.length > 0) {
+                if (this.raster_levels.length > 0 || this.geojson_color_levels.length > 0) {
                     // Create a custom legend control
                     L.Control.RasterLegend = L.Control.extend({
                         onAdd(map) {
@@ -455,7 +543,7 @@ export default {
                             div.style.boxShadow = "0 2px 10px rgba(0, 0, 0, 0.3)";
                             div.style.fontFamily = "Arial, sans-serif";
                             div.style.fontSize = "14px";
-                            div.style.maxWidth = "220px";
+                            div.style.maxWidth = "180px";
                             div.style.border = "1px solid #ccc";
                             div.style.position = "relative";
                             div.style.zIndex = "1000";
@@ -501,7 +589,12 @@ export default {
                     L.control.rasterLegend = (opts) => new L.Control.RasterLegend(opts)
 
                     // Add the legend to the map (Position: Bottom Left)
-                    L.control.rasterLegend({ position: 'bottomleft', raster_levels: this.raster_levels, theme: this.theme, tifFiles: mapDirectories.filter(c => c.includes('.tif')).join(",") }).addTo(this.map);
+                    if (this.raster_levels.length > 0) {
+                        L.control.rasterLegend({ position: 'bottomleft', raster_levels: this.raster_levels, theme: this.theme, tifFiles: mapDirectories.filter(c => c.includes('.tif')).join(",") }).addTo(this.map);
+                    }
+                    if (this.geojson_color_levels.length > 0) {
+                        L.control.rasterLegend({ position: 'bottomleft', raster_levels: this.geojson_color_levels, theme: this.theme, tifFiles: this.selectedFeature }).addTo(this.map);
+                    }
                 }
 
                 this.pushMessage({
@@ -551,24 +644,47 @@ export default {
             await new Promise((resolve) => setTimeout(resolve, 500));
 
             try {
-                const domtoimage = await import("dom-to-image-more");
-                const blob = await domtoimage.toBlob(mapElement);
+                let response;
+                if (this.exportFormat === "shp") {
+                    response = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/export_data`, {
+                        db_tables: JSON.stringify(this.selectedDbsTables),
+                        columns: JSON.stringify(this.allSelectedColumns ? "All" : this.exportColumns.filter((column) => column !== 'Season')),
+                        id: JSON.stringify(this.exportIds),
+                        start_date: this.exportDate.start,
+                        end_date: this.exportDate.end,
+                        date_type: this.exportDateType,
+                        interval: this.exportInterval,
+                        statistics: JSON.stringify(this.selectedStatistics),
+                        method: JSON.stringify(this.selectedMethod),
+                        date_type: this.dateType,
+                        export_path: this.exportPath,
+                        export_filename: this.exportFilename,
+                        export_format: this.exportFormat,
+                        options: JSON.stringify(this.exportOptions),
+                        graph_type: this.graphType,
+                        multi_graph_type: JSON.stringify(this.multiGraphType),
+                        geojson_data: JSON.stringify(this.geojson),
+                    });
+                } else {
+                    const domtoimage = await import("dom-to-image-more");
+                    const blob = await domtoimage.toBlob(mapElement);
 
-                // Convert to File and Send to Backend
-                const formData = new FormData();
-                formData.append("image", blob, `${this.exportFilename}.${this.exportFormat}`);
-                formData.append("export_format", this.exportFormat);
-                formData.append("export_path", this.exportPath);
-                formData.append("export_filename", this.exportFilename);
-                formData.append("file_paths", JSON.stringify(this.selectedGeoFolders));
+                    // Convert to File and Send to Backend
+                    const formData = new FormData();
+                    formData.append("image", blob, `${this.exportFilename}.${this.exportFormat}`);
+                    formData.append("export_format", this.exportFormat);
+                    formData.append("export_path", this.exportPath);
+                    formData.append("export_filename", this.exportFilename);
+                    formData.append("file_paths", JSON.stringify(this.selectedGeoFolders));
 
-                // Send to backend
-                const response = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/export_map`, formData, {
-                    headers: { "Content-Type": "multipart/form-data" }
-                });
+                    // Send to backend
+                    response = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/export_map`, formData, {
+                        headers: { "Content-Type": "multipart/form-data" }
+                    });
+                }
 
                 if (response.data.error) {
-                    alert("Error exporting map: ", response.data.error);
+                    alert("Error exporting map: " + response.data.error);
                 } else {
                     this.pushMessage({
                         message: "Map image downloaded successfully",
@@ -593,6 +709,7 @@ export default {
     --text-color: black;
     --button-primary: green;
     --button-danger: red;
+    --dropdown-bg: #fff;
     --overlay-background: rgba(0, 0, 0, 0.5);
 }
 
@@ -601,6 +718,7 @@ export default {
     --text-color: white;
     --button-primary: #28a745;
     --button-danger: #dc3545;
+    --dropdown-bg: #444;
     --overlay-background: rgba(0, 0, 0, 0.8);
 }
 
@@ -662,6 +780,41 @@ export default {
     cursor: pointer;
     color: var(--text-color);
     z-index: 1100;
+}
+
+.dropdown {
+    padding: 10px;
+    border: 1px solid var(--border-color);
+    border-radius: 5px;
+    background-color: var(--dropdown-bg);
+    font-size: 14px;
+    width: 100%;
+}
+
+.tab-header {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.tab-header button {
+    background: none;
+    border: none;
+    padding: 8px 15px;
+    cursor: pointer;
+    font-weight: bold;
+    color: var(--text-color);
+    transition: 0.3s;
+}
+
+.tab-header button.active {
+    border-bottom: 2px solid var(--button-primary);
+    color: var(--button-primary);
+}
+
+.tab-content {
+    padding: 10px;
 }
 
 .style-settings {
