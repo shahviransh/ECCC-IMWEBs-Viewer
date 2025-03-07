@@ -7,6 +7,8 @@ import geopandas as gpd
 import xlsxwriter
 import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
+import matplotlib.cm as cm
+from sklearn.preprocessing import KBinsDiscretizer
 from matplotlib.ticker import MaxNLocator, LinearLocator
 from cycler import cycler
 from config import Config
@@ -38,10 +40,13 @@ def fetch_data_service(data):
         interval = data.get("interval", "daily")
         method = json.loads(data.get("method", "['Equal']"))
         statistics = json.loads(data.get("statistics", "['None']"))
-        month = data.get("month", 'null')
-        season = data.get("season", 'null')
-        month = json.loads(month) if month == 'null' else month
-        season = json.loads(season) if season == 'null' else season
+
+        def get_json_value(data, key):
+            value = data.get(key, "null")
+            return json.loads(value) if value == "null" else value
+
+        month = get_json_value(data, "month")
+        season = get_json_value(data, "season")
         stats_df = None
 
         # Initialize DataFrame to store the merged data
@@ -175,6 +180,7 @@ def export_data_service(data):
         columns_list = json.loads(data.get("columns", "All"))
         date_type = data.get("date_type")
         graph_type = data.get("graph_type", "scatter")
+        geojson_data = json.loads(data.get("geojson_data", None))
 
         # Parse multi_graph_type
         multi_graph_type = json.loads(data.get("multi_graph_type", "[]"))
@@ -202,6 +208,7 @@ def export_data_service(data):
             options,
             date_type,
             multi_graph_type,
+            geojson_data,
             list(map(int, json.loads(data.get("id")))) if data.get("id") != [] else [],
         )
 
@@ -274,6 +281,7 @@ def save_to_file(
     options,
     date_type,
     multi_graph_type,
+    geojson_data,
     selected_ids=[],
 ):
     """Save two DataFrames to the specified file format sequentially."""
@@ -619,7 +627,9 @@ def aggregate_data(df, interval, method, date_type, month, season):
     if interval == "monthly":
         resampled_df = df.groupby(ID).resample("ME").first()
         if month:
-            resampled_df = resampled_df[resampled_df.index.get_level_values(date_type).month == int(month)]
+            resampled_df = resampled_df[
+                resampled_df.index.get_level_values(date_type).month == int(month)
+            ]
     elif interval == "seasonally":
         # Custom resampling for seasons
         df.reset_index(inplace=True)
@@ -1097,7 +1107,12 @@ def get_geojson_metadata(geojson_path):
     if bbox:
         x_min, x_max, y_min, y_max = bbox[0], bbox[2], bbox[1], bbox[3]
     else:
-        x_min, x_max, y_min, y_max = float("inf"), float("-inf"), float("inf"), float("-inf")
+        x_min, x_max, y_min, y_max = (
+            float("inf"),
+            float("-inf"),
+            float("inf"),
+            float("-inf"),
+        )
 
     field_names = []
 
@@ -1113,6 +1128,67 @@ def get_geojson_metadata(geojson_path):
         "field_names": list(dict.fromkeys(field_names)),
     }
 
+def generate_dynamic_colors(values, num_classes=5, colormap_name="YlGnBu"):
+    """
+    Generate dynamic colors based on feature column values using a colormap.
+    """
+    colormap = cm.get_cmap(colormap_name, num_classes)  # Get colormap with `num_classes` bins
+    norm = mcolors.Normalize(vmin=min(values), vmax=max(values))  # Normalize values
+    colors = [mcolors.to_hex(colormap(norm(level))) for level in np.linspace(min(values), max(values), num_classes)]
+    return colors
+
+def fetch_geojson_colors(data):
+    """
+    Fetches data from `fetch_data_service`, applies feature statistics, and generates geojson color mapping.
+    """
+    # Step 1: Fetch raw data
+    raw_data = fetch_data_service(data)
+    feature = data.get("feature", "value")
+    feature_statistic = data.get("feature_statistic", "mean")
+
+    if "data" not in raw_data:
+        return {"error": "No data found"}
+
+    df = pd.DataFrame(raw_data["data"])
+
+    # Ensure feature column exists
+    if feature not in df.columns:
+        return {"error": f"Feature column '{feature}' not found in data"}
+
+    # Step 2: Apply feature statistics
+    feature_df = df.groupby("ID")[feature].agg(feature_statistic).reset_index()
+
+    # Step 3: Apply Quantile Binning (Ensures Equal Distribution of IDs)
+    num_classes = 5
+    discretizer = KBinsDiscretizer(n_bins=num_classes, encode="ordinal", strategy="quantile")
+    feature_df["color_class"] = discretizer.fit_transform(feature_df[[feature]]).astype(int)
+
+    # Get bin edges
+    bin_edges = discretizer.bin_edges_[0]  # 6 bin edges for 5 bins
+
+    # Step 4: Generate 5 Colors Based on Quantile Bins
+    dynamic_colors = generate_dynamic_colors(feature_df[feature].values, num_classes=num_classes, colormap_name="YlGnBu")
+
+    # Step 5: Create 5 Color Levels Using
+    color_levels = [
+        {
+            "min": round(bin_edges[i], 2),
+            "max": round(bin_edges[i + 1], 2),
+            "color": dynamic_colors[i],
+        }
+        for i in range(num_classes)
+    ]
+
+    # Step 6: Assign Colors to Each ID Based on Their Bin
+    geojson_colors = {
+        row["ID"]: dynamic_colors[int(row["color_class"])]
+        for _, row in feature_df.iterrows()
+    }
+
+    return {
+        "geojson_colors": geojson_colors,
+        "geojson_color_levels": color_levels
+    }
 
 def process_geospatial_data(data):
     """
@@ -1221,7 +1297,12 @@ def process_geospatial_data(data):
 
             shp_metadata = {
                 "feature_count": reprojected_layer.GetFeatureCount(),
-                "extent": (round(x_min, 6), round(x_max, 6), round(y_min, 6), round(y_max, 6)),
+                "extent": (
+                    round(x_min, 6),
+                    round(x_max, 6),
+                    round(y_min, 6),
+                    round(y_max, 6),
+                ),
                 "field_names": properties,
             }
             geojson_metadata = {}
@@ -1369,17 +1450,11 @@ def process_geospatial_data(data):
             "Point": 3,
             "MultiPoint": 3,
         }
-        return order.get(geometry_type, 4)  # Default to last if unknown type
-
-    def sorted_merge(*iterables, key=None):
-        import heapq
-
-        """Efficiently merge sorted iterables."""
-        return heapq.merge(*iterables, key=key)
+        return order.get(geometry_type, float("inf"))  # Default to last if unknown type
 
     if combined_geojson:
-        combined_geojson["features"] = list(
-            sorted_merge(combined_geojson["features"], key=get_geometry_order)
+        combined_geojson["features"] = sorted(
+            combined_geojson["features"], key=get_geometry_order
         )
     return {
         "geojson": combined_geojson,

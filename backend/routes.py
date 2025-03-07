@@ -9,6 +9,7 @@ from services import (
     get_multi_columns_and_time_range,
     process_geospatial_data,
     export_map_service,
+    fetch_geojson_colors
 )
 from utils import shutdown_server, clear_cache
 from validate import (
@@ -40,10 +41,13 @@ def register_routes(app, cache):
 
         return jsonify(response)
 
-    @app.route("/api/export_data", methods=["GET"])
+    @app.route("/api/export_data", methods=["GET", "POST"])
     # This endpoint is not cached because the file is generated dynamically
     def export_data():
-        data = request.args
+        if request.method == "GET":
+            data = request.args
+        elif request.method == "POST":
+            data = request.json
 
         # Validate the request arguments
         validation_response = validate_export_data_args(data)
@@ -138,6 +142,22 @@ def register_routes(app, cache):
             return jsonify(validation_response)
 
         return send_file(filename, mimetype='image/png', as_attachment=True)
+    
+    @app.route("/api/get_geojson_colors", methods=["GET"])
+    def get_geojson_colors():
+        """
+        API endpoint to get GeoJSON colors.
+        """
+        data = request.args
+        
+        # Validate the request arguments
+        validation_response = validate_get_data_args(data)
+        if validation_response.get("error", None):
+            return jsonify(validation_response)
+        
+        colors = fetch_geojson_colors(data)
+        
+        return jsonify(colors)
     
     @app.route('/api/export_map', methods=['POST'])
     def export_map():
