@@ -6,7 +6,7 @@ const store = createStore({
     selectedDbsTables: [],
     selectedColumns: [],
     selectedGeoFolders: [],
-    geoColumsSet: false,
+    geoColumns: [],
     selectedIds: [],
     dateRange: {
       start: null,
@@ -64,16 +64,7 @@ const store = createStore({
       state.allSelectedColumns = value;
     },
     SET_COLUMNS(state, { columns }) {
-      if (state.pageTitle !== 'Map'){
-        state.geoColumsSet = false;
-      }
-
-      state.columns = state.geoColumsSet
-        ? [
-            ...state.columns,
-            ...columns.filter((c) => !state.columns.includes(c)),
-          ]
-        : columns;
+      state.columns = [...state.geoColumns, ...columns];
 
       // Remove the selected/export columns that are not in the new columns
       state.selectedColumns = state.selectedColumns.filter((column) =>
@@ -91,9 +82,9 @@ const store = createStore({
 
     },
     ADD_COLUMNS(state, { columns }) {
-      state.geoColumsSet = true;
       const temp = columns.filter((c) => !state.columns.includes(c));
-      state.columns = [...state.columns, ...temp];
+      state.geoColumns = temp;
+      state.columns = [...state.geoColumns, ...state.columns];
     },
     SET_SELECTED_DB_TABLE_REMOVE(state, table) {
       state.selectedDbsTables = state.selectedDbsTables.filter(
@@ -145,6 +136,8 @@ const store = createStore({
       }
       const temp = state.selectedDbsTables;
       state.selectedDbsTables = [...temp];
+      
+      state.selectedColumns = state.exportColumns = [];
     },
     SET_SELECTED_GEO_FOLDERS(state, folder) {
       if (!state.selectedGeoFolders.includes(folder)) {
@@ -152,6 +145,10 @@ const store = createStore({
       }
       const temp = state.selectedGeoFolders;
       state.selectedGeoFolders = [...temp];
+
+      if (state.selectedGeoFolders.length === 0) {
+        state.geoColumns = [];
+      }
     },
     SET_SELECTED_GEO_FOLDER_REMOVE(state, folder) {
       state.selectedGeoFolders = state.selectedGeoFolders.filter(
@@ -259,7 +256,7 @@ const store = createStore({
             }
           );
           if (response.data.error) {
-            alert("Error fetching data: ", response.data.error);
+            alert("Error fetching data: " + response.data.error);
             return;
           }
           commit("SET_FOLDER_TREE", response.data);
@@ -282,7 +279,7 @@ const store = createStore({
           }
         );
         if (response.data.error) {
-          alert("Error fetching data: ", response.data.error);
+          alert("Error fetching data: " + response.data.error);
           return;
         }
         commit("SET_TABLES", response.data);
@@ -301,7 +298,7 @@ const store = createStore({
         );
 
         if (response.data.error) {
-          alert("Error fetching data: ", response.data.error);
+          alert("Error fetching data: " + response.data.error);
           return;
         }
         commit("SET_OPTIONS", {
