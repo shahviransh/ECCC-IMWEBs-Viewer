@@ -195,6 +195,7 @@ export default {
     flex-direction: row;
     gap: 5px;
     margin: 0px auto;
+    min-height: fit-content;
     min-width: 45%;
     align-items: stretch;
     overflow-y: auto;
