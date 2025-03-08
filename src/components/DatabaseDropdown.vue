@@ -114,8 +114,8 @@ export default {
             }
             return null;
         },
-        onSelect(node, selected) {
-            if (node && selected) {
+        onSelect(node) {
+            if (node?.selected || node?.expanded) {
                 if (node.type === 'database') {
                     this.selectedDb = node.path;
                     this.fetchTables(this.selectedDb);
@@ -129,7 +129,6 @@ export default {
                     this.updateSelectedGeoFolders(node.path);
                 }
             } else {
-                console.log('Unselecting', node);
                 // Unselect table or folder
                 this.removeSelectedDbTable(node.name);
                 this.removeSelectedGeoFolder(node.path);

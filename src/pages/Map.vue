@@ -210,7 +210,7 @@ export default {
         },
     },
     computed: {
-        ...mapState(["selectedDbsTables", "selectedGeoFolders", "selectedMonth", "columns", "selectedSeason", "selectedColumns", "allSelectedColumns", "selectedIds", "dateRange", "selectedInterval", "selectedStatistics", "selectedMethod", "exportColumns", "exportIds", "exportDate", "exportInterval", "dateType", "exportDateType", "exportPath", "exportFilename", "exportFormat", "exportOptions", "theme"]),
+        ...mapState(["selectedDbsTables", "selectedGeoFolders", "selectedMonth", "columns", "selectedSeason", "selectedColumns", "allSelectedColumns", "selectedIds", "multiGraphType", "graphType", "currentZoomStart", "currentZoomEnd", "dateRange", "selectedInterval", "selectedStatistics", "selectedMethod", "exportColumns", "exportIds", "exportDate", "exportInterval", "dateType", "exportDateType", "exportPath", "exportFilename", "exportFormat", "exportOptions", "theme"]),
         polygonColor() {
             return this.theme === 'light' ? "#3388ff" : "#ff9800";
         },
@@ -291,7 +291,7 @@ export default {
                 if (response.data.error) {
                     alert("Error fetching Leaflet colors: " + response.data.error);
                 }
-            } else{
+            } else {
                 this.geojson_colors = {};
                 this.geojson_color_levels = [];
             }
@@ -790,8 +790,8 @@ export default {
 .tab-header {
     display: flex;
     justify-content: center;
-    gap: 10px;
-    margin-bottom: 10px;
+    gap: 5px;
+    margin-bottom: 0px;
 }
 
 .tab-header button {

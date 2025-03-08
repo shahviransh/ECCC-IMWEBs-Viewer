@@ -1,5 +1,7 @@
 <template>
-    <v-chart :option="chartOptions" :theme="theme" :key="refreshKey"></v-chart>
+    <div class="graph-display">
+        <v-chart :option="chartOptions" :theme="theme" :key="refreshKey"></v-chart>
+    </div>
 </template>
 
 <script>
@@ -87,7 +89,7 @@ export default {
                     left: '2%',
                     right: '2%',
                     bottom: '10%',
-                    top: '10%',
+                    top: '5%',
                     containLabel: true
                 },
                 dataZoom: [
@@ -213,3 +215,11 @@ export default {
     }
 };
 </script>
+
+<style scoped>
+.graph-display {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+</style>
