@@ -12,8 +12,6 @@ export default {
     data() {
         return {
             selectedDb: null,
-            selectedTable: null,
-            selectedFolder: null,
             treeData: [],
             separator: '/',
         };
@@ -116,8 +114,8 @@ export default {
             }
             return null;
         },
-        onSelect(node) {
-            if (node) {
+        onSelect(node, selected) {
+            if (node && selected) {
                 if (node.type === 'database') {
                     this.selectedDb = node.path;
                     this.fetchTables(this.selectedDb);
@@ -125,18 +123,16 @@ export default {
                     this.selectedTable = node.name;
                     this.updateSelectedDbsTables({
                         db: this.selectedDb,
-                        table: this.selectedTable
+                        table: node.name
                     });
                 } else if (node.type === 'file') {
-                    this.selectedFolder = node.path;
-                    this.updateSelectedGeoFolders(this.selectedFolder);
+                    this.updateSelectedGeoFolders(node.path);
                 }
             } else {
-                // Unselect table
-                this.removeSelectedDbTable(this.selectedTable);
-                this.removeSelectedGeoFolder(this.selectedFolder);
-                this.selectedTable = null;
-                this.selectedFolder = null;
+                console.log('Unselecting', node);
+                // Unselect table or folder
+                this.removeSelectedDbTable(node.name);
+                this.removeSelectedGeoFolder(node.path);
             }
         }
     },

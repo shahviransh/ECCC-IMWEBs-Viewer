@@ -291,6 +291,9 @@ export default {
                 if (response.data.error) {
                     alert("Error fetching Leaflet colors: " + response.data.error);
                 }
+            } else{
+                this.geojson_colors = {};
+                this.geojson_color_levels = [];
             }
             this.initializeMap(); // Initialize the map with the new styles
         },
@@ -536,7 +539,7 @@ export default {
                             div.style.boxShadow = "0 2px 10px rgba(0, 0, 0, 0.3)";
                             div.style.fontFamily = "Arial, sans-serif";
                             div.style.fontSize = "14px";
-                            div.style.maxWidth = "180px";
+                            div.style.maxWidth = "220px";
                             div.style.border = "1px solid #ccc";
                             div.style.position = "relative";
                             div.style.zIndex = "1000";

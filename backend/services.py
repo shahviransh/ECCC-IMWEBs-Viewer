@@ -8,6 +8,8 @@ import xlsxwriter
 import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
 import matplotlib.cm as cm
+import cmocean.cm
+import itertools
 from sklearn.preprocessing import KBinsDiscretizer
 from matplotlib.ticker import MaxNLocator, LinearLocator
 from cycler import cycler
@@ -27,7 +29,7 @@ os.environ["PROJ_LIB"] = Config.PROJ_LIB
 os.environ["GDAL_DATA"] = Config.GDAL_DATA
 
 
-def fetch_data_service(data):
+def fetch_data_service(data, data_daily=False):
     """Fetch data and statistics from the specified databases and tables."""
     try:
         # Extract the required parameters from the request data
@@ -41,13 +43,10 @@ def fetch_data_service(data):
         method = json.loads(data.get("method", "['Equal']"))
         statistics = json.loads(data.get("statistics", "['None']"))
 
-        def get_json_value(data, key):
-            value = data.get(key, "null")
-            return json.loads(value) if value == "null" else value
-
         month = get_json_value(data, "month")
         season = get_json_value(data, "season")
         stats_df = None
+        daily_df = None
 
         # Initialize DataFrame to store the merged data
         df = pd.DataFrame()
@@ -136,8 +135,8 @@ def fetch_data_service(data):
                 return {
                     "error": "Time conversion and statistics cannot be performed for non-time series data"
                 }
-            df, stats_df = aggregate_data(
-                df, interval, method, date_type, month, season
+            df, stats_df, daily_df = aggregate_data(
+                df, interval, method, date_type, month, season, data_daily
             )
         elif statistics != ["None"]:
             if not date_type:
@@ -151,10 +150,16 @@ def fetch_data_service(data):
             "data": df.to_dict(orient="records"),
             "stats": stats_df.to_dict(orient="records") if stats_df is not None else [],
             "statsColumns": stats_df.columns.tolist() if stats_df is not None else [],
+            "data_daily": daily_df.to_dict(orient="records")
+            if daily_df is not None
+            else [],
         }
     except Exception as e:
         return {"error": str(e)}
 
+def get_json_value(data, key):
+    value = data.get(key, "null")
+    return json.loads(value) if value == "null" else value
 
 def export_data_service(data):
     """Export data and statistics to a file in the specified format."""
@@ -513,8 +518,8 @@ def save_to_file(
 
         # Find the first column containing "id" (case-insensitive)
         if id_column:
-            # Rename 'ID' in dataframe1 to match the found id_column in gdf
-            dataframe1 = dataframe1.rename(columns={"ID": id_column})
+            # Rename ID in dataframe1 to match the found id_column in gdf
+            dataframe1 = dataframe1.rename(columns={ID: id_column})
 
             # Merge the Shapefile data with the attribute DataFrame using the correct ID column
             # Left join to keep all geometries in the Shapefile
@@ -664,12 +669,13 @@ def get_season_from_date(date_str):
 
 
 # Helper function to apply time interval aggregation
-def aggregate_data(df, interval, method, date_type, month, season):
+def aggregate_data(df, interval, method, date_type, month, season, data_daily):
     """Aggregate data based on the specified interval and method."""
     # Convert the date_type column to datetime
     df[date_type] = pd.to_datetime(df[date_type])
     df.set_index(date_type, inplace=True)
     resampled_df = None
+    daily_df = None
     ID = next((col for col in df.columns if "ID" in col), None)
     # Resample the data based on the specified interval
     if interval == "monthly":
@@ -698,6 +704,23 @@ def aggregate_data(df, interval, method, date_type, month, season):
         else resampled_df
     )
     resampled_df.reset_index(inplace=True)
+    
+    # Handle daily data extraction
+    if data_daily:
+        df.reset_index(inplace=True)
+                
+        # Extract daily data based on the specified interval
+        if month:
+            daily_df = df[df[date_type].dt.month == int(month)]
+        elif season:
+            daily_df = df[df["Season"] == season.title()]
+        else:
+            daily_df = df.copy()
+        
+        # Add additional columns for year and month
+        daily_df["Year"] = daily_df[date_type].dt.year
+        daily_df["Month"] = daily_df[date_type].dt.month
+        daily_df[date_type] = daily_df[date_type].dt.strftime("%Y-%m-%d")
 
     # Format the date column based on the interval
     if interval != "seasonally":
@@ -710,14 +733,14 @@ def aggregate_data(df, interval, method, date_type, month, season):
         resampled_df[date_type] = resampled_df[date_type].dt.strftime("%Y-%m-%d")
     stats_df = calculate_statistics(resampled_df, method, date_type)
 
-    return resampled_df, stats_df.map(round_numeric_values)
+    return resampled_df, stats_df.map(round_numeric_values), daily_df if data_daily else None
 
 
 def round_numeric_values(value):
     """Round numeric values to 3 decimal places."""
     if isinstance(value, (float, int)):  # Check if the value is a number
-        return round(value, 3)  # Round to 3 decimal places
-    return value  # Leave non-numeric values unchanged
+        return round(value, 3) 
+    return value
 
 
 def calculate_statistics(df, statistics, date_type):
@@ -1116,8 +1139,8 @@ def get_raster_color_levels(band, colormap, num_classes=5):
     # Create the color level mapping
     color_levels = [
         {
-            "min": round(levels[i].item(), 2),
-            "max": round(levels[i + 1].item(), 2),
+            "min": round(levels[i].item(), 4),
+            "max": round(levels[i + 1].item(), 4),
             "color": colors[i],
         }
         for i in range(num_classes)
@@ -1176,7 +1199,7 @@ def get_geojson_metadata(geojson_path):
         "field_names": list(dict.fromkeys(field_names)),
     }
 
-def generate_dynamic_colors(values, num_classes=5, colormap_name="YlGnBu"):
+def generate_dynamic_colors(values, colormap_name, num_classes=5):
     """
     Generate dynamic colors based on feature column values using a colormap.
     """
@@ -1185,26 +1208,108 @@ def generate_dynamic_colors(values, num_classes=5, colormap_name="YlGnBu"):
     colors = [mcolors.to_hex(colormap(norm(level))) for level in np.linspace(min(values), max(values), num_classes)]
     return colors
 
+def get_colormap_name(feature):
+    """Automatically selects the best colormap for a given feature string."""
+    feature = feature.lower().replace("_", " ").split(" ")  # Normalize feature name
+    
+    feature_colormap_map = {
+        # Hydrology & Climate
+        "precipitation": "YlGnBu",
+        "rainfall": "YlGnBu",
+        "p": "YlGnBu",
+        "p_net": "YlGnBu",
+        "p_blow": "YlGnBu",
+        "surface runoff": "PuBu",
+        "runoff": "PuBu",
+        "qout_m3": "PuBu",
+        "qout_mm": "PuBu",
+        "flooding": "Blues",
+        "temperature": "RdYlBu_r",
+        "air temperature": "RdYlBu_r",
+        "soil temperature": "RdYlBu_r",
+        "humidity": "BuGn",
+        "drought": "BrBG",
+        "soil moisture": "BrBG",
+        "evaporation": "Oranges",
+        "wind speed": cmocean.cm.speed,
+
+        # Water Quality & Pollution
+        "air quality": "RdYlGn_r",
+        "air pollution": "RdYlGn_r",
+        "pm2.5": "RdYlGn_r",
+        "ozone": "RdYlGn_r",
+        "co2": "OrRd",
+        "chlorophyll": cmocean.cm.algae,
+        "chla": cmocean.cm.algae,
+        "cbod": "PuRd",
+        "dissolved oxygen": "coolwarm",
+        "nh3": "YlOrBr",
+        "no2": "YlOrBr",
+        "no3": "YlOrBr",
+        "organic nitrogen": "BuPu",
+        "organic phosphorus": "BuPu",
+        "sediment": "Greys",
+
+        # Geography & Terrain
+        "elevation": "terrain",
+        "altitude": "terrain",
+        "topography": "terrain",
+        "bathymetry": cmocean.cm.deep,
+
+        # Environmental & Vegetation
+        "vegetation": "Greens",
+        "ndvi": "PiYG",
+        "land cover": "tab10",
+        "forest density": "Greens",
+        "soil moisture": "BrBG",
+        
+        # Other Scientific Data
+        "population density": "Purples",
+    }
+
+    # Generate combinations of features, keeping order intact
+    for r in [1, 2]:  # Only generate combinations of length 1 and 2
+        for combo in itertools.combinations(feature, r):
+            combined_feat = " ".join(combo)
+            if combined_feat in feature_colormap_map:
+                return feature_colormap_map[combined_feat]
+        
+    # If no match found, return default "viridis"
+    return "viridis"
+
 def fetch_geojson_colors(data):
     """
     Fetches data from `fetch_data_service`, applies feature statistics, and generates geojson color mapping.
-    """
+    """    
     # Step 1: Fetch raw data
-    raw_data = fetch_data_service(data)
+    raw_data = fetch_data_service(data, data_daily=True)
     feature = data.get("feature", "value")
     feature_statistic = data.get("feature_statistic", "mean")
-
+    interval = data.get("interval", "daily")
+    
     if "data" not in raw_data:
         return {"error": "No data found"}
-
-    df = pd.DataFrame(raw_data["data"])
-
+    
+    df = pd.DataFrame(raw_data["data_daily"]) if raw_data["data_daily"] else pd.DataFrame(raw_data["data"])
+    ID = next((col for col in df.columns if "ID" in col), None)
+    
     # Ensure feature column exists
     if feature not in df.columns:
         return {"error": f"Feature column '{feature}' not found in data"}
 
     # Step 2: Apply feature statistics
-    feature_df = df.groupby("ID")[feature].agg(feature_statistic).reset_index()
+    if feature_statistic == "mean" and interval != "daily":
+        total_years = df['Year'].nunique()  # Unique number of years
+        if interval == "monthly":
+            total_months = df['Month'].nunique()
+            feature_df = df.groupby(ID)[feature].sum().transform(lambda x: x / (total_years*total_months)).reset_index()
+        elif interval == "yearly":
+            feature_df = df.groupby(ID)[feature].sum().transform(lambda x: x / total_years).reset_index()
+        elif interval == "seasonally":
+            total_seasons = df['Season'].nunique()
+            feature_df = df.groupby(ID)[feature].sum().transform(lambda x: x / (total_seasons*total_years)).reset_index()          
+    else:
+        feature_df = df.groupby(ID)[feature].agg(feature_statistic).reset_index()
 
     # Step 3: Apply Quantile Binning (Ensures Equal Distribution of IDs)
     num_classes = 5
@@ -1215,13 +1320,16 @@ def fetch_geojson_colors(data):
     bin_edges = discretizer.bin_edges_[0]  # 6 bin edges for 5 bins
 
     # Step 4: Generate 5 Colors Based on Quantile Bins
-    dynamic_colors = generate_dynamic_colors(feature_df[feature].values, num_classes=num_classes, colormap_name="YlGnBu")
+    dynamic_colors = generate_dynamic_colors(feature_df[feature].values, get_colormap_name(feature), num_classes=num_classes)
+
+    if (len(bin_edges) != 6):
+        return {"error": "Error generating color levels as the number of ID's is not greater than 5."}
 
     # Step 5: Create 5 Color Levels Using
     color_levels = [
         {
-            "min": round(bin_edges[i], 2),
-            "max": round(bin_edges[i + 1], 2),
+            "min": round(bin_edges[i], 4),
+            "max": round(bin_edges[i + 1], 4),
             "color": dynamic_colors[i],
         }
         for i in range(num_classes)
@@ -1229,7 +1337,7 @@ def fetch_geojson_colors(data):
 
     # Step 6: Assign Colors to Each ID Based on Their Bin
     geojson_colors = {
-        row["ID"]: dynamic_colors[int(row["color_class"])]
+        row[ID]: dynamic_colors[int(row["color_class"])]
         for _, row in feature_df.iterrows()
     }
 

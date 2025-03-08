@@ -15,6 +15,7 @@ charset-normalizer
 click
 click-plugins
 cligj
+cmocean
 colorama
 config
 contourpy 

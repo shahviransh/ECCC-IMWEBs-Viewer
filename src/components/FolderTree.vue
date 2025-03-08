@@ -61,13 +61,13 @@ export default {
                 this.$emit('select', node); // Emit the folder node
             } else if (node.type === 'table' || node.type === 'file') {
                 node.selected = !node.selected; // Toggle selection state
-                this.$emit('select', node.selected ? node : null); // Emit selected node or null if unselected
+                this.$emit('select', node, node.selected); // Emit selected node and if selected
             }
 
         },
         onSelect(node) {
             // Propagate the select event upwards
-            this.$emit('select', node);
+            this.$emit('select', node, node.selected);
         },
         expandNodesBasedOnPage(page) {
             if (this.modelFolder.includes('Jenette_Creek_Watershed')) {
