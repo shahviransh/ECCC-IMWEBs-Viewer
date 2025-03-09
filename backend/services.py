@@ -21,6 +21,7 @@ import json
 import threading
 import pyogrio
 from osgeo import ogr, osr, gdal
+from zipfile import ZipFile, ZIP_DEFLATED
 
 alias_mapping = {}
 global_dbs_tables_columns = {}
@@ -42,9 +43,8 @@ def fetch_data_service(data):
         interval = data.get("interval", "daily")
         method = json.loads(data.get("method", "['Equal']"))
         statistics = json.loads(data.get("statistics", "['None']"))
-
-        month = get_json_value(data, "month")
-        season = get_json_value(data, "season")
+        month = data.get("month", None)
+        season = data.get("season", None)
         stats_df = None
 
         # Initialize DataFrame to store the merged data
@@ -166,19 +166,14 @@ def fetch_data_service(data):
         return {"error": str(e)}
 
 
-def get_json_value(data, key):
-    value = data.get(key, "null")
-    return json.loads(value) if value == "null" else value
-
-
-def export_data_service(data):
+def export_data_service(data, is_empty=False):
     """Export data and statistics to a file in the specified format."""
     try:
         # Fetch the data and statistics from the fetch_data_service
-        output = fetch_data_service(data)
+        output = fetch_data_service(data) if not is_empty else {}
         if output.get("error", None):
             return output
-        df = pd.DataFrame(output["data"])
+        df = pd.DataFrame(output["data"]) if output.get("data", None) else None
         stats_df = (
             pd.DataFrame(output["stats"]) if output.get("statsColumns", None) else None
         )
@@ -225,6 +220,7 @@ def export_data_service(data):
             multi_graph_type,
             geojson_data,
             list(map(int, json.loads(data.get("id")))) if data.get("id") != [] else [],
+            is_empty,
         )
 
         return {"file_path": file_path}
@@ -298,6 +294,7 @@ def save_to_file(
     multi_graph_type,
     geojson_data,
     selected_ids=[],
+    is_empty=False,
 ):
     """Save two DataFrames to the specified file format sequentially."""
     # Set the file path
@@ -317,20 +314,21 @@ def save_to_file(
         "scatter": "scatter",
     }
 
-    # Check if the dataframe contains an ID column
-    ID = next((col for col in dataframe1.columns if "ID" in col), None)
-    dataframe1[date_type] = pd.to_datetime(dataframe1[date_type])
+    if not is_empty:
+        # Check if the dataframe contains an ID column
+        ID = next((col for col in dataframe1.columns if "ID" in col), None)
+        dataframe1[date_type] = pd.to_datetime(dataframe1[date_type])
 
-    # Keep track of which axis (primary or secondary) to use for each column
-    primary_axis_columns = []
-    secondary_axis_columns = []
+        # Keep track of which axis (primary or secondary) to use for each column
+        primary_axis_columns = []
+        secondary_axis_columns = []
 
-    # Classify columns based on their value ranges (example threshold: >100 for secondary y-axis)
-    for column in dataframe1.columns[1:]:
-        if dataframe1[column].max() > 100:
-            secondary_axis_columns.append(column)
-        else:
-            primary_axis_columns.append(column)
+        # Classify columns based on their value ranges (example threshold: >100 for secondary y-axis)
+        for column in dataframe1.columns[1:]:
+            if dataframe1[column].max() > 100:
+                secondary_axis_columns.append(column)
+            else:
+                primary_axis_columns.append(column)
 
     # Write first dataframe and/or statistics dataframe to file with csv/text format
     if file_format == "csv":
@@ -522,12 +520,16 @@ def save_to_file(
             "MultiPoint",
             "MultiLineString",
         ]
+        
+        # Set CRS if it's not already defined
+        if gdf.crs is None:
+            gdf.set_crs("EPSG:4326", allow_override=True, inplace=True)
 
         # Find the first column containing "id" (case-insensitive)
         id_column = next((col for col in gdf.columns if "id" in col.lower()), None)
 
         # Find the first column containing "id" (case-insensitive)
-        if id_column:
+        if id_column and dataframe1 is not None:
             # Rename ID in dataframe1 to match the found id_column in gdf
             dataframe1 = dataframe1.rename(columns={ID: id_column})
 
@@ -550,6 +552,7 @@ def save_to_file(
         geometry_and_suffixes = [
             (gdf_geom, f"_{gdf_geom.geom_type.iloc[0].lower()}")
             for gdf_geom in gdf_dict.values()
+            if not gdf_geom.empty
         ]
 
         # Iterate through each geometry type and save it if it's not empty
@@ -558,6 +561,15 @@ def save_to_file(
                 gdf_geom.to_file(
                     f"{base_filename}{suffix}.shp", driver="ESRI Shapefile"
                 )
+                
+        # Save all files in base directory
+        with ZipFile(f"{base_filename}.zip", "w", compression=ZIP_DEFLATED) as zipf:
+            for root, _, files in os.walk(os.path.dirname(file_path)):
+                for file in files:
+                    zipf.write(os.path.join(root, file)) if not file.endswith(".zip") else None
+                    
+        file_path = f"{base_filename}.zip"
+
     return file_path
 
 
@@ -1709,6 +1721,12 @@ def export_map_service(image, form_data):
 
             exported_images.append(image_path)
 
-        return {"exported_images": exported_images}
+        # Combine exported images into a single zip file
+        zip_path = os.path.join(export_dir, f"{output_filename}.zip")
+        with ZipFile(zip_path, "w") as zipf:
+            for image_path in exported_images:
+                zipf.write(image_path)
+
+        return {"file_path": zip_path}
     except Exception as e:
         return {"error": str(e)}

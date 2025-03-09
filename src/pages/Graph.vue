@@ -72,7 +72,7 @@ export default {
         };
     },
     computed: {
-        ...mapState(["selectedDbsTables", "selectedColumns", "allSelectedColumns", "multiGraphType", "currentZoomStart", "currentZoomEnd", "selectedIds", "dateRange", "selectedInterval", "selectedStatistics", "selectedMethod", "exportColumns", "graphType", "exportIds", "exportDate", "exportInterval", "dateType", "exportDateType", "exportPath", "exportFilename", "exportFormat", "exportOptions", "theme"]),
+        ...mapState(["selectedDbsTables", "selectedColumns", "allSelectedColumns", "multiGraphType", "currentZoomStart", "currentZoomEnd", "selectedIds", "dateRange", "selectedInterval", "selectedStatistics", "selectedMethod", "exportColumns", "graphType", "exportIds", "exportDate", "exportInterval", "dateType", "exportPath", "exportFilename", "exportFormat", "exportOptions", "theme"]),
     },
     methods: {
         ...mapActions(["updateSelectedColumns", "updateExportOptions", "updateAllSelectedColumns", "pushMessage", "clearMessages"]),
@@ -138,7 +138,6 @@ export default {
                         id: JSON.stringify(this.exportIds),
                         start_date: this.exportDate.start,
                         end_date: this.exportDate.end,
-                        date_type: this.exportDateType,
                         interval: this.exportInterval,
                         statistics: JSON.stringify(this.selectedStatistics),
                         method: JSON.stringify(this.selectedMethod),

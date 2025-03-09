@@ -9,7 +9,7 @@ from services import (
     get_multi_columns_and_time_range,
     process_geospatial_data,
     export_map_service,
-    fetch_geojson_colors
+    fetch_geojson_colors,
 )
 from utils import shutdown_server, clear_cache
 from validate import (
@@ -20,15 +20,13 @@ from validate import (
     validate_get_table_details_args,
     validate_geospatial_args,
     validate_export_map_args,
-    validate_serve_tif_args
+    validate_serve_tif_args,
 )
 
 
 def register_routes(app, cache):
     @app.route("/api/get_data", methods=["GET"])
-    @cache.cached(
-        timeout=300, query_string=True
-    )
+    @cache.cached(timeout=300, query_string=True)
     def get_data():
         data = request.args
 
@@ -54,14 +52,23 @@ def register_routes(app, cache):
         if validation_response.get("error", None):
             return jsonify(validation_response)
 
-        file_path = export_data_service(data)
+        if request.method == "POST":
+            if data.get("date_type", None):
+                is_empty = False
+            else:
+                is_empty = True
+                data["date_type"] = "GeoJson Only"
+            file_path = export_data_service(data, is_empty)
+        else:
+            file_path = export_data_service(data)
+            
+        if file_path.get("error", None):
+            return jsonify(file_path)
 
         return send_file(file_path.get("file_path"), as_attachment=True)
 
     @app.route("/api/get_tables", methods=["GET"])
-    @cache.cached(
-        timeout=300, query_string=True
-    )
+    @cache.cached(timeout=300, query_string=True)
     def get_tables():
         data = request.args
 
@@ -133,7 +140,7 @@ def register_routes(app, cache):
         Serve the TIF file from the specified path.
         """
         # Ensure the file has a .tif or .tiff extension
-        if not (filename.lower().endswith(('.tif', '.tiff', '.png'))):
+        if not (filename.lower().endswith((".tif", ".tiff", ".png"))):
             return jsonify({"error": "Only .tif or .tiff files are allowed"})
 
         # Validate the file path
@@ -141,8 +148,8 @@ def register_routes(app, cache):
         if validation_response.get("error", None):
             return jsonify(validation_response)
 
-        return send_file(filename, mimetype='image/png', as_attachment=True)
-    
+        return send_file(filename, mimetype="image/png", as_attachment=True)
+
     @app.route("/api/get_geojson_colors", methods=["GET"])
     @cache.cached(timeout=300, query_string=True)
     def get_geojson_colors():
@@ -150,22 +157,22 @@ def register_routes(app, cache):
         API endpoint to get GeoJSON colors.
         """
         data = request.args
-        
+
         # Validate the request arguments
         validation_response = validate_get_data_args(data)
         if validation_response.get("error", None):
             return jsonify(validation_response)
-        
+
         colors = fetch_geojson_colors(data)
-        
+
         return jsonify(colors)
-    
-    @app.route('/api/export_map', methods=['POST'])
+
+    @app.route("/api/export_map", methods=["POST"])
     def export_map():
         """
         API endpoint to export the map image.
         """
-        image = request.files.get('image')
+        image = request.files.get("image")
         form_data = request.form.to_dict()
 
         # Validate the request arguments
@@ -173,9 +180,12 @@ def register_routes(app, cache):
         if validation_response.get("error", None):
             return jsonify(validation_response)
 
-        image_path = export_map_service(image, form_data)
+        file_path = export_map_service(image, form_data)
+        
+        if file_path.get("error", None):
+            return jsonify(file_path)
 
-        return jsonify(image_path)
+        return send_file(file_path.get("file_path"), as_attachment=True)
 
     @app.route("/health", methods=["GET"])
     def health():

@@ -51,12 +51,12 @@ def validate_get_data_args(request_args):
         "start_date": {
             "type": "string",
             "required": True,
-            "regex": r"^\d{4}-\d{2}-\d{2}$",
+            "regex": r"^\d{4}-\d{2}-\d{2}$|^$",
         },
         "end_date": {
             "type": "string",
             "required": True,
-            "regex": r"^\d{4}-\d{2}-\d{2}$",
+            "regex": r"^\d{4}-\d{2}-\d{2}$|^$"
         },
         "date_type": {
             "type": "string",
@@ -74,12 +74,26 @@ def validate_get_data_args(request_args):
         "month": {
             "type": "string",
             "required": False,
-            "allowed": ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "null"],
+            "allowed": [
+                "1",
+                "2",
+                "3",
+                "4",
+                "5",
+                "6",
+                "7",
+                "8",
+                "9",
+                "10",
+                "11",
+                "12",
+                "",
+            ],
         },
         "season": {
             "type": "string",
             "required": False,
-            "allowed": ["summer", "winter", "fall", "spring", "null"],
+            "allowed": ["summer", "winter", "fall", "spring", ""],
         },
         "feature": {
             "type": "string",
@@ -88,8 +102,8 @@ def validate_get_data_args(request_args):
         "feature_statictic": {
             "type": "string",
             "required": False,
-            "allowed": ["Average", "Sum", "Maximum", "Minimum", "null"],
-        }
+            "allowed": ["Average", "Sum", "Maximum", "Minimum"],
+        },
     }
     return validate_request_args(schema, request_args)
 
@@ -107,12 +121,12 @@ def validate_export_data_args(request_args):
         "start_date": {
             "type": "string",
             "required": True,
-            "regex": r"^\d{4}-\d{2}-\d{2}$",
+            "regex": r"^\d{4}-\d{2}-\d{2}$|^$",
         },
         "end_date": {
             "type": "string",
             "required": True,
-            "regex": r"^\d{4}-\d{2}-\d{2}$",
+            "regex": r"^\d{4}-\d{2}-\d{2}$|^$",
         },
         "date_type": {
             "type": "string",
@@ -135,11 +149,44 @@ def validate_export_data_args(request_args):
         "export_format": {
             "type": "string",
             "required": True,
-            "allowed": ["csv", "txt", "xsls", "png", "jpg", "jpeg", "svg", "pdf"],
+            "allowed": [
+                "csv",
+                "txt",
+                "xsls",
+                "png",
+                "jpg",
+                "jpeg",
+                "svg",
+                "pdf",
+                "shp",
+            ],
         },
         "export_path": {"type": "string", "required": True},
         "options": {"type": "string", "required": True},
-        "geojson_data": {"type": "string", "required": False},
+        "month": {
+            "type": "string",
+            "required": False,
+            "allowed": [
+                "1",
+                "2",
+                "3",
+                "4",
+                "5",
+                "6",
+                "7",
+                "8",
+                "9",
+                "10",
+                "11",
+                "12",
+                "",
+            ],
+        },
+        "season": {
+            "type": "string",
+            "required": False,
+            "allowed": ["summer", "winter", "fall", "spring", ""],
+        },
     }
     return validate_request_args(schema, request_args)
 
@@ -200,7 +247,7 @@ def getUserValidationError(errors):
     """
     # Mapping regex patterns to human-readable messages
     regex_messages = {
-        r"^\d{4}-\d{2}-\d{2}$": "should be in the format YYYY-MM-DD (e.g., 2024-01-01).",
+        r"^\d{4}-\d{2}-\d{2}$|^$": "should be in the format YYYY-MM-DD (e.g., 2024-01-20).",
         r"^[\w,\s-]+$$": "should contain only letters, numbers, spaces, commas, underscore and hyphens.",
         r'\["\d+"(,\s*"\d+")*\]|\[\]': "should be a numbers quoted and enclosed in square brackets (e.g., ['1','2','3']).",
     }

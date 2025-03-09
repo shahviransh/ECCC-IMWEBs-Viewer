@@ -212,7 +212,7 @@ export default {
         },
     },
     computed: {
-        ...mapState(["selectedDbsTables", "selectedGeoFolders", "selectedMonth", "columns", "selectedSeason", "selectedColumns", "allSelectedColumns", "selectedIds", "multiGraphType", "graphType", "currentZoomStart", "currentZoomEnd", "dateRange", "selectedInterval", "selectedStatistics", "selectedMethod", "exportColumns", "exportIds", "exportDate", "exportInterval", "dateType", "exportDateType", "exportPath", "exportFilename", "exportFormat", "exportOptions", "theme"]),
+        ...mapState(["selectedDbsTables", "selectedGeoFolders", "selectedMonth", "columns", "selectedSeason", "selectedColumns", "allSelectedColumns", "selectedIds", "multiGraphType", "graphType", "currentZoomStart", "currentZoomEnd", "dateRange", "selectedInterval", "selectedStatistics", "selectedMethod", "exportColumns", "exportIds", "exportDate", "exportInterval", "dateType", "exportPath", "exportFilename", "exportFormat", "exportOptions", "theme"]),
         polygonColor() {
             return this.theme === 'light' ? "#3388ff" : "#ff9800";
         },
@@ -283,7 +283,7 @@ export default {
                         month: this.selectedMonth,
                         season: this.selectedSeason,
                         feature: this.selectedFeature,
-                        feature_statictic: this.selectedFeatureStatictic,
+                        feature_statictic: this.selectedFeatureStatistic,
                     }
                 });
 
@@ -651,7 +651,6 @@ export default {
                         id: JSON.stringify(this.exportIds),
                         start_date: this.exportDate.start,
                         end_date: this.exportDate.end,
-                        date_type: this.exportDateType,
                         interval: this.exportInterval,
                         statistics: JSON.stringify(this.selectedStatistics),
                         method: JSON.stringify(this.selectedMethod),

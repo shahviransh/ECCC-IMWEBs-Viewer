@@ -9,8 +9,8 @@ const store = createStore({
     geoColumns: [],
     selectedIds: [],
     dateRange: {
-      start: null,
-      end: null,
+      start: '',
+      end: '',
     },
     tooltipColumns: {},
     theme: "light",
@@ -24,18 +24,17 @@ const store = createStore({
     exportColumns: [],
     exportIds: [],
     exportDate: {
-      start: null,
-      end: null,
+      start: '',
+      end: '',
     },
     modelFolder: "Jenette_Creek_Watershed",
-    dateType: null,
-    exportDateType: null,
+    dateType: '',
     selectedMethod: ["Equal"],
     selectedStatistics: ["None"],
     selectedInterval: "daily",
     exportInterval: "daily",
-    selectedSeason: null,
-    selectedMonth: null,
+    selectedSeason: '',
+    selectedMonth: '',
     exportPath: "dataExport",
     exportFilename: "exported_data",
     exportFormat: "csv",
@@ -96,13 +95,12 @@ const store = createStore({
     },
     SET_OPTIONS(
       state,
-      { ids, dateRange, dateType, exportDate, exportDateType }
+      { ids, dateRange, dateType, exportDate }
     ) {
       state.ids = ids;
       state.dateRange = dateRange;
       state.dateType = dateType;
       state.exportDate = exportDate;
-      state.exportDateType = exportDateType;
     },
     SET_DEFAULT_SELECTIONS(
       state,
@@ -208,9 +206,6 @@ const store = createStore({
     SET_DATE_TYPE(state, type) {
       state.dateType = type;
     },
-    SET_EXPORT_DATE_TYPE(state, type) {
-      state.exportDateType = type;
-    },
     SET_SELECTED_METHOD(state, method) {
       state.selectedMethod = method;
     },
@@ -312,7 +307,6 @@ const store = createStore({
             start: response.data.start_date,
             end: response.data.end_date,
           },
-          exportDateType: response.data.date_type,
           selectedInterval: response.data.interval,
           exportInterval: response.data.interval,
         });
@@ -411,9 +405,6 @@ const store = createStore({
     },
     updateDateType({ commit }, type) {
       commit("SET_DATE_TYPE", type);
-    },
-    updateExportDateType({ commit }, type) {
-      commit("SET_EXPORT_DATE_TYPE", type);
     },
     updateSelectedMethod({ commit }, method) {
       commit("SET_SELECTED_METHOD", method);
