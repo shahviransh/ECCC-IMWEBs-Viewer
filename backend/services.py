@@ -18,14 +18,13 @@ from datetime import datetime
 from flask import abort
 import sys
 import json
-import threading
+from concurrent.futures import ThreadPoolExecutor
 import pyogrio
 from osgeo import ogr, osr, gdal
 from zipfile import ZipFile, ZIP_DEFLATED
 
 alias_mapping = {}
 global_dbs_tables_columns = {}
-lock = threading.Lock()
 os.environ["PROJ_LIB"] = Config.PROJ_LIB
 os.environ["GDAL_DATA"] = Config.GDAL_DATA
 
@@ -324,7 +323,8 @@ def save_to_file(
         secondary_axis_columns = []
 
         # Classify columns based on their value ranges (example threshold: >100 for secondary y-axis)
-        for column in dataframe1.columns[1:]:
+        selected_columns = [col for col in dataframe1.columns if col != date_type]
+        for column in selected_columns:
             if dataframe1[column].max() > 100:
                 secondary_axis_columns.append(column)
             else:
@@ -519,22 +519,34 @@ def save_to_file(
             "MultiPoint",
             "MultiLineString",
         ]
-        
+
         # Set CRS if it's not already defined
         if gdf.crs is None:
             gdf.set_crs("EPSG:4326", allow_override=True, inplace=True)
 
-        # Find the first column containing "id" (case-insensitive)
-        id_column = next((col for col in gdf.columns if "id" in col.lower()), None)
+        # Find all columns containing "id" (case-insensitive)
+        id_columns = [col for col in gdf.columns if "id" in col.lower()]
 
-        # Find the first column containing "id" (case-insensitive)
-        if id_column and dataframe1 is not None:
+        # If there are multiple id columns, merge them into a single 'ID' column
+        if len(id_columns) > 1:
+            # Initialize the 'ID' column with the first 'id' column
+            gdf["ID"] = gdf[id_columns[0]]
+
+            # Loop through the remaining 'id' columns and fill NaNs
+            for col in id_columns[1:]:
+                gdf["ID"] = gdf["ID"].fillna(gdf[col])
+
+            # Drop all the original 'id' columns
+            for col in id_columns:
+                gdf.drop(columns=[col], inplace=True)
+
+        if dataframe1 is not None:
             # Rename ID in dataframe1 to match the found id_column in gdf
-            dataframe1 = dataframe1.rename(columns={ID: id_column})
+            dataframe1 = dataframe1.rename(columns={ID: "ID"})
 
             # Merge the Shapefile data with the attribute DataFrame using the correct ID column
             # Left join to keep all geometries in the Shapefile
-            merged_gdf = gdf.merge(dataframe1, on=id_column, how="left")
+            merged_gdf = gdf.merge(dataframe1, on="ID", how="left")
         else:
             merged_gdf = gdf
 
@@ -547,28 +559,44 @@ def save_to_file(
 
         # List of GeoDataFrames and their corresponding suffixes
         geometry_and_suffixes = [
-            (gdf_geom, f"_{gdf_geom.geom_type.iloc[0].lower()}")
+            (
+                gdf_geom.dropna(how="all", axis=1).dropna(how="all", axis=0),
+                f"_{gdf_geom.geom_type.iloc[0].lower()}",
+            )
             for gdf_geom in gdf_dict.values()
             if not gdf_geom.empty
         ]
 
-        # Iterate through each geometry type and save it if it's not empty
-        for gdf_geom, suffix in geometry_and_suffixes:
-            if not gdf_geom.empty:
-                gdf_geom.to_file(
-                    f"{base_filename}{suffix}.shp", driver="ESRI Shapefile"
-                )
-                
-        # Save all files in base directory as a zip
-        with ZipFile(f"{base_filename}.zip", "w", compression=ZIP_DEFLATED) as zipf:
-            for root, _, files in os.walk(os.path.dirname(file_path)):
-                for file in files:
-                    zipf.write(os.path.join(root, file)) if not file.endswith(".zip") else None
-                    
+        # Save the GeoDataFrames to Shapefiles and create a zip file
+        save_data_and_create_zip(geometry_and_suffixes, base_filename, file_path)
+
         file_path = f"{base_filename}.zip"
 
     return file_path
 
+
+def save_geospatial_data(gdf_geom, suffix, base_filename):
+    """Function to save geospatial data (e.g., Shapefiles)."""
+    gdf_geom.to_file(f"{base_filename}{suffix}.shp", driver="ESRI Shapefile")
+
+def save_data_and_create_zip(geometry_and_suffixes, base_filename, file_path):
+    # First thread pool for saving geospatial data
+    with ThreadPoolExecutor() as executor:
+        # Unpack the geometry and suffixes and save the geospatial data
+        executor.map(lambda args: save_geospatial_data(*args, base_filename), geometry_and_suffixes)
+
+    # Create the zip file sequentially
+    file_paths = []
+    for root, _, files in os.walk(os.path.dirname(file_path)):
+        for file in files:
+            if not file.endswith(".zip"):
+                file_paths.append(os.path.join(root, file))
+
+    # Now zip the files
+    with ZipFile(f"{base_filename}.zip", "w", compression=ZIP_DEFLATED) as zipf:
+        for file_path in file_paths:
+            arcname = os.path.relpath(file_path, os.path.dirname(file_path))
+            zipf.write(file_path, arcname)
 
 def get_table_names(data):
     """

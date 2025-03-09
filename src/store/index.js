@@ -176,6 +176,10 @@ const store = createStore({
       state.messages = [];
     },
     SET_SELECTED_COLUMNS(state, columns) {
+      if (columns === "Geo"){
+        state.selectedColumns = state.exportColumns = [...state.selectedColumns, ...state.geoColumns];
+        return;
+      }
       state.selectedColumns = columns === 'All' ? state.exportColumns = state.columns : state.exportColumns = columns;
     },
     SET_SELECTED_IDS(state, ids) {

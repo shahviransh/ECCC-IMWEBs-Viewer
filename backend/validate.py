@@ -102,7 +102,7 @@ def validate_get_data_args(request_args):
         "feature_statictic": {
             "type": "string",
             "required": False,
-            "allowed": ["Average", "Sum", "Maximum", "Minimum"],
+            "allowed": ["mean", "sum", "max", "min"],
         },
     }
     return validate_request_args(schema, request_args)

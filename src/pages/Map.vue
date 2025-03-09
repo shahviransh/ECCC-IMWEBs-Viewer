@@ -266,6 +266,8 @@ export default {
             if (this.selectedColumns.length === 0 || this.arraysAreEqual(this.columns, this.properties)) {
                 this.updateSelectedColumns("All");
                 this.updateAllSelectedColumns(true);
+            } else{
+                this.updateSelectedColumns("Geo");
             }
             if (this.selectedDbsTables.length > 0) {
                 // Fetch GeoJSON data color information
@@ -647,7 +649,7 @@ export default {
                 if (this.exportFormat === "shp") {
                     response = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/export_data`, {
                         db_tables: JSON.stringify(this.selectedDbsTables),
-                        columns: JSON.stringify(this.allSelectedColumns ? "All" : this.exportColumns.filter((column) => column !== 'Season')),
+                        columns: JSON.stringify(this.allSelectedColumns ? "All" : this.exportColumns.filter((column) => column !== 'Season' && !this.properties.includes(column))),
                         id: JSON.stringify(this.exportIds),
                         start_date: this.exportDate.start,
                         end_date: this.exportDate.end,
