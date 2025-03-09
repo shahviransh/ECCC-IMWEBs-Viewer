@@ -30,8 +30,8 @@ ifeq ($(ARG), tauri)
 	@echo "Building Tauri app..."
 	del /F /Q "$(USERPROFILE)\OneDrive - McMaster University\Co-op 1st Work Term - ECCC\release\Imwebs-Viewer_*.msi"
 	del /F /Q "$(USERPROFILE)\OneDrive - McMaster University\Co-op 1st Work Term - ECCC\release\Imwebs-Viewer_*.exe"
-	del /F /Q "src-tauri\target\release\Imwebs-Viewer_*.exe"
-	del /F /Q "src-tauri\target\release\Imwebs-Viewer_*.msi"
+	if exist "src-tauri\target\release\Imwebs-Viewer_*.exe" del /F /Q "src-tauri\target\release\Imwebs-Viewer_*.exe"
+	if exist "src-tauri\target\release\Imwebs-Viewer_*.msi" del /F /Q "src-tauri\target\release\Imwebs-Viewer_*.msi"
 	npm run tauri:build
 	xcopy src-tauri\target\release "$(USERPROFILE)\OneDrive - McMaster University\Co-op 1st Work Term - ECCC\release" /Y /E /I /D
 else ifeq ($(ARG), electron)
