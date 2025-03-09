@@ -511,7 +511,6 @@ def save_to_file(
         # Load the GeoJSON dictionary into a GeoDataFrame
         gdf = gpd.GeoDataFrame.from_features(geojson_data["features"])
 
-        # List of geometry types
         geometry_types = [
             "Point",
             "LineString",
@@ -537,7 +536,6 @@ def save_to_file(
             # Left join to keep all geometries in the Shapefile
             merged_gdf = gdf.merge(dataframe1, on=id_column, how="left")
         else:
-            # If no ID column is found, use the original GeoDataFrame
             merged_gdf = gdf
 
         # Use a dictionary to store the filtered GeoDataFrames by geometry type
@@ -545,7 +543,6 @@ def save_to_file(
             geom: merged_gdf[merged_gdf.geom_type == geom] for geom in geometry_types
         }
 
-        # Get the base filename (without .shp extension)
         base_filename = os.path.splitext(file_path)[0]
 
         # List of GeoDataFrames and their corresponding suffixes
@@ -562,7 +559,7 @@ def save_to_file(
                     f"{base_filename}{suffix}.shp", driver="ESRI Shapefile"
                 )
                 
-        # Save all files in base directory
+        # Save all files in base directory as a zip
         with ZipFile(f"{base_filename}.zip", "w", compression=ZIP_DEFLATED) as zipf:
             for root, _, files in os.walk(os.path.dirname(file_path)):
                 for file in files:
