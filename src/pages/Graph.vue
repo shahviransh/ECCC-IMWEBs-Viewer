@@ -67,7 +67,7 @@ export default {
             stats: [],
             statsColumns: [],
             data: [],
-            ID: [],
+            ID: '',
             refreshKey: 0,
         };
     },
