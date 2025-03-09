@@ -98,7 +98,7 @@
                 </div>
             </div>
             <!-- Table Stats Graph Popup -->
-            <div v-if="showTableStatsPopup" class="modal-overlay">
+            <div v-show="showTableStatsPopup" class="modal-overlay">
                 <div class="modal" @mousedown="startDrag" :style="{ top: modalPosition.top, left: modalPosition.left }"
                     :key="modalKey">
                     <button class="close-button" @click="showTableStatsPopup = false">&times;</button>
@@ -111,12 +111,13 @@
 
                     <!-- Tab content -->
                     <div class="tab-content">
-                        <div v-if="activeTab === 'table'">
+                        <div v-show="activeTab === 'table'">
                             <TableStatsDisplay :data="data" :stats="stats" :statsColumns="statsColumns"
                                 :properties="properties" :selectedColumns="selectedColumns" :rowLimit="rowLimit" />
                         </div>
-                        <div v-if="activeTab === 'graph'">
-                            <GraphDisplay :data="data" :selectedColumns="selectedColumns"
+                        <div v-show="activeTab === 'graph'" class="graph-display">
+                            <GraphDisplay :data="data"
+                                :selectedColumns="selectedColumns.filter(col => !properties.includes(col))"
                                 :selectedIds="[selectedFeatureId.toString()]" :dateType="dateType" :ID="ID"
                                 :theme="theme" :refreshKey="refreshKey" :currentZoomStart="currentZoomStart"
                                 :currentZoomEnd="currentZoomEnd" :multiGraphType="multiGraphType"
@@ -185,9 +186,10 @@ export default {
             selectedFeatureStatistic: "mean",
             geojson_color_levels: {},
             geojson_colors: [],
+            refreshKey: 0,
             opacitySteps: Array.from({ length: 11 }, (_, i) => (i * 0.1).toFixed(1)),
             showTableStatsPopup: false,
-            selectedFeatureId: null,
+            selectedFeatureId: '',
             rowLimit: 100,
             modalKey: 0,
             modalPosition: {
@@ -328,6 +330,7 @@ export default {
             this.stats = response.data.stats;
             this.statsColumns = response.data.statsColumns;
             this.ID = this.selectedColumns.find((column) => column.includes('ID'));
+            this.refreshKey += 1;
             if (response.data.error) {
                 alert('Error fetching data: ' + response.data.error);
                 return;
@@ -740,7 +743,8 @@ export default {
     background: var(--background-color);
     padding: 15px;
     border-radius: 10px;
-    width: 25%;
+    width: 30%;
+    height: auto;
     text-align: center;
     color: var(--text-color);
     overflow-y: auto;
@@ -811,6 +815,11 @@ export default {
 
 .tab-content {
     padding: 10px;
+}
+
+.graph-display {
+    width: 100%;
+    height: 50vh;
 }
 
 .style-settings {

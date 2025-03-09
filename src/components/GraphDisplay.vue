@@ -1,6 +1,6 @@
 <template>
     <div class="graph-display">
-        <v-chart :option="chartOptions" :theme="theme" :key="refreshKey"></v-chart>
+        <v-chart :option="chartOptions" :theme="theme" :key="refreshKey" autoresize></v-chart>
     </div>
 </template>
 
@@ -31,7 +31,7 @@ export default {
         multiGraphType: Array,
         graphType: String,
     },
-    methods:{
+    methods: {
         getType(column) {
             // Use the Vuex state multiGraphType, which updates dynamically
             if (this.multiGraphType?.length > 0) {
@@ -51,7 +51,7 @@ export default {
             return this.data.some(row => row[column] > 100);
         },
     },
-    computed:{
+    computed: {
         chartOptions() {
             const xAxisData = this.data.map(row => row[this.dateType]);
 
@@ -86,7 +86,7 @@ export default {
                         : this.selectedColumns.filter(column => column !== this.dateType)
                 },
                 grid: {
-                    left: '2%',
+                    left: '4%',
                     right: '2%',
                     bottom: '10%',
                     top: '5%',
@@ -221,5 +221,6 @@ export default {
     width: 100%;
     height: 100%;
     overflow: hidden;
+    display: flex;
 }
 </style>

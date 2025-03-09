@@ -144,6 +144,7 @@ def register_routes(app, cache):
         return send_file(filename, mimetype='image/png', as_attachment=True)
     
     @app.route("/api/get_geojson_colors", methods=["GET"])
+    @cache.cached(timeout=300, query_string=True)
     def get_geojson_colors():
         """
         API endpoint to get GeoJSON colors.

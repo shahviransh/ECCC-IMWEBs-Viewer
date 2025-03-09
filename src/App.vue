@@ -174,6 +174,11 @@ body,
   cursor: pointer;
 }
 
+.taskbar-left {
+  display: flex;
+  align-items: center;
+}
+
 .taskbar button.active {
   background-color: var(--active-bg);
   color: white;

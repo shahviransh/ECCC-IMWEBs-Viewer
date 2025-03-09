@@ -195,7 +195,6 @@ export default {
     flex-direction: row;
     gap: 5px;
     margin: 0px auto;
-    min-height: fit-content;
     min-width: 45%;
     align-items: stretch;
     overflow-y: auto;
@@ -210,6 +209,7 @@ export default {
     padding: 5px;
     border-radius: 4px;
     box-shadow: var(--box-shadow);
+    min-height: fit-content;
 }
 
 .form-container-ref {
