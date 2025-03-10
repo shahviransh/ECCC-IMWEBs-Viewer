@@ -20,8 +20,9 @@ pipreq:
 python:
 	@echo "Building Python backend..."
 	@call pyinstaller backend/apppy.py -y --distpath backend/ --specpath backend/ --workpath backend/build --name apppy \
-	--add-data "C:/Users/viran/miniconda3/envs/venv/Library/share/proj;Library/share/proj" \
-	--hidden-import=pyogrio._geometry --hidden-import=pyogrio._io --collect-data=numpy
+	--add-data "$(USERPROFILE)/miniconda3/envs/venv/Library/share/proj;Library/share/proj" \
+	--hidden-import=pyogrio._geometry --hidden-import=pyogrio._io --collect-data=numpy \
+	--upx-dir="$(USERPROFILE)/OneDrive/Documents/GitHub/upx-5.0.0-win64"
 	xcopy backend\Jenette_Creek_Watershed backend\apppy\_internal\Jenette_Creek_Watershed /E /I
 
 # Build Electron or Tauri based on argument

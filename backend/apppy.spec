@@ -1,7 +1,7 @@
 # -*- mode: python ; coding: utf-8 -*-
 from PyInstaller.utils.hooks import collect_data_files
 
-datas = [('C:/Users/viran/miniconda3/envs/venv/Library/share/proj', 'Library/share/proj')]
+datas = [('C:\\Users\\viran/miniconda3/envs/venv/Library/share/proj', 'Library/share/proj')]
 datas += collect_data_files('numpy')
 
 
