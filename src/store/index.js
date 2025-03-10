@@ -154,7 +154,7 @@ const store = createStore({
     },
     SET_YAXIS(state, yAxis) {
       state.yAxis = yAxis.includes("ID") ? yAxis : ["ID", ...yAxis];
-      state.selectedColumns = [state.xAxis, ...yAxis];
+      state.selectedColumns = [state.xAxis, ...state.yAxis];
       state.exportColumns = [...state.selectedColumns];
     },
     PUSH_MESSAGE(state, { message, type, duration }) {
