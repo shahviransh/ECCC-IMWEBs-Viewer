@@ -724,6 +724,7 @@ def aggregate_data(df, interval, method, date_type, month, season):
     ID = next((col for col in df.columns if "ID" in col), None)
     # Resample the data based on the specified interval
     if interval == "monthly":
+        # Agrregate numerical values by summing for each ID, date_type, and interval
         resampled_df = df.groupby([ID, pd.Grouper(key=date_type, freq="ME")]).sum(
             numeric_only=True
         )
