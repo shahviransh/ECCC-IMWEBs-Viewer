@@ -288,7 +288,7 @@ const store = createStore({
         console.error("Error fetching tables: ", error.message);
       }
     },
-    async fetchColumns({ commit }, dbTables) {
+    async fetchColumns({ commit, dispatch }, dbTables) {
       try {
         const tables = dbTables.map((t) => t.table);
         await dispatch("pushMessage", {
