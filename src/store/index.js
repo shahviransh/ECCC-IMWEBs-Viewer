@@ -9,8 +9,8 @@ const store = createStore({
     geoColumns: [],
     selectedIds: [],
     dateRange: {
-      start: '',
-      end: '',
+      start: "",
+      end: "",
     },
     tooltipColumns: {},
     theme: "light",
@@ -24,17 +24,17 @@ const store = createStore({
     exportColumns: [],
     exportIds: [],
     exportDate: {
-      start: '',
-      end: '',
+      start: "",
+      end: "",
     },
     modelFolder: "Jenette_Creek_Watershed",
-    dateType: '',
+    dateType: "",
     selectedMethod: ["Equal"],
     selectedStatistics: ["None"],
     selectedInterval: "daily",
     exportInterval: "daily",
-    selectedSeason: '',
-    selectedMonth: '',
+    selectedSeason: "",
+    selectedMonth: "",
     exportPath: "dataExport",
     exportFilename: "exported_data",
     exportFormat: "csv",
@@ -78,7 +78,6 @@ const store = createStore({
         ...(columns.includes("ID") ? ["ID"] : []),
         ...state.selectedColumns,
       ];
-
     },
     ADD_COLUMNS(state, { columns }) {
       const temp = columns.filter((c) => !state.columns.includes(c));
@@ -93,10 +92,7 @@ const store = createStore({
     SET_TOOLTIP_COLUMNS(state, columns) {
       state.tooltipColumns = { ...columns };
     },
-    SET_OPTIONS(
-      state,
-      { ids, dateRange, dateType, exportDate }
-    ) {
+    SET_OPTIONS(state, { ids, dateRange, dateType, exportDate }) {
       state.ids = ids;
       state.dateRange = dateRange;
       state.dateType = dateType;
@@ -134,7 +130,7 @@ const store = createStore({
       }
       const temp = state.selectedDbsTables;
       state.selectedDbsTables = [...temp];
-      
+
       state.selectedColumns = state.exportColumns = [];
     },
     SET_SELECTED_GEO_FOLDERS(state, folder) {
@@ -176,11 +172,17 @@ const store = createStore({
       state.messages = [];
     },
     SET_SELECTED_COLUMNS(state, columns) {
-      if (columns === "Geo"){
-        state.selectedColumns = state.exportColumns = [...state.selectedColumns, ...state.geoColumns];
+      if (columns === "Geo") {
+        state.selectedColumns = state.exportColumns = [
+          ...state.selectedColumns,
+          ...state.geoColumns,
+        ];
         return;
       }
-      state.selectedColumns = columns === 'All' ? state.exportColumns = state.columns : state.exportColumns = columns;
+      state.selectedColumns =
+        columns === "All"
+          ? (state.exportColumns = state.columns)
+          : (state.exportColumns = columns);
     },
     SET_SELECTED_IDS(state, ids) {
       state.selectedIds = ids;
@@ -289,7 +291,10 @@ const store = createStore({
     async fetchColumns({ commit }, dbTables) {
       try {
         const tables = dbTables.map((t) => t.table);
-        this.pushMessage({ message: `Loading Parameters for ${tables.join(", ")}`, type: 'info' });
+        await dispatch("pushMessage", {
+          message: `Loading Parameters for ${tables.join(", ")}`,
+          type: "info",
+        });
         // Fetch all columns for all tables selected
         const response = await axios.get(
           `${import.meta.env.VITE_API_BASE_URL}/api/get_table_details`,
