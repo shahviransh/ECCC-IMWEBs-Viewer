@@ -15,7 +15,7 @@ from matplotlib.ticker import MaxNLocator, LinearLocator
 from cycler import cycler
 from config import Config
 from datetime import datetime
-from flask import abort
+from werkzeug.utils import safe_join
 import sys
 import json
 from concurrent.futures import ThreadPoolExecutor
@@ -231,7 +231,7 @@ def fetch_data_from_db(
     db_path, table_name, selected_ids, columns, start_date, end_date, date_type
 ):
     """Fetch data from a SQLite database table with real-to-alias mapping."""
-    conn = sqlite3.connect(os.path.join(Config.PATHFILE, db_path))
+    conn = sqlite3.connect(safe_join(Config.PATHFILE, db_path))
 
     # table_name is an alias so replace it with the real table name
     real_table_name = alias_mapping.get(table_name, {}).get("real", table_name)
@@ -298,13 +298,13 @@ def save_to_file(
     """Save two DataFrames to the specified file format sequentially."""
     # Set the file path
     file_path = (
-        os.path.join(Config.PATHFILE_EXPORT, export_path)
+        safe_join(Config.PATHFILE_EXPORT, export_path)
         if not os.path.isabs(export_path)
         else export_path
     )
 
     os.makedirs(file_path, exist_ok=True)
-    file_path = os.path.join(file_path, filename)
+    file_path = safe_join(file_path, filename)
 
     # Map graph types to Matplotlib Axes methods
     GRAPH_TYPE_MAPPING = {
@@ -589,7 +589,7 @@ def save_data_and_create_zip(geometry_and_suffixes, base_filename, file_path):
     for root, _, files in os.walk(os.path.dirname(file_path)):
         for file in files:
             if not file.endswith(".zip"):
-                file_paths.append(os.path.join(root, file))
+                file_paths.append(safe_join(root, file))
 
     # Now zip the files
     with ZipFile(f"{base_filename}.zip", "w", compression=ZIP_DEFLATED) as zipf:
@@ -603,7 +603,7 @@ def get_table_names(data):
     """
     try:
         db_path = data.get("db_path")
-        conn = sqlite3.connect(os.path.join(Config.PATHFILE, db_path))
+        conn = sqlite3.connect(safe_join(Config.PATHFILE, db_path))
         cursor = conn.cursor()
         cursor.execute("SELECT name FROM sqlite_master WHERE type='table';")
         tables = cursor.fetchall()
@@ -644,7 +644,7 @@ def get_files_and_folders(data):
             else folder_path
         )
         # Construct the absolute folder path relative to the current file location
-        folder_path = os.path.join(base_path, folder_path)
+        folder_path = safe_join(base_path, folder_path)
         root = os.path.abspath(base_folder)
 
     try:
@@ -657,7 +657,7 @@ def get_files_and_folders(data):
 
             # Append directories
             for fdir in dirs:
-                dir_rel_path = os.path.join(rel_dir, fdir)
+                dir_rel_path = safe_join(rel_dir, fdir)
                 # Ensure the relative path starts with the base folder name
                 dir_rel_path = dir_rel_path[dir_rel_path.find(base_folder) :]
                 files_and_folders.append(
@@ -668,7 +668,7 @@ def get_files_and_folders(data):
                 )
             # Append files
             for name in files:
-                file_rel_path = os.path.join(rel_dir, name)
+                file_rel_path = safe_join(rel_dir, name)
                 # Ensure the relative path starts with the base folder name
                 file_rel_path = file_rel_path[file_rel_path.find(base_folder) :]
 
@@ -677,7 +677,7 @@ def get_files_and_folders(data):
                     (".shp", ".db3", ".tif", ".tiff")
                 ) and not file_rel_path.endswith("reprojected.tif"):
                     if file_rel_path.endswith(".db3") and "lookup" not in file_rel_path:
-                        folder_tree.add(os.path.join(Config.PATHFILE, file_rel_path))
+                        folder_tree.add(safe_join(Config.PATHFILE, file_rel_path))
                     elif file_rel_path.endswith(".db3") and "lookup" in file_rel_path:
                         Config.LOOKUP = file_rel_path
                         lookup_found = True
@@ -824,7 +824,7 @@ def calculate_statistics(df, statistics, date_type):
 
 def load_alias_mapping(folder_tree):
     """Load alias mapping from the lookup.db3 database."""
-    conn = sqlite3.connect(os.path.join(Config.PATHFILE, Config.LOOKUP))
+    conn = sqlite3.connect(safe_join(Config.PATHFILE, Config.LOOKUP))
     alias_map = {}
 
     # Query the alias tables (Hydroclimate, BMP, scenario_2)
@@ -859,7 +859,7 @@ def get_columns_and_time_range(db_path, table_name):
         real_table_name = alias_mapping.get(table_name, {}).get("real", table_name)
 
         # Connect to the database
-        conn = sqlite3.connect(os.path.join(Config.PATHFILE, db_path))
+        conn = sqlite3.connect(safe_join(Config.PATHFILE, db_path))
 
         # Fetch column information using PRAGMA for the real table name
         query = f"PRAGMA table_info('{real_table_name}')"
@@ -1385,7 +1385,7 @@ def process_geospatial_data(data):
     """
 
     file_paths = map(
-        lambda x: os.path.join(Config.PATHFILE, x), json.loads(data.get("file_paths"))
+        lambda x: safe_join(Config.PATHFILE, x), json.loads(data.get("file_paths"))
     )
     combined_geojson = {}
     combined_bounds = None
@@ -1669,7 +1669,7 @@ def export_map_service(image, form_data):
         output_path = form_data.get("export_path")
         output_filename = form_data.get("export_filename")
         file_paths = map(
-            lambda x: os.path.join(Config.PATHFILE, x),
+            lambda x: safe_join(Config.PATHFILE, x),
             json.loads(form_data.get("file_paths")),
         )
 
@@ -1677,9 +1677,9 @@ def export_map_service(image, form_data):
         if output_format not in valid_formats:
             return {"error": "Unsupported export format"}
 
-        export_dir = os.path.join(Config.PATHFILE_EXPORT, output_path)
+        export_dir = safe_join(Config.PATHFILE_EXPORT, output_path)
         os.makedirs(export_dir, exist_ok=True)
-        image_path = os.path.join(export_dir, f"{output_filename}.{output_format}")
+        image_path = safe_join(export_dir, f"{output_filename}.{output_format}")
 
         # Export image formats
         if output_format in ["jpg", "jpeg", "png", "pdf"] and image:
@@ -1738,7 +1738,7 @@ def export_map_service(image, form_data):
 
             # Save plot
             file_name = os.path.basename(file_path).split(".")[0]
-            image_path = os.path.join(
+            image_path = safe_join(
                 export_dir, f"{output_filename}_{file_name}.{output_format}"
             )
             plt.savefig(image_path, dpi=300, format=output_format)
@@ -1747,7 +1747,7 @@ def export_map_service(image, form_data):
             exported_images.append(image_path)
 
         # Combine exported images into a single zip file
-        zip_path = os.path.join(export_dir, f"{output_filename}.zip")
+        zip_path = safe_join(export_dir, f"{output_filename}.zip")
         with ZipFile(zip_path, "w") as zipf:
             for image_path in exported_images:
                 zipf.write(image_path)
