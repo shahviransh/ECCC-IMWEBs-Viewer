@@ -122,7 +122,6 @@ export default {
                         this.pushMessage({ message: `Graph Loaded ${this.selectedColumns.length} columns x ${this.data.length} rows`, type: 'success' });
                     });
 
-                    this.pushMessage({ message: `Graph Loading ${this.selectedColumns.length} columns x ${this.data.length} rows`, type: 'info' });
                 }
             } catch (error) {
                 console.error('Error fetching data: ', error.message);
@@ -153,7 +152,7 @@ export default {
                 if (response.data.error) {
                     alert('Error fetching data: ' + response.data.error);
                     return;
-                } else { this.pushMessage({ message: `Exported ${this.exportColumns.length} columns x ${this.data.length} rows`, type: 'info' }); }
+                } else { this.pushMessage({ message: `Exported ${this.exportColumns.length} columns x ${this.data.length} rows`, type: 'success' }); }
                 if (this.selectedInterval === 'seasonally' && !this.selectedMethod.includes('Equal') && !this.selectedColumns.includes('Season')) {
                     this.updateSelectedColumns(this.selectedColumns.concat(['Season']));
                 } else if (this.selectedColumns.includes('Season') && this.selectedInterval !== 'seasonally') {
