@@ -83,7 +83,7 @@ export default {
                     this.updateAllSelectedColumns(true);
                 }
 
-                this.pushMessage({ message: `Data Loading`, type: 'info' });
+                this.pushMessage({ message: `Table Loading`, type: 'info' });
 
                 // Fetch the data for the map
                 const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/get_data`, {
