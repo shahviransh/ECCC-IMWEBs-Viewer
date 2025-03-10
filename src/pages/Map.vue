@@ -357,7 +357,7 @@ export default {
         },
         async fetchGeoJson() {
             try {
-                this.pushMessage({ message: `Loading Parameters for ${this.selectedGeoFolders.join(", ")}`, type: 'info' });
+                this.pushMessage({ message: `Loading Parameters for ${this.selectedGeoFolders.map(folder => folder.split("/").pop()).join(", ")}`, type: 'info' });
 
                 // Fetch GeoTIFF and GeoJSON data from the backend
                 const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/geospatial`, {

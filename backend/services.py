@@ -528,17 +528,16 @@ def save_to_file(
         id_columns = [col for col in gdf.columns if "id" in col.lower()]
 
         # If there are multiple id columns, merge them into a single 'ID' column
-        if len(id_columns) > 1:
-            # Initialize the 'ID' column with the first 'id' column
-            gdf["ID"] = gdf[id_columns[0]]
+        # Initialize the 'ID' column with the first 'id' column
+        gdf["ID"] = gdf[id_columns[0]]
 
-            # Loop through the remaining 'id' columns and fill NaNs
-            for col in id_columns[1:]:
-                gdf["ID"] = gdf["ID"].fillna(gdf[col])
+        # Loop through the remaining 'id' columns and fill NaNs
+        for col in id_columns[1:]:
+            gdf["ID"] = gdf["ID"].fillna(gdf[col])
 
-            # Drop all the original 'id' columns
-            for col in id_columns:
-                gdf.drop(columns=[col], inplace=True)
+        # Drop all the original 'id' columns
+        for col in id_columns:
+            gdf.drop(columns=[col], inplace=True)
 
         if dataframe1 is not None:
             # Rename ID in dataframe1 to match the found id_column in gdf
