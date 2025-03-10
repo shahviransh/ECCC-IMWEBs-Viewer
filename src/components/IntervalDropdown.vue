@@ -178,4 +178,11 @@ export default {
     border-color: var(--focus-border);
     outline: none;
 }
+
+@media (min-width: 1650px) {
+    .interval-container {
+        flex: 1 1 200px;
+        min-width: 200px;
+    }
+}
 </style>

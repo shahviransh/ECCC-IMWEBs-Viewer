@@ -142,9 +142,23 @@ export default {
         },
         heightVar(isXAxis, isYAxis) {
             const isTauri = window.isTauri !== undefined;
-            isXAxis = isXAxis !== undefined || isXAxis;
-            isYAxis = isYAxis !== undefined || isYAxis;
-            return isXAxis ? '5vh' : isYAxis ? isTauri ? '66vh' : '62vh' : isTauri ? '36vh' : '34vh';
+            const screenHeight = window.innerHeight;
+
+            if (screenHeight > 1080) {
+                if (isXAxis) {
+                    return '6vh';
+                } else if (isYAxis) {
+                    return isTauri ? '78vh' : '74vh';
+                } else {
+                    return isTauri ? '44vh' : '42vh';
+                }
+            } else if (isXAxis) {
+                return '5vh';
+            } else if (isYAxis) {
+                return isTauri ? '66vh' : '62vh';
+            } else {
+                return isTauri ? '36vh' : '34vh';
+            }
         },
         toggleSelection(event, modelArray, exportColumns = false) {
             const option = event.target;

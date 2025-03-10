@@ -111,4 +111,11 @@ export default {
     color: var(--text-color);
     margin-bottom: 0px;
 }
+
+@media (min-width: 1650px) {
+    .statistics-container {
+        flex: 1 1 200px;
+        min-width: 200px;
+    }
+}
 </style>

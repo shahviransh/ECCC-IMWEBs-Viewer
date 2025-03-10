@@ -263,4 +263,12 @@ input[type="text"]::placeholder {
     color: #999;
     font-style: italic;
 }
+
+@media (min-width: 1650px) {
+    .form-container,
+    .form-container-ref {
+        flex: 1 1 200px;
+        min-width: 200px;
+    }
+}
 </style>
