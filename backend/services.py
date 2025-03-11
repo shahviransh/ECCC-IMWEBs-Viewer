@@ -139,7 +139,7 @@ def fetch_data_service(data):
             return {"error": "No data found for the specified filters."}
 
         # Perform time conversion and aggregation if necessary
-        if method != ["Equal"] and interval != "daily":
+        if "Equal" not in method and interval != "daily":
             if not date_type:
                 return {
                     "error": "Time conversion and statistics cannot be performed for non-time series data"
@@ -147,7 +147,7 @@ def fetch_data_service(data):
             df, stats_df = aggregate_data(
                 df, interval, method, date_type, month, season
             )
-        elif statistics != ["None"]:
+        elif "None" not in statistics:
             if not date_type:
                 return {
                     "error": "Time conversion and statistics cannot be performed for non-time series data"

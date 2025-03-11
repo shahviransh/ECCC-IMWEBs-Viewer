@@ -40,9 +40,15 @@ export default {
     methods: {
         ...mapActions(["updateSelectedStatistics", "updateSelectedMethod"]),
         onStatisticsChange() {
+            if (this.selectedStatistics.length > 1) {
+                this.selectedStatistics = this.selectedStatistics.filter(stat => stat !== "None");
+            }
             this.updateSelectedStatistics(this.selectedStatistics);
         },
         onMethodChange() {
+            if (this.selectedMethod.length > 1) {
+                this.selectedMethod = this.selectedMethod.filter(method => method !== "Equal");
+            }
             this.updateSelectedMethod(this.selectedMethod);
         },
     },

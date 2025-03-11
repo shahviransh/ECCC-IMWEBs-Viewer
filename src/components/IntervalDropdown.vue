@@ -53,6 +53,7 @@ export default {
             set(value) {
                 this.updateSelectedInterval(value);
                 this.updateExportInterval(value); // Update export interval as well to match selected interval
+                this.checkAggregationRequirement(value);
             }
         },
         expInterval: {
@@ -101,7 +102,7 @@ export default {
                 { value: "12", label: "December" },
             ];
         },
-        ...mapState(["selectedInterval", "exportInterval", "selectedSeason", "selectedMonth", "theme", "pageTitle"]),
+        ...mapState(["selectedInterval", "exportInterval", "selectedSeason", "selectedMethod", "selectedMonth", "theme", "pageTitle"]),
     },
     methods: {
         ...mapActions(["updateSelectedInterval", "updateExportInterval", "updateSelectedMonth", "updateSelectedSeason"]),
@@ -116,6 +117,11 @@ export default {
         isValidExportInterval(importInterval, exportInterval) {
             const intervals = ["daily", "monthly", "seasonally", "yearly"];
             return intervals.indexOf(exportInterval) >= intervals.indexOf(importInterval);
+        },
+        checkMethodSelection(interval) {
+            if (interval !== "daily" && (!this.selectedMethods || this.selectedMethods.includes("Equal"))) {
+                alert("Please choose at least one of Average, Sum, Minimum, or Maximum from the Method Conversion.");
+            }
         }
     },
 };
