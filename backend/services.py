@@ -1177,8 +1177,8 @@ def get_raster_color_levels(band, colormap, num_classes=5):
     # Create the color level mapping
     color_levels = [
         {
-            "min": round(levels[i].item(), 4),
-            "max": round(levels[i + 1].item(), 4),
+            "min": round(levels[i].item(), 2),
+            "max": round(levels[i + 1].item(), 2),
             "color": colors[i],
         }
         for i in range(num_classes)
@@ -1371,8 +1371,8 @@ def fetch_geojson_colors(data):
     # Step 5: Create 5 Color Levels Using
     color_levels = [
         {
-            "min": round(bin_edges[i], 4),
-            "max": round(bin_edges[i + 1], 4),
+            "min": round(bin_edges[i], 2),
+            "max": round(bin_edges[i + 1], 2),
             "color": dynamic_colors[i],
         }
         for i in range(num_classes)
