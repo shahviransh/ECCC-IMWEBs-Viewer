@@ -182,7 +182,6 @@ export default {
             polygonOpacity: 0.8,
             lineOpacity: 0.8,
             pointOpacity: 0.5,
-            selectedFeature: null,
             selectedFeatureStatistic: "mean",
             geojson_color_levels: {},
             geojson_colors: [],
@@ -222,9 +221,12 @@ export default {
         pointColor() {
             return this.theme === 'light' ? "#000000" : "#ff5722";
         },
+        selectedFeature(){
+            return this.selectedColumns.find(col => !this.properties.includes(col) && col !== this.dateType && col !== 'ID') || '';
+        }
     },
     methods: {
-        ...mapActions(["updateSelectedColumns", "addColumns", "updateToolTipColumns", "updateAllSelectedColumns", "updateSelectedIds", "updateColumns", "pushMessage", "clearMessages"]),
+        ...mapActions(["updateSelectedColumns", "addColumns", "updateExportFilename", "updateToolTipColumns", "updateAllSelectedColumns", "updateSelectedIds", "updateColumns", "pushMessage", "clearMessages"]),
         arraysAreEqual(arr1, arr2) {
             if (arr1.length !== arr2.length) return false; // Different lengths → Not equal
 
@@ -266,7 +268,7 @@ export default {
             if (this.selectedColumns.length === 0 || this.arraysAreEqual(this.columns, this.properties)) {
                 this.updateSelectedColumns("All");
                 this.updateAllSelectedColumns(true);
-            } else{
+            } else {
                 this.updateSelectedColumns("Geo");
             }
             if (this.selectedDbsTables.length > 0) {
@@ -649,6 +651,8 @@ export default {
             try {
                 let response;
                 if (this.exportFormat === "shp") {
+                    const filename = `${this.selectedGeoFolders.map(folder => folder.split("/").pop()).join(", ")}_${this.exportInterval}_${this.selectedFeature}_${this.selectedFeatureStatistic}`;
+                    this.updateExportFilename(filename.replace(/ /g, "-").replace(/\./g, "-").replace(/\(/g, "").replace(/\)/g, ""));
                     response = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/export_data`, {
                         db_tables: JSON.stringify(this.selectedDbsTables),
                         columns: JSON.stringify(this.allSelectedColumns ? "All" : this.exportColumns.filter((column) => column !== 'Season' && !this.properties.includes(column))),
@@ -666,6 +670,8 @@ export default {
                         graph_type: this.graphType,
                         multi_graph_type: JSON.stringify(this.multiGraphType),
                         geojson_data: JSON.stringify(this.geojson),
+                        feature: this.selectedFeature,
+                        feature_statictic: this.selectedFeatureStatistic
                     });
                 } else {
                     const domtoimage = await import("dom-to-image-more");
