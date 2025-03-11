@@ -225,8 +225,6 @@ def export_data_service(data, is_empty=False):
             is_empty,
         )
         
-        if "error" in file_path:
-            return file_path
 
         return {"file_path": file_path}
     except Exception as e:
@@ -550,23 +548,17 @@ def save_to_file(
         if dataframe1 is not None:
             # Rename ID in dataframe1 to match the found id_column in gdf
             dataframe1 = dataframe1.rename(columns={ID: "ID"})
-            
-            if not feature or feature == "value":
-                # Auto-select the feature column except ID and date_type
-                feature = [
-                    col for col in dataframe1.columns if col != ID
-                    and col != date_type
-                ]
-                
-                if len(feature) >= 1:
-                    feature = feature[0]
-                else:
-                    return {"error": "No feature column found in the data."}
 
             # Merge the Shapefile data with the attribute DataFrame using the correct ID column
             # Left join to keep all geometries in the Shapefile
             merged_gdf = gdf.merge(
-                dataframe1.groupby("ID")[feature].agg(feature_statistic).reset_index(),
+                (
+                    pd.DataFrame([])
+                    if not feature or feature == "value"
+                    else dataframe1.groupby("ID")[feature]
+                    .agg(feature_statistic)
+                    .reset_index()
+                ),
                 on="ID",
                 how="left",
             )
@@ -767,12 +759,12 @@ def aggregate_data(df, interval, method, date_type, month, season):
     elif interval == "seasonally":
         # Custom resampling for seasons
         df["Season"] = df[date_type].apply(lambda x: get_season_from_date(x))
-        
+
         # Quarterly year starts in December resampling for seasons
         # DJF, MAM, JJA, SON
-        resampled_df = df.groupby([ID, "Season", pd.Grouper(key=date_type, freq="QS-DEC")]).sum(
-            numeric_only=True
-        )
+        resampled_df = df.groupby(
+            [ID, "Season", pd.Grouper(key=date_type, freq="QS-DEC")]
+        ).sum(numeric_only=True)
         if season:
             resampled_df = resampled_df[resampled_df["Season"] == season.title()]
     else:
