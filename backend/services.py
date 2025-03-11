@@ -753,9 +753,9 @@ def aggregate_data(df, interval, method, date_type, month, season):
         # Custom resampling for seasons
         df["Season"] = df[date_type].apply(lambda x: get_season_from_date(x))
         
-        # Quarterly year ends in November resampling for seasons
+        # Quarterly year starts in December resampling for seasons
         # DJF, MAM, JJA, SON
-        resampled_df = df.groupby([ID, "Season", pd.Grouper(key=date_type, freq="Q-NOV")]).sum(
+        resampled_df = df.groupby([ID, "Season", pd.Grouper(key=date_type, freq="QS-DEC")]).sum(
             numeric_only=True
         )
         if season:
