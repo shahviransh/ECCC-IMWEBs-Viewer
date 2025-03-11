@@ -53,7 +53,7 @@ export default {
             set(value) {
                 this.updateSelectedInterval(value);
                 this.updateExportInterval(value); // Update export interval as well to match selected interval
-                this.checkAggregationRequirement(value);
+                this.checkMethodSelection(value);
             }
         },
         expInterval: {
@@ -119,7 +119,7 @@ export default {
             return intervals.indexOf(exportInterval) >= intervals.indexOf(importInterval);
         },
         checkMethodSelection(interval) {
-            if (interval !== "daily" && (!this.selectedMethods || this.selectedMethods.includes("Equal"))) {
+            if (interval !== "daily" && (!this.selectedMethod || this.selectedMethod.includes("Equal"))) {
                 alert("Please choose at least one of Average, Sum, Minimum, or Maximum from the Method Conversion.");
             }
         }
