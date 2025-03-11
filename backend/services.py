@@ -550,7 +550,11 @@ def save_to_file(
 
             # Merge the Shapefile data with the attribute DataFrame using the correct ID column
             # Left join to keep all geometries in the Shapefile
-            merged_gdf = gdf.merge(dataframe1.groupby("ID")[feature].agg(feature_statistic).reset_index(), on="ID", how="left")
+            merged_gdf = gdf.merge(
+                dataframe1.groupby("ID")[feature].agg(feature_statistic).reset_index(),
+                on="ID",
+                how="left",
+            )
         else:
             merged_gdf = gdf
 
@@ -583,11 +587,15 @@ def save_geospatial_data(gdf_geom, suffix, base_filename):
     """Function to save geospatial data (e.g., Shapefiles)."""
     gdf_geom.to_file(f"{base_filename}{suffix}.shp", driver="ESRI Shapefile")
 
+
 def save_data_and_create_zip(geometry_and_suffixes, base_filename, file_path):
     # First thread pool for saving geospatial data
     with ThreadPoolExecutor() as executor:
         # Unpack the geometry and suffixes and save the geospatial data
-        executor.map(lambda args: save_geospatial_data(*args, base_filename), geometry_and_suffixes)
+        executor.map(
+            lambda args: save_geospatial_data(*args, base_filename),
+            geometry_and_suffixes,
+        )
 
     # Create the zip file sequentially
     file_paths = []
@@ -601,6 +609,7 @@ def save_data_and_create_zip(geometry_and_suffixes, base_filename, file_path):
         for file_path in file_paths:
             arcname = os.path.relpath(file_path, os.path.dirname(file_path))
             zipf.write(file_path, arcname)
+
 
 def get_table_names(data):
     """
@@ -743,21 +752,19 @@ def aggregate_data(df, interval, method, date_type, month, season):
     elif interval == "seasonally":
         # Custom resampling for seasons
         df["Season"] = df[date_type].apply(lambda x: get_season_from_date(x))
-        # Get the first date in each season for each ID
-        first_dates = df.groupby([ID, "Season"])[date_type].min().reset_index()
-
-        # Aggregate numerical values by summing
-        aggregated_df = df.groupby([ID, "Season"]).sum(numeric_only=True).reset_index()
-
-        # Merge the first dates back to retain the earliest date for each season
-        resampled_df = pd.merge(aggregated_df, first_dates, on=[ID, "Season"])
+        
+        # Quarterly year ends in November resampling for seasons
+        # DJF, MAM, JJA, SON
+        resampled_df = df.groupby([ID, "Season", pd.Grouper(key=date_type, freq="Q-NOV")]).sum(
+            numeric_only=True
+        )
         if season:
             resampled_df = resampled_df[resampled_df["Season"] == season.title()]
     else:
         resampled_df = df
 
     # Reset the index to convert the MultiIndex to columns
-    resampled_df.reset_index(inplace=True) if interval != "seasonally" else None
+    resampled_df.reset_index(inplace=True)
 
     # Format the date column based on the interval
     if interval != "daily":
