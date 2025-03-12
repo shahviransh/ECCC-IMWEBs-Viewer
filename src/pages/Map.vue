@@ -84,9 +84,9 @@
                             <label>Selected Feature Statistic:</label>
                             <select v-model="selectedFeatureStatistic" class="dropdown">
                                 <option value="mean">Average</option>
+                                <option value="sum">Sum</option>
                                 <option value="min">Minimum</option>
                                 <option value="max">Maximum</option>
-                                <option value="sum">Sum</option>
                             </select>
                         </div>
                     </div>
@@ -287,7 +287,7 @@ export default {
                         month: this.selectedMonth,
                         season: this.selectedSeason,
                         feature: this.selectedFeature,
-                        feature_statictic: this.selectedFeatureStatistic,
+                        feature_statistic: this.selectedFeatureStatistic,
                     }
                 });
 
@@ -671,7 +671,7 @@ export default {
                         multi_graph_type: JSON.stringify(this.multiGraphType),
                         geojson_data: JSON.stringify(this.geojson),
                         feature: this.selectedFeature,
-                        feature_statictic: this.selectedFeatureStatistic
+                        feature_statistic: this.selectedFeatureStatistic
                     });
                 } else {
                     const domtoimage = await import("dom-to-image-more");

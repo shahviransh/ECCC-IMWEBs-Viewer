@@ -99,7 +99,7 @@ def validate_get_data_args(request_args):
             "type": "string",
             "required": False,
         },
-        "feature_statictic": {
+        "feature_statistic": {
             "type": "string",
             "required": False,
             "allowed": ["mean", "sum", "max", "min"],
