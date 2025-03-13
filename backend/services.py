@@ -1381,6 +1381,10 @@ def fetch_geojson_colors(data):
         return {
             "error": "Error generating color levels as the number of ID's is not greater than 5."
         }
+    elif np.any(np.isinf(bin_edges)):
+        return {
+            "error": "Error generating color levels as minimum values are all constant values."
+        }
 
     # Step 5: Create 5 Color Levels Using
     color_levels = [
