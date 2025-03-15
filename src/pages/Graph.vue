@@ -104,6 +104,9 @@ export default {
                         interval: this.selectedInterval,
                         statistics: JSON.stringify(this.selectedStatistics),
                         method: JSON.stringify(this.selectedMethod),
+                    },
+                    headers: {
+                        Authorization: `Bearer ${localStorage.getItem("token")}`
                     }
                 });
                 if (this.selectedInterval === 'seasonally' && !this.selectedMethod.includes('Equal') && !this.selectedColumns.includes('Season')) {
@@ -149,6 +152,9 @@ export default {
                         options: JSON.stringify(this.exportOptions),
                         graph_type: this.graphType,
                         multi_graph_type: JSON.stringify(this.multiGraphType),
+                    },
+                    headers: {
+                        Authorization: `Bearer ${localStorage.getItem("token")}`
                     }
                 });
                 if (response.data.error) {

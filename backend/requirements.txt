@@ -29,6 +29,7 @@ executing
 Flask
 Flask-Caching
 flask-cors
+Flask-JWT-Extended
 Flask-SocketIO
 folium 
 fonttools 
@@ -61,6 +62,7 @@ pycparser
 Pygments
 pyinstaller
 pyinstaller-hooks-contrib
+PyJWT
 pyogrio 
 pyparsing 
 pyproj 

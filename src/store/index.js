@@ -254,6 +254,9 @@ const store = createStore({
             `${import.meta.env.VITE_API_BASE_URL}/api/list_files`,
             {
               params: { folder_path: this.state.modelFolder },
+              headers: {
+                Authorization: `Bearer ${localStorage.getItem("token")}`,
+              },
             }
           );
           if (response.data.error) {
@@ -277,6 +280,9 @@ const store = createStore({
           `${import.meta.env.VITE_API_BASE_URL}/api/get_tables`,
           {
             params: { db_path: db },
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
           }
         );
         if (response.data.error) {
@@ -295,12 +301,15 @@ const store = createStore({
           message: `Loading Parameters for ${tables.join(", ")}`,
           type: "info",
         });
-        
+
         // Fetch all columns for all tables selected
         const response = await axios.get(
           `${import.meta.env.VITE_API_BASE_URL}/api/get_table_details`,
           {
             params: { db_tables: JSON.stringify(dbTables) },
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
           }
         );
 

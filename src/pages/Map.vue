@@ -221,7 +221,7 @@ export default {
         pointColor() {
             return this.theme === 'light' ? "#000000" : "#ff5722";
         },
-        selectedFeature(){
+        selectedFeature() {
             return this.selectedColumns.find(col => !this.properties.includes(col) && col !== this.dateType && col !== 'ID') || '';
         }
     },
@@ -288,6 +288,9 @@ export default {
                         season: this.selectedSeason,
                         feature: this.selectedFeature,
                         feature_statistic: this.selectedFeatureStatistic,
+                    },
+                    headers: {
+                        Authorization: `Bearer ${localStorage.getItem("token")}`
                     }
                 });
 
@@ -323,6 +326,9 @@ export default {
                     method: JSON.stringify(this.selectedMethod),
                     month: this.selectedMonth,
                     season: this.selectedSeason,
+                },
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem("token")}`
                 }
             });
             if (this.selectedInterval === 'seasonally' && !this.selectedMethod.includes('Equal') && !this.selectedColumns.includes('Season')) {
@@ -365,6 +371,9 @@ export default {
                 const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/geospatial`, {
                     params: {
                         file_paths: JSON.stringify(this.selectedGeoFolders),
+                    },
+                    headers: {
+                        Authorization: `Bearer ${localStorage.getItem("token")}`
                     }
                 });
 
@@ -427,8 +436,8 @@ export default {
                                 style.fillColor = featureColor || this.polygonColor; // Default to polygonColor if no match
                                 style.color = featureColor || this.polygonColor;
                             } else if (feature.geometry.type === 'LineString' || feature.geometry.type === 'MultiLineString') {
-                                style.color = this.lineColor;
-                                style.fillColor = this.lineColor;
+                                style.color = featureColor || this.lineColor;
+                                style.fillColor = featureColor || this.lineColor;
                                 style.weight = 2;
                                 style.opacity = 1;
                                 style.fillOpacity = this.lineOpacity;
@@ -672,6 +681,11 @@ export default {
                         geojson_data: JSON.stringify(this.geojson),
                         feature: this.selectedFeature,
                         feature_statistic: this.selectedFeatureStatistic
+                    }, {
+                        headers: {
+                            Authorization: `Bearer ${localStorage.getItem("token")}`,
+                            "Content-Type": "application/json",
+                        },
                     });
                 } else {
                     const domtoimage = await import("dom-to-image-more");
@@ -687,7 +701,7 @@ export default {
 
                     // Send to backend
                     response = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/export_map`, formData, {
-                        headers: { "Content-Type": "multipart/form-data" }
+                        headers: { "Content-Type": "multipart/form-data", Authorization: `Bearer ${localStorage.getItem("token")}` }
                     });
                 }
 

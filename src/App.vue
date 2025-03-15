@@ -1,5 +1,6 @@
 <template>
-  <div id="papp" :class="theme">
+  <Login v-if="!isAuthenticated" v-model:isAuthenticated="isAuthenticated" />
+  <div v-else id="papp" :class="theme">
     <!-- Top Bar -->
     <header class="top-bar">
       <div class="title-container">
@@ -38,6 +39,8 @@
 <script>
 import { mapState, mapActions } from "vuex";
 import MessageBox from "./components/MessageBox.vue";
+import Login from "./pages/Login.vue";
+import axios from "axios";
 import { open } from "@tauri-apps/plugin-dialog";
 import { dirname } from "@tauri-apps/api/path";
 
@@ -45,6 +48,7 @@ export default {
   name: "App",
   data() {
     return {
+      isAuthenticated: false,
       pages: [
         "Project",
         "Table",
@@ -63,6 +67,7 @@ export default {
   },
   components: {
     MessageBox,
+    Login,
   },
   methods: {
     ...mapActions(["updateTheme", "updatePageTitle", "updateCurrentZoom", "updateModelFolder"]),
@@ -108,13 +113,39 @@ export default {
     handleResetZoom() {
       this.updateCurrentZoom({ start: 0, end: 100 });
     },
+    async checkAuth() {
+      const token = localStorage.getItem("token");
+
+      if (!token) {
+        this.isAuthenticated = false;
+        return;
+      }
+      try {
+        const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/verify-token`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        this.isAuthenticated = response.status === 200;
+      } catch {
+        localStorage.removeItem("token");
+        this.isAuthenticated = false;
+      }
+    },
   },
-  mounted() {
+  async mounted() {
     // Set initial theme on load
     document.body.className = this.theme;
-    this.updatePageTitle(this.activePage);
-    this.$router.push({ name: this.activePage });
+    await this.checkAuth();
   },
+  watch: {
+    isAuthenticated() {
+      if (this.isAuthenticated) {
+        this.updatePageTitle(this.activePage);
+      this.$router.push({ name: this.activePage }); // Redirect after successful login
+      } else {
+        this.$router.push({ name: "Login" }); // Redirect to login page
+      }
+    },
+  }
 };
 </script>
 <style>

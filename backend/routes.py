@@ -1,6 +1,15 @@
 from flask import jsonify, request, send_file
 import os
 import sys
+from flask_jwt_extended import (
+    JWTManager,
+    create_access_token,
+    jwt_required,
+    verify_jwt_in_request,
+)
+from dotenv import load_dotenv
+import secrets
+import bcrypt
 from services import (
     fetch_data_service,
     get_files_and_folders,
@@ -23,9 +32,55 @@ from validate import (
     validate_serve_tif_args,
 )
 
+# Load environment variables
+load_dotenv()
+
+# In the Tauri EXE sidecar, HTTPS is not required and we can use default credentials.
+# When running as a web app, HTTPS is required and proper environment variables should be set for security.
+ADMIN_USERNAME = os.getenv("ADMIN_USERNAME", "admin")
+ADMIN_PASSWORD_HASH = os.getenv(
+    "ADMIN_PASSWORD_HASH", bcrypt.hashpw("admin".encode(), bcrypt.gensalt()).decode()
+)
+JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY", secrets.token_hex(32))
+
 
 def register_routes(app, cache):
+    app.config["JWT_SECRET_KEY"] = JWT_SECRET_KEY
+    app.config["JWT_ACCESS_TOKEN_EXPIRES"] = 3600  # 1 hour
+    jwt = JWTManager(app)
+
+    @app.route("/login", methods=["POST"])
+    def login():
+        """
+        Authenticate user using hashed password.
+        """
+        data = request.get_json()
+        username = data.get("username")
+        password = data.get("password")
+
+        if not username or not password:
+            return jsonify({"error": "Missing username or password"}), 400
+
+        # Verify username and hashed password
+        if username != ADMIN_USERNAME or not bcrypt.checkpw(
+            password.encode(), ADMIN_PASSWORD_HASH.encode()
+        ):
+            return jsonify({"error": "Invalid credentials"}), 401
+
+        access_token = create_access_token(identity=username)
+
+        return jsonify(access_token=access_token)
+    
+    @app.route("/api/verify-token", methods=["GET"])
+    def verify_token():
+        try:
+            verify_jwt_in_request()
+            return jsonify({"valid": True}), 200
+        except:
+            return jsonify({"valid": False}), 401
+
     @app.route("/api/get_data", methods=["GET"])
+    @jwt_required()
     @cache.cached(timeout=300, query_string=True)
     def get_data():
         data = request.args
@@ -41,13 +96,9 @@ def register_routes(app, cache):
 
     @app.route("/api/export_data", methods=["GET", "POST"])
     # This endpoint is not cached because the file is generated dynamically
+    @jwt_required()
     def export_data():
-        if request.method == "GET":
-            data = request.args
-        elif request.method == "POST":
-            data = request.json
-
-        # Validate the request arguments
+        data = request.args if request.method == "GET" else request.json
         validation_response = validate_export_data_args(data)
         if validation_response.get("error", None):
             return jsonify(validation_response)
@@ -68,6 +119,7 @@ def register_routes(app, cache):
         return send_file(file_path.get("file_path"), as_attachment=True)
 
     @app.route("/api/get_tables", methods=["GET"])
+    @jwt_required()
     @cache.cached(timeout=300, query_string=True)
     def get_tables():
         data = request.args
@@ -83,6 +135,7 @@ def register_routes(app, cache):
         return jsonify(tables.get("tables"))
 
     @app.route("/api/list_files", methods=["GET"])
+    @jwt_required()
     def list_files():
         """
         Endpoint to list all files and directories in the specified path.
@@ -99,6 +152,7 @@ def register_routes(app, cache):
         return jsonify(files_and_folders.get("files_and_folders"))
 
     @app.route("/api/get_table_details", methods=["GET"])
+    @jwt_required()
     @cache.cached(
         timeout=300, query_string=True
     )  # Cache this endpoint for 2 minutes (120 seconds)
@@ -118,6 +172,7 @@ def register_routes(app, cache):
         return jsonify(columns_and_time_range_dict)
 
     @app.route("/api/geospatial", methods=["GET"])
+    @jwt_required()
     @cache.cached(timeout=300, query_string=True)
     def geospatial():
         """
@@ -135,6 +190,7 @@ def register_routes(app, cache):
         return jsonify(geo_data)
 
     @app.route("/geotiff/<path:filename>", methods=["GET"])
+    @jwt_required()
     def serve_tif(filename):
         """
         Serve the TIF file from the specified path.
@@ -151,6 +207,7 @@ def register_routes(app, cache):
         return send_file(filename, mimetype="image/png", as_attachment=True)
 
     @app.route("/api/get_geojson_colors", methods=["GET"])
+    @jwt_required()
     @cache.cached(timeout=300, query_string=True)
     def get_geojson_colors():
         """
@@ -168,6 +225,7 @@ def register_routes(app, cache):
         return jsonify(colors)
 
     @app.route("/api/export_map", methods=["POST"])
+    @jwt_required()
     def export_map():
         """
         API endpoint to export the map image.
@@ -181,7 +239,7 @@ def register_routes(app, cache):
             return jsonify(validation_response)
 
         file_path = export_map_service(image, form_data)
-        
+
         if file_path.get("error", None):
             return jsonify(file_path)
 
@@ -193,8 +251,12 @@ def register_routes(app, cache):
 
     @app.route("/shutdown", methods=["GET"])
     def shutdown():
-        shutdown_server()
-        return "Server shutting down...", 200
+        # Shutdown the server if running as a standalone executable
+        if getattr(sys, "frozen", False): 
+            shutdown_server()
+            return "Server shutting down...", 200
+        else:
+            return "Server is not running as a standalone executable.", 200
 
     @app.route("/clear_cache", methods=["GET"])
     def clear_cache_route():
