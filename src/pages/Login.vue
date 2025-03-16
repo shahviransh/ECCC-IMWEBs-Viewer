@@ -48,10 +48,10 @@ export default {
         async login() {
             try {
                 // Use 'admin' and 'admin' as default login credentials if running in Tauri
-                const response = window.isTauri !== undefined ? await axios.post(`${import.meta.env.VITE_API_BASE_URL}/login`, {
+                const response = window.isTauri !== undefined ? await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/login`, {
                     username: 'admin',
                     password: 'admin'
-                }) : await axios.post(`${import.meta.env.VITE_API_BASE_URL}/login`, {
+                }) : await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/login`, {
                     username: this.username,
                     password: this.password
                 });

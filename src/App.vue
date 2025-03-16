@@ -6,6 +6,7 @@
       <div class="title-container">
         <h2>IMWEBs Viewer</h2>
       </div>
+      <button class="logout-button" @click="logout">🚪 Logout</button>
       <button class="theme-switch" @click="toggleTheme">
         <span v-if="theme === 'light'">🌞</span>
         <span v-else>🌜</span>
@@ -130,6 +131,21 @@ export default {
         this.isAuthenticated = false;
       }
     },
+    async logout() {
+      try {
+        const token = localStorage.getItem("token");
+        if (token) {
+          await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/logout`, {}, {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+        }
+      } catch (error) {
+        console.error("Logout failed", error);
+      } finally {
+        localStorage.removeItem("token");
+        this.isAuthenticated = false;
+      }
+    },
   },
   async mounted() {
     // Set initial theme on load
@@ -141,8 +157,6 @@ export default {
       if (this.isAuthenticated) {
         this.updatePageTitle(this.activePage);
       this.$router.push({ name: this.activePage }); // Redirect after successful login
-      } else {
-        this.$router.push({ name: "Login" }); // Redirect to login page
       }
     },
   }
@@ -239,5 +253,14 @@ body,
   font-size: 24px;
   cursor: pointer;
   color: var(--top-bar-text);
+}
+
+.logout-button {
+  background: none;
+  border: none;
+  font-size: 16px;
+  cursor: pointer;
+  color: var(--top-bar-text);
+  margin-left: 10px;
 }
 </style>

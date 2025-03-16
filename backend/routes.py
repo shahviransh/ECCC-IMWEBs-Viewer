@@ -5,6 +5,7 @@ from flask_jwt_extended import (
     JWTManager,
     create_access_token,
     jwt_required,
+    get_jwt,
     verify_jwt_in_request,
 )
 from dotenv import load_dotenv
@@ -42,14 +43,15 @@ ADMIN_PASSWORD_HASH = os.getenv(
     "ADMIN_PASSWORD_HASH", bcrypt.hashpw("admin".encode(), bcrypt.gensalt()).decode()
 )
 JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY", secrets.token_hex(32))
-
+# Store revoked tokens
+revoked_tokens = set()
 
 def register_routes(app, cache):
     app.config["JWT_SECRET_KEY"] = JWT_SECRET_KEY
     app.config["JWT_ACCESS_TOKEN_EXPIRES"] = 3600  # 1 hour
     jwt = JWTManager(app)
 
-    @app.route("/login", methods=["POST"])
+    @app.route("/api/login", methods=["POST"])
     def login():
         """
         Authenticate user using hashed password.
@@ -70,6 +72,21 @@ def register_routes(app, cache):
         access_token = create_access_token(identity=username)
 
         return jsonify(access_token=access_token)
+
+    @app.route("/api/logout", methods=["POST"])
+    @jwt_required()
+    def logout():
+        """
+        Logout the user by revoking the token.
+        """
+        jti = get_jwt()["jti"]  # Get the unique identifier of the token
+        revoked_tokens.add(jti)
+        return jsonify({"message": "Logged out successfully"}), 200
+
+    # Token revocation check
+    @jwt.token_in_blocklist_loader
+    def check_if_token_revoked(jwt_header, jwt_payload):
+        return jwt_payload["jti"] in revoked_tokens
     
     @app.route("/api/verify-token", methods=["GET"])
     def verify_token():
