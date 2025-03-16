@@ -2,7 +2,7 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
 use reqwest::Client;
-use std::{ env, process::Command, thread::sleep, time::Duration };
+use std::{ env, process::Command};
 use std::fs;
 use std::path::Path;
 
