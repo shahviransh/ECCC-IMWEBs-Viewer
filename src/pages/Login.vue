@@ -45,17 +45,13 @@ export default {
         isAuthenticated: Boolean
     },
     methods: {
-        async login() {
+        async login(autoLogin = false) {
             try {
-                // Use 'admin' and 'admin' as default login credentials if running in Tauri
-                const response = window.isTauri !== undefined ? await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/login`, {
-                    username: 'admin',
-                    password: 'admin'
-                }) : await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/login`, {
-                    username: this.username,
-                    password: this.password
-                });
+                const credentials = autoLogin 
+                    ? { username: 'admin', password: 'admin' }
+                    : { username: this.username, password: this.password };
 
+                const response = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/login`, credentials);
                 const token = response.data.access_token;
                 localStorage.setItem('token', token);
                 this.$emit("update:isAuthenticated", true);
@@ -63,6 +59,12 @@ export default {
                 console.error(err);
                 this.error = err.response?.data?.error || 'Invalid username or password';
             }
+        }
+    },
+    mounted() {
+        // Auto login in Tauri
+        if (window.isTauri !== undefined) {
+            this.login(true);
         }
     }
 };
