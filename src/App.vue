@@ -1,5 +1,6 @@
 <template>
-  <Login v-if="!isAuthenticated" v-model:isAuthenticated="isAuthenticated" />
+  <Loading v-if="isLoading" />
+  <Login v-else-if="!isAuthenticated" v-model:isAuthenticated="isAuthenticated" />
   <div v-else id="papp" :class="theme">
     <!-- Top Bar -->
     <header class="top-bar">
@@ -41,6 +42,7 @@
 import { mapState, mapActions } from "vuex";
 import MessageBox from "./components/MessageBox.vue";
 import Login from "./pages/Login.vue";
+import Loading from "./pages/Loading.vue";
 import axios from "axios";
 import { open } from "@tauri-apps/plugin-dialog";
 import { dirname } from "@tauri-apps/api/path";
@@ -50,6 +52,7 @@ export default {
   data() {
     return {
       isAuthenticated: false,
+      isLoading: true,
       pages: [
         "Project",
         "Table",
@@ -69,6 +72,7 @@ export default {
   components: {
     MessageBox,
     Login,
+    Loading,
   },
   methods: {
     ...mapActions(["updateTheme", "updatePageTitle", "updateCurrentZoom", "updateModelFolder"]),
@@ -114,14 +118,28 @@ export default {
     handleResetZoom() {
       this.updateCurrentZoom({ start: 0, end: 100 });
     },
+    async checkServerStatus() {
+      // Check if the server is running, keep checking every 2 seconds
+      const interval = setInterval(async () => {
+        try {
+          await axios.get(`${import.meta.env.VITE_API_BASE_URL}/health`);
+          this.isLoading = false;
+          clearInterval(interval); // Stop checking once successful
+        } catch (error) {
+          console.error("Server is not running", error);
+        }
+      }, 2000);
+    },
     async checkAuth() {
       const token = localStorage.getItem("token");
 
+      // Check if token is present and valid
       if (!token) {
         this.isAuthenticated = false;
         return;
       }
       try {
+        // Verify token with the server
         const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/verify-token`, {
           headers: { Authorization: `Bearer ${token}` },
         });
@@ -133,6 +151,7 @@ export default {
     },
     async logout() {
       try {
+        // Clear token from local storage and logout from the server
         const token = localStorage.getItem("token");
         if (token) {
           await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/logout`, {}, {
@@ -150,13 +169,14 @@ export default {
   async mounted() {
     // Set initial theme on load
     document.body.className = this.theme;
+    await this.checkServerStatus();
     await this.checkAuth();
   },
   watch: {
     isAuthenticated() {
       if (this.isAuthenticated) {
         this.updatePageTitle(this.activePage);
-      this.$router.push({ name: this.activePage }); // Redirect after successful login
+        this.$router.push({ name: this.activePage }); // Redirect after successful login
       }
     },
   }

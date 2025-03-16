@@ -113,9 +113,6 @@ async fn start_server() {
     }
 
     command.spawn().expect("Failed to start server");
-
-    // Wait a few seconds for the server to start
-    sleep(Duration::from_secs(5));
 }
 
 async fn shutdown_flask() {
