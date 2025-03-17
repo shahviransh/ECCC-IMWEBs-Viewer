@@ -102,8 +102,6 @@ jobs:
           elif [[ ${{ matrix.platform == 'windows-latest' }} ]]; then
             curl -LO https://github.com/upx/upx/releases/download/v5.0.0/upx-5.0.0-win64.zip
             unzip upx-5.0.0-win64.zip
-            mkdir -p C:/usr/local/bin/upx
-            mv upx-5.0.0-win64/upx.exe C:/usr/local/bin/upx/upx.exe
           fi
         shell: bash    
 
@@ -131,7 +129,7 @@ jobs:
           conda run -n venv pyinstaller backend/apppy.py -y --distpath backend/ --specpath backend/ --workpath backend/build --name apppy `
             --add-data "$env:CONDA/envs/venv/Library/share/proj;Library/share/proj" `
             --hidden-import=pyogrio._geometry --hidden-import=pyogrio._io --collect-data=numpy `
-            --upx-dir=/usr/local/bin;
+            --upx-dir=upx-5.0.0-win64;
   
       - name: Build backend with PyInstaller
         if: matrix.platform != 'windows-latest'
