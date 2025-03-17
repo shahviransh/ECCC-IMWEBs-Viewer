@@ -88,20 +88,7 @@ jobs:
           librsvg2-dev libfuse2 \
           libwebkit2gtk-4.1-dev libjavascriptcoregtk-4.1-dev
         # webkitgtk 4.0 is for Tauri v1 - webkitgtk 4.1 is for Tauri v2.
-        # You can remove the one that doesn't apply to your app to speed up the workflow a bit.
-      
-      - name: Install UPX (ubuntu and macos only)
-        run: |
-          if [[ ${{ matrix.platform == 'ubuntu-22.04' }} ]]; then
-            curl -LO https://github.com/upx/upx/releases/download/v5.0.0/upx-5.0.0-amd64_linux.tar.xz
-            tar -xf upx-5.0.0-amd64_linux.tar.xz
-            sudo mv upx-5.0.0-amd64_linux/upx /usr/local/bin/upx
-          elif [[ ${{ matrix.platform == 'macos-latest' }} ]]; then
-            brew install upx
-            sudo mv /opt/homebrew/Cellar/upx/4.2.4/upx /usr/local/bin/upx
-          fi
-        shell: bash    
-
+        # You can remove the one that doesn't apply to your app to speed up the workflow a bit.  
       
       - name: Install frontend dependencies
         run: npm install # change this to npm, pnpm or bun depending on which one you use.
@@ -117,7 +104,7 @@ jobs:
           channels: defaults,conda-forge
           python-version: 3.12
 
-      - name: Build backend with PyInstaller (Windows only)
+      - name: Build backend with PyInstaller UPX Enabled (Windows only)
         if: matrix.platform == 'windows-latest'
         shell: pwsh
         run: |
@@ -137,8 +124,7 @@ jobs:
           conda run -n venv pip install --no-cache-dir -r backend/requirements.txt
           conda run -n venv pyinstaller backend/apppy.py -y --distpath backend/ --specpath backend/ --workpath backend/build --name apppy \
           --add-data "$CONDA/envs/venv/share/proj:share/proj" \
-          --hidden-import=pyogrio._geometry --hidden-import=pyogrio._io --collect-data=numpy \
-          --upx-dir=/usr/local/bin
+          --hidden-import=pyogrio._geometry --hidden-import=pyogrio._io --collect-data=numpy
         shell: bash
 
       - name: Restore Cache
