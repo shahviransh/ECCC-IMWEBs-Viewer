@@ -113,14 +113,6 @@ jobs:
           conda run -n venv pyinstaller backend/apppy.py -y --distpath backend/ --specpath backend/ --workpath backend/build --name apppy `
             --add-data "$env:CONDA/envs/venv/Library/share/proj;Library/share/proj" `
             --hidden-import=pyogrio._geometry --hidden-import=pyogrio._io --collect-data=numpy;
-
-          conda list > packages.txt;
-
-      - name: Upload artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: backend-artifacts
-          path: packages.txt
   
       - name: Build backend with PyInstaller
         if: matrix.platform != 'windows-latest'
