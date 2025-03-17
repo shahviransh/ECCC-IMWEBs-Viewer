@@ -124,8 +124,6 @@ jobs:
           conda run -n venv pyinstaller backend/apppy.py -y --distpath backend/ --specpath backend/ --workpath backend/build --name apppy \
           --add-data "$CONDA/envs/venv/share/proj:share/proj" \
           --hidden-import=pyogrio._geometry --hidden-import=pyogrio._io --collect-data=numpy
-          
-          du -sh --block-size=1G "./backend/apppy/_internal"
         shell: bash
 
       - name: Restore Cache
