@@ -121,7 +121,7 @@ jobs:
         if: matrix.platform == 'windows-latest'
         shell: pwsh
         run: |
-          curl -LO https://github.com/upx/upx/releases/download/v5.0.0/upx-5.0.0-win64.zip
+          Invoke-WebRequest -Uri https://github.com/upx/upx/releases/download/v5.0.0/upx-5.0.0-win64.zip -OutFile "upx-5.0.0-win64.zip"
           unzip upx-5.0.0-win64.zip
           conda install -n venv -c conda-forge gdal geopandas pyogrio -y;
           conda run -n venv pip install --no-cache-dir -r backend/requirements.txt;
