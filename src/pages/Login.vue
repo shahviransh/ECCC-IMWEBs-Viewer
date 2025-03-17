@@ -10,7 +10,7 @@
             <div class="panel-body">
                 <fieldset>
                     <legend class="panel-title">Sign in to IMWEBs Viewer</legend>
-                    <form @submit.prevent="login">
+                    <form @submit.prevent="login(false)">
                         <div class="formGroup">
                             <label for="username"><b>Email address:</b></label>
                             <input id="username" type="text" v-model="username" class="formControl" maxlength="50"
@@ -45,12 +45,13 @@ export default {
         isAuthenticated: Boolean
     },
     methods: {
-        async login(autoLogin = false) {
+        async login(autoLogin) {
             try {
                 const credentials = autoLogin 
                     ? { username: 'admin', password: 'admin' }
                     : { username: this.username, password: this.password };
 
+                console.log(autoLogin);
                 const response = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/login`, credentials);
                 const token = response.data.access_token;
                 localStorage.setItem('token', token);
