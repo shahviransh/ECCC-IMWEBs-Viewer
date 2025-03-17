@@ -86,17 +86,27 @@ jobs:
           curl wget file libxau-dev libpng-dev \
           libappindicator3-dev libgdk-pixbuf2.0-dev \
           librsvg2-dev libfuse2 \
-          libwebkit2gtk-4.1-dev libjavascriptcoregtk-4.1-dev upx
+          libwebkit2gtk-4.1-dev libjavascriptcoregtk-4.1-dev
         # webkitgtk 4.0 is for Tauri v1 - webkitgtk 4.1 is for Tauri v2.
         # You can remove the one that doesn't apply to your app to speed up the workflow a bit.
-
-      - name: Install UPX (Windows only)
-        if: matrix.platform == 'windows-latest'
-        run: choco install upx
       
-      - name: Install UPX (macOS only)
-        if: matrix.platform == 'macos-latest'
-        run: brew install upx
+      - name: Install UPX
+        run: |
+          if [[ ${{ matrix.platform == 'ubuntu-22.04' }} ]]; then
+            curl -LO https://github.com/upx/upx/releases/download/v5.0.0/upx-5.0.0-amd64_linux.tar.xz
+            tar -xf upx-5.0.0-amd64_linux.tar.xz
+            sudo mv upx-5.0.0-amd64_linux/upx /usr/local/bin/upx
+          elif [[ ${{ matrix.platform == 'macos-latest' }} ]]; then
+            brew install upx
+            sudo mv /opt/homebrew/Cellar/upx/4.2.4/upx /usr/local/bin/upx
+          elif [[ ${{ matrix.platform == 'windows-latest' }} ]]; then
+            curl -LO https://github.com/upx/upx/releases/download/v5.0.0/upx-5.0.0-win64.zip
+            unzip upx-5.0.0-win64.zip
+            mkdir -p C:/usr/local/bin/upx
+            mv upx-5.0.0-win64/upx.exe C:/usr/local/bin/upx/upx.exe
+          fi
+        shell: bash    
+
       
       - name: Install frontend dependencies
         run: npm install # change this to npm, pnpm or bun depending on which one you use.
@@ -121,7 +131,7 @@ jobs:
           conda run -n venv pyinstaller backend/apppy.py -y --distpath backend/ --specpath backend/ --workpath backend/build --name apppy `
             --add-data "$env:CONDA/envs/venv/Library/share/proj;Library/share/proj" `
             --hidden-import=pyogrio._geometry --hidden-import=pyogrio._io --collect-data=numpy `
-            --upx-dir=/usr/local/bin/upx;
+            --upx-dir=/usr/local/bin;
   
       - name: Build backend with PyInstaller
         if: matrix.platform != 'windows-latest'
@@ -131,7 +141,7 @@ jobs:
           conda run -n venv pyinstaller backend/apppy.py -y --distpath backend/ --specpath backend/ --workpath backend/build --name apppy \
           --add-data "$CONDA/envs/venv/share/proj:share/proj" \
           --hidden-import=pyogrio._geometry --hidden-import=pyogrio._io --collect-data=numpy \
-          --upx-dir=/usr/local/bin/upx
+          --upx-dir=/usr/local/bin
         shell: bash
 
       - name: Restore Cache
