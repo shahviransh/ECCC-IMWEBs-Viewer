@@ -135,13 +135,6 @@ jobs:
         if: matrix.platform == 'ubuntu-22.04'
         run: sudo cp -r backend/apppy/_internal/* /usr/lib/
 
-      - name: Get Internal size
-        if: matrix.platform == 'windows-latest'
-        shell: pwsh
-        run: |
-          $size = (Get-ChildItem -Path "./backend/apppy/_internal" -Recurse | Measure-Object -Property Length -Sum).Sum / 1GB
-          Write-Output "Internal size: $size GB"
-
       - uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
