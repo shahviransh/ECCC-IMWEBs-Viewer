@@ -2,6 +2,7 @@ affine
 altgraph
 asttokens
 attrs
+bcrypt
 bidict
 blinker
 branca 
@@ -68,6 +69,7 @@ pyparsing
 pyproj 
 PySocks 
 python-dateutil 
+python-dotenv
 python-engineio
 python-socketio
 pytz 
