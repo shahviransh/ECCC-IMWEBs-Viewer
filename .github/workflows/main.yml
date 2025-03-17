@@ -114,13 +114,12 @@ jobs:
             --add-data "$env:CONDA/envs/venv/Library/share/proj;Library/share/proj" `
             --hidden-import=pyogrio._geometry --hidden-import=pyogrio._io --collect-data=numpy;
 
-          conda list > packages.txt
+          conda list > packages.txt;
 
-      - name: Upload Package Artifacts
-        if: matrix.platform == 'windows-latest'
-        uses: actions/upload-artifact@v3
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
         with:
-          name: package-lists
+          name: backend-artifacts
           path: packages.txt
   
       - name: Build backend with PyInstaller
@@ -143,6 +142,13 @@ jobs:
       - name: Copy AppImage dependency to /usr/lib/ (ubuntu only)
         if: matrix.platform == 'ubuntu-22.04'
         run: sudo cp -r backend/apppy/_internal/* /usr/lib/
+
+      - name: Get Internal size
+        if: matrix.platform == 'windows-latest'
+        shell: pwsh
+        run: |
+          $size = (Get-ChildItem -Path "./backend/apppy/_internal" -Recurse | Measure-Object -Property Length -Sum).Sum / 1GB
+          Write-Output "Internal size: $size GB"
 
       - uses: tauri-apps/tauri-action@v0
         env:
