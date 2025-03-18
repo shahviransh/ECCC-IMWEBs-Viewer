@@ -192,8 +192,8 @@ export default {
             rowLimit: 100,
             modalKey: 0,
             modalPosition: {
-                top: "25%",
-                left: "25%",
+                top: "50%",
+                left: "50%",
             },
             dragging: false,
             offset: { x: 0, y: 0 },
@@ -253,8 +253,7 @@ export default {
             if (!this.dragging) return;
             this.modalPosition = {
                 top: `${event.clientY - this.offset.y}px`,
-                left: `${event.clientX - this.offset.x}px`,
-                transform: "none" // Disable centering after drag starts
+                left: `${event.clientX - this.offset.x}px`
             };
         },
         stopDrag() {
@@ -768,6 +767,7 @@ export default {
     border-radius: 10px;
     width: 30%;
     height: auto;
+    transform: (-50%, -50%);
     text-align: center;
     color: var(--text-color);
     overflow-y: auto;
