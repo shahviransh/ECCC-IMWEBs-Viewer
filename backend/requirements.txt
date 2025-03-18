@@ -13,7 +13,6 @@ cairocffi
 Cerberus
 certifi 
 cffi 
-cfgv 
 charset-normalizer 
 click
 click-plugins
@@ -28,9 +27,7 @@ DateTime
 debugpy
 decorator
 defusedxml
-distlib 
 executing
-filelock 
 Flask
 Flask-Caching
 flask-cors
@@ -44,14 +41,13 @@ h11
 h2 
 hpack 
 hyperframe 
-identify 
 idna 
 itsdangerous
 Jinja2 
 joblib 
 kiwisolver 
 mapclassify 
-markdown-it-py 
+markdown-it-py
 MarkupSafe 
 matplotlib
 mdurl
@@ -60,7 +56,6 @@ mkl_fft
 mkl_random 
 munkres
 networkx 
-nodeenv 
 numexpr 
 numpy 
 packaging 
@@ -68,8 +63,6 @@ pandas
 pbr
 pefile
 pillow 
-platformdirs 
-pre_commit 
 pure_eval
 pycparser 
 Pygments
@@ -102,11 +95,8 @@ stevedore
 threadpoolctl 
 tinycss2
 tzdata 
-uarray
-ukkonen 
 unicodedata2 
 urllib3 
-virtualenv 
 wcwidth
 webencodings
 Werkzeug
