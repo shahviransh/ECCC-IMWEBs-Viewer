@@ -99,7 +99,8 @@
             </div>
             <!-- Table Stats Graph Popup -->
             <div v-show="showTableStatsPopup" class="modal-overlay">
-                <div class="modal" @mousedown="startDrag" :style="{ top: modalPosition.top, left: modalPosition.left }"
+                <div class="modal" @mousedown="startDrag"
+                    :style="{ top: modalPosition.top, left: modalPosition.left, traslate: modalPosition.translate }"
                     :key="modalKey">
                     <button class="close-button" @click="showTableStatsPopup = false">&times;</button>
 
@@ -192,8 +193,9 @@ export default {
             rowLimit: 100,
             modalKey: 0,
             modalPosition: {
-                top: "50%",
-                left: "50%",
+                top: "25%",
+                left: "25%",
+                translate: "(-50%, -50%)",
             },
             dragging: false,
             offset: { x: 0, y: 0 },
@@ -253,7 +255,8 @@ export default {
             if (!this.dragging) return;
             this.modalPosition = {
                 top: `${event.clientY - this.offset.y}px`,
-                left: `${event.clientX - this.offset.x}px`
+                left: `${event.clientX - this.offset.x}px`,
+                translate: "none",
             };
         },
         stopDrag() {
@@ -767,7 +770,6 @@ export default {
     border-radius: 10px;
     width: 30%;
     height: auto;
-    transform: (-50%, -50%);
     text-align: center;
     color: var(--text-color);
     overflow-y: auto;
