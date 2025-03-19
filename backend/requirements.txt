@@ -35,7 +35,7 @@ Flask-JWT-Extended
 Flask-SocketIO
 folium 
 fonttools 
-GDAL 
+GDAL
 geopandas 
 h11
 h2 
@@ -51,9 +51,6 @@ markdown-it-py
 MarkupSafe 
 matplotlib
 mdurl
-mkl-service
-mkl_fft 
-mkl_random 
 munkres
 networkx 
 numexpr 
