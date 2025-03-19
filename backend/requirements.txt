@@ -35,7 +35,7 @@ Flask-JWT-Extended
 Flask-SocketIO
 folium 
 fonttools 
-GDAL
+GDAL 
 geopandas 
 h11
 h2 
