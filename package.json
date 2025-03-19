@@ -20,7 +20,7 @@
   },
   "dependencies": {
     "@tauri-apps/api": "^2.2.0",
-    "@tauri-apps/cli": "^2.2.5",
+    "@tauri-apps/cli": "^2.3.0",
     "@tauri-apps/plugin-dialog": "^2.2.0",
     "axios": "^1.8.2",
     "dom-to-image-more": "^3.5.0",
