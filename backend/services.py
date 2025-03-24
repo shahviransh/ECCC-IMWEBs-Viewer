@@ -26,6 +26,7 @@ alias_mapping = {}
 global_dbs_tables_columns = {}
 os.environ["PROJ_LIB"] = Config.PROJ_LIB
 os.environ["GDAL_DATA"] = Config.GDAL_DATA
+bmp_db_path_global = None
 
 
 def fetch_data_service(data):
@@ -43,7 +44,13 @@ def fetch_data_service(data):
         statistics = json.loads(data.get("statistics", "['None']"))
         month = data.get("month", None)
         season = data.get("season", None)
+        spatial_scale = data.get("spatial_scale", None)
+        field_selected_ids = data.get("field_selected_ids", [])
         stats_df = None
+
+        if spatial_scale == "field":
+            field_selected_ids = selected_ids
+            selected_ids = []
 
         # Initialize DataFrame to store the merged data
         df = pd.DataFrame()
@@ -138,6 +145,93 @@ def fetch_data_service(data):
         if df.empty:
             return {"error": "No data found for the specified filters."}
 
+        if spatial_scale == "field":
+            # Connect to BMP.db3 to fetch subarea information
+            bmp_db_path = os.path.join(Config.PATHFILE, bmp_db_path_global)
+            conn = sqlite3.connect(bmp_db_path)
+
+            try:
+                # Read Subarea information (Id, FieldId, and Area) from the Subarea table
+                query = "SELECT Id AS 'ID', FieldId, Area FROM Subarea"
+                params = []
+
+                # Add conditions for selected field IDs
+                if field_selected_ids:
+                    placeholders = ",".join(["?"] * len(field_selected_ids))
+                    query += f" WHERE FieldId IN ({placeholders})"
+                    params.extend(field_selected_ids)
+                subarea_df = pd.read_sql_query(query, conn, params=params)
+
+                # Ensure the required columns exist in the DataFrame
+                if (
+                    "ID" not in subarea_df.columns
+                    or "FieldId" not in subarea_df.columns
+                    or "Area" not in subarea_df.columns
+                ):
+                    return {
+                        "error": "Subarea table does not contain the required columns: ID, FieldId, Area"
+                    }
+
+                # Calculate the total area for each field
+                field_area_df = (
+                    subarea_df.groupby(["FieldId"])["Area"].sum().reset_index()
+                )
+                field_area_df.rename(columns={"Area": "Total_Area"}, inplace=True)
+
+                # Merge the total field area back into the subarea DataFrame
+                subarea_df = subarea_df.merge(field_area_df, on="FieldId")
+
+                # Calculate the area fraction for each subarea within its field
+                subarea_df["Area_Fraction"] = (
+                    subarea_df["Area"] / subarea_df["Total_Area"]
+                )
+
+                date_type_list = [date_type] if date_type else []
+
+                # Merge the subarea values from the main DataFrame (df) into the subarea DataFrame
+                subarea_values = (
+                    df.set_index(["ID", *date_type_list])
+                    .select_dtypes(include=["number"])
+                    .reset_index()
+                )
+                subarea_values.rename(columns={"ID": "Subarea_ID"}, inplace=True)
+                subarea_df = subarea_df.merge(
+                    subarea_values, left_on="ID", right_on="Subarea_ID", how="left"
+                )
+
+                # Calculate the area-weighted field values for all numerical columns
+                weighted_columns = []
+                for col in subarea_values.columns:
+                    if col not in [
+                        "Subarea_ID",
+                        *date_type_list,
+                    ]:  # Skip the ID and Date column
+                        subarea_df[col] = subarea_df[col] * subarea_df["Area_Fraction"]
+                        weighted_columns.append(col)
+
+                # Aggregate the weighted values to calculate the field values
+                field_values_df = (
+                    subarea_df.groupby(["FieldId", *date_type_list])[weighted_columns]
+                    .sum()
+                    .reset_index()
+                )
+                field_values_df.rename(columns={"FieldId": "ID"}, inplace=True)
+
+                # Replace the original DataFrame's values with the calculated field values
+                df = field_values_df.copy().map(round_numeric_values)
+
+            except Exception as e:
+                return {"error": f"Error processing field values: {str(e)}"}
+            finally:
+                conn.close()
+        elif spatial_scale == "reach":
+            # Select all IDs except 0 as Reach ID = 0 is used for watershed average
+            df = df[df["ID"] != 0]
+        elif spatial_scale == "unknown":
+            return {
+                "error": "Spatial scale is unknown. Please select a valid spatial scale."
+            }
+
         # Perform time conversion and aggregation if necessary
         if "Equal" not in method and interval != "daily":
             if not date_type:
@@ -224,7 +318,6 @@ def export_data_service(data, is_empty=False):
             list(map(int, json.loads(data.get("id")))) if data.get("id") != [] else [],
             is_empty,
         )
-        
 
         return {"file_path": file_path}
     except Exception as e:
@@ -628,7 +721,6 @@ def get_table_names(data):
         cursor = conn.cursor()
         cursor.execute("SELECT name FROM sqlite_master WHERE type='table';")
         tables = cursor.fetchall()
-        conn.close()
         # Map real table names to alias names
         alias_tables = [
             alias_mapping.get(table[0], {}).get("alias", table[0]) for table in tables
@@ -636,6 +728,8 @@ def get_table_names(data):
         return {"tables": alias_tables}
     except Exception as e:
         return {"error": str(e)}
+    finally:
+        conn.close()
 
 
 def get_files_and_folders(data):
@@ -645,6 +739,7 @@ def get_files_and_folders(data):
 
     folder_tree = set()
     folder_path = data.get("folder_path", "Jenette_Creek_Watershed")
+    global bmp_db_path_global
 
     if os.path.isabs(folder_path):
         # Update Config.PATHFILE to point to the parent directory of the provided absolute path
@@ -702,6 +797,8 @@ def get_files_and_folders(data):
                     elif file_rel_path.endswith(".db3") and "lookup" in file_rel_path:
                         Config.LOOKUP = file_rel_path
                         lookup_found = True
+                    if "bmp" in file_rel_path.lower():
+                        bmp_db_path_global = file_rel_path
                     files_and_folders.append(
                         {
                             "type": (
@@ -925,9 +1022,6 @@ def get_columns_and_time_range(db_path, table_name):
             id_df = pd.read_sql_query(id_query, conn)
             ids = id_df[id_column].tolist()
 
-        # Close the connection
-        conn.close()
-
         # Return alias column names instead of real ones
         return {
             "columns": alias_columns,
@@ -939,6 +1033,8 @@ def get_columns_and_time_range(db_path, table_name):
         }
     except Exception as e:
         return {"error": str(e)}
+    finally:
+        conn.close()
 
 
 def get_multi_columns_and_time_range(data):
@@ -1036,11 +1132,11 @@ def get_multi_columns_and_time_range(data):
         return {
             "columns": columns,
             "global_columns": global_dbs_tables_columns,
-            "start_date": start_date,
-            "end_date": end_date,
+            "start_date": start_date or "",
+            "end_date": end_date or "",
             "ids": [str(id) for id in sorted(ids)],
-            "date_type": multi_columns_time_range[0]["date_type"],
-            "interval": multi_columns_time_range[0]["interval"],
+            "date_type": multi_columns_time_range[0]["date_type"] or "",
+            "interval": multi_columns_time_range[0]["interval"] or "",
         }
     except Exception as e:
         return {"error": str(e)}
@@ -1338,17 +1434,20 @@ def fetch_geojson_colors(data):
     Fetches data from `fetch_data_service`, applies feature statistics, and generates geojson color mapping.
     """
     # Step 1: Fetch raw data
-    raw_data = fetch_data_service(data)
+    output = fetch_data_service(data)
     feature = data.get("feature", "value")
     feature_statistic = data.get("feature_statistic", "mean")
 
     if not feature or feature == "value":
         return {}
+    
+    if output.get("error", None):
+        return output
 
-    if "data" not in raw_data:
+    if "data" not in output:
         return {"error": "No data found"}
 
-    df = pd.DataFrame(raw_data["data"])
+    df = pd.DataFrame(output["data"])
     ID = next((col for col in df.columns if "ID" in col), None)
 
     if ID is None:
@@ -1379,7 +1478,7 @@ def fetch_geojson_colors(data):
 
     if len(bin_edges) != 6:
         return {
-            "error": "Error generating color levels as the number of ID's is not greater than 5."
+            "error": "Error generating color levels as the data rows are <= 5."
         }
     elif np.any(np.isinf(bin_edges)):
         return {
@@ -1389,8 +1488,8 @@ def fetch_geojson_colors(data):
     # Step 5: Create 5 Color Levels Using
     color_levels = [
         {
-            "min": round(bin_edges[i], 2),
-            "max": round(bin_edges[i + 1], 2),
+            "min": round(bin_edges[i], 4),
+            "max": round(bin_edges[i + 1], 4),
             "color": dynamic_colors[i],
         }
         for i in range(num_classes)

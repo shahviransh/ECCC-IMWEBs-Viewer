@@ -104,6 +104,11 @@ def validate_get_data_args(request_args):
             "required": False,
             "allowed": ["mean", "sum", "max", "min"],
         },
+        "spatial_scale": {
+            "type": "string",
+            "required": False,
+            "allowed": ["subarea", "field", "reach", "subbasin", "unknown"]
+        }
     }
     return validate_request_args(schema, request_args)
 
@@ -187,6 +192,24 @@ def validate_export_data_args(request_args):
             "required": False,
             "allowed": ["summer", "winter", "fall", "spring", ""],
         },
+        "geojson_data": {
+            "type": "string",
+            "required": False,
+        },
+        "feature": {
+            "type": "string",
+            "required": False,
+        },
+        "feature_statistic": {
+            "type": "string",
+            "required": False,
+            "allowed": ["mean", "sum", "max", "min"],
+        },
+        "spatial_scale": {
+            "type": "string",
+            "required": False,
+            "allowed": ["subarea", "field", "reach", "subbasin", "unknown"]
+        }
     }
     return validate_request_args(schema, request_args)
 

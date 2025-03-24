@@ -81,8 +81,9 @@ const store = createStore({
     },
     ADD_COLUMNS(state, { columns }) {
       const temp = columns.filter((c) => !state.columns.includes(c));
+      const columnsNotGeo = state.columns.filter((c) => !state.geoColumns.includes(c));
       state.geoColumns = temp;
-      state.columns = [...state.geoColumns, ...state.columns];
+      state.columns = [...state.geoColumns, ...columnsNotGeo];
     },
     SET_SELECTED_DB_TABLE_REMOVE(state, table) {
       state.selectedDbsTables = state.selectedDbsTables.filter(
@@ -90,7 +91,7 @@ const store = createStore({
       );
     },
     SET_TOOLTIP_COLUMNS(state, columns) {
-      state.tooltipColumns = { ...columns };
+      state.tooltipColumns = { ...columns, ...state.tooltipColumns };
     },
     SET_OPTIONS(state, { ids, dateRange, dateType, exportDate }) {
       state.ids = ids;

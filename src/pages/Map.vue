@@ -88,6 +88,14 @@
                                 <option value="min">Minimum</option>
                                 <option value="max">Maximum</option>
                             </select>
+
+                            <label>Selected Spactial Scale:</label>
+                            <select v-model="spatialScale" class="dropdown">
+                                <option value="subbasin">Subbasin</option>
+                                <option value="subarea">Subarea</option>
+                                <option value="field">Field</option>
+                                <option value="reach">Reach</option>
+                            </select>
                         </div>
                     </div>
 
@@ -193,8 +201,8 @@ export default {
             rowLimit: 100,
             modalKey: 0,
             modalPosition: {
-                top: "25%",
-                left: "25%",
+                top: "50%",
+                left: "50%",
                 translate: "(-50%, -50%)",
             },
             dragging: false,
@@ -225,6 +233,33 @@ export default {
         },
         selectedFeature() {
             return this.selectedColumns.find(col => !this.properties.includes(col) && col !== this.dateType && col !== 'ID') || '';
+        },
+        spatialScale: {
+            get() {
+                // Define a mapping of keywords to spatial scales
+                const scaleKeywords = {
+                    subarea: "subarea",
+                    subbasin: "subbasin",
+                    reach: "reach",
+                    field: "field",
+                };
+
+                // Find the first matching keyword in the selectedGeoFolders
+                for (const [keyword, scale] of Object.entries(scaleKeywords)) {
+                    if (this.selectedGeoFolders.some(folder => folder.toLowerCase().includes(keyword))) {
+                        this.selectedSpatialScale = scale;
+                        return scale;
+                    }
+                }
+
+                // Default to unknown if no match
+                this.selectedSpatialScale = "unknown";
+                return "unknown";
+            },
+            set(value) {
+                // Update the user's selected spatial scale
+                this.selectedSpatialScale = value;
+            },
         }
     },
     methods: {
@@ -290,6 +325,7 @@ export default {
                         season: this.selectedSeason,
                         feature: this.selectedFeature,
                         feature_statistic: this.selectedFeatureStatistic,
+                        spatial_scale: this.selectedSpatialScale,
                     },
                     headers: {
                         Authorization: `Bearer ${localStorage.getItem("token")}`
@@ -328,6 +364,7 @@ export default {
                     method: JSON.stringify(this.selectedMethod),
                     month: this.selectedMonth,
                     season: this.selectedSeason,
+                    spatial_scale: this.selectedSpatialScale,
                 },
                 headers: {
                     Authorization: `Bearer ${localStorage.getItem("token")}`
@@ -426,9 +463,11 @@ export default {
                                 fillOpacity: this.polygonOpacity,
                             };
 
+                            const idName = this.selectedSpatialScale === 'subarea' ? 'gridcode' : this.selectedSpatialScale === 'reach' ? 'id_' : 'id';
+
                             // Check if geojson_colors has a color for this feature's id
                             const featureId = Object.entries(feature.properties)
-                                .filter(([key, value]) => key.toLowerCase().includes('id') && value !== null)
+                                .filter(([key, value]) => key.toLowerCase().includes(idName) && value !== null)
                                 .map(([, value]) => value)?.[0] ?? null;
 
                             const featureColor = this.geojson_colors[featureId?.toFixed(1).toString()];
@@ -680,9 +719,12 @@ export default {
                         options: JSON.stringify(this.exportOptions),
                         graph_type: this.graphType,
                         multi_graph_type: JSON.stringify(this.multiGraphType),
+                        month: this.selectedMonth,
+                        season: this.selectedSeason,
                         geojson_data: JSON.stringify(this.geojson),
                         feature: this.selectedFeature,
-                        feature_statistic: this.selectedFeatureStatistic
+                        feature_statistic: this.selectedFeatureStatistic,
+                        spatial_scale: this.selectedSpatialScale
                     }, {
                         headers: {
                             Authorization: `Bearer ${localStorage.getItem("token")}`,

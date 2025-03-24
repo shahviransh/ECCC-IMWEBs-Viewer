@@ -51,7 +51,6 @@ export default {
                     ? { username: 'admin', password: 'admin' }
                     : { username: this.username, password: this.password };
 
-                console.log(autoLogin);
                 const response = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/login`, credentials);
                 const token = response.data.access_token;
                 localStorage.setItem('token', token);
