@@ -11,6 +11,7 @@ import matplotlib.cm as cm
 import cmocean.cm
 import itertools
 from sklearn.preprocessing import KBinsDiscretizer
+from scipy.stats import skew
 from matplotlib.ticker import MaxNLocator, LinearLocator
 from cycler import cycler
 from config import Config
@@ -626,10 +627,7 @@ def save_to_file(
             gdf.set_crs("EPSG:4326", allow_override=True, inplace=True)
 
         # TODO: Ask for the ID column name
-        spatial_scale_id_map = {
-            "reach": "id_",
-            "subarea": "gridcode"
-        }
+        spatial_scale_id_map = {"reach": "id_", "subarea": "gridcode"}
 
         # Get the ID column name based on the spatial scale
         id_name = spatial_scale_id_map.get(spatial_scale, "id")
@@ -1451,7 +1449,7 @@ def fetch_geojson_colors(data):
 
     if not feature or feature == "value":
         return {}
-    
+
     if output.get("error", None):
         return output
 
@@ -1470,10 +1468,18 @@ def fetch_geojson_colors(data):
 
     feature_df = df.groupby(ID)[feature].agg(feature_statistic).reset_index()
 
-    # Step 3: Apply Quantile Binning (Ensures Equal Distribution of IDs)
+    # Step 3: Decide binning strategy based on skewness
+    skewness = skew(
+        feature_df[feature].dropna()
+    )  # Calculate skewness of the feature column
+    binning_strategy = (
+        "quantile" if abs(skewness) > 1 else "uniform"
+    )  # Threshold for skewness
+
+    # Apply the chosen binning strategy
     num_classes = 5
     discretizer = KBinsDiscretizer(
-        n_bins=num_classes, encode="ordinal", strategy="quantile"
+        n_bins=num_classes, encode="ordinal", strategy=binning_strategy
     )
     feature_df["color_class"] = discretizer.fit_transform(feature_df[[feature]]).astype(
         int
@@ -1488,9 +1494,7 @@ def fetch_geojson_colors(data):
     )
 
     if len(bin_edges) != 6:
-        return {
-            "error": "Error generating color levels as the data rows are <= 5."
-        }
+        return {"error": "Error generating color levels as the data rows are <= 5."}
     elif np.any(np.isinf(bin_edges)):
         return {
             "error": "Error generating color levels as minimum values are all constant values."
