@@ -625,10 +625,12 @@ def save_to_file(
         if gdf.crs is None:
             gdf.set_crs("EPSG:4326", allow_override=True, inplace=True)
 
-        id_name = "id_" if spatial_scale == "reach" else ("gridcode" if spatial_scale == "subarea" else "id")
+        id_name = "objectid"
 
-        # Find all columns containing "id" (case-insensitive)
+        # Find all columns containing id_name (case-insensitive)
         id_columns = [col for col in gdf.columns if id_name in col.lower()]
+        
+        id_columns = id_columns if id_columns else [col for col in gdf.columns if "id" in col.lower()]
 
         # If there are multiple id columns, merge them into a single 'ID' column
         # Initialize the 'ID' column with the first 'id' column
