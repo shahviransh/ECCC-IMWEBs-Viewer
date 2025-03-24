@@ -625,7 +625,14 @@ def save_to_file(
         if gdf.crs is None:
             gdf.set_crs("EPSG:4326", allow_override=True, inplace=True)
 
-        id_name = "id_" if spatial_scale == "reach" else ("gridcode" if spatial_scale == "subarea" else "id")
+        # TODO: Ask for the ID column name
+        spatial_scale_id_map = {
+            "reach": "id_",
+            "subarea": "gridcode"
+        }
+
+        # Get the ID column name based on the spatial scale
+        id_name = spatial_scale_id_map.get(spatial_scale, "id")
 
         # Find all columns containing "id" (case-insensitive)
         id_columns = [col for col in gdf.columns if id_name in col.lower()]

@@ -255,6 +255,6 @@ label {
 
 .dropdown[multiple] {
     padding: 5px;
-    overflow-y: auto;
+    overflow: auto;
 }
 </style>

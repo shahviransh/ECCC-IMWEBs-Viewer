@@ -263,7 +263,7 @@ export default {
         }
     },
     methods: {
-        ...mapActions(["updateSelectedColumns", "addColumns", "updateExportFilename", "updateToolTipColumns", "updateAllSelectedColumns", "updateSelectedIds", "updateColumns", "pushMessage", "clearMessages"]),
+        ...mapActions(["updateSelectedColumns", "addColumns", "updateExportFilename", "updateToolTipColumns", "updateAllSelectedColumns", "updateSelectedIds", "pushMessage", "clearMessages"]),
         arraysAreEqual(arr1, arr2) {
             if (arr1.length !== arr2.length) return false; // Different lengths → Not equal
 

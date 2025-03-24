@@ -80,7 +80,7 @@ const store = createStore({
       ];
     },
     ADD_COLUMNS(state, { columns }) {
-      const temp = columns.filter((c) => !state.columns.includes(c));
+      const temp = columns.filter((c) => !state.columns.includes(c) || state.geoColumns.includes(c));
       const columnsNotGeo = state.columns.filter((c) => !state.geoColumns.includes(c));
       state.geoColumns = temp;
       state.columns = [...state.geoColumns, ...columnsNotGeo];
@@ -360,7 +360,6 @@ const store = createStore({
     },
     updateSelectedGeoFolders({ commit }, folder) {
       commit("SET_SELECTED_GEO_FOLDERS", folder);
-      commit("SET_COLUMNS", { columns: [] });
     },
     updateAllSelectedColumns({ commit }, value) {
       commit("SET_ALL_SELECTED_COLUMNS", value);
