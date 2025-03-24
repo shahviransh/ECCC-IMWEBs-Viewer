@@ -702,7 +702,7 @@ export default {
                 let response;
                 if (this.exportFormat === "shp") {
                     const filename = `${this.selectedGeoFolders.map(folder => folder.split("/").pop()).join(", ")}_${this.exportInterval}_${this.selectedFeature}_${this.selectedFeatureStatistic}`;
-                    this.updateExportFilename(filename.replace(/ /g, "-").replace(/\./g, "-").replace(/\(/g, "").replace(/\)/g, ""));
+                    this.updateExportFilename(filename.replace(/[ \\\/\.\(\)]/g, "-").replace(/-+/g, "-"));
                     response = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/export_data`, {
                         db_tables: JSON.stringify(this.selectedDbsTables),
                         columns: JSON.stringify(this.allSelectedColumns ? "All" : this.exportColumns.filter((column) => column !== 'Season' && !this.properties.includes(column))),

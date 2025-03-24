@@ -315,6 +315,7 @@ def export_data_service(data, is_empty=False):
             geojson_data,
             feature,
             feature_statistic,
+            data.get("spatial_scale"),
             list(map(int, json.loads(data.get("id")))) if data.get("id") != [] else [],
             is_empty,
         )
@@ -391,6 +392,7 @@ def save_to_file(
     geojson_data,
     feature,
     feature_statistic,
+    spatial_scale,
     selected_ids=[],
     is_empty=False,
 ):
@@ -623,8 +625,10 @@ def save_to_file(
         if gdf.crs is None:
             gdf.set_crs("EPSG:4326", allow_override=True, inplace=True)
 
+        id_name = "id_" if spatial_scale == "reach" else ("gridcode" if spatial_scale == "subarea" else "id")
+
         # Find all columns containing "id" (case-insensitive)
-        id_columns = [col for col in gdf.columns if "id" in col.lower()]
+        id_columns = [col for col in gdf.columns if id_name in col.lower()]
 
         # If there are multiple id columns, merge them into a single 'ID' column
         # Initialize the 'ID' column with the first 'id' column
