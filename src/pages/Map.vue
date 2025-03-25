@@ -200,6 +200,7 @@ export default {
             selectedFeatureId: '',
             rowLimit: 100,
             modalKey: 0,
+            default_crs: '',
             modalPosition: {
                 top: "50%",
                 left: "50%",
@@ -423,6 +424,7 @@ export default {
                 this.image_urls = response.data.image_urls;
                 this.properties = response.data.properties;
                 this.raster_levels = response.data.raster_levels;
+                this.default_crs = response.data.default_crs;
 
                 this.updateToolTipColumns(response.data.tooltip);
 
@@ -479,7 +481,7 @@ export default {
                             } else if (feature.geometry.type === 'LineString' || feature.geometry.type === 'MultiLineString') {
                                 style.color = featureColor || this.lineColor;
                                 style.fillColor = featureColor || this.lineColor;
-                                style.weight = 2;
+                                style.weight = 5;
                                 style.opacity = 1;
                                 style.fillOpacity = this.lineOpacity;
                             }
@@ -565,8 +567,27 @@ export default {
                 if (this.image_urls.length > 0) {
                     // Add raster images layer using Leaflet ImageOverlay
                     this.image_urls.forEach((url) => {
-                        L.imageOverlay(import.meta.env.VITE_API_BASE_URL + url, this.bounds,
-                            { opacity: 1.0 }).addTo(this.map);
+                        const imageUrl = import.meta.env.VITE_API_BASE_URL + url;
+
+                        // Make the axios GET request with Authorization header
+                        axios.get(imageUrl, {
+                            headers: {
+                                'Authorization': `Bearer ${localStorage.getItem('token')}`,
+                                'Accept': 'image/png'
+                            },
+                            responseType: 'blob'
+                        })
+                            .then(response => {
+                                // Create an object URL for the fetched image blob
+                                const imageObjectUrl = URL.createObjectURL(response.data);
+
+                                L.imageOverlay(imageObjectUrl, this.bounds, {
+                                    opacity: 1.0
+                                }).addTo(this.map);
+                            })
+                            .catch(error => {
+                                console.error('Error fetching image with axios:', error);
+                            });
                     });
                 }
 
@@ -724,7 +745,8 @@ export default {
                         geojson_data: JSON.stringify(this.geojson),
                         feature: this.selectedFeature,
                         feature_statistic: this.selectedFeatureStatistic,
-                        spatial_scale: this.selectedSpatialScale
+                        spatial_scale: this.selectedSpatialScale,
+                        default_crs: this.default_crs,
                     }, {
                         headers: {
                             Authorization: `Bearer ${localStorage.getItem("token")}`,

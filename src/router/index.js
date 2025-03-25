@@ -2,9 +2,6 @@ import { createRouter, createWebHistory } from "vue-router";
 import Project from "../pages/Project.vue";
 import Graph from "../pages/Graph.vue";
 import Map from "../pages/Map.vue";
-import Calibration from "../pages/Calibration.vue";
-import BMP from "../pages/BMP.vue";
-import Tools from "../pages/Tools.vue";
 import Help from "../pages/Help.vue";
 
 const routes = [
@@ -31,21 +28,6 @@ const routes = [
     path: "/map",
     name: "Map",
     component: Map,
-  },
-  {
-    path: "/calibration",
-    name: "Calibration",
-    component: Calibration,
-  },
-  {
-    path: "/bmp",
-    name: "BMP",
-    component: BMP,
-  },
-  {
-    path: "/tools",
-    name: "Tools",
-    component: Tools,
   },
   {
     path: "/help",

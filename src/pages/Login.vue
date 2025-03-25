@@ -18,8 +18,27 @@
                         </div>
                         <div class="formGroup">
                             <label for="password"><b>Password:</b></label>
-                            <input id="password" type="password" v-model="password" class="formControl" maxlength="50"
-                                required autocomplete="current-password" />
+                            <div class="passwordWrapper">
+                                <input id="password" :type="showPassword ? 'text' : 'password'" v-model="password"
+                                    class="formControl" maxlength="50" required autocomplete="current-password" />
+                                <span class="togglePassword" @click="togglePasswordVisibility">
+                                    <svg v-if="showPassword" xmlns="http://www.w3.org/2000/svg" class="eyeIcon"
+                                        viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                        stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                        <circle cx="12" cy="12" r="3"></circle>
+                                    </svg>
+                                    <svg v-else xmlns="http://www.w3.org/2000/svg" class="eyeIcon" viewBox="0 0 24 24"
+                                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                        stroke-linejoin="round">
+                                        <path d="M2 12s4-5 10-5 10 5 10 5-4 5-10 5-10-5-10-5z"></path>
+                                        <path d="M4 18l1-2"></path>
+                                        <path d="M8 20l1-2"></path>
+                                        <path d="M16 20l-1-2"></path>
+                                        <path d="M20 18l-1-2"></path>
+                                    </svg>
+                                </span>
+                            </div>
                         </div>
                         <button type="submit" class="loginButton">Sign in</button>
                         <p v-if="error" class="errorMessage">{{ error }}</p>
@@ -38,16 +57,20 @@ export default {
         return {
             username: '',
             password: '',
-            error: ''
+            error: '',
+            showPassword: false
         };
     },
     props: {
         isAuthenticated: Boolean
     },
     methods: {
+        togglePasswordVisibility() {
+            this.showPassword = !this.showPassword;
+        },
         async login(autoLogin) {
             try {
-                const credentials = autoLogin 
+                const credentials = autoLogin
                     ? { username: 'admin', password: 'admin' }
                     : { username: this.username, password: this.password };
 
@@ -129,7 +152,7 @@ body {
 }
 
 .formControl {
-    width: 100%;
+    width: 95%;
     padding: 8px;
     border: 1px solid #ccc;
     border-radius: 4px;
@@ -152,5 +175,37 @@ body {
 .errorMessage {
     color: red;
     margin-top: 10px;
+}
+
+.passwordWrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.passwordWrapper .formControl {
+    flex: 1;
+}
+
+.togglePassword {
+    position: absolute;
+    cursor: pointer;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    color: #007bff;
+}
+
+.togglePassword:hover {
+    color: #0056b3;
+}
+
+.eyeIcon {
+    width: 20px;
+    height: 20px;
 }
 </style>

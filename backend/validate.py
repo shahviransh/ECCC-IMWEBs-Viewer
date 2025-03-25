@@ -209,6 +209,11 @@ def validate_export_data_args(request_args):
             "type": "string",
             "required": False,
             "allowed": ["subarea", "field", "reach", "subbasin", "unknown"]
+        },
+        "default_crs": {
+            "type": "string",
+            "required": False,
+            "allowed": ["EPSG:4326", "EPSG:26917"],
         }
     }
     return validate_request_args(schema, request_args)

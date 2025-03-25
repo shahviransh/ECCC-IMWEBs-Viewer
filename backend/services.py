@@ -286,6 +286,7 @@ def export_data_service(data, is_empty=False):
         geojson_data = json.loads(data.get("geojson_data", None))
         feature = data.get("feature", "value")
         feature_statistic = data.get("feature_statistic", "mean")
+        default_crs = data.get("default_crs", "EPSG:4326")
 
         # Parse multi_graph_type
         multi_graph_type = json.loads(data.get("multi_graph_type", "[]"))
@@ -317,6 +318,7 @@ def export_data_service(data, is_empty=False):
             feature,
             feature_statistic,
             data.get("spatial_scale"),
+            default_crs,
             list(map(int, json.loads(data.get("id")))) if data.get("id") != [] else [],
             is_empty,
         )
@@ -394,6 +396,7 @@ def save_to_file(
     feature,
     feature_statistic,
     spatial_scale,
+    default_crs,
     selected_ids=[],
     is_empty=False,
 ):
@@ -624,9 +627,20 @@ def save_to_file(
 
         # Set CRS if it's not already defined
         if gdf.crs is None:
-            gdf.set_crs("EPSG:4326", allow_override=True, inplace=True)
+            gdf.set_crs(default_crs, allow_override=True, inplace=True)
+        
+        if gdf.crs:
+            # Create an osr.SpatialReference object from the GeoDataFrame's CRS
+            source_srs = osr.SpatialReference()
+            source_srs.ImportFromEPSG(int(gdf.crs.to_epsg()))
 
-        # TODO: Ask for the ID column name
+            # Set the axis mapping strategy to OAMS_AUTHORITY_COMPLIANT (opposite of OAMS_TRADITIONAL_GIS_ORDER)
+            if source_srs.SetAxisMappingStrategy:
+                source_srs.SetAxisMappingStrategy(osr.OAMS_AUTHORITY_COMPLIANT)
+
+            # Update the GeoDataFrame's CRS with the modified axis mapping strategy
+            gdf.set_crs(source_srs.ExportToWkt(), allow_override=True, inplace=True)
+
         spatial_scale_id_map = {"reach": "id_", "subarea": "gridcode"}
 
         # Get the ID column name based on the spatial scale
@@ -894,9 +908,15 @@ def aggregate_data(df, interval, method, date_type, month, season):
 
 
 def round_numeric_values(value):
-    """Round numeric values to 3 decimal places."""
+    """
+    Round numeric values to 4 decimal places if they are small (less than 0.01),
+    otherwise round to 2 decimal places.
+    """
     if isinstance(value, (float, int)):  # Check if the value is a number
-        return round(value, 3)
+        if abs(value) < 0.01:  # Small values
+            return round(value, 4)
+        else:  # Larger values
+            return round(value, 2)
     return value
 
 
@@ -1471,7 +1491,7 @@ def fetch_geojson_colors(data):
     # Step 3: Decide binning strategy based on skewness
     skewness = skew(
         feature_df[feature].dropna()
-    )  # Calculate skewness of the feature column
+    )
     binning_strategy = (
         "quantile" if abs(skewness) > 1 else "uniform"
     )  # Threshold for skewness
@@ -1503,8 +1523,8 @@ def fetch_geojson_colors(data):
     # Step 5: Create 5 Color Levels Using
     color_levels = [
         {
-            "min": round(bin_edges[i], 4),
-            "max": round(bin_edges[i + 1], 4),
+            "min": round_numeric_values(bin_edges[i]),
+            "max": round_numeric_values(bin_edges[i + 1]),
             "color": dynamic_colors[i],
         }
         for i in range(num_classes)
@@ -1533,6 +1553,7 @@ def process_geospatial_data(data):
     combined_properties = []
     tool_tip = {}
     image_urls = []
+    default_crs = None
 
     for file_path in file_paths:
         toolTipKey = f"{(os.path.basename(file_path),os.path.basename(file_path))}"
@@ -1548,9 +1569,18 @@ def process_geospatial_data(data):
 
             # Handle Spatial Reference System
             source_srs = layer.GetSpatialRef()
-            if not source_srs:
+            if source_srs:
+                authority_name = source_srs.GetAuthorityName(None)
+                authority_code = source_srs.GetAuthorityCode(None)
+
+                if authority_name and authority_code:
+                    default_crs = f"{authority_name}:{authority_code}"
+                else:
+                    default_crs = "EPSG:4326"
+            else:
                 source_srs = osr.SpatialReference()
                 source_srs.ImportFromEPSG(26917)  # Default UTM Zone 17N if unspecified
+                default_crs = "EPSG:26917"
 
             target_srs = osr.SpatialReference()
             target_srs.ImportFromEPSG(4326)  # WGS84 (longitude/latitude)
@@ -1691,6 +1721,18 @@ def process_geospatial_data(data):
             # Ensure raster is in EPSG:4326 (WGS84)
             source_srs = osr.SpatialReference()
             source_srs.ImportFromWkt(raster_dataset.GetProjection())
+            if source_srs:
+                authority_name = source_srs.GetAuthorityName(None)
+                authority_code = source_srs.GetAuthorityCode(None)
+
+                if authority_name and authority_code:
+                    default_crs = f"{authority_name}:{authority_code}"
+                else:
+                    default_crs = "EPSG:4326"
+            else:
+                source_srs = osr.SpatialReference()
+                source_srs.ImportFromEPSG(26917)  # Default UTM Zone 17N if unspecified
+                default_crs = "EPSG:26917"
             target_srs = osr.SpatialReference()
             target_srs.ImportFromEPSG(4326)
 
@@ -1796,6 +1838,7 @@ def process_geospatial_data(data):
             if combined_bounds
             else None
         ),
+        "default_crs": default_crs,
         "raster_levels": raster_color_levels,
         "properties": combined_properties,
         "image_urls": image_urls,
