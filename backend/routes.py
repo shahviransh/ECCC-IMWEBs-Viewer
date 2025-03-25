@@ -1,4 +1,5 @@
 from flask import jsonify, request, send_file
+from werkzeug.utils import safe_join
 import os
 import sys
 from flask_jwt_extended import (
@@ -11,6 +12,7 @@ from flask_jwt_extended import (
 from dotenv import load_dotenv
 import secrets
 import bcrypt
+from config import Config
 from services import (
     fetch_data_service,
     get_files_and_folders,
@@ -215,6 +217,8 @@ def register_routes(app, cache):
         # Ensure the file has a .tif or .tiff extension
         if not (filename.lower().endswith((".tif", ".tiff", ".png"))):
             return jsonify({"error": "Only .tif or .tiff files are allowed"})
+        
+        filename = safe_join(Config.PATHFILE, filename)
 
         # Validate the file path
         validation_response = validate_serve_tif_args(filename)

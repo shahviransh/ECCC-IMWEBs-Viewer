@@ -22,6 +22,7 @@ from concurrent.futures import ThreadPoolExecutor
 import pyogrio
 from osgeo import ogr, osr, gdal
 from zipfile import ZipFile, ZIP_DEFLATED
+from werkzeug.utils import safe_join
 
 alias_mapping = {}
 global_dbs_tables_columns = {}
@@ -148,7 +149,7 @@ def fetch_data_service(data):
 
         if spatial_scale == "field":
             # Connect to BMP.db3 to fetch subarea information
-            bmp_db_path = os.path.join(Config.PATHFILE, bmp_db_path_global)
+            bmp_db_path = safe_join(Config.PATHFILE, bmp_db_path_global)
             conn = sqlite3.connect(bmp_db_path)
 
             try:
@@ -332,7 +333,7 @@ def fetch_data_from_db(
     db_path, table_name, selected_ids, columns, start_date, end_date, date_type
 ):
     """Fetch data from a SQLite database table with real-to-alias mapping."""
-    conn = sqlite3.connect(os.path.join(Config.PATHFILE, db_path))
+    conn = sqlite3.connect(safe_join(Config.PATHFILE, db_path))
 
     # table_name is an alias so replace it with the real table name
     real_table_name = alias_mapping.get(table_name, {}).get("real", table_name)
@@ -403,13 +404,13 @@ def save_to_file(
     """Save two DataFrames to the specified file format sequentially."""
     # Set the file path
     file_path = (
-        os.path.join(Config.PATHFILE_EXPORT, export_path)
+        safe_join(Config.PATHFILE_EXPORT, export_path)
         if not os.path.isabs(export_path)
         else export_path
     )
 
     os.makedirs(file_path, exist_ok=True)
-    file_path = os.path.join(file_path, filename)
+    file_path = safe_join(file_path, filename)
 
     # Map graph types to Matplotlib Axes methods
     GRAPH_TYPE_MAPPING = {
@@ -731,7 +732,7 @@ def get_table_names(data):
     """
     try:
         db_path = data.get("db_path")
-        conn = sqlite3.connect(os.path.join(Config.PATHFILE, db_path))
+        conn = sqlite3.connect(safe_join(Config.PATHFILE, db_path))
         cursor = conn.cursor()
         cursor.execute("SELECT name FROM sqlite_master WHERE type='table';")
         tables = cursor.fetchall()
@@ -774,7 +775,7 @@ def get_files_and_folders(data):
             else folder_path
         )
         # Construct the absolute folder path relative to the current file location
-        folder_path = os.path.join(base_path, folder_path)
+        folder_path = safe_join(base_path, folder_path)
         root = os.path.abspath(base_folder)
 
     try:
@@ -812,7 +813,7 @@ def get_files_and_folders(data):
                         Config.LOOKUP = file_rel_path
                         lookup_found = True
                     if "bmp" in file_rel_path.lower():
-                        bmp_db_path_global = file_rel_path
+                        bmp_db_path_global = file_rel_path.replace('\\', '/')
                     files_and_folders.append(
                         {
                             "type": (
@@ -995,7 +996,7 @@ def get_columns_and_time_range(db_path, table_name):
         real_table_name = alias_mapping.get(table_name, {}).get("real", table_name)
 
         # Connect to the database
-        conn = sqlite3.connect(os.path.join(Config.PATHFILE, db_path))
+        conn = sqlite3.connect(safe_join(Config.PATHFILE, db_path))
 
         # Fetch column information using PRAGMA for the real table name
         query = f"PRAGMA table_info('{real_table_name}')"
@@ -1523,7 +1524,7 @@ def fetch_geojson_colors(data):
 
     # Step 6: Assign Colors to Each ID Based on Their Bin
     geojson_colors = {
-        row[ID]: [dynamic_colors[int(row["color_class"])], row["color_class"] + 1]
+        row[ID]: [dynamic_colors[int(row["color_class"])], row["color_class"] + 2]
         for _, row in feature_df.iterrows()
     }
 
@@ -1536,7 +1537,7 @@ def process_geospatial_data(data):
     """
 
     file_paths = map(
-        lambda x: os.path.join(Config.PATHFILE, x), json.loads(data.get("file_paths"))
+        lambda x: safe_join(Config.PATHFILE, x), json.loads(data.get("file_paths"))
     )
     combined_geojson = {}
     combined_bounds = None
@@ -1795,7 +1796,7 @@ def process_geospatial_data(data):
 
             # Save the image URL for each GeoTIFF path only if the combined bounds are not far apart
             if overlap:
-                image_urls.append(f"/geotiff/{output_image_path}")
+                image_urls.append(f"/geotiff/{os.path.relpath(output_image_path, Config.PATHFILE)}")
         else:
             return {
                 "error": "Unsupported file type. Only .shp and .tif/.tiff are supported."
@@ -1843,20 +1844,16 @@ def export_map_service(image, form_data):
         output_path = form_data.get("export_path")
         output_filename = form_data.get("export_filename")
         file_paths = map(
-            lambda x: os.path.join(Config.PATHFILE, x),
+            lambda x: safe_join(Config.PATHFILE, x),
             json.loads(form_data.get("file_paths")),
         )
 
-        valid_formats = ["png", "jpg", "jpeg", "pdf"]
-        if output_format not in valid_formats:
-            return {"error": "Unsupported export format"}
-
-        export_dir = os.path.join(Config.PATHFILE_EXPORT, output_path)
+        export_dir = safe_join(Config.PATHFILE_EXPORT, output_path)
         os.makedirs(export_dir, exist_ok=True)
         image_path = os.path.join(export_dir, f"{output_filename}.{output_format}")
 
         # Export image formats
-        if output_format in ["jpg", "jpeg", "png", "pdf"] and image:
+        if image:
             img = Image.open(image)
             img.convert("RGB").save(image_path, output_format.upper(), quality=95)
 

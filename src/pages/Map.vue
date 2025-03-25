@@ -472,7 +472,7 @@ export default {
                                 .filter(([key, value]) => key.toLowerCase().includes(idName) && value !== null)
                                 .map(([, value]) => value)?.[0] ?? null;
 
-                            const [featureColor, featureWeight] = this.geojson_colors[featureId?.toFixed(1).toString()];
+                            const [featureColor, featureWeight] = this.geojson_colors[featureId?.toFixed(1).toString()] || [undefined, undefined];
 
                             if (feature.geometry.type === 'Polygon' || feature.geometry.type === 'MultiPolygon') {
                                 // Apply color from geojson_colors based on feature's id
@@ -485,7 +485,7 @@ export default {
                                 style.fillOpacity = this.lineOpacity;
                             }
                             
-                            style.weight = 2 * featureWeight || 2;
+                            style.weight = featureWeight || 2;
 
                             return style;
                         },
@@ -519,12 +519,15 @@ export default {
                                 }, 100);
                             });
 
+                            let featureWeight;
+
                             // Bind hover events to display popup
                             layer.on('mouseover', (e) => {
+                                featureWeight = e.target.options.weight || 2;
                                 e.target.setStyle({
                                     fillOpacity: e.target.options.fillOpacity > 0.5 ? 0 : 1,
                                     opacity: 1,
-                                    weight: 3,
+                                    weight: 2,
                                 });
 
                                 // Generate popup content dynamically
@@ -546,17 +549,17 @@ export default {
                                 if (feature.geometry.type === "Point" || feature.geometry.type === "MultiPoint") {
                                     layer.setStyle({
                                         fillOpacity: this.pointOpacity,
-                                        weight: 2,
+                                        weight: featureWeight
                                     });
                                 } else if (feature.geometry.type === "Polygon" || feature.geometry.type === "MultiPolygon") {
                                     layer.setStyle({
                                         fillOpacity: this.polygonOpacity,
-                                        weight: 2,
+                                        weight: featureWeight
                                     });
                                 } else {
                                     layer.setStyle({
                                         fillOpacity: this.lineOpacity,
-                                        weight: 2,
+                                        weight: featureWeight
                                     });
                                 }
                                 this.map.closePopup();
@@ -724,7 +727,7 @@ export default {
                 let response;
                 if (this.exportFormat === "shp") {
                     const filename = `${this.selectedGeoFolders.map(folder => folder.split("/").pop()).join(", ")}_${this.exportInterval}_${this.selectedFeature}_${this.selectedFeatureStatistic}`;
-                    this.updateExportFilename(filename.replace(/[ \\\/\.\(\)]/g, "-").replace(/-+/g, "-"));
+                    this.updateExportFilename(filename.replace(/[ \\\/\.\(\)]/g, "-").replace(/-+/g, "-").replace(/-_/g, "_"));
                     response = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/export_data`, {
                         db_tables: JSON.stringify(this.selectedDbsTables),
                         columns: JSON.stringify(this.allSelectedColumns ? "All" : this.exportColumns.filter((column) => column !== 'Season' && !this.properties.includes(column))),
