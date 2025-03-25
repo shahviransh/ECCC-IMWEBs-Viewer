@@ -1523,7 +1523,7 @@ def fetch_geojson_colors(data):
 
     # Step 6: Assign Colors to Each ID Based on Their Bin
     geojson_colors = {
-        row[ID]: dynamic_colors[int(row["color_class"])]
+        row[ID]: [dynamic_colors[int(row["color_class"])], row["color_class"] + 1]
         for _, row in feature_df.iterrows()
     }
 
