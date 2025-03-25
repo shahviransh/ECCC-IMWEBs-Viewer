@@ -472,7 +472,7 @@ export default {
                                 .filter(([key, value]) => key.toLowerCase().includes(idName) && value !== null)
                                 .map(([, value]) => value)?.[0] ?? null;
 
-                            const featureColor = this.geojson_colors[featureId?.toFixed(1).toString()];
+                            const [featureColor, featureWeight] = this.geojson_colors[featureId?.toFixed(1).toString()];
 
                             if (feature.geometry.type === 'Polygon' || feature.geometry.type === 'MultiPolygon') {
                                 // Apply color from geojson_colors based on feature's id
@@ -481,10 +481,11 @@ export default {
                             } else if (feature.geometry.type === 'LineString' || feature.geometry.type === 'MultiLineString') {
                                 style.color = featureColor || this.lineColor;
                                 style.fillColor = featureColor || this.lineColor;
-                                style.weight = 5;
                                 style.opacity = 1;
                                 style.fillOpacity = this.lineOpacity;
                             }
+                            
+                            style.weight = 2 * featureWeight || 2;
 
                             return style;
                         },
