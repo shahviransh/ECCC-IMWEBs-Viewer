@@ -627,19 +627,10 @@ def save_to_file(
 
         # Set CRS if it's not already defined
         if gdf.crs is None:
-            gdf.set_crs(default_crs, allow_override=True, inplace=True)
+            gdf.set_crs("EPSG:4326", allow_override=True, inplace=True)
         
-        if gdf.crs:
-            # Create an osr.SpatialReference object from the GeoDataFrame's CRS
-            source_srs = osr.SpatialReference()
-            source_srs.ImportFromEPSG(int(gdf.crs.to_epsg()))
-
-            # Set the axis mapping strategy to OAMS_AUTHORITY_COMPLIANT (opposite of OAMS_TRADITIONAL_GIS_ORDER)
-            if source_srs.SetAxisMappingStrategy:
-                source_srs.SetAxisMappingStrategy(osr.OAMS_AUTHORITY_COMPLIANT)
-
-            # Update the GeoDataFrame's CRS with the modified axis mapping strategy
-            gdf.set_crs(source_srs.ExportToWkt(), allow_override=True, inplace=True)
+        # Reproject the GeoDataFrame to the default CRS
+        gdf = gdf.to_crs(default_crs)
 
         spatial_scale_id_map = {"reach": "id_", "subarea": "gridcode"}
 
