@@ -131,7 +131,9 @@ def fetch_data_service(data):
                                 )
 
                     # Identify columns for merging; ignore columns with dash if they represent different data sources
-                    merge_on_columns = [col for col in df.columns if "id" in col.lower()]
+                    merge_on_columns = [
+                        col for col in df.columns if "id" in col.lower()
+                    ]
                     for col in df.columns:
                         if col in df_temp.columns and not col.startswith(
                             table["table"]
@@ -339,6 +341,7 @@ def fetch_data_from_db(
     real_table_name = alias_mapping.get(table_name, {}).get("real", table_name)
 
     # If specific columns are selected, map them to the real columns
+    columns_list = []
     if columns != "All":
         columns_list = columns
         real_columns = [
@@ -350,8 +353,8 @@ def fetch_data_from_db(
     # Start building the base query using real table name
     query = f"SELECT {columns if columns != 'All' else '*'} FROM {real_table_name}"
     params = []
-    
-    ID = next((col for col in columns if "id" in col.lower()), None)
+
+    ID = next((col for col in columns_list if "id" in col.lower()), "ID")
 
     # Add conditions for selected_ids
     if selected_ids != []:
@@ -423,7 +426,7 @@ def save_to_file(
 
     if not is_empty:
         # Check if the dataframe contains an ID column
-        ID = next((col for col in dataframe1.columns if "id" in col.lower()), None)
+        ID = next((col for col in dataframe1.columns if "id" in col.lower()), "ID")
         dataframe1[date_type] = pd.to_datetime(dataframe1[date_type])
 
         # Keep track of which axis (primary or secondary) to use for each column
@@ -631,7 +634,7 @@ def save_to_file(
         # Set CRS if it's not already defined
         if gdf.crs is None:
             gdf.set_crs("EPSG:4326", allow_override=True, inplace=True)
-        
+
         # Reproject the GeoDataFrame to the default CRS
         gdf = gdf.to_crs(default_crs)
 
@@ -815,7 +818,7 @@ def get_files_and_folders(data):
                         Config.LOOKUP = file_rel_path
                         lookup_found = True
                     if "bmp" in file_rel_path.lower():
-                        bmp_db_path_global = file_rel_path.replace('\\', '/')
+                        bmp_db_path_global = file_rel_path.replace("\\", "/")
                     files_and_folders.append(
                         {
                             "type": (
@@ -855,7 +858,7 @@ def aggregate_data(df, interval, method, date_type, month, season):
     # Convert the date_type column to datetime
     df[date_type] = pd.to_datetime(df[date_type])
     resampled_df = None
-    ID = next((col for col in df.columns if "id" in col.lower()), None)
+    ID = next((col for col in df.columns if "id" in col.lower()), "ID")
     # Resample the data based on the specified interval
     if interval == "monthly":
         # Agrregate numerical values by summing for each ID, date_type, and interval
@@ -1471,7 +1474,7 @@ def fetch_geojson_colors(data):
         return {"error": "No data found"}
 
     df = pd.DataFrame(output["data"])
-    ID = next((col for col in df.columns if "id" in col.lower()), None)
+    ID = next((col for col in df.columns if "id" in col.lower()), "ID")
 
     if ID is None:
         return {"error": "No ID column found in data"}
@@ -1483,9 +1486,7 @@ def fetch_geojson_colors(data):
     feature_df = df.groupby(ID)[feature].agg(feature_statistic).reset_index()
 
     # Step 3: Decide binning strategy based on skewness
-    skewness = skew(
-        feature_df[feature].dropna()
-    )
+    skewness = skew(feature_df[feature].dropna())
     binning_strategy = (
         "quantile" if abs(skewness) > 1 else "uniform"
     )  # Threshold for skewness
@@ -1798,7 +1799,9 @@ def process_geospatial_data(data):
 
             # Save the image URL for each GeoTIFF path only if the combined bounds are not far apart
             if overlap:
-                image_urls.append(f"/geotiff/{os.path.relpath(output_image_path, Config.PATHFILE)}")
+                image_urls.append(
+                    f"/geotiff/{os.path.relpath(output_image_path, Config.PATHFILE)}"
+                )
         else:
             return {
                 "error": "Unsupported file type. Only .shp and .tif/.tiff are supported."
