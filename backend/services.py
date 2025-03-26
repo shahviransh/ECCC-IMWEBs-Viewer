@@ -131,7 +131,7 @@ def fetch_data_service(data):
                                 )
 
                     # Identify columns for merging; ignore columns with dash if they represent different data sources
-                    merge_on_columns = [col for col in df.columns if "ID" in col]
+                    merge_on_columns = [col for col in df.columns if "id" in col.lower()]
                     for col in df.columns:
                         if col in df_temp.columns and not col.startswith(
                             table["table"]
@@ -350,11 +350,13 @@ def fetch_data_from_db(
     # Start building the base query using real table name
     query = f"SELECT {columns if columns != 'All' else '*'} FROM {real_table_name}"
     params = []
+    
+    ID = next((col for col in columns if "id" in col.lower()), None)
 
     # Add conditions for selected_ids
     if selected_ids != []:
         placeholders = ",".join(["?"] * len(selected_ids))
-        query += f" WHERE ID IN ({placeholders})"
+        query += f" WHERE {ID} IN ({placeholders})"
         params.extend(selected_ids)
 
     # Add date range conditions
@@ -373,7 +375,7 @@ def fetch_data_from_db(
     alias_columns = [
         (
             alias_mapping.get(real_table_name, {}).get("columns", {}).get(col, col)
-            if "ID" not in col
+            if ID not in col
             else col
         )
         for col in df.columns
@@ -421,7 +423,7 @@ def save_to_file(
 
     if not is_empty:
         # Check if the dataframe contains an ID column
-        ID = next((col for col in dataframe1.columns if "ID" in col), None)
+        ID = next((col for col in dataframe1.columns if "id" in col.lower()), None)
         dataframe1[date_type] = pd.to_datetime(dataframe1[date_type])
 
         # Keep track of which axis (primary or secondary) to use for each column
@@ -853,7 +855,7 @@ def aggregate_data(df, interval, method, date_type, month, season):
     # Convert the date_type column to datetime
     df[date_type] = pd.to_datetime(df[date_type])
     resampled_df = None
-    ID = next((col for col in df.columns if "ID" in col), None)
+    ID = next((col for col in df.columns if "id" in col.lower()), None)
     # Resample the data based on the specified interval
     if interval == "monthly":
         # Agrregate numerical values by summing for each ID, date_type, and interval
@@ -1036,7 +1038,7 @@ def get_columns_and_time_range(db_path, table_name):
                 break
 
         # Get list of IDs if an ID column exists, without querying unnecessary data
-        id_column = next((col for col in columns if "ID" in col), None)
+        id_column = next((col for col in columns if "id" in col.lower()), None)
         ids = []
         if id_column:
             id_query = f"SELECT DISTINCT {id_column} FROM {real_table_name}"
@@ -1079,7 +1081,7 @@ def get_multi_columns_and_time_range(data):
                     f"{table['table']}-{col}"
                     if col in all_columns
                     and col != columns_time_range["date_type"]
-                    and "ID" not in col
+                    and "id" not in col.lower()
                     else col
                 )
                 for col in columns_time_range["columns"]
@@ -1469,7 +1471,7 @@ def fetch_geojson_colors(data):
         return {"error": "No data found"}
 
     df = pd.DataFrame(output["data"])
-    ID = next((col for col in df.columns if "ID" in col), None)
+    ID = next((col for col in df.columns if "id" in col.lower()), None)
 
     if ID is None:
         return {"error": "No ID column found in data"}
