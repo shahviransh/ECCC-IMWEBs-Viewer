@@ -1474,7 +1474,7 @@ def fetch_geojson_colors(data):
         return {"error": "No data found"}
 
     df = pd.DataFrame(output["data"])
-    ID = next((col for col in df.columns if "id" in col.lower()), "ID")
+    ID = next((col for col in df.columns if "id" in col.lower()), None)
 
     if ID is None:
         return {"error": "No ID column found in data"}
