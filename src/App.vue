@@ -58,9 +58,6 @@ export default {
         "Table",
         "Graph",
         "Map",
-        "Calibration",
-        "BMP",
-        "Tools",
         "Help",
       ],
       activePage: "Project", // Set default page here
