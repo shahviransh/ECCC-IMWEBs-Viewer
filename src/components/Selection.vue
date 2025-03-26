@@ -268,7 +268,7 @@ input[type="text"]::placeholder {
     .form-container,
     .form-container-ref {
         flex: 1 1 200px;
-        min-width: 200px;
+        min-width: 100px;
     }
 }
 </style>

@@ -65,7 +65,7 @@ async fn start_server() {
 
     // Get the AppData\Local directory
     let local_appdata = env::var("LOCALAPPDATA").expect("Failed to get LOCALAPPDATA");
-    let mut backend_dir = std::path::Path::new(&local_appdata).join("Imwebs-Viewer").join("_up_");
+    let mut backend_dir = std::path::Path::new(&local_appdata).join("IMWEBs-Viewer").join("_up_");
 
     // Copy _up_ folder to AppData\Local if it is different from the exe directory
     if !are_paths_equal(&up_folder, &backend_dir) {
