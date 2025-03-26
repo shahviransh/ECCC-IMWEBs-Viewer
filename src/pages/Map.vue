@@ -37,7 +37,7 @@
                     <h4>Customize Map Style</h4>
 
                     <div class="style-settings">
-                        <label>Polygon Color: <input type="color" v-model="polygonColor"></label>
+                        <label>Polygon Color: <input type="color" v-model="polygonCol"></label>
 
                         <div class="slider-container">
                             <label>Polygon Opacity:</label>
@@ -49,7 +49,7 @@
                             </div>
                         </div>
 
-                        <label>Line Color: <input type="color" v-model="lineColor"></label>
+                        <label>Line Color: <input type="color" v-model="lineCol"></label>
 
                         <div class="slider-container">
                             <label>Line Opacity:</label>
@@ -61,7 +61,7 @@
                             </div>
                         </div>
 
-                        <label>Point Color: <input type="color" v-model="pointColor"></label>
+                        <label>Point Color: <input type="color" v-model="pointCol"></label>
 
                         <div class="slider-container">
                             <label>Point Opacity:</label>
@@ -74,7 +74,7 @@
                         </div>
                         <div class="column">
                             <label>Selected Feature:</label>
-                            <select v-model="selectedFeature" class="dropdown">
+                            <select v-model="selectedFeat" class="dropdown">
                                 <option
                                     v-for="feature in selectedColumns.filter(col => !this.properties.includes(col) && col !== dateType && col !== 'ID')"
                                     :key="feature" :value="feature">{{ feature
@@ -223,17 +223,41 @@ export default {
     },
     computed: {
         ...mapState(["selectedDbsTables", "selectedGeoFolders", "selectedMonth", "columns", "selectedSeason", "selectedColumns", "allSelectedColumns", "selectedIds", "multiGraphType", "graphType", "currentZoomStart", "currentZoomEnd", "dateRange", "selectedInterval", "selectedStatistics", "selectedMethod", "exportColumns", "exportIds", "exportDate", "exportInterval", "dateType", "exportPath", "exportFilename", "exportFormat", "exportOptions", "theme"]),
-        polygonColor() {
-            return this.theme === 'light' ? "#3388ff" : "#ff9800";
+        polygonCol:{
+            get() {
+                this.polygonColor = this.theme === 'light' ? "#3388ff" : "#ff9800";
+                return this.polygonColor;
+            },
+            set(value) {
+                this.polygonColor = value;
+            }
         },
-        lineColor() {
-            return this.theme === 'light' ? "#ff0000" : "#03A9F4";
+        lineCol:{
+            get() {
+                this.lineColor = this.theme === 'light' ? "#ff0000" : "#03A9F4";
+                return this.lineColor;
+            },
+            set(value) {
+                this.lineColor = value;
+            }
         },
-        pointColor() {
-            return this.theme === 'light' ? "#000000" : "#ff5722";
+        pointCol:{
+            get() {
+                this.pointColor = this.theme === 'light' ? "#000000" : "#ff5722";
+                return this.pointColor;
+            },
+            set(value) {
+                this.pointColor = value;
+            }
         },
-        selectedFeature() {
-            return this.selectedColumns.find(col => !this.properties.includes(col) && col !== this.dateType && col !== 'ID') || '';
+        selectedFeat:{
+            get() {
+                this.selectedFeature = this.selectedColumns.find(col => !this.properties.includes(col) && col !== this.dateType && col !== 'ID') || '';
+                return this.selectedFeature;
+            },
+            set(value) {
+                this.selectedFeature = value;
+            }  
         },
         spatialScale: {
             get() {
@@ -258,7 +282,6 @@ export default {
                 return "unknown";
             },
             set(value) {
-                // Update the user's selected spatial scale
                 this.selectedSpatialScale = value;
             },
         }
