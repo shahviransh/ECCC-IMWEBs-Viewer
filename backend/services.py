@@ -1800,7 +1800,7 @@ def process_geospatial_data(data):
             # Save the image URL for each GeoTIFF path only if the combined bounds are not far apart
             if overlap:
                 image_urls.append(
-                    f"/geotiff/{os.path.relpath(output_image_path, Config.PATHFILE)}"
+                    f"/api/geotiff/{os.path.relpath(output_image_path, Config.PATHFILE)}"
                 )
         else:
             return {

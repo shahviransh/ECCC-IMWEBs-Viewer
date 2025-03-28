@@ -208,7 +208,7 @@ def register_routes(app, cache):
 
         return jsonify(geo_data)
 
-    @app.route("/geotiff/<path:filename>", methods=["GET"])
+    @app.route("/api/geotiff/<path:filename>", methods=["GET"])
     @jwt_required()
     def serve_tif(filename):
         """
@@ -266,11 +266,11 @@ def register_routes(app, cache):
 
         return send_file(file_path.get("file_path"), as_attachment=True)
 
-    @app.route("/health", methods=["GET"])
+    @app.route("/api/health", methods=["GET"])
     def health():
         return "Server is running...", 200
 
-    @app.route("/shutdown", methods=["GET"])
+    @app.route("/api/shutdown", methods=["GET"])
     def shutdown():
         # Shutdown the server if running as a standalone executable
         if getattr(sys, "frozen", False): 
@@ -279,7 +279,7 @@ def register_routes(app, cache):
         else:
             return "Server is not running as a standalone executable.", 200
 
-    @app.route("/clear_cache", methods=["GET"])
+    @app.route("/api/clear_cache", methods=["GET"])
     def clear_cache_route():
         clear_cache(cache)
         return "Cache cleared.", 200

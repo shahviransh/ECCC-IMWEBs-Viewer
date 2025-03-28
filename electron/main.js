@@ -61,6 +61,6 @@ app.on("window-all-closed", () => {
   if (process.platform !== "darwin") {
     app.quit();
   }
-  axios.get("http://localhost:5000/shutdown");
+  axios.get("http://localhost:5000/api/shutdown");
   pythonProcess.kill();
 });

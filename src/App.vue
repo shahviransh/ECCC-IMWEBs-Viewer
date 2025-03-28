@@ -119,7 +119,7 @@ export default {
       // Check if the server is running, keep checking every 2 seconds
       const interval = setInterval(async () => {
         try {
-          await axios.get(`${import.meta.env.VITE_API_BASE_URL}/health`);
+          await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/health`);
           this.isLoading = false;
           clearInterval(interval); // Stop checking once successful
         } catch (error) {
