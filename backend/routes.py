@@ -44,7 +44,8 @@ ADMIN_USERNAME = os.getenv("ADMIN_USERNAME", "admin")
 ADMIN_PASSWORD_HASH = os.getenv(
     "ADMIN_PASSWORD_HASH", bcrypt.hashpw("admin".encode(), bcrypt.gensalt()).decode()
 )
-JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY", secrets.token_hex(32))
+JWT_SECRET_KEY = secrets.token_hex(256)
+
 # Store revoked tokens
 revoked_tokens = set()
 
