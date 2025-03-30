@@ -101,19 +101,19 @@ body {
     position: relative;
     min-height: 100vh;
     margin: 0;
+    font-family: Avenir, Helvetica, Arial, sans-serif;
 }
 
 .loginDiv {
     position: absolute;
-    flex-direction: row;
-    top: 0;
-    left: 0;
-    bottom: 0;
-    right: 0;
-    width: 430px;
-    height: 100%;
-    margin: 0 auto;
-    background: rgba(255, 255, 255, 0.3);
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 400px;
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    padding: 20px;
 }
 
 .BackgroundVideo {
@@ -123,49 +123,62 @@ body {
     min-width: 100%;
     min-height: 100%;
     opacity: 0.8;
+    z-index: -1;
 }
 
 .loginPanel {
-    position: absolute;
-    min-height: 100vh;
-    width: 100%;
-    background-color: white;
-    opacity: 0.3;
-}
-
-.panel-body fieldset {
-    margin: 20px;
+    text-align: center;
 }
 
 .site-logo {
-    margin: 25% 0;
-    text-align: center;
+    margin: 20px 0;
 }
 
 .panel-title {
-    text-align: center;
+    font-size: 1.5rem;
     font-weight: bold;
+    margin-bottom: 20px;
+    color: #333;
 }
 
 .formGroup {
     margin-bottom: 15px;
+    text-align: left;
+}
+
+.formGroup label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+    color: #555;
 }
 
 .formControl {
-    width: 95%;
-    padding: 8px;
+    width: 100%;
+    padding: 10px;
     border: 1px solid #ccc;
     border-radius: 4px;
+    font-size: 1rem;
+    box-sizing: border-box;
+}
+
+.formControl:focus {
+    border-color: #007bff;
+    outline: none;
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
 }
 
 .loginButton {
     width: 100%;
-    padding: 10px;
+    padding: 12px;
     background-color: #007bff;
     color: white;
     border: none;
     border-radius: 4px;
+    font-size: 1rem;
     cursor: pointer;
+    margin-top: 10px;
+    transition: background-color 0.3s ease;
 }
 
 .loginButton:hover {
@@ -175,6 +188,8 @@ body {
 .errorMessage {
     color: red;
     margin-top: 10px;
+    font-size: 0.9rem;
+    text-align: left;
 }
 
 .passwordWrapper {

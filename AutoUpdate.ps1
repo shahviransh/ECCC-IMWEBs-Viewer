@@ -37,4 +37,13 @@ npm install
 Write-Host "Building Vue frontend..."
 npm run build
 
+Write-Host "Moving built files to IIS directory..."
+$sourceDir = "$projectDir\dist"
+$destDir = "C:\inetpub\wwwroot\IMWEBs-Viewer"
+if (Test-Path $destDir) {
+    Remove-Item "$destDir\*" -Recurse -Force
+} else {
+    New-Item -ItemType Directory -Path $destDir
+}
+
 Write-Host "Update complete!"
