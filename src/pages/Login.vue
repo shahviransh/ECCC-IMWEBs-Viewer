@@ -86,7 +86,7 @@ export default {
     },
     mounted() {
         // Auto login in Tauri
-        if (window.isTauri !== undefined) {
+        if (window.__TAURI__) {
             this.login(true);
         }
     }

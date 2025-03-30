@@ -141,7 +141,7 @@ export default {
             return 'Unknown'; // Fallback if no table is found
         },
         heightVar(isXAxis, isYAxis) {
-            const isTauri = window.isTauri !== undefined;
+            const isTauri = !!window.__TAURI__;
             const screenHeight = window.innerHeight;
 
             if (screenHeight > 1080) {

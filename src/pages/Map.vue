@@ -710,7 +710,7 @@ export default {
         },
         heightVar() {
             // Set the height based on the environment
-            const isTauri = window.isTauri !== undefined;
+            const isTauri = !!window.__TAURI__;
             return isTauri ? "calc(100vh - 14vh)" : "calc(100vh - 16vh)";
         },
         async exportMap() {

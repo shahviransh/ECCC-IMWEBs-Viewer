@@ -254,7 +254,7 @@ const store = createStore({
           const response = await axios.get(
             `${import.meta.env.VITE_API_BASE_URL}/api/list_files`,
             {
-              params: { folder_path: this.state.modelFolder },
+              params: { folder_path: this.state.modelFolder, is_tauri: !!window.__TAURI__ },
               headers: {
                 Authorization: `Bearer ${localStorage.getItem("token")}`,
               },

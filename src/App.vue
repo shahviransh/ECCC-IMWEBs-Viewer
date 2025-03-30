@@ -72,21 +72,77 @@ export default {
     Loading,
   },
   methods: {
-    ...mapActions(["updateTheme", "updatePageTitle", "updateCurrentZoom", "updateModelFolder"]),
+    ...mapActions(["updateTheme", "updatePageTitle", "updateCurrentZoom", "updateModelFolder", "pushMessage", "fetchFolderTree"]),
     async selectFolder() {
       try {
-        const selectedPath = await open({
-          directory: false, // Allow both files and folders
-          multiple: false, // Only allow one selection
-        });
+        let folderPath;
 
-        if (selectedPath) {
-          const folderPath = selectedPath.endsWith("/") ? selectedPath : await dirname(selectedPath);
+        if (window.__TAURI__) {
+          // In Tauri, use Tauri API for selecting folder
+          const selectedPath = await open({
+            directory: false,  // Allow both files and folders
+            multiple: false,  // Only allow one selection
+          });
 
-          // Convert folder path to universal style
-          const universalPath = folderPath.replace(/\\/g, "/");
+          if (selectedPath) {
+            folderPath = selectedPath.endsWith("/") ? selectedPath : await dirname(selectedPath);
 
-          this.updateModelFolder(universalPath);
+            // Convert folder path to universal style
+            const universalPath = folderPath.replace(/\\/g, "/");
+
+            this.updateModelFolder(universalPath);
+          }
+        } else {
+          // Not in Tauri, use HTML input element to select folder
+          const input = document.createElement("input");
+          input.type = "file";
+          input.webkitdirectory = true;
+
+          input.onchange = async (event) => {
+            const files = event.target.files;
+            if (files.length === 0) {
+              return;
+            }
+            const formData = new FormData();
+
+            // Get the folder path from the first file's webkitRelativePath
+            const firstFile = files[0].webkitRelativePath;
+            const modelFolder = firstFile.substring(0, firstFile.indexOf("/"));
+
+            // Loop through all files to maintain their folder structure
+            for (const file of files) {
+              // Use the relative path of the file to determine the subfolder structure
+              const relativePath = file.webkitRelativePath;
+              const folderPath = relativePath.slice(0, relativePath.lastIndexOf('/'));
+              formData.append('files', file, `${folderPath}/${file.name}`);
+            }
+
+            this.pushMessage({
+              message: `Uploading ${files.length} files...`,
+              type: "info"
+            });
+
+            // Send the form data with the files and folder structure to the backend
+            const response = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/upload_folder`, formData, {
+              headers: { "Content-Type": "multipart/form-data", Authorization: `Bearer ${localStorage.getItem("token")}` }
+            });
+
+            if (response.data.error) {
+              alert("Error saving folder and files: " + response.data.error);
+            } else{
+              this.pushMessage({
+                message: `Folder and files saved successfully!`,
+                type: "success"
+              });
+            }
+
+            this.updateModelFolder(modelFolder);
+            this.fetchFolderTree();
+          };
+
+          // Trigger the file input to open the folder selection dialog
+          input.click();
+
         }
       } catch (error) {
         console.error("Error selecting folder: ", error);
