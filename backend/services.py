@@ -761,11 +761,13 @@ def get_files_and_folders(data):
     folder_path = data.get("folder_path", "Jenette_Creek_Watershed")
     global bmp_db_path_global
 
-    if os.path.isabs(folder_path):
+    if os.path.isabs(folder_path) and data.get("is_tauri", None):
         # Update Config.PATHFILE to point to the parent directory of the provided absolute path
         Config.PATHFILE = os.path.dirname(folder_path)
         base_folder = os.path.basename(folder_path)
         root = Config.PATHFILE
+    elif os.path.isabs(folder_path):
+        return {"error": "The folder path cannot be absolute when not using the Tauri app."}
     else:
         # If the folder path is relative, use it directly
         base_folder = folder_path
@@ -777,7 +779,7 @@ def get_files_and_folders(data):
                 else os.path.dirname(__file__)
             )
             if folder_path == "Jenette_Creek_Watershed"
-            else folder_path
+            else Config.PATHFILE
         )
         # Construct the absolute folder path relative to the current file location
         folder_path = safe_join(base_path, folder_path)

@@ -49,6 +49,7 @@ JWT_SECRET_KEY = secrets.token_hex(256)
 # Store revoked tokens
 revoked_tokens = set()
 
+
 def register_routes(app, cache):
     app.config["JWT_SECRET_KEY"] = JWT_SECRET_KEY
     app.config["JWT_ACCESS_TOKEN_EXPIRES"] = 3600  # 1 hour
@@ -90,7 +91,7 @@ def register_routes(app, cache):
     @jwt.token_in_blocklist_loader
     def check_if_token_revoked(jwt_header, jwt_payload):
         return jwt_payload["jti"] in revoked_tokens
-    
+
     @app.route("/api/verify-token", methods=["GET"])
     def verify_token():
         try:
@@ -98,6 +99,36 @@ def register_routes(app, cache):
             return jsonify({"valid": True}), 200
         except:
             return jsonify({"valid": False}), 401
+
+    @app.route("/api/upload_folder", methods=["POST"])
+    @jwt_required()
+    def upload_folder():
+        """
+        Endpoint to upload a folder with files to the server.
+        """
+        # The form data sent from the frontend
+        files = request.files.getlist("files")  # This retrieves all files
+
+        if not files:
+            return jsonify({"error": "No files uploaded"})
+
+        # Loop through each file and save it in the corresponding folder
+        for file in files:
+            file_path = safe_join(Config.PATHFILE, file.filename)
+            
+            # Ensure the file is not already there checking for duplicates
+            if os.path.exists(file_path) and os.path.getsize(file_path) == file.content_length:
+                continue
+            
+            # Get the folder name from the file's filename
+            folder_name = os.path.dirname(file_path)
+            os.makedirs(folder_name, exist_ok=True)
+            file.save(file_path)
+
+        return (
+            jsonify({"message": "Files uploaded successfully"}),
+            200,
+        )
 
     @app.route("/api/get_data", methods=["GET"])
     @jwt_required()
@@ -132,7 +163,7 @@ def register_routes(app, cache):
             file_path = export_data_service(data, is_empty)
         else:
             file_path = export_data_service(data)
-            
+
         if file_path.get("error", None):
             return jsonify(file_path)
 
@@ -218,7 +249,7 @@ def register_routes(app, cache):
         # Ensure the file has a .tif or .tiff extension
         if not (filename.lower().endswith((".tif", ".tiff", ".png"))):
             return jsonify({"error": "Only .tif or .tiff files are allowed"})
-        
+
         filename = safe_join(Config.PATHFILE, filename)
 
         # Validate the file path
@@ -274,7 +305,7 @@ def register_routes(app, cache):
     @app.route("/api/shutdown", methods=["GET"])
     def shutdown():
         # Shutdown the server if running as a standalone executable
-        if getattr(sys, "frozen", False): 
+        if getattr(sys, "frozen", False):
             shutdown_server()
             return "Server shutting down...", 200
         else:
