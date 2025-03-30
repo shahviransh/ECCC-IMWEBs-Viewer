@@ -20,11 +20,19 @@ export default defineConfig(async () => ({
   server: {
     port: 1420,
     strictPort: true,
+    proxy: {
+      "/api": {
+        target: "http://127.0.0.1:5000", // Flask backend
+        changeOrigin: true,
+        secure: false,
+      },
+    },
   },
 
-  // Add the base and build configuration for Electron
-  base: './',  // Ensure assets are loaded relatively
+  // Add the base and build configuration for Electron/Tauri
   envPrefix: ['VITE_', 'TAURI_ENV_*'],
+  // Use relative paths for Tauri, absolute for IIS
+  base: process.env.TAURI_ENV_PLATFORM ? "./" : "/",  // Ensure assets are loaded relatively
   // // For Electron
   // build: {
   //   outDir: 'dist',  // Output folder for the build
@@ -33,13 +41,14 @@ export default defineConfig(async () => ({
   //   },
   // For Tauri
   build: {
+    outDir: "dist",
     // Tauri uses Chromium on Windows and WebKit on macOS and Linux
     target:
       process.env.TAURI_ENV_PLATFORM == 'windows'
         ? 'chrome105'
         : 'safari13',
     // don't minify for debug builds
-    minify: !process.env.TAURI_ENV_DEBUG ? 'esbuild' : false,
+    minify: process.env.TAURI_ENV_DEBUG ? false : 'esbuild',
     // produce sourcemaps for debug builds
     sourcemap: !!process.env.TAURI_ENV_DEBUG,
   },
