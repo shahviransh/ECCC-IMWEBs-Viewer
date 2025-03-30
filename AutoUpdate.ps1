@@ -1,9 +1,6 @@
 <<<<<<< HEAD
 $projectDir = "C:\Users\{user}\Documents\GitHub\ECCC-IMWEBs-Viewer"
 =======
-$projectDir = "C:\Users\viran\OneDrive\Documents\GitHub\ECCC-IMWEBs-Viewer"
->>>>>>> d0e6e7035c5d18c5f0553ae3401b7a6d7321d4a6
-$repoUrl = "https://github.com/shahviransh/ECCC-IMWEBs-Viewer"
 $backendScript = "$projectDir\backend\apppy.py"
 
 if (-not (Test-Path $projectDir)) {
