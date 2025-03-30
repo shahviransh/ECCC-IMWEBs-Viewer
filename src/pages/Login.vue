@@ -95,6 +95,7 @@ export default {
 
 <style scoped>
 /* Author: Dr. Michael Yu
+   With some modifications by @shahviransh Viransh Shah
    GitHub: https://github.com/hawklorry/Ecosystem-Services-Assessment-Tool/blob/master/src/AgBMTool.Front/ClientApp/src/app/login/login.component.css */
 html,
 body {
@@ -110,7 +111,7 @@ body {
     left: 50%;
     transform: translate(-50%, -50%);
     width: 400px;
-    background: rgba(255, 255, 255, 0.9);
+    background: rgba(255, 255, 255, 0.8);
     border-radius: 8px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     padding: 20px;
