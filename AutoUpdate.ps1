@@ -1,6 +1,4 @@
-<<<<<<< HEAD
 $projectDir = "C:\Users\{user}\Documents\GitHub\ECCC-IMWEBs-Viewer"
-=======
 $backendScript = "$projectDir\backend\apppy.py"
 
 if (-not (Test-Path $projectDir)) {
