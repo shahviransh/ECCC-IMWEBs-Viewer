@@ -185,6 +185,7 @@ button {
 
 button:hover {
     background-color: var(--hover-bg-color);
+    transform: translateY(-2px);
 }
 
 button:focus {
