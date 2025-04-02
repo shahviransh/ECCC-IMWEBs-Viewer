@@ -166,7 +166,7 @@ export default {
             // Check if all selected columns are in formats
             const allColumnsInFormats = this.allOptions.every(col => formats.some(format => format.name === col));
             if (!allColumnsInFormats) {
-                this.pushMessage({ message: "All selected columns must be in the multi-graph formats", type: "error" });
+                alert("All selected columns must be in the multi-graph formats");
             } else {
                 this.pushMessage({ message: "All selected columns are in the multi-graph formats", type: "success" });
             }
