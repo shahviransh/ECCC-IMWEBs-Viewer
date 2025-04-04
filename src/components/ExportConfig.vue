@@ -148,7 +148,7 @@ export default {
         filteredOptions5() {
             return this.allOptions.filter(option => !this.selectedColumns2.includes(option) && !this.selectedColumns1.includes(option));
         },
-        ...mapState(['exportPath', 'exportFilename', 'exportFormat', "theme", "pageTitle", "graphType", "selectedColumns", "dateType"]),
+        ...mapState(['exportPath', 'exportFilename', 'exportFormat', "theme", "idColumn", "pageTitle", "graphType", "selectedColumns", "dateType"]),
     },
     methods: {
         ...mapActions(["updateExportPath", "updateExportFilename", "updateExportFormat", "updateGraphType", "updateMultiGraphType", "pushMessage"]),
@@ -188,7 +188,7 @@ export default {
             this.mapping = this.graphType.split('-');
         },
         selectedColumns() {
-            this.allOptions = this.selectedColumns.filter(option => option !== this.dateType && !option.includes("ID"));
+            this.allOptions = this.selectedColumns.filter(option => option !== this.dateType && !option.includes(this.idColumn));
         },
         pageTitle() {
             if (['Project', 'Table'].includes(this.pageTitle)) {

@@ -3,8 +3,8 @@
     <transition-group name="fade" tag="div">
       <div v-for="(msg, index) in messages" :key="index" :class="['message-box', msg.type]">
         <div class="message-content">
-          <span>{{ msg.text }}</span>
-          <button @click="removeMessage(index)" class="close-button">✕</button>
+          <span class="message-text">{{ msg.text }}</span>
+          <button @click="removeMessage(index)" class="close-button" aria-label="Close message">✕</button>
         </div>
         <div class="countdown-bar" :style="{ width: (msg.timeLeft / msg.totalTime * 100) + '%' }"></div>
       </div>
@@ -13,7 +13,7 @@
 </template>
 
 <script>
-import { mapState, mapActions } from 'vuex'; // Import Vuex helpers
+import { mapState, mapActions } from 'vuex';
 
 export default {
   name: 'MessageBox',
@@ -30,7 +30,7 @@ export default {
           this.removeMessage(this.messages.indexOf(msg));
           clearInterval(interval);
         }
-      }, 0);
+      }, 100);
     },
     removeMessage(index) {
       this.sliceMessage(index);
@@ -60,6 +60,8 @@ export default {
   --success-bg: #4caf50;
   --warning-bg: #ff9800;
   --error-bg: #f44336;
+  --text-color: #000000;
+  --countdown-bg: rgba(255, 255, 255, 0.5);
 }
 
 .dark {
@@ -67,6 +69,33 @@ export default {
   --success-bg: #388e3c;
   --warning-bg: #f57c00;
   --error-bg: #d32f2f;
+  --text-color: #ffffff;
+  --countdown-bg: rgba(255, 255, 255, 0.5);
+}
+
+.message-container {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  max-width: 350px;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.message-box {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: 15px 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  font-size: 14px;
+  line-height: 1.5;
+  animation: slideIn 0.3s ease-out;
 }
 
 .message-box.info {
@@ -85,27 +114,6 @@ export default {
   background-color: var(--error-bg);
 }
 
-.message-container {
-  position: fixed;
-  bottom: 20px;
-  right: 20px;
-  max-width: 300px;
-  z-index: 9999;
-}
-
-.message-box {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: start;
-  justify-content: space-between;
-  padding: 10px 15px;
-  border-radius: 5px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-  margin-bottom: 10px;
-  transition: opacity 0.3s ease;
-}
-
 .message-content {
   display: flex;
   align-items: center;
@@ -113,31 +121,52 @@ export default {
   width: 100%;
 }
 
-.countdown-bar {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  height: 5px;
-  background-color: rgba(255, 255, 255, 0.5);
-  width: 100%;
+.message-text {
+  flex: 1;
+  margin-right: 10px;
 }
 
 .close-button {
   background: none;
   border: none;
-  color: inherit;
+  color: var(--text-color);
   font-size: 1.2em;
   cursor: pointer;
-  margin-left: auto;
+  transition: transform 0.2s ease;
+}
+
+.close-button:hover {
+  transform: scale(1.2);
+}
+
+.countdown-bar {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 4px;
+  background-color: var(--countdown-bg);
 }
 
 .fade-enter-active,
 .fade-leave-active {
-  transition: opacity 0.3s;
+  transition: opacity 0.3s, transform 0.3s;
 }
 
 .fade-enter,
 .fade-leave-to {
   opacity: 0;
+  transform: translateY(10px);
+}
+
+/* Slide-in animation */
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 </style>

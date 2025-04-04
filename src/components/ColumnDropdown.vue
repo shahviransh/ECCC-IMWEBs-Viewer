@@ -102,7 +102,7 @@ export default {
                 this.updateYAxis(value);
             }
         },
-        ...mapState(['columns', 'ids', 'selectedColumns', 'theme', 'selectedGeoFolders', 'dateType', 'tooltipColumns', 'exportColumns', 'pageTitle', 'xAxis', 'yAxis', 'dateType'])
+        ...mapState(['columns', 'ids', 'selectedColumns', 'theme', 'idColumn', 'selectedGeoFolders', 'dateType', 'tooltipColumns', 'exportColumns', 'pageTitle', 'xAxis', 'yAxis', 'dateType'])
     },
     data() {
         return {
@@ -128,7 +128,7 @@ export default {
                     return table_name;
                 } else if (columns.includes(column)) {
                     const table_name = key.split(',')[1].replace(")", "").replace(/['"]/g, '');
-                    if ([this.dateType, 'ID'].includes(column)) {
+                    if ([this.dateType, this.idColumn].includes(column)) {
                         return 'All Tables';
                     }
                     else {

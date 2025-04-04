@@ -398,7 +398,7 @@ const store = createStore({
     updateXAxis({ commit }, xAxis) {
       commit("SET_XAXIS", xAxis);
     },
-    pushMessage({ commit }, { message, type, duration = 5000 }) {
+    pushMessage({ commit }, { message, type, duration = window.__TAURI__  ? 5000 : 2000 }) {
       commit("PUSH_MESSAGE", { message, type, duration });
     },
     sliceMessage({ commit }, index) {
