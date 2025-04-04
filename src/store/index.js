@@ -19,6 +19,7 @@ const store = createStore({
     tables: [],
     columns: [],
     ids: [],
+    idColumn: "",
     currentZoomStart: 0,
     currentZoomEnd: 100,
     exportColumns: [],
@@ -48,6 +49,7 @@ const store = createStore({
     xAxis: "",
     yAxis: [],
     allSelectedColumns: false,
+    mathFormula: '',
   },
   mutations: {
     SET_PROJECT_FOLDER(state, folder) {
@@ -75,7 +77,7 @@ const store = createStore({
 
       state.selectedColumns = state.exportColumns = [
         ...(columns.includes(state.dateType) ? [state.dateType] : []),
-        ...(columns.includes("ID") ? ["ID"] : []),
+        ...(columns.includes(state.idColumn) ? [state.idColumn] : []),
         ...state.selectedColumns,
       ];
     },
@@ -93,9 +95,10 @@ const store = createStore({
     SET_TOOLTIP_COLUMNS(state, columns) {
       state.tooltipColumns = { ...columns, ...state.tooltipColumns };
     },
-    SET_OPTIONS(state, { ids, dateRange, dateType, exportDate }) {
+    SET_OPTIONS(state, { ids, dateRange, idColumn, dateType, exportDate }) {
       state.ids = ids;
       state.dateRange = dateRange;
+      state.idColumn = idColumn;
       state.dateType = dateType;
       state.exportDate = exportDate;
     },
@@ -122,6 +125,9 @@ const store = createStore({
     },
     SET_PAGE_TITLE(state, title) {
       state.pageTitle = title;
+    },
+    SET_CALCULATION(state, { mathFormula }) {
+      state.mathFormula = mathFormula;
     },
     SET_SELECTED_DBS_TABLES(state, { db, table }) {
       if (
@@ -154,7 +160,7 @@ const store = createStore({
       state.xAxis = xAxis;
     },
     SET_YAXIS(state, yAxis) {
-      state.yAxis = yAxis.includes("ID") ? yAxis : ["ID", ...yAxis];
+      state.yAxis = yAxis.includes(state.idColumn) ? yAxis : [state.idColumn, ...yAxis];
       state.selectedColumns = [state.xAxis, ...state.yAxis];
       state.exportColumns = [...state.selectedColumns];
     },
@@ -324,6 +330,7 @@ const store = createStore({
             start: response.data.start_date,
             end: response.data.end_date,
           },
+          idColumn: response.data.id_column,
           dateType: response.data.date_type,
           exportDate: {
             start: response.data.start_date,
@@ -348,6 +355,9 @@ const store = createStore({
     // Add similar actions for other components
     updateModelFolder({ commit }, folder) {
       commit("SET_PROJECT_FOLDER", folder);
+    },
+    updateCalculation({ commit }, { mathFormula }) {
+      commit("SET_CALCULATION", { mathFormula });
     },
     addColumns({ commit }, columns) {
       commit("ADD_COLUMNS", { columns });

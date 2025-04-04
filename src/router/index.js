@@ -6,31 +6,31 @@ import Help from "../pages/Help.vue";
 
 const routes = [
   {
-    path: "/",
+    path: "/IMWEBs-Viewer",
     component: Project,
   },
   {
-    path: "/project",
+    path: "/IMWEBs-Viewer/project",
     name: "Project",
     component: Project,
   },
   {
-    path: "/table",
+    path: "/IMWEBs-Viewer/table",
     name: "Table",
     component: Project,
   },
   {
-    path: "/graph",
+    path: "/IMWEBs-Viewer/graph",
     name: "Graph",
     component: Graph,
   },
   {
-    path: "/map",
+    path: "/IMWEBs-Viewer/map",
     name: "Map",
     component: Map,
   },
   {
-    path: "/help",
+    path: "/IMWEBs-Viewer/help",
     name: "Help",
     component: Help,
   },
