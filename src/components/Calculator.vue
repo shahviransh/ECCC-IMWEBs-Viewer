@@ -46,7 +46,7 @@ export default {
     data() {
         return {
             mode: "auto", // 'auto' or 'manual'
-            preview: "",
+            preview: this.mathFormula || "",
             currentNumber: "",
             selectedOperator: null,
             numbers: Array.from({ length: 10 }, (_, i) => i.toString()),

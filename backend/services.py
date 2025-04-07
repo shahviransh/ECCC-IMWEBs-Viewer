@@ -38,7 +38,9 @@ def fetch_data_service(data):
     try:
         # Extract the required parameters from the request data
         db_tables = json.loads(data.get("db_tables"))
-        columns = json.loads(data.get("columns")) if data.get("columns") != "All" else "All"
+        columns = (
+            json.loads(data.get("columns")) if data.get("columns") != "All" else "All"
+        )
         selected_ids = json.loads(data.get("id"))
         id_column = data.get("id_column", "ID")
         start_date = data.get("start_date")
@@ -283,27 +285,33 @@ def fetch_data_service(data):
                     return {"error": "Invalid characters or columns in the formula."}
 
                 # Create a mapping of alias to real column names
-                real_col = {}
-                for table in db_tables:
-                    for col in numerical_columns:
-                        real_col[col] = (
-                            alias_mapping.get(table["table"], {})
-                            .get("columns", {})
-                            .get(col, col)
+                real_col = {
+                    col: columns_dict[col]
+                    for table in db_tables
+                    for col in numerical_columns
+                    if col
+                    in (
+                        columns_dict := alias_mapping.get(table["table"], {}).get(
+                            "columns", {}
                         )
+                    )
+                }
 
                 # Replace only column names in the formula, ignoring operators
                 new_feature = math_formula
                 for col in numerical_columns:
                     if col in real_col:
                         new_feature = new_feature.replace(col, real_col[col])
-                    math_formula = math_formula.replace(col, re.sub(r"[()/\\]", "", col.replace(" ", "_")))
+                    math_formula = math_formula.replace(
+                        col, re.sub(r"[()/\\]", "", col.replace(" ", "_"))
+                    )
 
                 # Handle division by zero by replacing zeros with a small number (e.g., 0.001) in the DataFrame
                 if "/" in formula_symbols:
                     # Extract the column names involved in division (after '/')
                     div_columns = re.findall(
-                        r"(df\['([^']*)'\]|\d+(\.\d+)?)\s*\/\s*(df\['([^']*)'\]", formula
+                        r"(df\['([^']*)'\]|\d+(\.\d+)?)\s*\/\s*(df\['([^']*)'\]",
+                        formula,
                     )
                     for col_denum in div_columns:
                         df[col_denum[-1]] = df[col_denum[-1]].replace(0, 0.001)
@@ -321,7 +329,10 @@ def fetch_data_service(data):
                     new_feature = ""
                     for col_name in numerical_columns:
                         for col_formula in math_formulas:
-                            if re.sub(r"[()/\\]", "", col_name.replace(" ", "_")) in col_formula:
+                            if (
+                                re.sub(r"[()/\\]", "", col_name.replace(" ", "_"))
+                                in col_formula
+                            ):
                                 # Evaluate the formula and assign it to the new column
                                 df[col_name] = ne.evaluate(
                                     col_formula.strip(), local_dict=local_dict
@@ -380,7 +391,9 @@ def export_data_service(data, is_empty=False):
         output_path = data.get("export_path", "dataExport")
         # Handle options json stringify
         options = json.loads(data.get("options", "{'data': true, 'stats': true}"))
-        columns_list = json.loads(data.get("columns")) if data.get("columns") != "All" else "All"
+        columns_list = (
+            json.loads(data.get("columns")) if data.get("columns") != "All" else "All"
+        )
         id_column = data.get("id_column", "ID")
         date_type = data.get("date_type")
         graph_type = data.get("graph_type", "scatter")
@@ -427,6 +440,7 @@ def export_data_service(data, is_empty=False):
         return {"file_path": file_path}
     except Exception as e:
         return {"error": str(e)}
+
 
 def fetch_data_from_db(
     db_path, table_name, selected_ids, columns, start_date, end_date, date_type
