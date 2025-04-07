@@ -350,7 +350,7 @@ def fetch_data_service(data):
 
         # Return the data and statistics as dictionaries
         return {
-            "data": df.to_dict(orient="records"),
+            "data": df.map(round_numeric_values).to_dict(orient="records"),
             "new_feature": new_feature,
             "stats": stats_df.to_dict(orient="records") if stats_df is not None else [],
             "statsColumns": stats_df.columns.tolist() if stats_df is not None else [],
