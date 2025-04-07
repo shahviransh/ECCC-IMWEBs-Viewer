@@ -64,7 +64,7 @@ export default {
         };
     },
     computed: {
-        ...mapState(["selectedDbsTables", "selectedColumns", "allSelectedColumns", "selectedIds", "idColumn", "dateRange", "selectedInterval", "selectedStatistics", "selectedMethod", "exportColumns", "exportIds", "exportDate", "exportInterval", "dateType", "exportPath", "exportFilename", "exportFormat", "exportOptions", "theme"]),
+        ...mapState(["selectedDbsTables", "selectedColumns", "allSelectedColumns", "mathFormula", "selectedIds", "idColumn", "dateRange", "selectedInterval", "selectedStatistics", "selectedMethod", "exportColumns", "exportIds", "exportDate", "exportInterval", "dateType", "exportPath", "exportFilename", "exportFormat", "exportOptions", "theme"]),
     },
     methods: {
         ...mapActions(["updateSelectedColumns", "updateExportOptions", "updateAllSelectedColumns", "pushMessage", "clearMessages"]),
@@ -97,11 +97,16 @@ export default {
                         interval: this.selectedInterval,
                         statistics: JSON.stringify(this.selectedStatistics),
                         method: JSON.stringify(this.selectedMethod),
+                        math_formula: this.mathFormula,
                     },
                     headers: {
                         Authorization: `Bearer ${localStorage.getItem("token")}`
                     }
                 });
+                // Check if the new feature is added to columns
+                if (response.data.new_feature) {
+                    this.updateSelectedColumns(this.selectedColumns.concat([response.data.new_feature]));
+                }
                 if (this.selectedInterval === 'seasonally' && !this.selectedMethod.includes('Equal') && !this.selectedColumns.includes('Season')) {
                     this.updateSelectedColumns(this.selectedColumns.concat(['Season']));
                 } else if (this.selectedColumns.includes('Season') && this.selectedInterval !== 'seasonally') {
@@ -146,6 +151,7 @@ export default {
                         export_filename: this.exportFilename,
                         export_format: this.exportFormat,
                         options: JSON.stringify(this.exportOptions),
+                        math_formula: this.mathFormula,
                     },
                     headers: {
                         Authorization: `Bearer ${localStorage.getItem("token")}`

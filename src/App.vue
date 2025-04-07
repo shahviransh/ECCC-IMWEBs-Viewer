@@ -26,7 +26,7 @@
           <button @click="handleResetZoom">Reset Zoom</button>
         </span>
 
-        <span v-if="['Graph', 'Map'].includes(activePage)">
+        <span>
           <button @click="showCalculator = true">Calculator ➕➖✖️➗</button>
         </span>
       </div>

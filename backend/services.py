@@ -301,7 +301,7 @@ def fetch_data_service(data):
                 new_feature = math_formula
                 for col in numerical_columns:
                     if col in real_col:
-                        new_feature = new_feature.replace(col, real_col[col])
+                        new_feature = new_feature.replace(col, real_col.get(col, col))
                     math_formula = math_formula.replace(
                         col, re.sub(r"[()/\\]", "", col.replace(" ", "_"))
                     )
