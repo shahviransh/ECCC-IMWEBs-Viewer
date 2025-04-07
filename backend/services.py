@@ -861,7 +861,7 @@ def get_files_and_folders(data):
     if (
         os.path.isabs(folder_path)
         and data.get("is_tauri", None) == "true"
-        and os.environ.get("RUNNING_UNDER_WAITRESS") == "1"
+        and os.environ.get("RUNNING_UNDER_WAITRESS") != "1"
     ):
         # Update Config.PATHFILE to point to the parent directory of the provided absolute path
         Config.PATHFILE = os.path.dirname(folder_path)
