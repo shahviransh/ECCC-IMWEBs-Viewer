@@ -6,38 +6,38 @@ import Help from "../pages/Help.vue";
 
 const routes = [
   {
-    path: "/IMWEBs-Viewer",
+    path: "/",
     component: Project,
   },
   {
-    path: "/IMWEBs-Viewer/project",
+    path: "/project",
     name: "Project",
     component: Project,
   },
   {
-    path: "/IMWEBs-Viewer/table",
+    path: "/table",
     name: "Table",
     component: Project,
   },
   {
-    path: "/IMWEBs-Viewer/graph",
+    path: "/graph",
     name: "Graph",
     component: Graph,
   },
   {
-    path: "/IMWEBs-Viewer/map",
+    path: "/map",
     name: "Map",
     component: Map,
   },
   {
-    path: "/IMWEBs-Viewer/help",
+    path: "/help",
     name: "Help",
     component: Help,
   },
 ];
 
 const router = createRouter({
-  history: createWebHistory(), // Use default web history
+  history: createWebHistory(window.__TAURI__ ? "/" : "/IMWEBs-Viewer"), // Use default web history
   routes,
 });
 
