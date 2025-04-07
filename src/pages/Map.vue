@@ -399,7 +399,7 @@ export default {
             });
             // Check if the new feature is added to columns
             if (response.data.new_feature) {
-                this.updateSelectedColumns(this.selectedColumns.concat(response.data.new_feature));
+                this.updateSelectedColumns(this.selectedColumns.concat([response.data.new_feature]));
                 this.selectedFeature = response.data.new_feature;
             }
             if (this.selectedInterval === 'seasonally' && !this.selectedMethod.includes('Equal') && !this.selectedColumns.includes('Season')) {
