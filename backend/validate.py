@@ -48,6 +48,11 @@ def validate_get_data_args(request_args):
             "required": True,
             "regex": r'\["\d+"(,\s*"\d+")*\]|\[\]',
         },
+        "id_column": {
+            "type": "string",
+            "required": True,
+            "regex": r"^\s*|[\w\s-]+$",
+        },
         "start_date": {
             "type": "string",
             "required": True,
@@ -108,7 +113,11 @@ def validate_get_data_args(request_args):
             "type": "string",
             "required": False,
             "allowed": ["subarea", "field", "reach", "subbasin", "unknown"]
-        }
+        },
+        "math_formula": {
+            "type": "string",
+            "required": False,
+        },
     }
     return validate_request_args(schema, request_args)
 
@@ -122,6 +131,11 @@ def validate_export_data_args(request_args):
             "type": "string",
             "required": True,
             "regex": r'\["\d+"(,\s*"\d+")*\]|\[\]',
+        },
+        "id_column": {
+            "type": "string",
+            "required": True,
+            "regex": r"^\s*|[\w\s-]+$",
         },
         "start_date": {
             "type": "string",
@@ -214,7 +228,11 @@ def validate_export_data_args(request_args):
             "type": "string",
             "required": False,
             "allowed": ["EPSG:4326", "EPSG:26917"],
-        }
+        },
+        "math_formula": {
+            "type": "string",
+            "required": False,
+        },
     }
     return validate_request_args(schema, request_args)
 
@@ -276,7 +294,9 @@ def getUserValidationError(errors):
     # Mapping regex patterns to human-readable messages
     regex_messages = {
         r"^\d{4}-\d{2}-\d{2}$|^$": "should be in the format YYYY-MM-DD (e.g., 2024-01-20).",
+        r"^\d+(\.\d+)?$": "should be a number (e.g., 123.45).",
         r"^[\w,\s-]+$$": "should contain only letters, numbers, spaces, commas, underscore and hyphens.",
+        r"^\s*|[\w\s-]+$": "should contain only letters, numbers, spaces, underscores and hyphens.",
         r'\["\d+"(,\s*"\d+")*\]|\[\]': "should be a numbers quoted and enclosed in square brackets (e.g., ['1','2','3']).",
     }
 

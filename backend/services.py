@@ -23,6 +23,8 @@ import pyogrio
 from osgeo import ogr, osr, gdal
 from zipfile import ZipFile, ZIP_DEFLATED
 from werkzeug.utils import safe_join
+import re
+import numexpr as ne
 
 alias_mapping = {}
 global_dbs_tables_columns = {}
@@ -36,8 +38,9 @@ def fetch_data_service(data):
     try:
         # Extract the required parameters from the request data
         db_tables = json.loads(data.get("db_tables"))
-        columns = json.loads(data.get("columns", "All"))
+        columns = json.loads(data.get("columns")) if data.get("columns") != "All" else "All"
         selected_ids = json.loads(data.get("id"))
+        id_column = data.get("id_column", "ID")
         start_date = data.get("start_date")
         end_date = data.get("end_date")
         date_type = data.get("date_type")
@@ -48,6 +51,7 @@ def fetch_data_service(data):
         season = data.get("season", None)
         spatial_scale = data.get("spatial_scale", None)
         field_selected_ids = data.get("field_selected_ids", [])
+        math_formula = data.get("math_formula", None)
         stats_df = None
 
         if spatial_scale == "field":
@@ -60,9 +64,13 @@ def fetch_data_service(data):
         # Fetch the data for each database and table, and merge it based on date_type & 'ID'
         for table in db_tables:
             try:
-                table_key = f'{(table["db"], table["table"])}'
+                table_key = f"{(table['db'], table['table'])}"
                 global_columns = global_dbs_tables_columns.get(table_key)
-                ID = ["ID"] if global_columns and "ID" in global_columns else []
+                ID = (
+                    [id_column]
+                    if global_columns and id_column in global_columns
+                    else []
+                )
                 duplicate_columns = []
                 is_all_columns = False
 
@@ -80,6 +88,7 @@ def fetch_data_service(data):
                         col for col in columns if col.startswith(table["table"])
                     ]
 
+                    # Check if the table has a prefix
                     for col in columns:
                         if col in prefix_columns:
                             original_col = col[
@@ -149,14 +158,25 @@ def fetch_data_service(data):
         if df.empty:
             return {"error": "No data found for the specified filters."}
 
+        ID = id_column
+
         if spatial_scale == "field":
             # Connect to BMP.db3 to fetch subarea information
             bmp_db_path = safe_join(Config.PATHFILE, bmp_db_path_global)
             conn = sqlite3.connect(bmp_db_path)
 
             try:
+                # Get the ID column name for Subarea table
+                query = f"PRAGMA table_info('Subarea')"
+                cursor = conn.cursor()
+                cursor.execute(query)
+                subarea_id = next(
+                    (col[1] for col in cursor.fetchall() if "id" in col[1].lower()),
+                    "ID",
+                )
+
                 # Read Subarea information (Id, FieldId, and Area) from the Subarea table
-                query = "SELECT Id AS 'ID', FieldId, Area FROM Subarea"
+                query = f"SELECT {subarea_id} AS '{ID}', FieldId, Area FROM Subarea"
                 params = []
 
                 # Add conditions for selected field IDs
@@ -168,7 +188,7 @@ def fetch_data_service(data):
 
                 # Ensure the required columns exist in the DataFrame
                 if (
-                    "ID" not in subarea_df.columns
+                    ID not in subarea_df.columns
                     or "FieldId" not in subarea_df.columns
                     or "Area" not in subarea_df.columns
                 ):
@@ -194,13 +214,13 @@ def fetch_data_service(data):
 
                 # Merge the subarea values from the main DataFrame (df) into the subarea DataFrame
                 subarea_values = (
-                    df.set_index(["ID", *date_type_list])
+                    df.set_index([ID, *date_type_list])
                     .select_dtypes(include=["number"])
                     .reset_index()
                 )
-                subarea_values.rename(columns={"ID": "Subarea_ID"}, inplace=True)
+                subarea_values.rename(columns={ID: "Subarea_ID"}, inplace=True)
                 subarea_df = subarea_df.merge(
-                    subarea_values, left_on="ID", right_on="Subarea_ID", how="left"
+                    subarea_values, left_on=ID, right_on="Subarea_ID", how="left"
                 )
 
                 # Calculate the area-weighted field values for all numerical columns
@@ -219,7 +239,7 @@ def fetch_data_service(data):
                     .sum()
                     .reset_index()
                 )
-                field_values_df.rename(columns={"FieldId": "ID"}, inplace=True)
+                field_values_df.rename(columns={"FieldId": ID}, inplace=True)
 
                 # Replace the original DataFrame's values with the calculated field values
                 df = field_values_df.copy().map(round_numeric_values)
@@ -230,11 +250,87 @@ def fetch_data_service(data):
                 conn.close()
         elif spatial_scale == "reach":
             # Select all IDs except 0 as Reach ID = 0 is used for watershed average
-            df = df[df["ID"] != 0]
+            df = df[df[ID] != 0]
         elif spatial_scale == "unknown":
             return {
                 "error": "Spatial scale is unknown. Please select a valid spatial scale."
             }
+
+        # Combine all numerical columns in df.columns except 'ID' using the specified math_sign
+        numerical_columns = [
+            col for col in df.select_dtypes(include=["number"]).columns if col != ID
+        ]
+        new_feature = ""
+
+        # Parse and evaluate the formula dynamically
+        if math_formula:
+            try:
+                # Replace column names in the formula with their corresponding DataFrame references
+                formula = math_formula
+                formula_symbols = math_formula
+                for col in numerical_columns:
+                    formula = formula.replace(col, f"df['{col}']")
+                    # Remove column names from the formula symbols
+                    formula_symbols = formula_symbols.replace(col, "")
+
+                # Check if formula only contains allowed mathematical operators and column names
+                formula_symbols = set(list(formula_symbols))
+
+                if not all(
+                    char.isnumeric() or char in "+-*/,." or char.isspace()
+                    for char in formula_symbols
+                ):
+                    return {"error": "Invalid characters or columns in the formula."}
+
+                # Create a mapping of alias to real column names
+                real_col = {}
+                for table in db_tables:
+                    for col in numerical_columns:
+                        real_col[col] = (
+                            alias_mapping.get(table["table"], {})
+                            .get("columns", {})
+                            .get(col, col)
+                        )
+
+                # Replace only column names in the formula, ignoring operators
+                new_feature = math_formula
+                for col in numerical_columns:
+                    if col in real_col:
+                        new_feature = new_feature.replace(col, real_col[col])
+                    math_formula = math_formula.replace(col, re.sub(r"[()/\\]", "", col.replace(" ", "_")))
+
+                # Handle division by zero by replacing zeros with a small number (e.g., 0.001) in the DataFrame
+                if "/" in formula_symbols:
+                    # Extract the column names involved in division (after '/')
+                    div_columns = re.findall(
+                        r"(df\['([^']*)'\]|\d+(\.\d+)?)\s*\/\s*(df\['([^']*)'\]", formula
+                    )
+                    for col_denum in div_columns:
+                        df[col_denum[-1]] = df[col_denum[-1]].replace(0, 0.001)
+
+                # Prepare the local_dict with column data
+                local_dict = {
+                    re.sub(r"[()/\\]", "", col.replace(" ", "_")): df[col].values
+                    for col in numerical_columns
+                }
+
+                # Evaluate the formula to update the existing columns or create new one
+                if "," in math_formula:
+                    # Handle multiple columns in the formula, update existing columns
+                    math_formulas = math_formula.split(",")
+                    new_feature = ""
+                    for col_name in numerical_columns:
+                        for col_formula in math_formulas:
+                            if re.sub(r"[()/\\]", "", col_name.replace(" ", "_")) in col_formula:
+                                # Evaluate the formula and assign it to the new column
+                                df[col_name] = ne.evaluate(
+                                    col_formula.strip(), local_dict=local_dict
+                                )
+                else:
+                    # Evaluate the formula and assign it to the new column
+                    df[new_feature] = ne.evaluate(math_formula, local_dict=local_dict)
+            except Exception as e:
+                return {"error": f"Error evaluating formula: {str(e)}"}
 
         # Perform time conversion and aggregation if necessary
         if "Equal" not in method and interval != "daily":
@@ -255,6 +351,7 @@ def fetch_data_service(data):
         # Return the data and statistics as dictionaries
         return {
             "data": df.to_dict(orient="records"),
+            "new_feature": new_feature,
             "stats": stats_df.to_dict(orient="records") if stats_df is not None else [],
             "statsColumns": stats_df.columns.tolist() if stats_df is not None else [],
         }
@@ -282,11 +379,12 @@ def export_data_service(data, is_empty=False):
         output_format = data.get("export_format", "csv")
         output_path = data.get("export_path", "dataExport")
         # Handle options json stringify
-        options = json.loads(data.get("options", '{"data": true, "stats": true}'))
-        columns_list = json.loads(data.get("columns", "All"))
+        options = json.loads(data.get("options", "{'data': true, 'stats': true}"))
+        columns_list = json.loads(data.get("columns")) if data.get("columns") != "All" else "All"
+        id_column = data.get("id_column", "ID")
         date_type = data.get("date_type")
         graph_type = data.get("graph_type", "scatter")
-        geojson_data = json.loads(data.get("geojson_data", None))
+        geojson_data = json.loads(data.get("geojson_data", "{}"))
         feature = data.get("feature", "value")
         feature_statistic = data.get("feature_statistic", "mean")
         default_crs = data.get("default_crs", "EPSG:4326")
@@ -298,7 +396,7 @@ def export_data_service(data, is_empty=False):
             multi_graph_type = [
                 {"type": graph_type, "name": column}
                 for column in columns_list
-                if not column.endswith("ID") and column != date_type
+                if not column.endswith(id_column) and column != date_type
             ]
 
         if not date_type:
@@ -329,7 +427,6 @@ def export_data_service(data, is_empty=False):
         return {"file_path": file_path}
     except Exception as e:
         return {"error": str(e)}
-
 
 def fetch_data_from_db(
     db_path, table_name, selected_ids, columns, start_date, end_date, date_type
@@ -761,13 +858,19 @@ def get_files_and_folders(data):
     folder_path = data.get("folder_path", "Jenette_Creek_Watershed")
     global bmp_db_path_global
 
-    if os.path.isabs(folder_path) and data.get("is_tauri", None):
+    if (
+        os.path.isabs(folder_path)
+        and data.get("is_tauri", None) == "true"
+        and os.environ.get("RUNNING_UNDER_WAITRESS") == "1"
+    ):
         # Update Config.PATHFILE to point to the parent directory of the provided absolute path
         Config.PATHFILE = os.path.dirname(folder_path)
         base_folder = os.path.basename(folder_path)
         root = Config.PATHFILE
     elif os.path.isabs(folder_path):
-        return {"error": "The folder path cannot be absolute when not using the Tauri app."}
+        return {
+            "error": "The folder path cannot be absolute when not using the Tauri app."
+        }
     else:
         # If the folder path is relative, use it directly
         base_folder = folder_path
@@ -1055,6 +1158,7 @@ def get_columns_and_time_range(db_path, table_name):
             "columns": alias_columns,
             "start_date": start_date,
             "end_date": end_date,
+            "id_column": id_column or "",
             "ids": ids,
             "date_type": date_type,
             "interval": interval,
@@ -1073,7 +1177,7 @@ def get_multi_columns_and_time_range(data):
         all_columns = set()
 
         for table in db_tables:
-            table_key = f'{(table["db"], table["table"])}'
+            table_key = f"{(table['db'], table['table'])}"
 
             columns_time_range = get_columns_and_time_range(table["db"], table["table"])
 
@@ -1096,7 +1200,7 @@ def get_multi_columns_and_time_range(data):
 
             # Store columns for each table in a global dictionary
             global_dbs_tables_columns[table_key] = (
-                columns_time_range["columns"] + ["ID"]
+                columns_time_range["columns"] + [columns_time_range["id_column"]]
                 if columns_time_range["ids"] != []
                 else columns_time_range["columns"]
             )
@@ -1106,7 +1210,7 @@ def get_multi_columns_and_time_range(data):
             )
 
         # Verify each entry in global_dbs_tables_columns against db_tables
-        existing_keys = {f'{(table["db"], table["table"])}' for table in db_tables}
+        existing_keys = {f"{(table['db'], table['table'])}" for table in db_tables}
 
         keys_to_delete = [
             key for key in global_dbs_tables_columns.keys() if key not in existing_keys
@@ -1116,7 +1220,7 @@ def get_multi_columns_and_time_range(data):
             del global_dbs_tables_columns[key]
 
         # Check consistency across tables for date_type, interval, start_date, end_date, and ids
-        keys_to_check = ["date_type", "interval"]
+        keys_to_check = ["date_type", "interval", "id_column"]
         for key in keys_to_check:
             unique_values = set(table[key] for table in multi_columns_time_range)
             if len(unique_values) > 1:
@@ -1125,6 +1229,9 @@ def get_multi_columns_and_time_range(data):
         # Intersection of start and end dates from all tables
         start_dates = [table["start_date"] for table in multi_columns_time_range]
         end_dates = [table["end_date"] for table in multi_columns_time_range]
+        id_column = [table["id_column"] for table in multi_columns_time_range][
+            0
+        ]  # Assuming all tables have the same ID column
         start_date = max(start_dates)
         end_date = min(end_dates)
 
@@ -1137,7 +1244,7 @@ def get_multi_columns_and_time_range(data):
         )
 
         if include_id:
-            columns.append("ID")
+            columns.append(id_column or "ID")
 
         # Add all other columns from each table
         columns += [
@@ -1147,9 +1254,9 @@ def get_multi_columns_and_time_range(data):
             if col
             not in [
                 multi_columns_time_range[0]["date_type"],
-                "ID",
+                id_column or "ID",
             ]
-            and "ID" not in col
+            and (id_column or "ID") not in col
         ]
 
         # Intersection of IDs from all tables
@@ -1162,6 +1269,7 @@ def get_multi_columns_and_time_range(data):
             "global_columns": global_dbs_tables_columns,
             "start_date": start_date or "",
             "end_date": end_date or "",
+            "id_column": id_column or "ID",
             "ids": [str(id) for id in sorted(ids)],
             "date_type": multi_columns_time_range[0]["date_type"] or "",
             "interval": multi_columns_time_range[0]["interval"] or "",
@@ -1463,7 +1571,7 @@ def fetch_geojson_colors(data):
     """
     # Step 1: Fetch raw data
     output = fetch_data_service(data)
-    feature = data.get("feature", "value")
+    feature = output.get("new_feature", None) or data.get("feature", "value")
     feature_statistic = data.get("feature_statistic", "mean")
 
     if not feature or feature == "value":

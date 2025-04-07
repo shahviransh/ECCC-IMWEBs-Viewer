@@ -1,4 +1,5 @@
 from flask import jsonify, request, send_file
+import mimetypes
 from werkzeug.utils import safe_join
 import os
 import sys
@@ -115,11 +116,14 @@ def register_routes(app, cache):
         # Loop through each file and save it in the corresponding folder
         for file in files:
             file_path = safe_join(Config.PATHFILE, file.filename)
-            
+
             # Ensure the file is not already there checking for duplicates
-            if os.path.exists(file_path) and os.path.getsize(file_path) == file.content_length:
+            if (
+                os.path.exists(file_path)
+                and os.path.getsize(file_path) == file.content_length
+            ):
                 continue
-            
+
             # Get the folder name from the file's filename
             folder_name = os.path.dirname(file_path)
             os.makedirs(folder_name, exist_ok=True)
@@ -167,7 +171,17 @@ def register_routes(app, cache):
         if file_path.get("error", None):
             return jsonify(file_path)
 
-        return send_file(file_path.get("file_path"), as_attachment=True)
+        # Determine the mimetype based on the file extension
+        file_extension = file_path.get("file_path").split(".")[-1].lower()
+        mimetype = (
+            mimetypes.types_map.get(f".{file_extension}", "application/octet-stream")
+            if file_extension != "xlsx"
+            else "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        )
+
+        return send_file(
+            file_path.get("file_path"), mimetype=mimetype, as_attachment=True
+        )
 
     @app.route("/api/get_tables", methods=["GET"])
     @jwt_required()
@@ -296,7 +310,11 @@ def register_routes(app, cache):
         if file_path.get("error", None):
             return jsonify(file_path)
 
-        return send_file(file_path.get("file_path"), as_attachment=True)
+        mimetype = mimetypes.types_map.get(".zip", "application/octet-stream")
+
+        return send_file(
+            file_path.get("file_path"), mimetype=mimetype, as_attachment=True
+        )
 
     @app.route("/api/health", methods=["GET"])
     def health():

@@ -60,12 +60,11 @@ export default {
             stats: [],
             statsColumns: [],
             data: [],
-            ID: '',
             rowLimit: 100,
         };
     },
     computed: {
-        ...mapState(["selectedDbsTables", "selectedColumns", "allSelectedColumns", "selectedIds", "dateRange", "selectedInterval", "selectedStatistics", "selectedMethod", "exportColumns", "exportIds", "exportDate", "exportInterval", "dateType", "exportPath", "exportFilename", "exportFormat", "exportOptions", "theme"]),
+        ...mapState(["selectedDbsTables", "selectedColumns", "allSelectedColumns", "selectedIds", "idColumn", "dateRange", "selectedInterval", "selectedStatistics", "selectedMethod", "exportColumns", "exportIds", "exportDate", "exportInterval", "dateType", "exportPath", "exportFilename", "exportFormat", "exportOptions", "theme"]),
     },
     methods: {
         ...mapActions(["updateSelectedColumns", "updateExportOptions", "updateAllSelectedColumns", "pushMessage", "clearMessages"]),
@@ -91,6 +90,7 @@ export default {
                         db_tables: JSON.stringify(this.selectedDbsTables),
                         columns: JSON.stringify(this.allSelectedColumns ? "All" : this.selectedColumns.filter((column) => column !== 'Season')),
                         id: JSON.stringify(this.selectedIds),
+                        id_column: this.idColumn,
                         start_date: this.dateRange.start,
                         end_date: this.dateRange.end,
                         date_type: this.dateType,
@@ -102,6 +102,10 @@ export default {
                         Authorization: `Bearer ${localStorage.getItem("token")}`
                     }
                 });
+                // Check if the new feature is added to columns
+                if (response.data.new_feature) {
+                    this.updateSelectedColumns(this.selectedColumns.concat(response.data.new_feature));
+                }
                 if (this.selectedInterval === 'seasonally' && !this.selectedMethod.includes('Equal') && !this.selectedColumns.includes('Season')) {
                     this.updateSelectedColumns(this.selectedColumns.concat(['Season']));
                 } else if (this.selectedColumns.includes('Season') && this.selectedInterval !== 'seasonally') {
@@ -110,7 +114,6 @@ export default {
                 this.data = response.data.data;
                 this.stats = response.data.stats;
                 this.statsColumns = response.data.statsColumns;
-                this.ID = this.selectedColumns.find((column) => column.includes('ID'));
                 if (response.data.error) {
                     alert('Error fetching data: ' + response.data.error);
                     return;
@@ -136,6 +139,7 @@ export default {
                         db_tables: JSON.stringify(this.selectedDbsTables),
                         columns: JSON.stringify(this.allSelectedColumns ? "All" : this.exportColumns.filter((column) => column !== 'Season')),
                         id: JSON.stringify(this.exportIds),
+                        id_column: this.idColumn,
                         start_date: this.exportDate.start,
                         end_date: this.exportDate.end,
                         interval: this.exportInterval,
@@ -149,7 +153,8 @@ export default {
                     },
                     headers: {
                         Authorization: `Bearer ${localStorage.getItem("token")}`
-                    }
+                    },
+                    responseType: 'blob'
                 });
                 if (response.data.error) {
                     alert('Error fetching data: ' + response.data.error);
@@ -160,6 +165,19 @@ export default {
                     this.updateSelectedColumns(this.selectedColumns.concat(['Season']));
                 } else if (this.selectedColumns.includes('Season') && this.selectedInterval !== 'seasonally') {
                     this.updateSelectedColumns(this.selectedColumns.filter((column) => column !== 'Season'));
+                }
+
+                if (!window.__TAURI__) {
+                    // Download the file using the browser as a blob
+                    const blob = new Blob([response.data], { type: response.headers['content-type'] });
+                    const link = document.createElement('a');
+                    const url = URL.createObjectURL(blob);
+                    link.href = url;
+                    link.setAttribute('download', this.exportFilename);
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                    URL.revokeObjectURL(url);
                 }
             } catch (error) {
                 console.error('Error exporting data: ', error.message);

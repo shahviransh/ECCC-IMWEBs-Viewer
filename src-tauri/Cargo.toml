@@ -1,6 +1,6 @@
 [package]
 name = "IMWEBs-Viewer"
-version = "0.2.4"
+version = "0.2.5"
 description = "IMWEBs Viewer"
 authors = ["Viransh Shah"]
 license = "MIT"

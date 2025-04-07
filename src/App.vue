@@ -25,12 +25,18 @@
           <button @click="handleZoomOut">Zoom Out</button>
           <button @click="handleResetZoom">Reset Zoom</button>
         </span>
+
+        <span v-if="['Graph', 'Map'].includes(activePage)">
+          <button @click="showCalculator = true">Calculator ➕➖✖️➗</button>
+        </span>
       </div>
       <div class="taskbar-right">
         <button v-for="page in pages" :key="page" :class="{ active: page === activePage }" @click="navigateTo(page)">{{
           page }}</button>
       </div>
     </nav>
+
+    <Calculator v-if="showCalculator" @closePopup="showCalculator = false"/>
 
     <!-- Main Content -->
     <router-view class="main-content" />
@@ -41,6 +47,7 @@
 <script>
 import { mapState, mapActions } from "vuex";
 import MessageBox from "./components/MessageBox.vue";
+import Calculator from "./components/Calculator.vue";
 import Login from "./pages/Login.vue";
 import Loading from "./pages/Loading.vue";
 import axios from "axios";
@@ -61,6 +68,7 @@ export default {
         "Help",
       ],
       activePage: "Project", // Set default page here
+      showCalculator: false,
     };
   },
   computed: {
@@ -70,6 +78,7 @@ export default {
     MessageBox,
     Login,
     Loading,
+    Calculator,
   },
   methods: {
     ...mapActions(["updateTheme", "updatePageTitle", "updateCurrentZoom", "updateModelFolder", "pushMessage", "fetchFolderTree"]),

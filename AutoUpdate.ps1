@@ -17,7 +17,14 @@ if ($localHash -eq $remoteHash) {
     exit 0
 }
 
-git pull 
+# Attempt to pull changes
+git pull
+if ($LASTEXITCODE -ne 0) {
+    # If merge conflicts occur, reset the local branch to match the remote branch
+    Write-Host "Merge conflict detected. Resetting local branch to match remote..." -ForegroundColor Yellow
+    git fetch origin
+    git reset --hard origin/main
+}
 
 # Stop existing Flask process on port 5000
 $existingProcess = Get-NetTCPConnection -LocalPort 5000 -ErrorAction SilentlyContinue | Select-Object OwningProcess

@@ -126,7 +126,7 @@ const store = createStore({
     SET_PAGE_TITLE(state, title) {
       state.pageTitle = title;
     },
-    SET_CALCULATION(state, { mathFormula }) {
+    SET_CALCULATION(state, mathFormula) {
       state.mathFormula = mathFormula;
     },
     SET_SELECTED_DBS_TABLES(state, { db, table }) {
@@ -356,8 +356,8 @@ const store = createStore({
     updateModelFolder({ commit }, folder) {
       commit("SET_PROJECT_FOLDER", folder);
     },
-    updateCalculation({ commit }, { mathFormula }) {
-      commit("SET_CALCULATION", { mathFormula });
+    updateCalculation({ commit }, mathFormula ) {
+      commit("SET_CALCULATION", mathFormula);
     },
     addColumns({ commit }, columns) {
       commit("ADD_COLUMNS", { columns });

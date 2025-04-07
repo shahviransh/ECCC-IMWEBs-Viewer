@@ -76,7 +76,7 @@
                             <label>Selected Feature:</label>
                             <select v-model="selectedFeat" class="dropdown">
                                 <option
-                                    v-for="feature in selectedColumns.filter(col => !this.properties.includes(col) && col !== dateType && col !== 'ID')"
+                                    v-for="feature in selectedColumns.filter(col => !this.properties.includes(col) && col !== dateType && col !== idColumn)"
                                     :key="feature" :value="feature">{{ feature
                                     }}</option>
                             </select>
@@ -127,7 +127,7 @@
                         <div v-show="activeTab === 'graph'" class="graph-display">
                             <GraphDisplay :data="data"
                                 :selectedColumns="selectedColumns.filter(col => !properties.includes(col))"
-                                :selectedIds="[selectedFeatureId.toString()]" :dateType="dateType" :ID="ID"
+                                :selectedIds="[selectedFeatureId.toString()]" :dateType="dateType" :ID="idColumn"
                                 :theme="theme" :refreshKey="refreshKey" :currentZoomStart="currentZoomStart"
                                 :currentZoomEnd="currentZoomEnd" :multiGraphType="multiGraphType"
                                 :graphType="graphType" />
@@ -178,7 +178,6 @@ export default {
             stats: [],
             statsColumns: [],
             data: [],
-            ID: '',
             activeTab: 'table',
             map: null,
             geojson: {},
@@ -222,8 +221,8 @@ export default {
         },
     },
     computed: {
-        ...mapState(["selectedDbsTables", "selectedGeoFolders", "selectedMonth", "columns", "selectedSeason", "selectedColumns", "allSelectedColumns", "selectedIds", "multiGraphType", "graphType", "currentZoomStart", "currentZoomEnd", "dateRange", "selectedInterval", "selectedStatistics", "selectedMethod", "exportColumns", "exportIds", "exportDate", "exportInterval", "dateType", "exportPath", "exportFilename", "exportFormat", "exportOptions", "theme"]),
-        polygonCol:{
+        ...mapState(["selectedDbsTables", "selectedGeoFolders", "mathFormula", "selectedMonth", "columns", "idColumn", "selectedSeason", "selectedColumns", "allSelectedColumns", "selectedIds", "multiGraphType", "graphType", "currentZoomStart", "currentZoomEnd", "dateRange", "selectedInterval", "selectedStatistics", "selectedMethod", "exportColumns", "exportIds", "exportDate", "exportInterval", "dateType", "exportPath", "exportFilename", "exportFormat", "exportOptions", "theme"]),
+        polygonCol: {
             get() {
                 this.polygonColor = this.theme === 'light' ? "#3388ff" : "#ff9800";
                 return this.polygonColor;
@@ -232,7 +231,7 @@ export default {
                 this.polygonColor = value;
             }
         },
-        lineCol:{
+        lineCol: {
             get() {
                 this.lineColor = this.theme === 'light' ? "#ff0000" : "#03A9F4";
                 return this.lineColor;
@@ -241,7 +240,7 @@ export default {
                 this.lineColor = value;
             }
         },
-        pointCol:{
+        pointCol: {
             get() {
                 this.pointColor = this.theme === 'light' ? "#000000" : "#ff5722";
                 return this.pointColor;
@@ -250,14 +249,14 @@ export default {
                 this.pointColor = value;
             }
         },
-        selectedFeat:{
+        selectedFeat: {
             get() {
-                this.selectedFeature = this.selectedColumns.find(col => !this.properties.includes(col) && col !== this.dateType && col !== 'ID') || '';
+                this.selectedFeature = this.selectedColumns.find(col => !this.properties.includes(col) && col !== this.dateType && col !== this.idColumn) && !this.mathFormula || '';
                 return this.selectedFeature;
             },
             set(value) {
                 this.selectedFeature = value;
-            }  
+            }
         },
         spatialScale: {
             get() {
@@ -339,6 +338,7 @@ export default {
                         db_tables: JSON.stringify(this.selectedDbsTables),
                         columns: JSON.stringify(this.allSelectedColumns ? "All" : this.selectedColumns.filter((column) => column !== 'Season' && !this.properties.includes(column))),
                         id: JSON.stringify(this.selectedIds),
+                        id_column: this.idColumn,
                         start_date: this.dateRange.start,
                         end_date: this.dateRange.end,
                         date_type: this.dateType,
@@ -350,6 +350,7 @@ export default {
                         feature: this.selectedFeature,
                         feature_statistic: this.selectedFeatureStatistic,
                         spatial_scale: this.selectedSpatialScale,
+                        math_formula: this.mathFormula,
                     },
                     headers: {
                         Authorization: `Bearer ${localStorage.getItem("token")}`
@@ -380,6 +381,7 @@ export default {
                     db_tables: JSON.stringify(this.selectedDbsTables),
                     columns: JSON.stringify(this.allSelectedColumns ? "All" : this.selectedColumns.filter((column) => column !== 'Season' && !this.properties.includes(column))),
                     id: JSON.stringify([this.selectedFeatureId.toString()]),
+                    id_column: this.idColumn,
                     start_date: this.dateRange.start,
                     end_date: this.dateRange.end,
                     date_type: this.dateType,
@@ -389,11 +391,17 @@ export default {
                     month: this.selectedMonth,
                     season: this.selectedSeason,
                     spatial_scale: this.selectedSpatialScale,
+                    math_formula: this.mathFormula,
                 },
                 headers: {
                     Authorization: `Bearer ${localStorage.getItem("token")}`
                 }
             });
+            // Check if the new feature is added to columns
+            if (response.data.new_feature) {
+                this.updateSelectedColumns(this.selectedColumns.concat(response.data.new_feature));
+                this.selectedFeature = response.data.new_feature;
+            }
             if (this.selectedInterval === 'seasonally' && !this.selectedMethod.includes('Equal') && !this.selectedColumns.includes('Season')) {
                 this.updateSelectedColumns(this.selectedColumns.concat(['Season']));
             } else if (this.selectedColumns.includes('Season') && this.selectedInterval !== 'seasonally') {
@@ -402,7 +410,6 @@ export default {
             this.data = response.data.data;
             this.stats = response.data.stats;
             this.statsColumns = response.data.statsColumns;
-            this.ID = this.selectedColumns.find((column) => column.includes('ID'));
             this.refreshKey += 1;
             if (response.data.error) {
                 alert('Error fetching data: ' + response.data.error);
@@ -507,7 +514,7 @@ export default {
                                 style.opacity = 1;
                                 style.fillOpacity = this.lineOpacity;
                             }
-                            
+
                             style.weight = featureWeight || 2;
 
                             return style;
@@ -527,7 +534,7 @@ export default {
                             // Bind click events to open table statistics popup
                             layer.on("click", () => {
                                 const featureId = Object.entries(feature.properties)
-                                    .filter(([key, value]) => key.toLowerCase().includes(this.ID.toLowerCase()) && value !== null)
+                                    .filter(([key, value]) => key.toLowerCase().includes('id') && value !== null)
                                     .map(([, value]) => value)?.[0] ?? null;
                                 if (!featureId) {
                                     return;
@@ -750,11 +757,12 @@ export default {
                 let response;
                 if (this.exportFormat === "shp") {
                     const filename = `${this.selectedGeoFolders.map(folder => folder.split("/").pop()).join(", ")}_${this.exportInterval}_${this.selectedFeature}_${this.selectedFeatureStatistic}`;
-                    this.updateExportFilename(filename.replace(/[ \\\/\.\(\)]/g, "-").replace(/-+/g, "-").replace(/-_/g, "_"));
+                    this.updateExportFilename(filename.replace(/[ \\\/\.\(\)]/g, "-").replace(/-+/g, "-").replace(/-_|_+/g, "_"));
                     response = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/export_data`, {
                         db_tables: JSON.stringify(this.selectedDbsTables),
                         columns: JSON.stringify(this.allSelectedColumns ? "All" : this.exportColumns.filter((column) => column !== 'Season' && !this.properties.includes(column))),
                         id: JSON.stringify(this.exportIds),
+                        id_column: this.idColumn,
                         start_date: this.exportDate.start,
                         end_date: this.exportDate.end,
                         interval: this.exportInterval,
@@ -774,11 +782,13 @@ export default {
                         feature_statistic: this.selectedFeatureStatistic,
                         spatial_scale: this.selectedSpatialScale,
                         default_crs: this.default_crs,
+                        math_formula: this.mathFormula,
                     }, {
                         headers: {
                             Authorization: `Bearer ${localStorage.getItem("token")}`,
                             "Content-Type": "application/json",
                         },
+                        responseType: 'blob'
                     });
                 } else {
                     const domtoimage = await import("dom-to-image-more");
@@ -794,7 +804,8 @@ export default {
 
                     // Send to backend
                     response = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/export_map`, formData, {
-                        headers: { "Content-Type": "multipart/form-data", Authorization: `Bearer ${localStorage.getItem("token")}` }
+                        headers: { "Content-Type": "multipart/form-data", Authorization: `Bearer ${localStorage.getItem("token")}` },
+                        responseType: 'blob'
                     });
                 }
 
@@ -805,6 +816,19 @@ export default {
                         message: "Map image downloaded successfully",
                         type: "success",
                     });
+                }
+
+                if (!window.__TAURI__) {
+                    // Download the file using the browser as a blob
+                    const blob = new Blob([response.data], { type: response.headers['content-type'] });
+                    const link = document.createElement('a');
+                    const url = URL.createObjectURL(blob);
+                    link.href = url;
+                    link.setAttribute('download', this.exportFilename);
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                    URL.revokeObjectURL(url);
                 }
             } catch (error) {
                 console.error("Error capturing map:", error);
@@ -863,7 +887,21 @@ export default {
     height: auto;
     text-align: center;
     color: var(--text-color);
+    animation: fadeIn 0.3s ease-in-out;
     overflow-y: auto;
+}
+
+/* Smooth fade-in animation */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
 }
 
 .modal-buttons {

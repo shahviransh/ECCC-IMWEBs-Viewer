@@ -78,7 +78,7 @@ export default {
   bottom: 20px;
   right: 20px;
   max-width: 350px;
-  z-index: 1000;
+  z-index: 9999;
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -90,11 +90,11 @@ export default {
   flex-direction: column;
   align-items: flex-start;
   justify-content: space-between;
-  padding: 15px 20px;
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  padding: 15px 15px;
+  border-radius: 6px;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
   font-size: 14px;
-  line-height: 1.5;
+  line-height: 1.2;
   animation: slideIn 0.3s ease-out;
 }
 
@@ -123,7 +123,7 @@ export default {
 
 .message-text {
   flex: 1;
-  margin-right: 10px;
+  padding-right: 20px;
 }
 
 .close-button {
