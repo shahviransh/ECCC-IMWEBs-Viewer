@@ -296,6 +296,8 @@ def fetch_data_service(data):
                         )
                     )
                 }
+                
+                special_chars = "!@#$%^&()_|~/`{}[]:;\"\\'<>,?"
 
                 # Replace only column names in the formula, ignoring operators
                 new_feature = math_formula
@@ -303,7 +305,7 @@ def fetch_data_service(data):
                     if col in real_col:
                         new_feature = new_feature.replace(col, real_col.get(col, col))
                     math_formula = math_formula.replace(
-                        col, re.sub(r"[()/\\]", "", col.replace(" ", "_"))
+                        col, re.sub(f"[{re.escape(special_chars)}]", "", col.replace(" ", "_"))
                     )
 
                 # Handle division by zero by replacing zeros with a small number (e.g., 0.001) in the DataFrame
@@ -318,7 +320,7 @@ def fetch_data_service(data):
 
                 # Prepare the local_dict with column data
                 local_dict = {
-                    re.sub(r"[()/\\]", "", col.replace(" ", "_")): df[col].values
+                    re.sub(f"[{re.escape(special_chars)}]", "", col.replace(" ", "_")): df[col].values
                     for col in numerical_columns
                 }
 
@@ -330,7 +332,7 @@ def fetch_data_service(data):
                     for col_name in numerical_columns:
                         for col_formula in math_formulas:
                             if (
-                                re.sub(r"[()/\\]", "", col_name.replace(" ", "_"))
+                                re.sub(f"[{re.escape(special_chars)}]", "", col.replace(" ", "_"))
                                 in col_formula
                             ):
                                 # Evaluate the formula and assign it to the new column
@@ -1588,6 +1590,7 @@ def fetch_geojson_colors(data):
     feature = output.get("new_feature", None) or data.get("feature", "value")
     feature_statistic = data.get("feature_statistic", "mean")
 
+    # TODO: Check new_feature
     if not feature or feature == "value":
         return {}
 

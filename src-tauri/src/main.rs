@@ -5,6 +5,7 @@ use reqwest::Client;
 use std::{ env, process::Command};
 use std::fs;
 use std::path::Path;
+use std::path::PathBuf;
 
 #[cfg(target_os = "windows")]
 const CREATE_NO_WINDOW: u32 = 0x08000000;
@@ -56,6 +57,34 @@ fn are_paths_equal(path1: &Path, path2: &Path) -> bool {
     }
 }
 
+fn get_local_appdata_path(app_name: &str) -> PathBuf {
+    #[cfg(target_os = "windows")]
+    {
+        let base = env::var("LOCALAPPDATA").expect("LOCALAPPDATA not set");
+        return PathBuf::from(base).join(app_name);
+    }
+
+    #[cfg(target_os = "linux")]
+    {
+        let base = env::var("XDG_DATA_HOME")
+            .map(PathBuf::from)
+            .unwrap_or_else(|_| {
+                let home = env::var("HOME").expect("HOME not set");
+                PathBuf::from(home).join(".local/share")
+            });
+        return base.join(app_name);
+    }
+
+    #[cfg(target_os = "macos")]
+    {
+        let home = env::var("HOME").expect("HOME not set");
+        return PathBuf::from(home)
+            .join("Library")
+            .join("Application Support")
+            .join(app_name);
+    }
+}
+
 #[tauri::command]
 async fn start_server() {
     // Get the current executable's directory
@@ -63,10 +92,9 @@ async fn start_server() {
     let exe_dir = current_exe.parent().expect("Failed to get parent directory");
     let up_folder = exe_dir.join("_up_");
 
-    // Get the AppData\Local directory
-    let local_appdata = env::var("LOCALAPPDATA").expect("Failed to get LOCALAPPDATA");
-    let mut backend_dir = std::path::Path::new(&local_appdata).join("IMWEBs-Viewer").join("_up_");
-
+    let local_appdata = get_local_appdata_path("IMWEBs-Viewer");
+    let mut backend_dir = local_appdata.join("_up_");
+    
     // Copy _up_ folder to AppData\Local if it is different from the exe directory
     if !are_paths_equal(&up_folder, &backend_dir) {
         copy_dir_recursive(&up_folder, &backend_dir).expect(

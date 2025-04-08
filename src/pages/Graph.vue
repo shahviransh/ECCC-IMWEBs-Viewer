@@ -28,7 +28,7 @@
             <!-- Component 4: Main View -->
             <div class="main-view">
                 <!-- Graph Display -->
-                <GraphDisplay :data="data" :selectedColumns="selectedColumns" :selectedIds="selectedIds"
+                <GraphDisplay :data="data" :selectedColumns="onlyShowSelected ? [onlyShowSelected] : selectedColumns" :selectedIds="selectedIds"
                     :dateType="dateType" :ID="idColumn" :theme="theme" :refreshKey="refreshKey"
                     :currentZoomStart="currentZoomStart" :currentZoomEnd="currentZoomEnd"
                     :multiGraphType="multiGraphType" :graphType="graphType" />
@@ -68,6 +68,7 @@ export default {
             statsColumns: [],
             data: [],
             refreshKey: 0,
+            onlyShowSelected: null,
         };
     },
     computed: {
@@ -113,6 +114,7 @@ export default {
                 // Check if the new feature is added to columns
                 if (response.data.new_feature) {
                     this.updateSelectedColumns(this.selectedColumns.concat([response.data.new_feature]));
+                    this.onlyShowSelected = response.data.new_feature;
                 }
                 if (this.selectedInterval === 'seasonally' && !this.selectedMethod.includes('Equal') && !this.selectedColumns.includes('Season')) {
                     this.updateSelectedColumns(this.selectedColumns.concat(['Season']));
