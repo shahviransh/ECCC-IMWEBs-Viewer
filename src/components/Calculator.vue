@@ -117,10 +117,11 @@ export default {
             this.saveFormula();
         },
         saveFormula(message = false) {
+            this.updateCalculation(this.preview);
             if (message) {
                 this.pushMessage({ message: `Formula Saved: ${this.preview}`, type: 'success' });
+                this.closePopup();
             }
-            this.updateCalculation(this.preview);
         },
         closePopup() {
             this.$emit("closePopup");

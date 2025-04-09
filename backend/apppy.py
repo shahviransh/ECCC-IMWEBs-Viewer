@@ -8,11 +8,6 @@ import os
 
 # Load environment variables
 load_dotenv()
-from dotenv import load_dotenv
-import os
-
-# Load environment variables
-load_dotenv()
 
 app = Flask(__name__)
 CORS(app)
@@ -25,8 +20,9 @@ register_routes(app, cache)
 register_error_handlers(app)
 
 if __name__ == "__main__":
-    if os.getenv("PRODUCTION") == "true":
+    if os.getenv("PRODUCTION") == "True":
         from waitress import serve
+
         os.environ["RUNNING_UNDER_WAITRESS"] = "1"
         serve(app, host="127.0.0.1", port=5000)
     else:

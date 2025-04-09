@@ -41,16 +41,50 @@
                             </div>
                         </div>
                         <button type="submit" class="loginButton">Sign in</button>
+                        <HCaptcha :sitekey="sitekey" :reCaptchaCompat="false"
+                            @verify="onHCaptchaChange" />
+                        <button type="button" class="contactAdminButton" @click="showContactForm = true">Contact
+                            Admin</button>
                         <p v-if="error" class="errorMessage">{{ error }}</p>
                     </form>
                 </fieldset>
             </div>
         </div>
     </div>
+    <div v-if="showContactForm" class="contactFormOverlay">
+        <div class="contactForm">
+            <h3>Contact Admin</h3>
+            <form :action="formSubmitUrl" method="POST">
+                <div class="formGroup">
+                    <label for="name"><b>Name:</b></label>
+                    <input id="name" type="text" class="formControl" required />
+                </div>
+                <div class="formGroup">
+                    <label for="email"><b>Email:</b></label>
+                    <input id="email" type="email" class="formControl" required />
+                </div>
+                <div class="formGroup">
+                    <label for="message"><b>Message:</b></label>
+                    <textarea id="message" class="formControl" rows="4"
+                        required></textarea>
+                </div>
+                <input type="hidden" name="_cc" :value="cc" />
+                <input type="hidden" name="_subject" value="Contact from IMWEBs Viewer Form">
+                <input type="hidden" name="_template" value="box">
+                <button type="submit" class="submitButton">Send</button>
+                <button type="button" class="cancelButton" @click="showContactForm = false">Cancel</button>
+            </form>
+        </div>
+    </div>
+    <div class="logos">
+        <img src="../assets/ECCC.png" alt="ECCC Logo" class="ecccLogo" />
+        <img src="../assets/UoG.png" alt="University of Guelph Logo" class="uogLogo" />
+    </div>
 </template>
 
 <script>
 import axios from 'axios';
+import HCaptcha from '@hcaptcha/vue3-hcaptcha';
 
 export default {
     data() {
@@ -58,11 +92,19 @@ export default {
             username: '',
             password: '',
             error: '',
-            showPassword: false
+            showPassword: false,
+            showContactForm: false,
+            captchaToken: null,
+            formSubmitUrl: `https://formsubmit.co/${import.meta.env.VITE_FORM_SUBMIT_ID}`,
+            sitekey: import.meta.env.VITE_HCAPTCHA_SITE_KEY,
+            cc: import.meta.env.VITE_RECIPIENTS
         };
     },
     props: {
         isAuthenticated: Boolean
+    },
+    components: {
+        HCaptcha
     },
     methods: {
         togglePasswordVisibility() {
@@ -71,8 +113,13 @@ export default {
         async login(autoLogin) {
             try {
                 const credentials = autoLogin
-                    ? { username: 'admin', password: 'admin' }
+                    ? { username: 'default', password: 'default' }
                     : { username: this.username, password: this.password };
+
+                if (!autoLogin && !this.captchaToken) {
+                    this.error = 'Please complete the CAPTCHA';
+                    return;
+                }
 
                 const response = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/login`, credentials);
                 const token = response.data.access_token;
@@ -82,7 +129,10 @@ export default {
                 console.error(err);
                 this.error = err.response?.data?.error || 'Invalid username or password';
             }
-        }
+        },
+        onHCaptchaChange(captchaToken) {
+            this.captchaToken = captchaToken;
+        },
     },
     mounted() {
         // Auto login in Tauri
@@ -94,9 +144,6 @@ export default {
 </script>
 
 <style scoped>
-/* Author: Dr. Michael Yu
-   With some modifications by @shahviransh Viransh Shah
-   GitHub: https://github.com/hawklorry/Ecosystem-Services-Assessment-Tool/blob/master/src/AgBMTool.Front/ClientApp/src/app/login/login.component.css */
 html,
 body {
     position: relative;
@@ -143,7 +190,7 @@ body {
 }
 
 .formGroup {
-    margin-bottom: 15px;
+    margin-bottom: 10px;
     text-align: left;
 }
 
@@ -224,5 +271,98 @@ body {
 .eyeIcon {
     width: 20px;
     height: 20px;
+}
+
+.contactAdminButton {
+    width: 100%;
+    padding: 12px;
+    background-color: #28a745;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.contactAdminButton:hover {
+    background-color: #218838;
+}
+
+.contactFormOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.contactForm {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    width: 400px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.contactForm h3 {
+    text-align: center;
+}
+
+.submitButton {
+    width: 100%;
+    padding: 10px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.submitButton:hover {
+    background-color: #0056b3;
+}
+
+.cancelButton {
+    width: 100%;
+    padding: 10px;
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.cancelButton:hover {
+    background-color: #c82333;
+}
+
+.logos {
+    position: fixed;
+    bottom: 10px;
+    right: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    z-index: 1000;
+}
+
+.ecccLogo,
+.uogLogo {
+    width: 250px;
+    margin-bottom: 10px;
+}
+
+.uogLogo {
+    margin-bottom: 0;
 }
 </style>

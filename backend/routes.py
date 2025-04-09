@@ -41,9 +41,9 @@ load_dotenv()
 
 # In the Tauri EXE sidecar, HTTPS is not required and we can use default credentials.
 # When running as a web app, HTTPS is required and proper environment variables should be set for security.
-ADMIN_USERNAME = os.getenv("ADMIN_USERNAME", "admin")
-ADMIN_PASSWORD_HASH = os.getenv(
-    "ADMIN_PASSWORD_HASH", bcrypt.hashpw("admin".encode(), bcrypt.gensalt()).decode()
+ADMIN_USERNAME = os.getenv("ADMIN_USERNAME", "default")
+ADMIN_PASSWORD = os.getenv(
+    "ADMIN_PASSWORD", bcrypt.hashpw("default".encode(), bcrypt.gensalt()).decode()
 )
 JWT_SECRET_KEY = secrets.token_hex(256)
 
@@ -70,7 +70,7 @@ def register_routes(app, cache):
 
         # Verify username and hashed password
         if username != ADMIN_USERNAME or not bcrypt.checkpw(
-            password.encode(), ADMIN_PASSWORD_HASH.encode()
+            password.encode(), ADMIN_PASSWORD.encode()
         ):
             return jsonify({"error": "Invalid credentials"}), 401
 
@@ -95,6 +95,9 @@ def register_routes(app, cache):
 
     @app.route("/api/verify-token", methods=["GET"])
     def verify_token():
+        """
+        Verify the JWT token in the request headers.
+        """
         try:
             verify_jwt_in_request()
             return jsonify({"valid": True}), 200
