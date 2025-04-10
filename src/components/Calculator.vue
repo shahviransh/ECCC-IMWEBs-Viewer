@@ -54,7 +54,7 @@ export default {
         };
     },
     computed: {
-        ...mapState(["selectedColumns", "theme", "idColumn", "dateType", "geoColumns"]),
+        ...mapState(["selectedColumns", "theme", "mathFormula", "idColumn", "dateType", "geoColumns"]),
         selectColumns() {
             return this.selectedColumns.filter(
                 (col) => !this.geoColumns.includes(col) && col !== this.dateType && col !== this.idColumn

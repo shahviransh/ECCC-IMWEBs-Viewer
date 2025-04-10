@@ -40,9 +40,9 @@
                                 </span>
                             </div>
                         </div>
-                        <button type="submit" class="loginButton">Sign in</button>
                         <HCaptcha :sitekey="sitekey" :reCaptchaCompat="false"
                             @verify="onHCaptchaChange" />
+                        <button type="submit" class="loginButton">Sign in</button>
                         <button type="button" class="contactAdminButton" @click="showContactForm = true">Contact
                             Admin</button>
                         <p v-if="error" class="errorMessage">{{ error }}</p>
@@ -57,15 +57,15 @@
             <form :action="formSubmitUrl" method="POST">
                 <div class="formGroup">
                     <label for="name"><b>Name:</b></label>
-                    <input id="name" type="text" class="formControl" required />
+                    <input id="name" name="name" type="text" placeholder="Full Name" class="formControl" required />
                 </div>
                 <div class="formGroup">
                     <label for="email"><b>Email:</b></label>
-                    <input id="email" type="email" class="formControl" required />
+                    <input id="email" name="email" type="email" placeholder="Email Address" class="formControl" required />
                 </div>
                 <div class="formGroup">
                     <label for="message"><b>Message:</b></label>
-                    <textarea id="message" class="formControl" rows="4"
+                    <textarea id="message" name="message" placeholder="Your Message" class="formControl" rows="4"
                         required></textarea>
                 </div>
                 <input type="hidden" name="_cc" :value="cc" />

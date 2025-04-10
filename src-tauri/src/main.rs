@@ -70,7 +70,7 @@ fn get_local_appdata_path(app_name: &str) -> PathBuf {
             .map(PathBuf::from)
             .unwrap_or_else(|_| {
                 let home = env::var("HOME").expect("HOME not set");
-                PathBuf::from(home).join(".local/share")
+                PathBuf::from(home).join("/usr/lib")
             });
         return base.join(app_name);
     }
