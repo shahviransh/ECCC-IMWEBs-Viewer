@@ -45,8 +45,8 @@ This application is built with Tauri, Vue 3 as the frontend, and Flask as the ba
 
 ### Application Data Path
 If you would like to change the installation location for the app during installation, please keep it to the following default directory based on your platform:
-- Windows: `C:\Users\{your_user}\AppData\Local\IMWEBs-Viewer`
-- Linux: `/usr/lib/IMWEBs-Viewer`
-- macOS: `/Users/{your_user}/Library/Application Support/IMWEBs-Viewer`
+- Windows: `LOCALAPPDATA env var` or `C:\Users\{your_user}\AppData\Local\IMWEBs-Viewer`
+- Linux: `XDG_DATA_HOME or HOME env var` or`/usr/lib/IMWEBs-Viewer`
+- macOS: `HOME env var` or `/Users/{your_user}/Library/Application Support/IMWEBs-Viewer`
 
 Launch the Application: The application connects the Vue 3 frontend with the Flask backend and should be ready to use.
