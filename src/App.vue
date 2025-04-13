@@ -2,6 +2,10 @@
   <Loading v-if="isLoading" />
   <Login v-else-if="!isAuthenticated" v-model:isAuthenticated="isAuthenticated" />
   <div v-else id="papp" :class="theme">
+    <div v-if="isUploading" class="upload-loader">
+      <div class="spinner"></div>
+      <h3>{{ uploadMessage }}</h3>
+    </div>
     <!-- Top Bar -->
     <header class="top-bar">
       <div class="title-container">
@@ -36,8 +40,7 @@
       </div>
     </nav>
 
-    <Calculator v-if="showCalculator" @closePopup="showCalculator = false"/>
-
+    <Calculator v-if="showCalculator" @closePopup="showCalculator = false" />
     <!-- Main Content -->
     <router-view class="main-content" />
     <MessageBox />
@@ -69,6 +72,8 @@ export default {
       ],
       activePage: "Project", // Set default page here
       showCalculator: false,
+      isUploading: false,
+      uploadMessage: "Uploading folder, please wait...",
     };
   },
   computed: {
@@ -131,14 +136,29 @@ export default {
               type: "info"
             });
 
+            this.isUploading = true;
+            this.uploadMessage = "Uploading folder, please wait...";
+
+            const timeout = setTimeout(() => {
+              this.uploadMessage = "Still uploading... the folder might be large, please wait a bit longer.";
+            }, 2000); // 30 seconds
+
             // Send the form data with the files and folder structure to the backend
             const response = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/upload_folder`, formData, {
               headers: { "Content-Type": "multipart/form-data", Authorization: `Bearer ${localStorage.getItem("token")}` }
             });
 
+            // Show loading symbol circular with saying uploading folder please wait
+            // If taking lonker than 60 seconds, show plesae wait longer folder is big
+
+
             if (response.data.error) {
+              clearTimeout(timeout);
+              this.isUploading = false;
               alert("Error saving folder and files: " + response.data.error);
-            } else{
+            } else {
+              clearTimeout(timeout);
+              this.isUploading = false;
               this.pushMessage({
                 message: `Folder and files saved successfully!`,
                 type: "success"
@@ -154,6 +174,8 @@ export default {
 
         }
       } catch (error) {
+        clearTimeout(timeout);
+        this.isUploading = false;
         console.error("Error selecting folder: ", error);
       }
     },
@@ -344,5 +366,40 @@ body,
   cursor: pointer;
   color: var(--top-bar-text);
   margin-left: 10px;
+}
+
+.upload-loader {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  flex-direction: column;
+  color: white;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+
+.spinner {
+  border: 4px solid var(--top-bar-bg);
+  border-top: 4px solid #5aa3f0;
+  border-radius: 100%;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
+  margin-bottom: 1rem;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
 }
 </style>
