@@ -112,7 +112,7 @@ export default {
                     }
                 });
                 // Check if the new feature is added to columns
-                if (response.data.new_feature) {
+                if (response.data.new_feature && !this.selectedColumns.includes(response.data.new_feature)) {
                     this.updateSelectedColumns(this.selectedColumns.concat([response.data.new_feature]));
                     this.onlyShowSelected = response.data.new_feature;
                 }

@@ -201,8 +201,8 @@ export default {
             modalKey: 0,
             default_crs: '',
             modalPosition: {
-                top: "50%",
-                left: "50%",
+                top: "25%",
+                left: "25%",
                 translate: "(-50%, -50%)",
             },
             dragging: false,
@@ -251,7 +251,7 @@ export default {
         },
         selectedFeat: {
             get() {
-                this.selectedFeature = this.selectedColumns.find(col => !this.properties.includes(col) && col !== this.dateType && col !== this.idColumn) && !this.mathFormula || '';
+                this.selectedFeature = this.selectedColumns.find(col => !this.properties.includes(col) && col !== this.dateType && col !== this.idColumn && !this.mathFormula) || '';
                 return this.selectedFeature;
             },
             set(value) {
@@ -398,7 +398,7 @@ export default {
                 }
             });
             // Check if the new feature is added to columns
-            if (response.data.new_feature) {
+            if (response.data.new_feature && !this.selectedColumns.includes(response.data.new_feature)) {
                 this.updateSelectedColumns(this.selectedColumns.concat([response.data.new_feature]));
                 this.selectedFeature = response.data.new_feature;
             }

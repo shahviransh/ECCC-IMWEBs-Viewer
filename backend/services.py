@@ -1590,7 +1590,6 @@ def fetch_geojson_colors(data):
     feature = output.get("new_feature", None) or data.get("feature", "value")
     feature_statistic = data.get("feature_statistic", "mean")
 
-    # TODO: Check new_feature
     if not feature or feature == "value":
         return {}
 
