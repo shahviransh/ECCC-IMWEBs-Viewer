@@ -22,19 +22,19 @@
 <details>
   <summary>Click to expand</summary>
   <ol>
-    <li><a href="#about-the-project">About The Project</a>
+    <li><a href="#-about-the-project">About The Project</a>
       <ul>
-        <li><a href="#key-features">Key Features</a></li>
+        <li><a href="#-key-features">Key Features</a></li>
       </ul>
     </li>
-    <li><a href="#architecture">Architecture</a></li>
-    <li><a href="#getting-started">Getting Started</a>
+    <li><a href="#%EF%B8%8F-architecture">Architecture</a></li>
+    <li><a href="#-getting-started">Getting Started</a>
       <ul>
-        <li><a href="#installation">Installation</a></li>
-        <li><a href="#application-data-path">Application Data Path</a></li>
+        <li><a href="#-installation">Installation</a></li>
+        <li><a href="#-application-data-path">Application Data Path</a></li>
       </ul>
     </li>
-    <li><a href="#acknowledgments">Acknowledgments</a></li>
+    <li><a href="#-acknowledgments">Acknowledgments</a></li>
   </ol>
 </details>
 
