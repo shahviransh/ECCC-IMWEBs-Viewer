@@ -59,9 +59,6 @@ The ECCC-IMWEBs-Viewer is a desktop application designed for visualizing and ana
 *   **Formula Evaluation:** Allows users to combine numerical columns using mathematical formulas to create new features.
 
 ## Architecture
-
-![Architecture Diagram](https://github.com/user-attachments/assets/721b7fb3-e480-4809-9023-fd48b82b1f8c)
-
 The application follows a modular architecture:
 
 *   **Frontend:** Vue 3 components handle user interactions, data display, and visualization. Key components include:
