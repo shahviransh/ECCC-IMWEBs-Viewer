@@ -31,6 +31,6 @@ if ($existingProcess) {
 Start-Process -NoNewWindow -FilePath "conda" -ArgumentList "run -n venv python $backendScript" -PassThru | Out-Null
 
 # Node.js build process
-npm run prestart
 npm install
+npm run prestart
 npm run build
