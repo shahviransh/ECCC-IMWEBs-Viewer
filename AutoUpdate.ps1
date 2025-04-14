@@ -1,11 +1,5 @@
 $projectDir = "C:\ECCC-IMWEBs-Viewer"
 $backendScript = "$projectDir\backend\apppy.py"
-$repoUrl = "https://github.com/shahviransh/ECCC-IMWEBs-Viewer.git"
-
-# Check if the project directory exists, if not, clone the repository
-if (-not (Test-Path $projectDir)) {    
-    git clone $repoUrl $projectDir
-}
 
 Set-Location $projectDir
 
