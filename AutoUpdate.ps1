@@ -28,7 +28,7 @@ if ($existingProcess) {
 }
 
 # Start the Flask server in a new process
-Start-Process -NoNewWindow -FilePath "conda" -ArgumentList "run -n venv python $backendScript" -PassThru | Out-Null
+Start-Process -FilePath "conda" -ArgumentList "run -n venv python $backendScript" -RedirectStandardOutput "$projectDir\flask.log" -RedirectStandardError "$projectDir\flask_error.log"
 
 # Node.js build process
 npm install
