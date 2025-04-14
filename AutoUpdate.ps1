@@ -1,5 +1,6 @@
-$projectDir = "C:\Users\YourUser\Documents\GitHub\ECCC-IMWEBs-Viewer"
+$projectDir = "C:\ECCC-IMWEBs-Viewer"
 $backendScript = "$projectDir\backend\apppy.py"
+$repoUrl = "https://github.com/shahviransh/ECCC-IMWEBs-Viewer.git"
 
 # Check if the project directory exists, if not, clone the repository
 if (-not (Test-Path $projectDir)) {    
@@ -13,8 +14,8 @@ git fetch origin
 $remoteHash = git rev-parse origin/main
 
 # Check if the local and remote hashes are the same
-if ($localHash -eq $remoteHash) {    
-    exit 0
+if ($localHash -eq $remoteHash) {
+    exit 0   
 }
 
 # Attempt to pull changes
@@ -39,13 +40,3 @@ Start-Process -NoNewWindow -FilePath "conda" -ArgumentList "run -n venv python $
 npm run prestart
 npm install
 npm run build
-
-# Copy the built files to the web server directory
-# TODO: Update the destination directory as per web server configuration
-$sourceDir = "$projectDir\dist"
-$destDir = "C:\inetpub\wwwroot\IMWEBs-Viewer"
-if (Test-Path $destDir) {
-    Remove-Item "$destDir\*" -Recurse -Force
-} else {
-    New-Item -ItemType Directory -Path $destDir
-}
