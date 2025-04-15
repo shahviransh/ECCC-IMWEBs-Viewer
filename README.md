@@ -137,7 +137,7 @@ Launch the Application: The application connects the Vue 3 frontend with the Fla
 
 ### ❌ Export Fails: “Permission Denied” or File Not Saved
 
-If you're trying to **export a file (e.g., CSV, PNG, SHP, etc.)**, and the operation silently fails or you see a **permission error**, it's likely due to **write restrictions** on the default export directory.
+If you're trying to **export a file (e.g., CSV, PNG, SHP, etc.)**, and the operation fails or you see a **permission error**, it's likely due to **write restrictions** on the default export directory.
 
 > By default, the backend saves export files **relative to its own installation path** (see [Application Data Path](#-application-data-path)), based on the system's application data location:
 
