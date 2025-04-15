@@ -124,13 +124,6 @@ Download the latest release from the [GitHub Releases Page](https://github.com/s
     ```
     Then move the extracted application to your **Applications** folder. Launch the application as usual.
 
-### 📁 Application Data Path
-
-If you would like to change the installation location for the app during installation, please keep it to the following default directory based on your platform:
-- Windows: `LOCALAPPDATA env var` or `C:\Users\{your_user}\AppData\Local\IMWEBs-Viewer`
-- Linux: `XDG_DATA_HOME or HOME env var` or`/usr/lib/IMWEBs-Viewer`
-- macOS: `HOME env var` or `/Users/{your_user}/Library/Application Support/IMWEBs-Viewer`
-
 Launch the Application: The application connects the Vue 3 frontend with the Flask backend and should be ready to use.
 
 ## ⚠️ Common Issues
@@ -139,7 +132,7 @@ Launch the Application: The application connects the Vue 3 frontend with the Fla
 
 If you're trying to **export a file (e.g., CSV, PNG, SHP, etc.)**, and the operation fails or you see a **permission error**, it's likely due to **write restrictions** on the default export directory.
 
-> By default, the backend saves export files **relative to its own installation path** (see [Application Data Path](#-application-data-path)), based on the system's application data location
+> By default, the backend saves export files **relative to its own installation path**.
 
 ### 💡 Why This Happens:
 - If the app is installed in a **system directory** (like `/usr/lib/` or `Program Files`), the backend might not have **write access** there **without admin privileges**.
