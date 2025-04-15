@@ -34,6 +34,7 @@
         <li><a href="#-application-data-path">Application Data Path</a></li>
       </ul>
     </li>
+    <li><a href="#%EF%B8%8F-common-issues">Common Issues</a></li>
     <li><a href="#-acknowledgments">Acknowledgments</a></li>
   </ol>
 </details>
@@ -131,6 +132,27 @@ If you would like to change the installation location for the app during install
 - macOS: `HOME env var` or `/Users/{your_user}/Library/Application Support/IMWEBs-Viewer`
 
 Launch the Application: The application connects the Vue 3 frontend with the Flask backend and should be ready to use.
+
+## ⚠️ Common Issues
+
+### ❌ Export Fails: “Permission Denied” or File Not Saved
+
+If you're trying to **export a file (e.g., CSV, PNG, SHP, etc.)**, and the operation silently fails or you see a **permission error**, it's likely due to **write restrictions** on the default export directory.
+
+> By default, the backend saves export files **relative to its own installation path** (see [Application Data Path](#-application-data-path)), based on the system's application data location:
+
+### 💡 Why This Happens:
+- If the app is installed in a **system directory** (like `/usr/lib/` or `Program Files`), the backend might not have **write access** there **without admin privileges**.
+- Since the backend writes export files **relative to its own location**, it fails if that location is **read-only** for the current user.
+
+### ✅ Solution:
+To avoid export issues:
+
+1. **Change the export path to a folder the user has write access to**, such as:
+   - Desktop
+   - Downloads
+   - Documents
+   - A custom folder inside the user's home directory (e.g., `~/IMWEBs-Exports`)
 
 ## 🙌 Acknowledgments
 
