@@ -267,8 +267,6 @@ def register_routes(app, cache):
         if not (filename.lower().endswith((".tif", ".tiff", ".png"))):
             return jsonify({"error": "Only .tif or .tiff files are allowed"})
 
-        filename = safe_join(Config.PATHFILE, filename)
-
         # Validate the file path
         validation_response = validate_serve_tif_args(filename)
         if validation_response.get("error", None):

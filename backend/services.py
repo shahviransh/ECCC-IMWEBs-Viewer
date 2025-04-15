@@ -25,6 +25,7 @@ from zipfile import ZipFile, ZIP_DEFLATED
 from werkzeug.utils import safe_join
 import re
 import numexpr as ne
+from platformdirs import user_data_dir
 
 alias_mapping = {}
 global_dbs_tables_columns = {}
@@ -296,7 +297,7 @@ def fetch_data_service(data):
                         )
                     )
                 }
-                
+
                 special_chars = "!@#$%^&()_|~/`{}[]:;\"\\'<>,?"
 
                 # Replace only column names in the formula, ignoring operators
@@ -305,7 +306,10 @@ def fetch_data_service(data):
                     if col in real_col:
                         new_feature = new_feature.replace(col, real_col.get(col, col))
                     math_formula = math_formula.replace(
-                        col, re.sub(f"[{re.escape(special_chars)}]", "", col.replace(" ", "_"))
+                        col,
+                        re.sub(
+                            f"[{re.escape(special_chars)}]", "", col.replace(" ", "_")
+                        ),
                     )
 
                 # Handle division by zero by replacing zeros with a small number (e.g., 0.001) in the DataFrame
@@ -320,7 +324,9 @@ def fetch_data_service(data):
 
                 # Prepare the local_dict with column data
                 local_dict = {
-                    re.sub(f"[{re.escape(special_chars)}]", "", col.replace(" ", "_")): df[col].values
+                    re.sub(
+                        f"[{re.escape(special_chars)}]", "", col.replace(" ", "_")
+                    ): df[col].values
                     for col in numerical_columns
                 }
 
@@ -332,7 +338,11 @@ def fetch_data_service(data):
                     for col_name in numerical_columns:
                         for col_formula in math_formulas:
                             if (
-                                re.sub(f"[{re.escape(special_chars)}]", "", col.replace(" ", "_"))
+                                re.sub(
+                                    f"[{re.escape(special_chars)}]",
+                                    "",
+                                    col.replace(" ", "_"),
+                                )
                                 in col_formula
                             ):
                                 # Evaluate the formula and assign it to the new column
@@ -1676,6 +1686,10 @@ def process_geospatial_data(data):
     image_urls = []
     default_crs = None
 
+    data_dir = user_data_dir("IMWEBs-Viewer", False)
+    temp_dir = os.path.join(data_dir, "TempFiles")
+    os.makedirs(temp_dir, exist_ok=True)
+
     for file_path in file_paths:
         toolTipKey = f"{(os.path.basename(file_path),os.path.basename(file_path))}"
         # Check if the file is a shapefile (.shp)
@@ -1786,7 +1800,9 @@ def process_geospatial_data(data):
                 "field_names": properties,
             }
             geojson_metadata = {}
-            geojson_path = os.path.splitext(file_path)[0] + "_output.geojson"
+            geojson_path = os.path.join(
+                temp_dir, os.path.basename(file_path) + "_output.geojson"
+            )
 
             # Check if a GeoJSON file already exists and extract metadata
             if os.path.exists(geojson_path):
@@ -1863,8 +1879,8 @@ def process_geospatial_data(data):
 
             if not source_srs.IsSame(target_srs):
                 # Reproject the raster to EPSG:4326
-                reprojected_file_path = (
-                    os.path.splitext(file_path)[0] + "_reprojected.tif"
+                reprojected_file_path = os.path.join(
+                    temp_dir, os.path.basename(file_path) + "_reprojected.tif"
                 )
                 (
                     gdal.Warp(reprojected_file_path, raster_dataset, dstSRS="EPSG:4326")
@@ -1889,7 +1905,9 @@ def process_geospatial_data(data):
                 [y_max, x_max],
             ]
 
-            output_image_path = os.path.splitext(file_path)[0] + "_rendered.png"
+            output_image_path = os.path.join(
+                temp_dir, os.path.basename(file_path) + "_rendered.png"
+            )
 
             # Read raster data and render to an image
             band = raster_dataset.GetRasterBand(1)  # Use the first raster band
@@ -1926,7 +1944,7 @@ def process_geospatial_data(data):
             # Save the image URL for each GeoTIFF path only if the combined bounds are not far apart
             if overlap:
                 image_urls.append(
-                    f"/api/geotiff/{os.path.relpath(output_image_path, Config.PATHFILE)}"
+                    f"/api/geotiff/{output_image_path}"
                 )
         else:
             return {

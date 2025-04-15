@@ -60,6 +60,7 @@ pandas
 pbr
 pefile
 pillow 
+platformdirs
 pure_eval
 pycparser 
 Pygments

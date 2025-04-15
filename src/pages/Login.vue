@@ -5,8 +5,6 @@
     </video>
     <div class="loginDiv">
         <div class="loginPanel">
-            <div class="site-logo">
-            </div>
             <div class="panel-body">
                 <fieldset>
                     <legend class="panel-title">Sign in to IMWEBs Viewer</legend>
@@ -45,6 +43,7 @@
                         <button type="submit" class="loginButton">Sign in</button>
                         <button type="button" class="contactAdminButton" @click="showContactForm = true">Contact
                             Admin</button>
+                        <button type="button" class="helpButton" @click="showHelpPopup = true">Help</button>
                         <p v-if="error" class="errorMessage">{{ error }}</p>
                     </form>
                 </fieldset>
@@ -76,6 +75,18 @@
             </form>
         </div>
     </div>
+    <div v-if="showHelpPopup" class="contactFormOverlay">
+        <div class="helpPopup">
+            <h3>Help</h3>
+            <p>If you are having trouble with the website, contact admin or use the desktop app with the same functionality and features as the web app.</p>
+            <p>
+                <a href="https://github.com/shahviransh/ECCC-IMWEBs-Viewer" target="_blank">
+                    Click here and follow installation instructions.
+                </a>
+            </p>
+            <button type="button" class="cancelButton" @click="showHelpPopup = false">Close</button>
+        </div>
+    </div>
     <div class="logos">
         <img src="../assets/ECCC.png" alt="ECCC Logo" class="ecccLogo" />
         <img src="../assets/UoG.png" alt="University of Guelph Logo" class="uogLogo" />
@@ -97,7 +108,8 @@ export default {
             captchaToken: null,
             formSubmitUrl: `https://formsubmit.co/${import.meta.env.VITE_FORM_SUBMIT_ID}`,
             sitekey: import.meta.env.VITE_HCAPTCHA_SITE_KEY,
-            cc: import.meta.env.VITE_RECIPIENTS
+            cc: import.meta.env.VITE_RECIPIENTS,
+            showHelpPopup: false
         };
     },
     props: {
@@ -149,7 +161,7 @@ body {
     position: relative;
     min-height: 100vh;
     margin: 0;
-    font-family: Avenir, Helvetica, Arial, sans-serif;
+    font-family: Avenir, Helvetica;
 }
 
 .loginDiv {
@@ -218,7 +230,7 @@ body {
 
 .loginButton {
     width: 100%;
-    padding: 12px;
+    padding: 10px;
     background-color: #007bff;
     color: white;
     border: none;
@@ -275,7 +287,7 @@ body {
 
 .contactAdminButton {
     width: 100%;
-    padding: 12px;
+    padding: 10px;
     background-color: #28a745;
     color: white;
     border: none;
@@ -344,6 +356,49 @@ body {
 
 .cancelButton:hover {
     background-color: #c82333;
+}
+
+.helpButton {
+    width: 100%;
+    padding: 10px;
+    background-color: #ffc107;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.helpButton:hover {
+    background-color: #e0a800;
+}
+
+.helpPopup {
+    background: white;
+    padding: 10px;
+    border-radius: 8px;
+    width: 400px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    text-align: center;
+}
+
+.helpPopup h3 {
+    text-align: center;
+}
+
+.helpPopup p {
+    font-size: 1rem;
+    color: #333;
+}
+
+.helpPopup a {
+    color: #007bff;
+    text-decoration: none;
+}
+
+.helpPopup a:hover {
+    text-decoration: underline;
 }
 
 .logos {

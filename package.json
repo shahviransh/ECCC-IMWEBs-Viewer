@@ -3,10 +3,10 @@
   "private": true,
   "description": "A brief description of your app.",
   "author": "Viransh Shah",
-  "version": "0.2.5",
+  "version": "0.2.6",
   "type": "module",
   "scripts": {
-    "prestart": "node convert-package.js",
+    "prestart": "node sync.js",
     "dev": "concurrently \"npm run vue-dev\" \"npm run python-dev\"",
     "python-dev": "python -Xfrozen_modules=off -m debugpy --listen 5678 --wait-for-client backend/apppy.py",
     "vue-dev": "vite",
@@ -15,8 +15,7 @@
     "electron": "npx electron . && vite",
     "electron:build": "vite build && electron-builder",
     "tauri": "node src-tauri/main.js && tauri",
-    "tauri:build": "node src-tauri/main.js && tauri build && node src-tauri/move.js",
-    "sync-version": "node sync-version.js"
+    "tauri:build": "node src-tauri/main.js && tauri build && node src-tauri/move.js"
   },
   "dependencies": {
     "@hcaptcha/vue3-hcaptcha": "^1.3.0",
