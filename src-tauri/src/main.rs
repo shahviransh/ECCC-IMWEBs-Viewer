@@ -3,7 +3,6 @@
 
 use reqwest::Client;
 use std::{ env, process::Command};
-use std::path::PathBuf;
 
 #[cfg(target_os = "windows")]
 const CREATE_NO_WINDOW: u32 = 0x08000000;
