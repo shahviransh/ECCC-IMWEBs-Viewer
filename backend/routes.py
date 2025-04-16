@@ -266,6 +266,8 @@ def register_routes(app, cache):
         # Ensure the file has a .tif or .tiff extension
         if not (filename.lower().endswith((".tif", ".tiff", ".png"))):
             return jsonify({"error": "Only .tif or .tiff files are allowed"})
+        
+        filename = safe_join(Config.TEMPDIR, filename)
 
         # Validate the file path
         validation_response = validate_serve_tif_args(filename)

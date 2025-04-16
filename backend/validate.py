@@ -282,7 +282,7 @@ def validate_export_map_args(image, form_data):
 
 
 def validate_serve_tif_args(filename):
-    if not os.path.exists(filename):
+    if filename and not os.path.exists(filename):
         return {"error": "Invalid path specified for the GeoTIFF file."}
     return {"filename": filename}
 

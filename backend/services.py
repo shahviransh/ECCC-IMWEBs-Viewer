@@ -25,13 +25,13 @@ from zipfile import ZipFile, ZIP_DEFLATED
 from werkzeug.utils import safe_join
 import re
 import numexpr as ne
-from platformdirs import user_data_dir
 
 alias_mapping = {}
 global_dbs_tables_columns = {}
 os.environ["PROJ_LIB"] = Config.PROJ_LIB
 os.environ["GDAL_DATA"] = Config.GDAL_DATA
 bmp_db_path_global = None
+os.makedirs(Config.TEMPDIR, exist_ok=True)
 
 
 def fetch_data_service(data):
@@ -1686,10 +1686,6 @@ def process_geospatial_data(data):
     image_urls = []
     default_crs = None
 
-    data_dir = user_data_dir("IMWEBs-Viewer", False)
-    temp_dir = os.path.join(data_dir, "TempFiles")
-    os.makedirs(temp_dir, exist_ok=True)
-
     for file_path in file_paths:
         toolTipKey = f"{(os.path.basename(file_path),os.path.basename(file_path))}"
         # Check if the file is a shapefile (.shp)
@@ -1801,7 +1797,7 @@ def process_geospatial_data(data):
             }
             geojson_metadata = {}
             geojson_path = os.path.join(
-                temp_dir, os.path.basename(file_path) + "_output.geojson"
+                Config.TEMPDIR, os.path.basename(file_path) + "_output.geojson"
             )
 
             # Check if a GeoJSON file already exists and extract metadata
@@ -1880,7 +1876,7 @@ def process_geospatial_data(data):
             if not source_srs.IsSame(target_srs):
                 # Reproject the raster to EPSG:4326
                 reprojected_file_path = os.path.join(
-                    temp_dir, os.path.basename(file_path) + "_reprojected.tif"
+                    Config.TEMPDIR, os.path.basename(file_path) + "_reprojected.tif"
                 )
                 (
                     gdal.Warp(reprojected_file_path, raster_dataset, dstSRS="EPSG:4326")
@@ -1906,7 +1902,7 @@ def process_geospatial_data(data):
             ]
 
             output_image_path = os.path.join(
-                temp_dir, os.path.basename(file_path) + "_rendered.png"
+                Config.TEMPDIR, os.path.basename(file_path) + "_rendered.png"
             )
 
             # Read raster data and render to an image
@@ -1944,7 +1940,7 @@ def process_geospatial_data(data):
             # Save the image URL for each GeoTIFF path only if the combined bounds are not far apart
             if overlap:
                 image_urls.append(
-                    f"/api/geotiff/{output_image_path}"
+                    f"/api/geotiff/{os.path.basename(output_image_path)}"
                 )
         else:
             return {

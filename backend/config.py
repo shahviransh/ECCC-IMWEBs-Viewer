@@ -1,6 +1,6 @@
 import os
 import sys
-
+from platformdirs import user_data_dir
 
 class Config:
     PATHFILE_EXPORT = PATHFILE = (
@@ -21,3 +21,4 @@ class Config:
         else os.path.join(conda_prefix, lib, "share/gdal")
     )
     LOOKUP = "Jenette_Creek_Watershed/Database/lookup.db3"
+    TEMPDIR = os.path.join(user_data_dir("IMWEBs-Viewer", False), "TempFiles")
