@@ -188,7 +188,7 @@ rm -rf ~/Library/Application\ Support/IMWEBs-Viewer/TempFiles
     - Yongbo Liu (ECCC)
     - Wanhong Yang (UoG)
     - Jaison Thomas (UoG)
-    - Md Bodruddoza (Uog)
+    - Md Bodruddoza (UoG)
     - Liu Geography
     - Michael Yu
 - Open-Source Maintainers:
