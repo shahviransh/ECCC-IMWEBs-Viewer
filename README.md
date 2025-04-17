@@ -132,7 +132,7 @@ Launch the Application: The application connects the Vue 3 frontend with the Fla
 
 If you're trying to **export a file (e.g., CSV, PNG, SHP, etc.)**, and the operation fails or you see a **permission error**, it's likely due to **write restrictions** on the default export directory.
 
-> By default, the backend saves export files **relative to its own installation path**.
+> By default, the backend saves export files **relative to the IMWEBs-Viewer app’s installation directory**, typically at: `{IMWEBs-Viewer App Path}/_up_/backend/apppy/_internal`
 
 ### 💡 Why This Happens:
 - If the app is installed in a **system directory** (like `/usr/lib/` or `Program Files`), the backend might not have **write access** there **without admin privileges**.
