@@ -533,7 +533,7 @@ def save_to_file(
     # Set the file path
     file_path = (
         safe_join(Config.PATHFILE_EXPORT, export_path)
-        if not os.path.isabs(export_path)
+        if not os.path.isabs(export_path) or os.environ.get("WAITRESS") == "1"
         else export_path
     )
 
@@ -887,7 +887,7 @@ def get_files_and_folders(data):
     if (
         os.path.isabs(folder_path)
         and data.get("is_tauri", None) == "true"
-        and os.environ.get("RUNNING_UNDER_WAITRESS") != "1"
+        and os.environ.get("WAITRESS") != "1"
     ):
         # Update Config.PATHFILE to point to the parent directory of the provided absolute path
         Config.PATHFILE = os.path.dirname(folder_path)

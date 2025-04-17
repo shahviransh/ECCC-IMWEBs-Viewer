@@ -267,6 +267,7 @@ def register_routes(app, cache):
         if not (filename.lower().endswith((".tif", ".tiff", ".png"))):
             return jsonify({"error": "Only .tif or .tiff files are allowed"})
         
+        # Ensure the file is in the TEMP directory
         filename = safe_join(Config.TEMPDIR, filename)
 
         # Validate the file path
