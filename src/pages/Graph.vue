@@ -178,12 +178,11 @@ export default {
 
                 if (!window.__TAURI__) {
                     // Download the file using the browser as a blob
-                    const { default: DOMPurify } = await import("dompurify");
                     const blob = new Blob([response.data], { type: response.headers['content-type'] });
                     const link = document.createElement('a');
                     const url = URL.createObjectURL(blob);
                     link.href = url;
-                    link.setAttribute('download', DOMPurify.sanitize(this.exportFilename));
+                    link.download = this.exportFilename;
                     document.body.appendChild(link);
                     link.click();
                     document.body.removeChild(link);
