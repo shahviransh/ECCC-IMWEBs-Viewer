@@ -128,9 +128,9 @@ Launch the Application: The application connects the Vue 3 frontend with the Fla
 
 ## ⚠️ Common Issues
 
-### ❌ Export Fails: “Permission Denied” or File Not Saved
+### ❌ Can't Find Exported Files or Export Fails: “Permission Denied” or Files Not Saved
 
-If you're trying to **export a file (e.g., CSV, PNG, SHP, etc.)**, and the operation fails or you see a **permission error**, it's likely due to **write restrictions** on the default export directory.
+If you're trying to **export files (e.g., CSV, PNG, SHP, etc.)**, and the operation fails or you see a **permission error**, it's likely due to **write restrictions** on the default export directory. If you **can’t find the exported files**, see below.
 
 > By default, the backend saves export files **relative to the IMWEBs-Viewer app’s installation directory**, typically at: `{IMWEBs-Viewer App Path}/_up_/backend/apppy/_internal`
 
