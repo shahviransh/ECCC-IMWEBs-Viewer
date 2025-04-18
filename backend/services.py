@@ -316,7 +316,7 @@ def fetch_data_service(data):
                 if "/" in formula_symbols:
                     # Extract the column names involved in division (after '/')
                     div_columns = re.findall(
-                        r"(df\['([^']*)'\]|\d+(\.\d+)?)\s*\/\s*(df\['([^']*)'\]",
+                        r"(df\['([^']*)'\]|\d+(\.\d+)?)\s*\/\s*df\['([^']*)'\]",
                         formula,
                     )
                     for col_denum in div_columns:

@@ -18,7 +18,7 @@
 
             <h4>Selected Columns:</h4>
             <div class="buttons">
-                <button v-for="col in selectColumns" :key="col" :disabled="mode === 'auto'"
+                <button v-for="col in selectColumns" :key="col" :disabled="mode === 'auto' || stack.includes(col)"
                     @click="handleColumnClick(col)">
                     {{ col }}
                 </button>
@@ -29,7 +29,8 @@
                     {{ num }}
                 </button>
                 <button class="decimal" @click="handleDecimalClick">.</button>
-                <button v-for="operator in operators" :key="operator" class="operator" @click="handleOperatorClick(operator)">
+                <button v-for="operator in operators" :key="operator" class="operator"
+                    @click="handleOperatorClick(operator)">
                     {{ operator }}
                 </button>
                 <button class="backspace" @click="handleBackspace">⌫</button>
@@ -51,6 +52,7 @@ export default {
             selectedOperator: null,
             numbers: Array.from({ length: 10 }, (_, i) => i.toString()),
             operators: ["+", "-", "*", "/"],
+            stack: [],
         };
     },
     computed: {
@@ -64,10 +66,12 @@ export default {
     methods: {
         ...mapActions(["updateCalculation", "pushMessage"]),
         handleColumnClick(col) {
-            if (this.mode === "manual") {
-                this.preview += col;
-                this.saveFormula();
+            if (this.mode !== "manual") {
+                return;
             }
+            this.preview += col;
+            this.stack.push(col);
+            this.saveFormula();
         },
         handleNumberClick(num) {
             if (this.mode === "auto" && !this.selectedOperator) {
@@ -92,10 +96,10 @@ export default {
                 // Check if currentNumber is not empty, then append operator to it and selectedColumns
                 // If empty, append operator to selectedColumns
                 this.preview = this.currentNumber ? this.selectColumns
-                .map((col) => `${this.currentNumber}${operator}${col}`)
-                .join(", ") : this.selectColumns
-                .map((col) => `${col}`)
-                .join(` ${operator} `);
+                    .map((col) => `${this.currentNumber}${operator}${col}`)
+                    .join(", ") : this.selectColumns
+                        .map((col) => `${col}`)
+                        .join(` ${operator} `);
                 this.selectedOperator = operator;
             } else if (this.mode === "manual") {
                 this.preview += ` ${operator} `;
@@ -104,7 +108,16 @@ export default {
         },
         handleBackspace() {
             if (this.mode === "manual") {
-                this.preview = this.preview.slice(0, -1);
+                const lastChar = this.preview.slice(-1);
+                if (lastChar === " ") {
+                    this.preview = this.preview.slice(0, -3); // Remove operator and spaces
+                } else if (this.operators.includes(lastChar)) {
+                    this.preview = this.preview.slice(0, -2); // Remove operator and space
+                } else if (this.numbers.includes(lastChar) || lastChar === ".") {
+                    this.preview = this.preview.slice(0, -1); // Remove last number or decimal
+                } else {
+                    this.preview = this.preview.replace(this.stack.pop(), ""); // Remove last column
+                }
             } else if (this.mode === "auto") {
                 if (this.currentNumber) {
                     this.currentNumber = this.currentNumber.slice(0, -1);
@@ -218,7 +231,7 @@ export default {
 
 .calculator-grid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr); 
+    grid-template-columns: repeat(3, 1fr);
     gap: 5px;
     margin-top: 10px;
 }
@@ -248,11 +261,11 @@ button:disabled {
 }
 
 .number {
-    grid-column: span 1; 
+    grid-column: span 1;
 }
 
 .operator {
-    background: var(--active-bg); 
+    background: var(--active-bg);
     grid-column: span 1;
 }
 
@@ -261,7 +274,7 @@ button:disabled {
 }
 
 .backspace {
-    background: #f44336; 
+    background: #f44336;
     color: #fff;
     grid-column: span 1;
     font-size: 20px;
@@ -269,7 +282,7 @@ button:disabled {
 }
 
 .equal {
-    background: #d1c4e9; 
+    background: #d1c4e9;
     color: #000;
     grid-column: span 2;
     font-size: 20px;
