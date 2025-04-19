@@ -41,7 +41,7 @@ const store = createStore({
     exportFormat: "csv",
     graphType: "scatter",
     multiGraphType: [],
-    exportOptions: { data: false, stats: false },
+    exportOptions: { table: true, stats: false },
     defaultInterval: "",
     defaultStartDate: "",
     defaultEndDate: "",

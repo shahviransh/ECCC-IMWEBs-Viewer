@@ -13,7 +13,7 @@ import Multiselect from 'vue-multiselect';
 export default {
     data() {
         return {
-            selectedOptions: [],
+            selectedOptions: ['Table'],
         };
     },
     components: {

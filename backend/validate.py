@@ -56,12 +56,12 @@ def validate_get_data_args(request_args):
         "start_date": {
             "type": "string",
             "required": True,
-            "regex": r"^\d{4}-\d{2}-\d{2}$|^$",
+            "regex": r"^\d*|^\d{4}-\d{2}-\d{2}$|^$",
         },
         "end_date": {
             "type": "string",
             "required": True,
-            "regex": r"^\d{4}-\d{2}-\d{2}$|^$"
+            "regex": r"^\d*|^\d{4}-\d{2}-\d{2}$|^$"
         },
         "date_type": {
             "type": "string",
@@ -140,12 +140,12 @@ def validate_export_data_args(request_args):
         "start_date": {
             "type": "string",
             "required": True,
-            "regex": r"^\d{4}-\d{2}-\d{2}$|^$",
+            "regex": r"^\d*|^\d{4}-\d{2}-\d{2}$|^$",
         },
         "end_date": {
             "type": "string",
             "required": True,
-            "regex": r"^\d{4}-\d{2}-\d{2}$|^$",
+            "regex": r"^\d*|^\d{4}-\d{2}-\d{2}$|^$",
         },
         "date_type": {
             "type": "string",
@@ -293,7 +293,7 @@ def getUserValidationError(errors):
     """
     # Mapping regex patterns to human-readable messages
     regex_messages = {
-        r"^\d{4}-\d{2}-\d{2}$|^$": "should be in the format YYYY-MM-DD (e.g., 2024-01-20).",
+        r"^\d*|^\d{4}-\d{2}-\d{2}$|^$": "should be in the format YYYY-MM-DD (e.g., 2024-01-20) or Day or Month or Year.",
         r"^\d+(\.\d+)?$": "should be a number (e.g., 123.45).",
         r"^[\w,\s-]+$$": "should contain only letters, numbers, spaces, commas, underscore and hyphens.",
         r"^\s*|[\w\s-]+$": "should contain only letters, numbers, spaces, underscores and hyphens.",

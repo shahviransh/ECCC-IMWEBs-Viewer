@@ -272,9 +272,9 @@ def fetch_data_service(data):
                 formula = math_formula
                 formula_symbols = math_formula
                 for col in numerical_columns:
-                    formula = formula.replace(col, f"df['{col}']")
+                    formula = formula.replace(col, f"df['{col}']", 1)
                     # Remove column names from the formula symbols
-                    formula_symbols = formula_symbols.replace(col, "")
+                    formula_symbols = formula_symbols.replace(col, "", 1)
 
                 # Check if formula only contains allowed mathematical operators and column names
                 formula_symbols = set(list(formula_symbols))
@@ -298,7 +298,7 @@ def fetch_data_service(data):
                     )
                 }
 
-                special_chars = "!@#$%^&()_|~/`{}[]:;\"\\'<>,?"
+                special_chars = "!@#$%^&()_+-*/.|~/`{}[]:;\"\\'<>,?0123456789 "
 
                 # Replace only column names in the formula, ignoring operators
                 new_feature = math_formula
@@ -308,8 +308,11 @@ def fetch_data_service(data):
                     math_formula = math_formula.replace(
                         col,
                         re.sub(
-                            f"[{re.escape(special_chars)}]", "", col.replace(" ", "_")
+                            f"[{re.escape(special_chars)}]",
+                            "",
+                            col
                         ),
+                        1,
                     )
 
                 # Handle division by zero by replacing zeros with a small number (e.g., 0.001) in the DataFrame
@@ -325,8 +328,10 @@ def fetch_data_service(data):
                 # Prepare the local_dict with column data
                 local_dict = {
                     re.sub(
-                        f"[{re.escape(special_chars)}]", "", col.replace(" ", "_")
-                    ): df[col].values
+                        f"[{re.escape(special_chars)}]",
+                        "",
+                        col
+                    ).strip(): df[col].values
                     for col in numerical_columns
                 }
 
@@ -341,7 +346,7 @@ def fetch_data_service(data):
                                 re.sub(
                                     f"[{re.escape(special_chars)}]",
                                     "",
-                                    col.replace(" ", "_"),
+                                    col_name
                                 )
                                 in col_formula
                             ):
@@ -351,7 +356,7 @@ def fetch_data_service(data):
                                 )
                 else:
                     # Evaluate the formula and assign it to the new column
-                    df[new_feature] = ne.evaluate(math_formula, local_dict=local_dict)
+                    df[new_feature] = ne.evaluate(math_formula.strip(), local_dict=local_dict)
             except Exception as e:
                 return {"error": f"Error evaluating formula: {str(e)}"}
 
@@ -402,7 +407,7 @@ def export_data_service(data, is_empty=False):
         output_format = data.get("export_format", "csv")
         output_path = data.get("export_path", "dataExport")
         # Handle options json stringify
-        options = json.loads(data.get("options", "{'data': true, 'stats': true}"))
+        options = json.loads(data.get("options", "{'table': true, 'stats': true}"))
         columns_list = (
             json.loads(data.get("columns")) if data.get("columns") != "All" else "All"
         )
@@ -1939,9 +1944,7 @@ def process_geospatial_data(data):
 
             # Save the image URL for each GeoTIFF path only if the combined bounds are not far apart
             if overlap:
-                image_urls.append(
-                    f"/api/geotiff/{os.path.basename(output_image_path)}"
-                )
+                image_urls.append(f"/api/geotiff/{os.path.basename(output_image_path)}")
         else:
             return {
                 "error": "Unsupported file type. Only .shp and .tif/.tiff are supported."
