@@ -182,7 +182,7 @@ export default {
                     const link = document.createElement('a');
                     const url = URL.createObjectURL(blob);
                     link.href = url;
-                    link.download = this.exportFilename;
+                    link.setAttribute('download', this.exportFilename);
                     document.body.appendChild(link);
                     link.click();
                     document.body.removeChild(link);
