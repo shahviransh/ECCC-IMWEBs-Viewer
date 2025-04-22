@@ -133,7 +133,6 @@ def fetch_data_service(data):
                     df = df_temp
                 else:
                     # Case of All columns, rename columns to table-column format
-                    # TODO: Check All columns case
                     if is_all_columns:
                         for col in df.columns:
                             if col in df_temp.columns:
@@ -151,7 +150,7 @@ def fetch_data_service(data):
                             table["table"]
                         ):
                             merge_on_columns.append(col)
-                    df = pd.merge(df, df_temp, on=merge_on_columns, how="outer")
+                    df = pd.merge(df, df_temp, on=merge_on_columns, how="inner")
                     # Drop rows with NaN in the required columns
                     df.dropna(inplace=True)
             except Exception as e:
