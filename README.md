@@ -189,6 +189,7 @@ rm -rf ~/Library/Application\ Support/IMWEBs-Viewer/TempFiles
     - Wanhong Yang (UoG)
     - Jaison Thomas (UoG)
     - Md Bodruddoza (UoG)
+    - Lane D Buryta (UoG)
     - Liu Geography
     - Michael Yu
 - Open-Source Maintainers:
