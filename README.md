@@ -9,11 +9,7 @@
 </div>
 
 <div align="center">
-  <iframe width="560" height="315" 
-          src="https://www.youtube.com/embed/KNyyVSygOWY" 
-          title="IMWEBs Viewer Demo" frameborder="0" 
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-          allowfullscreen></iframe>
+  [![IMWEBs Viewer Demo](https://img.youtube.com/vi/KNyyVSygOWY/0.jpg)](https://www.youtube.com/watch?v=KNyyVSygOWY)
   <p>🎥 See the application in action</p>
 </div>
 
