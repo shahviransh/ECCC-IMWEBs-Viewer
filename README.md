@@ -9,10 +9,12 @@
 </div>
 
 <div align="center">
-  <a href="https://github.com/shahviransh/eccc-imwebs-viewer">
-    <img src="https://github.com/user-attachments/assets/f45c9ee9-ad2f-40f4-bb60-e9bbd1472c45" alt="Project Demo">
-    <p>🎥 See the application in action</p>
-  </a>
+  <iframe width="560" height="315" 
+          src="https://www.youtube.com/embed/xAWRXelykF0" 
+          title="IMWEBs Viewer Demo" frameborder="0" 
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+          allowfullscreen></iframe>
+  <p>🎥 See the application in action</p>
 </div>
 
 ---
