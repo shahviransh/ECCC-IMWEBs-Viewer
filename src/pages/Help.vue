@@ -338,7 +338,7 @@
                         <li><strong>Web App:</strong> You *upload* folders to the server. It's accessible via a web
                             browser. Find the link on the project's main <a
                                 href="https://github.com/shahviransh/ECCC-IMWEBs-Viewer" target="_blank">GitHub page</a>
-                            (check the README).</li>
+                            (check the About).</li>
                     </ul>
                 </li>
                 <li><strong>Exporting:</strong>
