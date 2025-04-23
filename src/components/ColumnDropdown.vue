@@ -5,8 +5,8 @@
             <div class="form-container">
                 <div class="form-group">
                     <label for="column-select">Select Columns:</label>
-                    <select id="column-select" class="dropdown" v-model="selectColumns" multiple
-                        :style="{ height: heightVar() }" @mousedown.prevent="toggleSelection($event, selectColumns)">
+                    <select id="column-select" class="dropdown" v-model="selectedColumns" multiple
+                        :style="{ height: heightVar() }" @mousedown.prevent="toggleSelection($event)">
                         <option v-for="column in columns" :key="column" :value="column" :title="findTableName(column)"
                             @click.stop>
                             {{ column }}
@@ -17,8 +17,8 @@
             <div class="form-container">
                 <div class="form-group">
                     <label for="export-column-select">Export Select Columns:</label>
-                    <select id="export-column-select" class="dropdown" v-model="expColumns" multiple
-                        :style="{ height: heightVar() }" @mousedown.prevent="toggleSelection($event, expColumns, true)">
+                    <select id="export-column-select" class="dropdown" v-model="exportColumns" multiple
+                        :style="{ height: heightVar() }" @mousedown.prevent="toggleSelection($event, true)">
                         <option v-for="column in columns" :key="column" :value="column" :title="findTableName(column)"
                             @click.stop>
                             {{ column }}
@@ -43,9 +43,9 @@
             <div class="form-container">
                 <div class="form-group">
                     <label for="y-axis-select">Y-Axis:</label>
-                    <select id="y-axis-select" class="dropdown" v-model="yaxis" multiple
+                    <select id="y-axis-select" class="dropdown" v-model="yAxis" multiple
                         :style="{ height: heightVar(undefined, true) }"
-                        @mousedown.prevent="toggleSelection($event, yaxis)">
+                        @mousedown.prevent="toggleSelection($event)">
                         <option v-for="column in columns.filter(col => col !== dateType)" :key="column" :value="column"
                             :title="findTableName(column)" @click.stop>
                             {{ column }}
@@ -70,36 +70,12 @@ export default {
     },
     computed: {
         // Binding selected columns directly from Vuex
-        selectColumns: {
-            get() {
-                return this.selectedColumns; // Get the value from Vuex
-            },
-            set(value) {
-                this.updateSelectedColumns(value); // Update Vuex state on change
-            }
-        },
-        expColumns: {
-            get() {
-                return this.exportColumns;
-            },
-            set(value) {
-                this.updateExportColumns(value);
-            }
-        },
         xaxis: {
             get() {
                 return this.xAxis;
             },
             set(value) {
                 this.updateXAxis(value);
-            }
-        },
-        yaxis: {
-            get() {
-                return this.yAxis
-            },
-            set(value) {
-                this.updateYAxis(value);
             }
         },
         ...mapState(['columns', 'ids', 'selectedColumns', 'theme', 'idColumn', 'selectedGeoFolders', 'dateType', 'tooltipColumns', 'exportColumns', 'pageTitle', 'xAxis', 'yAxis', 'dateType'])
@@ -160,10 +136,11 @@ export default {
                 return isTauri ? '36vh' : '34vh';
             }
         },
-        toggleSelection(event, modelArray, exportColumns = false) {
+        toggleSelection(event, exportColumns = false) {
             const option = event.target;
             if (option.tagName === 'OPTION') {
                 const optionValue = option.value;
+                let modelArray = exportColumns ? [...this.exportColumns] : [...this.selectedColumns];
                 const index = modelArray.indexOf(optionValue);
                 if (index > -1) {
                     modelArray.splice(index, 1); // Remove if already selected
