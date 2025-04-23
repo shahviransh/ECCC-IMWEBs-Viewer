@@ -166,6 +166,11 @@ Remove-Item -Recurse -Force "$env:LOCALAPPDATA\IMWEBs-Viewer\TempFiles"
 rm -rf ~/Library/Application\ Support/IMWEBs-Viewer/TempFiles
 ```
 
+## 📄 Technical Report
+For a detailed explanation of the application's architecture, data processing workflows, and design decisions, please refer to the full technical report:
+
+[👉 Download the IMWEBs-Viewer Technical Report (.docx)](https://github.com/shahviransh/ECCC-IMWEBs-Viewer/raw/refs/heads/main/Technical%20Report.docx)
+
 ## 🙌 Acknowledgments
 
 - Core Technologies:
