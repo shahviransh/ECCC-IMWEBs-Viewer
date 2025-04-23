@@ -306,11 +306,7 @@ def fetch_data_service(data):
                         new_feature = new_feature.replace(col, real_col.get(col, col))
                     math_formula = math_formula.replace(
                         col,
-                        re.sub(
-                            f"[{re.escape(special_chars)}]",
-                            "",
-                            col
-                        ),
+                        re.sub(f"[{re.escape(special_chars)}]", "", col),
                         1,
                     )
 
@@ -326,11 +322,9 @@ def fetch_data_service(data):
 
                 # Prepare the local_dict with column data
                 local_dict = {
-                    re.sub(
-                        f"[{re.escape(special_chars)}]",
-                        "",
-                        col
-                    ).strip(): df[col].values
+                    re.sub(f"[{re.escape(special_chars)}]", "", col)
+                    .strip(): df[col]
+                    .values
                     for col in numerical_columns
                 }
 
@@ -342,11 +336,7 @@ def fetch_data_service(data):
                     for col_name in numerical_columns:
                         for col_formula in math_formulas:
                             if (
-                                re.sub(
-                                    f"[{re.escape(special_chars)}]",
-                                    "",
-                                    col_name
-                                )
+                                re.sub(f"[{re.escape(special_chars)}]", "", col_name)
                                 in col_formula
                             ):
                                 # Evaluate the formula and assign it to the new column
@@ -355,7 +345,9 @@ def fetch_data_service(data):
                                 )
                 else:
                     # Evaluate the formula and assign it to the new column
-                    df[new_feature] = ne.evaluate(math_formula.strip(), local_dict=local_dict)
+                    df[new_feature] = ne.evaluate(
+                        math_formula.strip(), local_dict=local_dict
+                    )
             except Exception as e:
                 return {"error": f"Error evaluating formula: {str(e)}"}
 
@@ -472,7 +464,7 @@ def fetch_data_from_db(
     if columns != "All":
         columns_list = columns
         real_columns = [
-            alias_mapping.get(table_name, {}).get("columns", {}).get(col, col)
+            f'"{alias_mapping.get(table_name, {}).get("columns", {}).get(col, col)}"'
             for col in columns_list
         ]
         columns = ",".join(real_columns)
@@ -1266,7 +1258,11 @@ def get_multi_columns_and_time_range(data):
         end_date = min(end_dates)
 
         # Combine all columns with date_type as first column
-        columns = [multi_columns_time_range[0]["date_type"]] if multi_columns_time_range[0]["date_type"] else []
+        columns = (
+            [multi_columns_time_range[0]["date_type"]]
+            if multi_columns_time_range[0]["date_type"]
+            else []
+        )
 
         # Check if ID column is present in any of the tables
         include_id = any(
