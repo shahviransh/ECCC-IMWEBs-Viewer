@@ -31,10 +31,11 @@
     <li><a href="#-getting-started">Getting Started</a>
       <ul>
         <li><a href="#-installation">Installation</a></li>
-        <li><a href="#-application-data-path">Application Data Path</a></li>
       </ul>
     </li>
     <li><a href="#%EF%B8%8F-common-issues">Common Issues</a></li>
+    <li><a href="#-freeing-up-space-after-uninstalling">Freeing Up Space After Uninstalling</a></li>
+    <li><a href="#-technical-report">Technical Report</a></li>
     <li><a href="#-acknowledgments">Acknowledgments</a></li>
   </ol>
 </details>
