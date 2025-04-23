@@ -8,12 +8,11 @@
   </p>
 </div>
 
-<div align="center">
-  <a href="https://github.com/shahviransh/eccc-imwebs-viewer">
-    <img src="https://github.com/user-attachments/assets/f45c9ee9-ad2f-40f4-bb60-e9bbd1472c45" alt="Project Demo">
-    <p>🎥 See the application in action</p>
+<p align="center">
+  <a href="https://www.youtube.com/watch?v=KNyyVSygOWY">
+    <img src="https://img.youtube.com/vi/KNyyVSygOWY/0.jpg" alt="IMWEBs Viewer Demo" /><br/>🎥 See the application in action
   </a>
-</div>
+</p>
 
 ---
 
@@ -31,10 +30,11 @@
     <li><a href="#-getting-started">Getting Started</a>
       <ul>
         <li><a href="#-installation">Installation</a></li>
-        <li><a href="#-application-data-path">Application Data Path</a></li>
       </ul>
     </li>
     <li><a href="#%EF%B8%8F-common-issues">Common Issues</a></li>
+    <li><a href="#-freeing-up-space-after-uninstalling">Freeing Up Space After Uninstalling</a></li>
+    <li><a href="#-technical-report">Technical Report</a></li>
     <li><a href="#-acknowledgments">Acknowledgments</a></li>
   </ol>
 </details>
@@ -165,6 +165,11 @@ Remove-Item -Recurse -Force "$env:LOCALAPPDATA\IMWEBs-Viewer\TempFiles"
 ```bash
 rm -rf ~/Library/Application\ Support/IMWEBs-Viewer/TempFiles
 ```
+
+## 📄 Technical Report
+For a detailed explanation of the application's architecture, data processing workflows, and design decisions, please refer to the full technical report:
+
+[👉 Download the IMWEBs-Viewer Technical Report (.docx)](https://github.com/shahviransh/ECCC-IMWEBs-Viewer/raw/refs/heads/main/Technical%20Report.docx)
 
 ## 🙌 Acknowledgments
 
