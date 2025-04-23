@@ -1266,7 +1266,7 @@ def get_multi_columns_and_time_range(data):
         end_date = min(end_dates)
 
         # Combine all columns with date_type as first column
-        columns = [multi_columns_time_range[0]["date_type"]]
+        columns = [multi_columns_time_range[0]["date_type"]] if multi_columns_time_range[0]["date_type"] else []
 
         # Check if ID column is present in any of the tables
         include_id = any(
