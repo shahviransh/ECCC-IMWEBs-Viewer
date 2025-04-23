@@ -11,10 +11,8 @@
 <p align="center">
   <a href="https://www.youtube.com/watch?v=KNyyVSygOWY">
     <img src="https://img.youtube.com/vi/KNyyVSygOWY/0.jpg" alt="IMWEBs Viewer Demo" />
+    🎥 See the application in action
   </a>
-</p>
-<p align="center">
-  🎥 See the application in action
 </p>
 
 ---
