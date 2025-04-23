@@ -171,7 +171,7 @@ def validate_export_data_args(request_args):
             "allowed": [
                 "csv",
                 "txt",
-                "xsls",
+                "xlsx",
                 "png",
                 "jpg",
                 "jpeg",

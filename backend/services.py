@@ -539,7 +539,9 @@ def save_to_file(
     # Map graph types to Matplotlib Axes methods
     GRAPH_TYPE_MAPPING = {
         "line": "plot",
-        "bar": "column",
+        "bar": "bar",
+        "barx": "column",
+        "linex": "line",
         "scatter": "scatter",
     }
 
@@ -578,6 +580,9 @@ def save_to_file(
     elif file_format == "xlsx":
         # Write the DataFrame to an Excel file
         with pd.ExcelWriter(file_path, engine="xlsxwriter") as writer:
+            date_type_list = [date_type] if date_type else []
+            cols_to_front = [ID, *date_type_list] + [col for col in dataframe1.columns if col not in [ID, *date_type_list]]
+            dataframe1 = dataframe1[cols_to_front]
             # Sort dataframe by ID column for consistent selection
             dataframe1 = dataframe1.sort_values([ID])
             # Write the DataFrame to Excel
@@ -599,7 +604,7 @@ def save_to_file(
                     chart
                     if multi_graph_type_same
                     else workbook.add_chart(
-                        {"type": GRAPH_TYPE_MAPPING[column_graph["type"]]}
+                        {"type": GRAPH_TYPE_MAPPING.get(column_graph["type"] + "x", column_graph["type"])}
                     )
                 )
                 column = column_graph["name"]
