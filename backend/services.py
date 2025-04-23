@@ -581,7 +581,9 @@ def save_to_file(
         # Write the DataFrame to an Excel file
         with pd.ExcelWriter(file_path, engine="xlsxwriter") as writer:
             date_type_list = [date_type] if date_type else []
-            cols_to_front = [*date_type_list, ID] + [col for col in dataframe1.columns if col not in [ID, *date_type_list]]
+            cols_to_front = [*date_type_list, ID] + [
+                col for col in dataframe1.columns if col not in [ID, *date_type_list]
+            ]
             dataframe1 = dataframe1[cols_to_front]
             # Sort dataframe by ID column for consistent selection
             dataframe1 = dataframe1.sort_values([ID])
@@ -604,7 +606,11 @@ def save_to_file(
                     chart
                     if multi_graph_type_same
                     else workbook.add_chart(
-                        {"type": GRAPH_TYPE_MAPPING.get(column_graph["type"] + "x", column_graph["type"])}
+                        {
+                            "type": GRAPH_TYPE_MAPPING.get(
+                                column_graph["type"] + "x", column_graph["type"]
+                            )
+                        }
                     )
                 )
                 column = column_graph["name"]
@@ -1602,7 +1608,8 @@ def fetch_geojson_colors(data):
     """
     # Step 1: Fetch raw data
     output = fetch_data_service(data)
-    feature = output.get("new_feature", None) or data.get("feature", "value")
+    new_feature = output.get("new_feature", None)
+    feature = new_feature or data.get("feature", "value")
     feature_statistic = data.get("feature_statistic", "mean")
 
     if not feature or feature == "value":
@@ -1672,7 +1679,11 @@ def fetch_geojson_colors(data):
         for _, row in feature_df.iterrows()
     }
 
-    return {"geojson_colors": geojson_colors, "geojson_color_levels": color_levels}
+    return {
+        "geojson_colors": geojson_colors,
+        "geojson_color_levels": color_levels,
+        "new_feature": new_feature,
+    }
 
 
 def process_geospatial_data(data):

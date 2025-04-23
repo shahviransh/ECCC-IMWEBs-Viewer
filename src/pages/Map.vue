@@ -356,6 +356,11 @@ export default {
                         Authorization: `Bearer ${localStorage.getItem("token")}`
                     }
                 });
+                // Check if the new feature is added to columns
+                if (response.data.new_feature && !this.selectedColumns.includes(response.data.new_feature)) {
+                    this.updateSelectedColumns(this.selectedColumns.concat([response.data.new_feature]));
+                    this.selectedFeature = response.data.new_feature;
+                }
 
                 this.geojson_colors = response.data.geojson_colors;
                 this.geojson_color_levels = response.data.geojson_color_levels;
@@ -397,11 +402,6 @@ export default {
                     Authorization: `Bearer ${localStorage.getItem("token")}`
                 }
             });
-            // Check if the new feature is added to columns
-            if (response.data.new_feature && !this.selectedColumns.includes(response.data.new_feature)) {
-                this.updateSelectedColumns(this.selectedColumns.concat([response.data.new_feature]));
-                this.selectedFeature = response.data.new_feature;
-            }
             if (this.selectedInterval === 'seasonally' && !this.selectedMethod.includes('Equal') && !this.selectedColumns.includes('Season')) {
                 this.updateSelectedColumns(this.selectedColumns.concat(['Season']));
             } else if (this.selectedColumns.includes('Season') && this.selectedInterval !== 'seasonally') {
