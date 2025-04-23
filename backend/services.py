@@ -581,7 +581,7 @@ def save_to_file(
         # Write the DataFrame to an Excel file
         with pd.ExcelWriter(file_path, engine="xlsxwriter") as writer:
             date_type_list = [date_type] if date_type else []
-            cols_to_front = [ID, *date_type_list] + [col for col in dataframe1.columns if col not in [ID, *date_type_list]]
+            cols_to_front = [*date_type_list, ID] + [col for col in dataframe1.columns if col not in [ID, *date_type_list]]
             dataframe1 = dataframe1[cols_to_front]
             # Sort dataframe by ID column for consistent selection
             dataframe1 = dataframe1.sort_values([ID])
