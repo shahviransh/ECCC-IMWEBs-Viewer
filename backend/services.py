@@ -2069,7 +2069,7 @@ def export_map_service(image, form_data):
         zip_path = os.path.join(export_dir, f"{output_filename}.zip")
         with ZipFile(zip_path, "w") as zipf:
             for image_path in exported_images:
-                zipf.write(image_path)
+                zipf.write(image_path, os.path.basename(image_path))
 
         return {"file_path": zip_path}
     except Exception as e:
