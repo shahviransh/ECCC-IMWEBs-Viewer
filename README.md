@@ -10,7 +10,7 @@
 
 <p align="center">
   <a href="https://www.youtube.com/watch?v=KNyyVSygOWY">
-    <img src="https://img.youtube.com/vi/KNyyVSygOWY/0.jpg" alt="IMWEBs Viewer Demo" /><br/>🎥 See the application in action
+    <img src="https://img.youtube.com/vi/KNyyVSygOWY/0.jpg" alt="IMWEBs Viewer Demo" /><br/>🎥 See the application in action (33 mins)
   </a>
 </p>
 
@@ -60,6 +60,12 @@ Built with **Tauri**, **Vue 3**, and **Flask**, this application provides a rich
 ---
 
 ## 🏗️ Architecture
+
+<p align="center">
+  <a href="https://www.youtube.com/watch?v=x69xOCFa_0c">
+    <img src="https://img.youtube.com/vi/x69xOCFa_0c/0.jpg" alt="IMWEBs Viewer Demo" /><br/>🎥 See the application in action (20 mins)
+  </a>
+</p>
 
 ### 📦 Structure
 
