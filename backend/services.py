@@ -1163,9 +1163,8 @@ def get_columns_and_time_range(db_path, table_name):
         # Convert the table alias to its real name if necessary
         real_table_name = alias_mapping.get(table_name, {}).get("real", table_name)
 
-        TEST = safe_join(Config.PATHFILE, db_path)
         # Connect to the database
-        conn = sqlite3.connect(TEST)
+        conn = sqlite3.connect(safe_join(Config.PATHFILE, db_path))
 
         # Fetch column information using PRAGMA for the real table name
         query = f"PRAGMA table_info('{real_table_name}')"
