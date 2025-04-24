@@ -5,6 +5,7 @@ import numpy as np
 from PIL import Image
 import geopandas as gpd
 import xlsxwriter
+from xlsxwriter.utility import xl_col_to_name
 import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
 import matplotlib.cm as cm
@@ -548,7 +549,7 @@ def save_to_file(
     if not is_empty:
         # Check if the dataframe contains an ID column
         ID = next((col for col in dataframe1.columns if "id" in col.lower()), "ID")
-        dataframe1[date_type] = pd.to_datetime(dataframe1[date_type])
+        dataframe1[date_type] = pd.to_datetime(dataframe1[date_type]).dt.date
 
         # Keep track of which axis (primary or secondary) to use for each column
         primary_axis_columns = []
@@ -586,7 +587,7 @@ def save_to_file(
             ]
             dataframe1 = dataframe1[cols_to_front]
             # Sort dataframe by ID column for consistent selection
-            dataframe1 = dataframe1.sort_values([ID])
+            dataframe1 = dataframe1.sort_values([ID, *date_type_list])
             # Write the DataFrame to Excel
             dataframe1.to_excel(writer, sheet_name="Sheet1", index=False)
 
@@ -627,13 +628,14 @@ def save_to_file(
                             + len(dataframe1[dataframe1[ID] == selected_id])
                             - 1
                         )
+                        col_letter = xl_col_to_name(i + 1)
 
                         # Add a series to the overlay chart
                         overlay_chart.add_series(
                             {
                                 "name": f"{column} - {ID}: {selected_id}",
                                 "categories": f"Sheet1!$A${start_row}:$A${end_row}",  # Assuming column A contains categories
-                                "values": f"Sheet1!${chr(65 + i + 1)}${start_row}:${chr(65 + i + 1)}${end_row}",
+                                "values": f"Sheet1!${col_letter}${start_row}:${col_letter}${end_row}",
                                 "y2_axis": column
                                 in secondary_axis_columns,  # Assign to secondary y-axis if applicable
                             }
@@ -643,12 +645,13 @@ def save_to_file(
                         prev_end_row = end_row
 
                 else:
+                    col_letter = xl_col_to_name(i + 1) if ID else xl_col_to_name(i)
                     # Add a single series for each selected column when selected_ids is empty
                     overlay_chart.add_series(
                         {
                             "name": column,
                             "categories": f"Sheet1!$A$2:$A${row_count}",
-                            "values": f"Sheet1!${chr(65 + i)}$2:${chr(65 + i)}${row_count}",
+                            "values": f"Sheet1!${col_letter}$2:${col_letter}${row_count}",
                             "y2_axis": column in secondary_axis_columns,
                         }
                     )
@@ -664,13 +667,24 @@ def save_to_file(
                     "num_format": "yyyy-mm-dd",
                     "major_gridlines": {"visible": True},
                     "num_font": {"rotation": -45},
+                    "visible": True,
                 }
             )
-            chart.set_y_axis({"name": "Values (Smaller Values)"})
-            chart.set_y2_axis({"name": "Values (Larger Values)"})  # Add second y-axis
+            primary_y_axis_options = {
+                "name": "Values (Smaller Values)",
+                "major_gridlines": {"visible": bool(primary_axis_columns)},
+            }
+            chart.set_y_axis(primary_y_axis_options)
+
+            # Configure the secondary Y axis only if it's actually needed
+            if secondary_axis_columns:
+                chart.set_y2_axis({
+                    "name": "Values (Larger Values)",
+                    "major_gridlines": {"visible": True}
+                    })
 
             # Insert the chart into the worksheet
-            worksheet.insert_chart(f"{chr(65 + len(dataframe1.columns))}2", chart)
+            worksheet.insert_chart(f"{xl_col_to_name(len(dataframe1.columns) + 1)}2", chart)
             workbook.close()
     elif file_format in ["png", "jpg", "jpeg", "svg", "pdf"]:
         # Plot each column as a line on the same figure
