@@ -144,7 +144,7 @@ def fetch_data_service(data):
 
                     # Identify columns for merging; ignore columns with dash if they represent different data sources
                     merge_on_columns = [
-                        col for col in df.columns if "id" in col.lower()
+                        col for col in df.columns if "ID" in col
                     ]
                     for col in df.columns:
                         if col in df_temp.columns and not col.startswith(
@@ -474,7 +474,7 @@ def fetch_data_from_db(
     query = f"SELECT {columns if columns != 'All' else '*'} FROM {real_table_name}"
     params = []
 
-    ID = next((col for col in columns_list if "id" in col.lower()), "ID")
+    ID = next((col for col in columns_list if "ID" in col), "ID")
 
     # Add conditions for selected_ids
     if selected_ids != []:
@@ -548,7 +548,7 @@ def save_to_file(
 
     if not is_empty:
         # Check if the dataframe contains an ID column
-        ID = next((col for col in dataframe1.columns if "id" in col.lower()), "ID")
+        ID = next((col for col in dataframe1.columns if "ID" in col), "ID")
         dataframe1[date_type] = pd.to_datetime(dataframe1[date_type]).dt.date
 
         # Keep track of which axis (primary or secondary) to use for each column
@@ -1021,7 +1021,7 @@ def aggregate_data(df, interval, method, date_type, month, season):
     # Convert the date_type column to datetime
     df[date_type] = pd.to_datetime(df[date_type])
     resampled_df = None
-    ID = next((col for col in df.columns if "id" in col.lower()), "ID")
+    ID = next((col for col in df.columns if "ID" in col), "ID")
     # Resample the data based on the specified interval
     if interval == "monthly":
         # Agrregate numerical values by summing for each ID, date_type, and interval
@@ -1163,8 +1163,9 @@ def get_columns_and_time_range(db_path, table_name):
         # Convert the table alias to its real name if necessary
         real_table_name = alias_mapping.get(table_name, {}).get("real", table_name)
 
+        TEST = safe_join(Config.PATHFILE, db_path)
         # Connect to the database
-        conn = sqlite3.connect(safe_join(Config.PATHFILE, db_path))
+        conn = sqlite3.connect(TEST)
 
         # Fetch column information using PRAGMA for the real table name
         query = f"PRAGMA table_info('{real_table_name}')"
@@ -1204,7 +1205,7 @@ def get_columns_and_time_range(db_path, table_name):
                 break
 
         # Get list of IDs if an ID column exists, without querying unnecessary data
-        id_column = next((col for col in columns if "id" in col.lower()), None)
+        id_column = next((col for col in columns if "ID" in col), None)
         ids = []
         if id_column:
             id_query = f"SELECT DISTINCT {id_column} FROM {real_table_name}"
@@ -1647,7 +1648,7 @@ def fetch_geojson_colors(data):
         return {"error": "No data found"}
 
     df = pd.DataFrame(output["data"])
-    ID = next((col for col in df.columns if "id" in col.lower()), None)
+    ID = next((col for col in df.columns if "ID" in col), None)
 
     if ID is None:
         return {"error": "No ID column found in data"}
