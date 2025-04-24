@@ -70,7 +70,7 @@ Built with **Tauri**, **Vue 3**, and **Flask**, this application provides a rich
   - Lightning-fast development and optimized production builds using Vite
 - **Backend (Flask):**
   - `apppy.py`: Entry point
-  - `routes.py`: API endpoints (data, maps, export)
+  - `routes.py`: API endpoints (data, maps, export, authentication)
   - `services.py`: Data fetching and transformation logic
   - `validate.py`: Request validation
 - **Desktop Runtime (Tauri):**
