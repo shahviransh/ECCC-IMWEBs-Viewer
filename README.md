@@ -67,9 +67,10 @@ Built with **Tauri**, **Vue 3**, and **Flask**, this application provides a rich
   - UI components in `src/components/`
   - Pages like Graphs, Maps, Login, and Help in `src/pages/`
   - Vue Router and Vuex for routing and state management
+  - Lightning-fast development and optimized production builds using Vite
 - **Backend (Flask):**
   - `apppy.py`: Entry point
-  - `routes.py`: API endpoints (data, maps, export)
+  - `routes.py`: API endpoints (data, maps, export, authentication)
   - `services.py`: Data fetching and transformation logic
   - `validate.py`: Request validation
 - **Desktop Runtime (Tauri):**
