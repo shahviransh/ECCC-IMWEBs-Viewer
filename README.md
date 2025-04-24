@@ -2,7 +2,7 @@
   <img src="https://github.com/shahviransh/ECCC-IMWEBs-Viewer/blob/main/src-tauri/icons/128x128.png" alt="Logo" width="80" height="80">
   <h3 align="center">IMWEBs-Viewer</h3>
   <p align="center">
-    A cross-platform desktop application for exploring and analyzing IMWEBs environmental datasets.
+    A cross-platform desktop application for exploring and analyzing Integrated Modeling for Watershed Evaluation of BMPs (IMWEBs) datasets.
     <br />
     <a href="https://github.com/shahviransh/ECCC-IMWEBs-Viewer">View on GitHub</a>
   </p>
