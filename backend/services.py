@@ -659,6 +659,17 @@ def save_to_file(
                     chart = overlay_chart
                 else:
                     chart.combine(overlay_chart)
+            if not primary_axis_columns or (ID in primary_axis_columns and len(primary_axis_columns) == 1):
+                # Add dummy series to primary y-axis if no columns are present
+                chart.add_series(
+                    {
+                        "name": "Dummy",
+                        "categories": f"Sheet1!$A$2:$A${row_count}",
+                        "values": f"Sheet1!$B$2:$B${row_count}",
+                        "y2_axis": False,
+                    }
+                )        
+            
             # Customize the chart
             chart.set_x_axis(
                 {
@@ -672,7 +683,7 @@ def save_to_file(
             )
             primary_y_axis_options = {
                 "name": "Values (Smaller Values)",
-                "major_gridlines": {"visible": bool(primary_axis_columns)},
+                "major_gridlines": {"visible": len(primary_axis_columns) > 1},
             }
             chart.set_y_axis(primary_y_axis_options)
 
