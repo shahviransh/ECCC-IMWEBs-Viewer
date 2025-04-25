@@ -67,7 +67,7 @@ Built with **Tauri**, **Vue 3**, and **Flask**, this application provides a rich
   </a>
 </p>
 
-![Diagram](https://github.com/user-attachments/assets/94c657ce-f5ad-4fa7-97f4-18211e73c119)
+![Diagram](https://github.com/shahviransh/ECCC-IMWEBs-Viewer/blob//main/Diagram.png)
 
 ### 📦 Structure
 
