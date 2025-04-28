@@ -25,16 +25,6 @@ if ($LASTEXITCODE -ne 0) {
 # Install pip packages in conda env
 conda run -n venv pip install --no-cache-dir -r backend/requirements.txt
 
-# Stop existing Flask process on port 5000
-$service = Get-Service -Name $serviceName -ErrorAction SilentlyContinue
-if ($service -and $service.Status -eq 'Running') {
-    Stop-Service -Name $serviceName -Force
-    Start-Sleep -Seconds 2
-}
-
-# Start the Flask server as a new nssm service
-Start-Service -Name $serviceName
-
 # Node.js build process
 npm install
 npm run prestart
