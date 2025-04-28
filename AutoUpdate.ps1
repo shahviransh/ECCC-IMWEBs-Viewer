@@ -1,5 +1,6 @@
 $projectDir = "C:\ECCC-IMWEBs-Viewer"
 $backendScript = "$projectDir\backend\apppy.py"
+$serviceName = "IMWEBs-Viewer-Backend"
 
 Set-Location $projectDir
 
@@ -21,14 +22,18 @@ if ($LASTEXITCODE -ne 0) {
     git reset --hard origin/main
 }
 
+# Install pip packages in conda env
+conda run -n venv pip install --no-cache-dir -r backend/requirements.txt
+
 # Stop existing Flask process on port 5000
-$existingProcess = Get-NetTCPConnection -LocalPort 5000 -ErrorAction SilentlyContinue | Select-Object OwningProcess
-if ($existingProcess) {
-    Stop-Process -Id $existingProcess.OwningProcess -Force
+$service = Get-Service -Name $serviceName -ErrorAction SilentlyContinue
+if ($service -and $service.Status -eq 'Running') {
+    Stop-Service -Name $serviceName -Force
+    Start-Sleep -Seconds 2
 }
 
-# Start the Flask server in a new process
-Start-Process -FilePath "conda" -ArgumentList "run -n venv python $backendScript" -RedirectStandardOutput "$projectDir\flask.log" -RedirectStandardError "$projectDir\flask_error.log"
+# Start the Flask server as a new nssm service
+Start-Service -Name $serviceName
 
 # Node.js build process
 npm install
