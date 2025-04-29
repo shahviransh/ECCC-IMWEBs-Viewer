@@ -322,7 +322,7 @@ def register_routes(app, cache):
 
     @app.route("/api/health", methods=["GET"])
     def health():
-        return "Server is running...", 200
+        return f"Server is running... {os.getcwd()}, {getattr(sys, "frozen", False)}, {os.path.dirname(os.path.realpath(__file__))}", 200
 
     @app.route("/api/shutdown", methods=["GET"])
     def shutdown():
