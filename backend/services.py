@@ -923,15 +923,12 @@ def get_files_and_folders(data):
     ):
         # Update Config.PATHFILE to point to the parent directory of the provided absolute path
         Config.PATHFILE = os.path.dirname(folder_path)
-        base_folder = os.path.basename(folder_path)
-        root = Config.PATHFILE
+        base_path = Config.PATHFILE
     elif os.path.isabs(folder_path):
         return {
             "error": "The folder path cannot be absolute when not using the Tauri app."
         }
     else:
-        # If the folder path is relative, use it directly
-        base_folder = folder_path
         # Determine the base path of the application
         base_path = (
             (
@@ -944,7 +941,6 @@ def get_files_and_folders(data):
         )
         # Construct the absolute folder path relative to the current file location
         folder_path = safe_join(base_path, folder_path)
-        root = os.path.abspath(base_folder)
 
     try:
         files_and_folders = []
@@ -952,13 +948,11 @@ def get_files_and_folders(data):
 
         for dirpath, dirs, files in os.walk(folder_path):
             # Construct the relative path from the base folder
-            rel_dir = os.path.relpath(dirpath, root)
+            rel_dir = os.path.relpath(dirpath, base_path)
 
             # Append directories
             for fdir in dirs:
                 dir_rel_path = os.path.join(rel_dir, fdir)
-                # Ensure the relative path starts with the base folder name
-                dir_rel_path = dir_rel_path[dir_rel_path.find(base_folder) :]
                 files_and_folders.append(
                     {
                         "type": "folder",
@@ -968,8 +962,6 @@ def get_files_and_folders(data):
             # Append files
             for name in files:
                 file_rel_path = os.path.join(rel_dir, name)
-                # Ensure the relative path starts with the base folder name
-                file_rel_path = file_rel_path[file_rel_path.find(base_folder) :]
 
                 # Only include .shp, .db3, and .tif files
                 if file_rel_path.endswith(
