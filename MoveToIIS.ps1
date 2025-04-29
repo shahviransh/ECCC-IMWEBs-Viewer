@@ -1,5 +1,5 @@
 $projectDir = "C:\ECCC-IMWEBs-Viewer"
-$sourceDir = "$projectDir\dist"
+$sourceDir = "$projectDir\dist\*"
 $destDir = "C:\inetpub\wwwroot\IMWEBs-Viewer"
 
 Set-Location $projectDir
