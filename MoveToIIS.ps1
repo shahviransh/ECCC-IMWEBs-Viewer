@@ -17,6 +17,5 @@ if ($existingProcess) {
 Start-Process `
     -FilePath "powershell.exe" `
     -ArgumentList "-ExecutionPolicy Bypass -NoProfile -NoLogo -Command conda run -n venv python $projectDir\backend\apppy.py" `
-    -WindowStyle Hidden `
     -NoNewWindow `
     -WorkingDirectory "$projectDir\backend"
