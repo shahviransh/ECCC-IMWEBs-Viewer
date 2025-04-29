@@ -956,7 +956,7 @@ def get_files_and_folders(data):
 
             # Append directories
             for fdir in dirs:
-                dir_rel_path = os.path.join(rel_dir, fdir)
+                dir_rel_path = os.path.join(rel_dir, fdir).replace("\\", "/")
                 
                 # Ensure the relative path starts with the base folder name
                 dir_rel_path = dir_rel_path[dir_rel_path.find(base_folder) :]
@@ -968,7 +968,8 @@ def get_files_and_folders(data):
                 )
             # Append files
             for name in files:
-                file_rel_path = os.path.join(rel_dir, name)                
+                file_rel_path = os.path.join(rel_dir, name).replace("\\", "/")
+                               
                 # Ensure the relative path starts with the base folder name
                 file_rel_path = file_rel_path[file_rel_path.find(base_folder) :]
 
