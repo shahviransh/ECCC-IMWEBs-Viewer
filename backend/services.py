@@ -996,6 +996,8 @@ def get_files_and_folders(data):
             if not alias_mapping and lookup_found
             else None
         )
+        
+        files_and_folders.extend([base_folder, base_path, folder_path, root])
 
         return {"files_and_folders": files_and_folders}
     except Exception as e:
