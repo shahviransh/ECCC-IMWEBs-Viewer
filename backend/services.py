@@ -953,12 +953,12 @@ def get_files_and_folders(data):
         for dirpath, dirs, files in os.walk(folder_path):
             # Construct the relative path from the base folder
             rel_dir = os.path.relpath(dirpath, root)
-            
-            files_and_folders.extend([dirpath, dirs, files, rel_dir])
+            rel_dir = dirpath if rel_dir == "." else rel_dir
 
             # Append directories
             for fdir in dirs:
                 dir_rel_path = os.path.join(rel_dir, fdir)
+                
                 # Ensure the relative path starts with the base folder name
                 dir_rel_path = dir_rel_path[dir_rel_path.find(base_folder) :]
                 files_and_folders.append(
