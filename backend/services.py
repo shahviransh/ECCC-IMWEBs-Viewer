@@ -930,21 +930,19 @@ def get_files_and_folders(data):
             "error": "The folder path cannot be absolute when not using the Tauri app."
         }
     else:
-        # If the folder path is relative, use it directly
-        base_folder = folder_path
-        # Determine the base path of the application
-        base_path = (
-            (
-                sys._MEIPASS  # When the application is packaged with PyInstaller
+        # Relative path (default or relative in web mode)
+        if folder_path == "Jenette_Creek_Watershed":
+            base_path = (
+                sys._MEIPASS
                 if getattr(sys, "frozen", False)
                 else os.path.dirname(os.path.abspath(__file__))
             )
-            if folder_path == "Jenette_Creek_Watershed"
-            else Config.PATHFILE
-        )
-        # Construct the absolute folder path relative to the current file location
-        folder_path = safe_join(base_path, folder_path)
-        root = folder_path
+        else:
+            base_path = Config.PATHFILE
+
+        folder_path = os.path.abspath(safe_join(base_path, folder_path))
+
+    root = folder_path  # root must be the absolute path
 
     try:
         files_and_folders = []
