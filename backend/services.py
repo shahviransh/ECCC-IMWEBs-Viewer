@@ -944,7 +944,7 @@ def get_files_and_folders(data):
         )
         # Construct the absolute folder path relative to the current file location
         folder_path = safe_join(base_path, folder_path)
-        root = os.path.abspath(base_folder)
+        root = folder_path
 
     try:
         files_and_folders = []
@@ -953,7 +953,6 @@ def get_files_and_folders(data):
         for dirpath, dirs, files in os.walk(folder_path):
             # Construct the relative path from the base folder
             rel_dir = os.path.relpath(dirpath, root)
-            rel_dir = dirpath if rel_dir == "." else rel_dir
 
             # Append directories
             for fdir in dirs:
@@ -969,7 +968,7 @@ def get_files_and_folders(data):
                 )
             # Append files
             for name in files:
-                file_rel_path = os.path.join(rel_dir, name)
+                file_rel_path = os.path.join(rel_dir, name)                
                 # Ensure the relative path starts with the base folder name
                 file_rel_path = file_rel_path[file_rel_path.find(base_folder) :]
 
