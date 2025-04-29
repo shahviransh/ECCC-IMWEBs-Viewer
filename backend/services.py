@@ -930,19 +930,21 @@ def get_files_and_folders(data):
             "error": "The folder path cannot be absolute when not using the Tauri app."
         }
     else:
-        # Relative path (default or relative in web mode)
-        if folder_path == "Jenette_Creek_Watershed":
-            base_path = (
-                sys._MEIPASS
+        # If the folder path is relative, use it directly
+        base_folder = folder_path
+        # Determine the base path of the application
+        base_path = (
+            (
+                sys._MEIPASS  # When the application is packaged with PyInstaller
                 if getattr(sys, "frozen", False)
-                else os.path.dirname(os.path.abspath(__file__))
+                else os.path.dirname(__file__)
             )
-        else:
-            base_path = Config.PATHFILE
-
-        folder_path = os.path.abspath(safe_join(base_path, folder_path))
-
-    root = folder_path  # root must be the absolute path
+            if folder_path == "Jenette_Creek_Watershed"
+            else Config.PATHFILE
+        )
+        # Construct the absolute folder path relative to the current file location
+        folder_path = safe_join(base_path, folder_path)
+        root = os.path.abspath(base_folder)
 
     try:
         files_and_folders = []
@@ -954,8 +956,7 @@ def get_files_and_folders(data):
 
             # Append directories
             for fdir in dirs:
-                dir_rel_path = os.path.join(rel_dir, fdir).replace("\\", "/")
-                
+                dir_rel_path = os.path.join(rel_dir, fdir)
                 # Ensure the relative path starts with the base folder name
                 dir_rel_path = dir_rel_path[dir_rel_path.find(base_folder) :]
                 files_and_folders.append(
@@ -966,8 +967,7 @@ def get_files_and_folders(data):
                 )
             # Append files
             for name in files:
-                file_rel_path = os.path.join(rel_dir, name).replace("\\", "/")
-                               
+                file_rel_path = os.path.join(rel_dir, name)
                 # Ensure the relative path starts with the base folder name
                 file_rel_path = file_rel_path[file_rel_path.find(base_folder) :]
 
@@ -1000,7 +1000,6 @@ def get_files_and_folders(data):
         return {"files_and_folders": files_and_folders}
     except Exception as e:
         return {"error": str(e)}
-
 
 def get_season_from_date(date_str):
     """Map date strings to seasons."""
