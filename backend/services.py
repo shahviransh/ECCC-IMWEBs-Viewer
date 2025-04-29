@@ -937,7 +937,7 @@ def get_files_and_folders(data):
             (
                 sys._MEIPASS  # When the application is packaged with PyInstaller
                 if getattr(sys, "frozen", False)
-                else os.path.dirname(__file__)
+                else os.path.dirname(os.path.abspath(__file__))
             )
             if folder_path == "Jenette_Creek_Watershed"
             else Config.PATHFILE
@@ -953,6 +953,8 @@ def get_files_and_folders(data):
         for dirpath, dirs, files in os.walk(folder_path):
             # Construct the relative path from the base folder
             rel_dir = os.path.relpath(dirpath, root)
+            
+            files_and_folders.extend([dirpath, dirs, files, rel_dir])
 
             # Append directories
             for fdir in dirs:
@@ -996,8 +998,6 @@ def get_files_and_folders(data):
             if not alias_mapping and lookup_found
             else None
         )
-        
-        files_and_folders.extend([base_folder, base_path, folder_path, root])
 
         return {"files_and_folders": files_and_folders}
     except Exception as e:
