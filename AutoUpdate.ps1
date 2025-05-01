@@ -4,15 +4,6 @@ $serviceName = "IMWEBs-Viewer-Backend"
 
 Set-Location $projectDir
 
-$localHash = git rev-parse HEAD
-git fetch origin
-$remoteHash = git rev-parse origin/main
-
-# Check if the local and remote hashes are the same
-if ($localHash -eq $remoteHash) {
-    exit 0   
-}
-
 # Attempt to pull changes
 git pull
 if ($LASTEXITCODE -ne 0) {
