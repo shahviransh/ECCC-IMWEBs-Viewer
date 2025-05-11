@@ -4,5 +4,10 @@ $destDir = "C:\inetpub\wwwroot\IMWEBs-Viewer"
 
 Set-Location $projectDir
 
-# Copy the built files to the web server directory
+# Remove the destination folder entirely
+if (Test-Path $destDir) {
+    Remove-Item -Path $destDir -Recurse -Force
+}
+
+# Copy the entire dist folder to the destination
 Copy-Item -Path $sourceDir -Destination $destDir -Recurse -Force
