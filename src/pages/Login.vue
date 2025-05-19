@@ -161,7 +161,7 @@ body {
     position: relative;
     min-height: 100vh;
     margin: 0;
-    font-family: Avenir, Helvetica;
+    font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
 }
 
 .loginDiv {

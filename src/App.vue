@@ -278,7 +278,7 @@ body,
 
 <style scoped>
 #papp {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
+  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
   color: #2c3e50;
   text-align: center;
   font-size: 14px;
