@@ -471,7 +471,7 @@ def fetch_data_from_db(
         columns = ",".join(real_columns)
 
     # Start building the base query using real table name
-    query = f"SELECT {columns if columns != 'All' else '*'} FROM {real_table_name}"
+    query = f"SELECT {columns if columns != 'All' else '*'} FROM '{real_table_name}'"
     params = []
 
     ID = next((col for col in columns_list if "ID" in col), "ID")
