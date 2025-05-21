@@ -502,8 +502,7 @@ export default {
                                 .filter(([key, value]) => key.toLowerCase().includes(idName) && value !== null)
                                 .map(([, value]) => value)?.[0] ?? null;
 
-                            const [featureColor, featureWeight] = this.geojson_colors[featureId?.toFixed(1).toString()] || [undefined, undefined];
-
+                            const [featureColor, featureWeight] = this.geojson_colors[Number(featureId).toFixed(1).toString()] || [undefined, undefined];
                             if (feature.geometry.type === 'Polygon' || feature.geometry.type === 'MultiPolygon') {
                                 // Apply color from geojson_colors based on feature's id
                                 style.fillColor = featureColor || this.polygonColor; // Default to polygonColor if no match
