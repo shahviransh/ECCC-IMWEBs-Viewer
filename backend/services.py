@@ -1313,9 +1313,8 @@ def get_multi_columns_and_time_range(data):
         ]
 
         # Intersection of IDs from all tables
-        ids = set(multi_columns_time_range[0]["ids"]).intersection(
-            *[set(table["ids"]) for table in multi_columns_time_range]
-        )
+        id_sets = [set(filter(lambda x: x is not None, table["ids"])) for table in multi_columns_time_range]
+        ids = set.intersection(*id_sets) if id_sets else set()
 
         return {
             "columns": columns,
