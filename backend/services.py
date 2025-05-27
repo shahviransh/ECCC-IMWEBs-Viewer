@@ -1312,7 +1312,7 @@ def get_multi_columns_and_time_range(data):
             and (id_column or "ID") not in col
         ]
 
-        # Intersection of IDs from all tables
+        # Intersection of IDs from all tables and filter out None values
         id_sets = [set(filter(lambda x: x is not None, table["ids"])) for table in multi_columns_time_range]
         ids = set.intersection(*id_sets) if id_sets else set()
 
