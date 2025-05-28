@@ -124,6 +124,8 @@ export default {
 .message-text {
   flex: 1;
   padding-right: 20px;
+  word-break: break-word;
+  overflow-wrap: anywhere;
 }
 
 .close-button {
