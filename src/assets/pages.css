@@ -36,6 +36,15 @@
 :root {
     --top-bar-height: 14vh;
     --task-bar-height: 0;
+    font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+    line-height: 1.5;
+    font-weight: 400;
+
+    color: rgba(255, 255, 255, 0.87);
+
+    font-synthesis: none;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
 }
 
 body,
@@ -123,7 +132,8 @@ label {
 .main-view {
     width: 99%;
     /* Takes 2/4 of the horizontal space */
-    height: calc(100% - max(180px, 15%));  /* Takes remaining space */
+    height: calc(100% - max(180px, 15%));
+    /* Takes remaining space */
     margin: 0px;
     padding: 0px;
     overflow: auto;
@@ -132,7 +142,7 @@ label {
 .map-container {
     width: 100%;
     height: 100%;
-}  
+}
 
 .table-container,
 .stats-container {
