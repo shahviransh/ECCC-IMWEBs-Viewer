@@ -3,7 +3,7 @@
   "private": true,
   "description": "A brief description of your app.",
   "author": "Viransh Shah",
-  "version": "0.2.6",
+  "version": "0.2.7",
   "type": "module",
   "scripts": {
     "prestart": "node sync.js",
