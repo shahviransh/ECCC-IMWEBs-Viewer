@@ -1880,7 +1880,7 @@ def process_geospatial_data(data):
             # Save properties for each shapefile path
             tool_tip[toolTipKey] = properties
         # Handle GeoTIFF files
-        elif file_path.endswith(".tif") or file_path.endswith(".tiff"):
+        elif file_path.endswith((".tif",".tiff")):
             raster_dataset = gdal.Open(file_path)
             if not raster_dataset:
                 continue
@@ -2045,7 +2045,7 @@ def export_map_service(image, form_data):
             if file_path.endswith(".shp"):
                 gdf = gpd.read_file(file_path)
                 gdf.plot(ax=ax, edgecolor="black")
-            elif file_path.endswith(".tif") or file_path.endswith(".tiff"):
+            elif file_path.endswith((".tif", ".tiff")):
                 dataset = gdal.Open(file_path)
                 band = dataset.GetRasterBand(1)
                 cmap = get_metadata_colormap(band)
