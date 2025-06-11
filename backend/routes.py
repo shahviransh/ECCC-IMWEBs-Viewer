@@ -41,7 +41,7 @@ load_dotenv()
 
 # In the Tauri EXE sidecar, HTTPS is not required and we can use default credentials.
 # When running as a web app, HTTPS is required and proper environment variables should be set for security.
-ADMIN_USERNAME = os.getenv("ADMIN_USERNAME", "default")
+ADMIN_USERNAMES = os.getenv("ADMIN_USERNAMES", "default").split(",")
 ADMIN_PASSWORD = os.getenv(
     "ADMIN_PASSWORD", bcrypt.hashpw("default".encode(), bcrypt.gensalt()).decode()
 )
@@ -69,7 +69,7 @@ def register_routes(app, cache):
             return jsonify({"error": "Missing username or password"}), 400
 
         # Verify username and hashed password
-        if username != ADMIN_USERNAME or not bcrypt.checkpw(
+        if username in ADMIN_USERNAMES or not bcrypt.checkpw(
             password.encode(), ADMIN_PASSWORD.encode()
         ):
             return jsonify({"error": "Invalid credentials"}), 401
