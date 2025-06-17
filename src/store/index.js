@@ -258,7 +258,7 @@ const store = createStore({
       for (let attempt = 1; attempt <= maxRetries; attempt++) {
         try {
           const response = await axios.get(
-            `${import.meta.env.VITE_API_BASE_URL}/api/list_files`,
+            `${window.API_BASE_URL}/api/list_files`,
             {
               params: { folder_path: this.state.modelFolder, is_tauri: !!window.__TAURI__ },
               headers: {
@@ -284,7 +284,7 @@ const store = createStore({
     async fetchTables({ commit }, db) {
       try {
         const response = await axios.get(
-          `${import.meta.env.VITE_API_BASE_URL}/api/get_tables`,
+          `${window.API_BASE_URL}/api/get_tables`,
           {
             params: { db_path: db },
             headers: {
@@ -311,7 +311,7 @@ const store = createStore({
 
         // Fetch all columns for all tables selected
         const response = await axios.get(
-          `${import.meta.env.VITE_API_BASE_URL}/api/get_table_details`,
+          `${window.API_BASE_URL}/api/get_table_details`,
           {
             params: { db_tables: JSON.stringify(dbTables) },
             headers: {

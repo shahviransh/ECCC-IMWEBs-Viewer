@@ -110,7 +110,7 @@ export default {
             formSubmitUrl: `https://formsubmit.co/${import.meta.env.VITE_FORM_SUBMIT_ID}`,
             sitekey: import.meta.env.VITE_HCAPTCHA_SITE_KEY,
             cc: import.meta.env.VITE_RECIPIENTS,
-            thankYouUrl: `${import.meta.env.VITE_API_BASE_URL}/thank-you.html`,
+            thankYouUrl: `${window.API_BASE_URL}/thank-you.html`,
             showHelpPopup: false
         };
     },
@@ -135,7 +135,7 @@ export default {
                     return;
                 }
 
-                const response = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/login`, credentials);
+                const response = await axios.post(`${window.API_BASE_URL}/api/login`, credentials);
                 const token = response.data.access_token;
                 localStorage.setItem('token', token);
                 this.$emit("update:isAuthenticated", true);

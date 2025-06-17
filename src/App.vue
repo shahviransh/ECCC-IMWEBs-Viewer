@@ -143,8 +143,8 @@ export default {
               this.uploadMessage = "Still uploading... the folder might be large, please wait a bit longer.";
             }, 2000); // 30 seconds
 
-            // Send the form data with the files and folder structure to the backend
-            const response = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/upload_folder`, formData, {
+            // Use dynamic API base URL
+            const response = await axios.post(`${window.API_BASE_URL}/api/upload_folder`, formData, {
               headers: { "Content-Type": "multipart/form-data", Authorization: `Bearer ${localStorage.getItem("token")}` }
             });
 
@@ -203,16 +203,35 @@ export default {
       this.updateCurrentZoom({ start: 0, end: 100 });
     },
     async checkServerStatus() {
-      // Check if the server is running, keep checking every 2 seconds
-      const interval = setInterval(async () => {
+      // Try both external and internal URLs for /api/health
+      const externalUrl = import.meta.env.VITE_API_BASE_URL;
+      const internalUrl = import.meta.env.VITE_API_BASE_URL_INTERNAL;
+      let found = false;
+
+      const tryHealth = async (url) => {
         try {
-          await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/health`);
-          this.isLoading = false;
-          clearInterval(interval); // Stop checking once successful
-        } catch (error) {
-          console.error("Server is not running", error);
+          await axios.get(`${url}/api/health`);
+          return true;
+        } catch {
+          return false;
         }
-      }, 2000);
+      };
+
+      const interval = setInterval(async () => {
+        if (!found) {
+          if (await tryHealth(externalUrl)) {
+            window.API_BASE_URL = externalUrl;
+            found = true;
+          } else if (await tryHealth(internalUrl)) {
+            window.API_BASE_URL = internalUrl;
+            found = true;
+          }
+        }
+        if (found) {
+          this.isLoading = false;
+          clearInterval(interval);
+        }
+      }, 5000);
     },
     async checkAuth() {
       const token = localStorage.getItem("token");
@@ -223,8 +242,8 @@ export default {
         return;
       }
       try {
-        // Verify token with the server
-        const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/verify-token`, {
+        // Use dynamic API base URL
+        const response = await axios.get(`${window.API_BASE_URL}/api/verify-token`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         this.isAuthenticated = response.status === 200;
@@ -238,7 +257,7 @@ export default {
         // Clear token from local storage and logout from the server
         const token = localStorage.getItem("token");
         if (token) {
-          await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/logout`, {}, {
+          await axios.post(`${window.API_BASE_URL}/api/logout`, {}, {
             headers: { Authorization: `Bearer ${token}` },
           });
         }

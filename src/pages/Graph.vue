@@ -93,7 +93,7 @@ export default {
                 this.pushMessage({ message: `Graph Loading`, type: 'info' });
 
                 // Fetch the data for the map
-                const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/get_data`, {
+                const response = await axios.get(`${window.API_BASE_URL}/api/get_data`, {
                     params: {
                         db_tables: JSON.stringify(this.selectedDbsTables),
                         columns: JSON.stringify(this.allSelectedColumns ? "All" : this.selectedColumns.filter((column) => column !== 'Season')),
@@ -141,7 +141,7 @@ export default {
         // Export data to a file
         async exportData() {
             try {
-                const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/export_data`, {
+                const response = await axios.get(`${window.API_BASE_URL}/api/export_data`, {
                     params: {
                         db_tables: JSON.stringify(this.selectedDbsTables),
                         columns: JSON.stringify(this.allSelectedColumns ? "All" : this.exportColumns.filter((column) => column !== 'Season')),

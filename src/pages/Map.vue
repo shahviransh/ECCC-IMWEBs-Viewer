@@ -333,7 +333,7 @@ export default {
             }
             if (this.selectedDbsTables.length > 0) {
                 // Fetch GeoJSON data color information
-                const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/get_geojson_colors`, {
+                const response = await axios.get(`${window.API_BASE_URL}/api/get_geojson_colors`, {
                     params: {
                         db_tables: JSON.stringify(this.selectedDbsTables),
                         columns: JSON.stringify(this.allSelectedColumns ? "All" : this.selectedColumns.filter((column) => column !== 'Season' && !this.properties.includes(column))),
@@ -381,7 +381,7 @@ export default {
             this.stats = [];
 
             // Fetch the API data for the map
-            const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/get_data`, {
+            const response = await axios.get(`${window.API_BASE_URL}/api/get_data`, {
                 params: {
                     db_tables: JSON.stringify(this.selectedDbsTables),
                     columns: JSON.stringify(this.allSelectedColumns ? "All" : this.selectedColumns.filter((column) => column !== 'Season' && !this.properties.includes(column))),
@@ -438,7 +438,7 @@ export default {
                 this.pushMessage({ message: `Loading Parameters for ${this.selectedGeoFolders.map(folder => folder.split("/").pop()).join(", ")}`, type: 'info' });
 
                 // Fetch GeoTIFF and GeoJSON data from the backend
-                const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/geospatial`, {
+                const response = await axios.get(`${window.API_BASE_URL}/api/geospatial`, {
                     params: {
                         file_paths: JSON.stringify(this.selectedGeoFolders),
                     },
@@ -600,7 +600,7 @@ export default {
                 if (this.image_urls.length > 0) {
                     // Add raster images layer using Leaflet ImageOverlay
                     this.image_urls.forEach((url) => {
-                        const imageUrl = import.meta.env.VITE_API_BASE_URL + url;
+                        const imageUrl = window.API_BASE_URL + url;
 
                         // Make the axios GET request with Authorization header
                         axios.get(imageUrl, {
@@ -757,7 +757,7 @@ export default {
                 if (this.exportFormat === "shp") {
                     const filename = `${this.selectedGeoFolders.map(folder => folder.split("/").pop()).join(", ")}_${this.exportInterval}_${this.selectedFeature}_${this.selectedFeatureStatistic}`;
                     this.updateExportFilename(filename.replace(/[ \\\/\.\(\)]/g, "-").replace(/-+/g, "-").replace(/-_|_+/g, "_"));
-                    response = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/export_data`, {
+                    response = await axios.post(`${window.API_BASE_URL}/api/export_data`, {
                         db_tables: JSON.stringify(this.selectedDbsTables),
                         columns: JSON.stringify(this.allSelectedColumns ? "All" : this.exportColumns.filter((column) => column !== 'Season' && !this.properties.includes(column))),
                         id: JSON.stringify(this.exportIds),
@@ -802,7 +802,7 @@ export default {
                     formData.append("file_paths", JSON.stringify(this.selectedGeoFolders));
 
                     // Send to backend
-                    response = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/export_map`, formData, {
+                    response = await axios.post(`${window.API_BASE_URL}/api/export_map`, formData, {
                         headers: { "Content-Type": "multipart/form-data", Authorization: `Bearer ${localStorage.getItem("token")}` },
                         responseType: 'blob'
                     });
