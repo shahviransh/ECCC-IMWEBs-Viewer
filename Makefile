@@ -32,7 +32,8 @@ ifeq ($(ARG), tauri)
 	if exist "src-tauri\target\release\Imwebs-Viewer_*.exe" del /F /Q "src-tauri\target\release\Imwebs-Viewer_*.exe"
 	if exist "src-tauri\target\release\Imwebs-Viewer_*.msi" del /F /Q "src-tauri\target\release\Imwebs-Viewer_*.msi"
 	npm run tauri:build
-	xcopy src-tauri\target\release "$(USERPROFILE)\OneDrive - McMaster University\Co-op 1st Work Term - ECCC\release" /Y /E /I /D
+	xcopy "src-tauri\target\release\ECCC-IMWEBs-Viewer_*.exe" "$(USERPROFILE)\OneDrive - McMaster University\Co-op 1st Work Term - ECCC\release" /Y /I /D
+	xcopy "src-tauri\target\release\ECCC-IMWEBs-Viewer_*.msi" "$(USERPROFILE)\OneDrive - McMaster University\Co-op 1st Work Term - ECCC\release" /Y /I /D
 else ifeq ($(ARG), electron)
 	@echo "Building Electron app..."
 	npm run electron:build
