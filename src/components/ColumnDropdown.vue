@@ -96,17 +96,13 @@ export default {
         },
         pageTitle: {
             handler(newTitle) {
-                if (newTitle === 'Graph') {
-                    this.updateYAxis([]);
-                } else if (['Project', 'Table', 'Map'].includes(newTitle)) {
-                    this.updateSelectedColumns([]);
-                }
+                this.emptyColumns();
             },
             immediate: true
         }
     },
     methods: {
-        ...mapActions(['fetchColumns', 'updateSelectedColumns', 'updateExportColumns', 'updateXAxis', 'updateYAxis']),
+        ...mapActions(['fetchColumns', 'emptyColumns', 'updateSelectedColumns', 'updateExportColumns', 'updateXAxis', 'updateYAxis']),
         findTableName(column) {
             for (const [key, columns] of Object.entries(this.tooltipColumns)) {
                 const table_name = key.split(',')[1].replace(")", "").replace(/['"]/g, '').trim();

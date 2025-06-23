@@ -81,6 +81,12 @@ const store = createStore({
         ...state.selectedColumns,
       ];
     },
+    EMPTY_COLUMNS(state) {
+      state.columns = [];
+      state.geoColumns = [];
+      state.selectedColumns = [];
+      state.exportColumns = [];
+    },
     ADD_COLUMNS(state, { columns }) {
       const temp = columns.filter((c) => !state.columns.includes(c) || state.geoColumns.includes(c));
       const columnsNotGeo = state.columns.filter((c) => !state.geoColumns.includes(c));
@@ -427,6 +433,9 @@ const store = createStore({
     },
     updateGraphType({ commit }, format) {
       commit("SET_GRAPH_TYPE", format);
+    },
+    emptyColumns({ commit }) {
+      commit("EMPTY_COLUMNS");
     },
     updateMultiGraphType({ commit }, formats) {
       commit("SET_MULTI_GRAPH_TYPE", formats);
