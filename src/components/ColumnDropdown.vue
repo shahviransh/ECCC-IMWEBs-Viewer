@@ -94,6 +94,16 @@ export default {
             }, 1000), // Adjust debounce delay as needed
             deep: true
         },
+        pageTitle: {
+            handler(newTitle) {
+                if (newTitle === 'Graph') {
+                    this.updateYAxis([]);
+                } else if (['Project', 'Table', 'Map'].includes(newTitle)) {
+                    this.updateSelectedColumns([]);
+                }
+            },
+            immediate: true
+        }
     },
     methods: {
         ...mapActions(['fetchColumns', 'updateSelectedColumns', 'updateExportColumns', 'updateXAxis', 'updateYAxis']),
