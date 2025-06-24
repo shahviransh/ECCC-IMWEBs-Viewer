@@ -53,6 +53,79 @@ export default {
     },
     computed: {
         chartOptions() {
+            // Multi-series pie: each selected column is a ring in a single pie chart
+            if (this.graphType === 'pie' && !this.dateType) {
+                const valueColumns = this.selectedColumns.filter(col => ![this.ID, "Help_ID"].includes(col));
+                const ringCount = valueColumns.length;
+                const minRadius = 30;
+                const maxRadius = 70;
+                const radiusStep = (maxRadius - minRadius) / (ringCount || 1);
+
+                // Collect all unique values for legend
+                const legendData = [
+                    ...new Set(
+                        valueColumns.flatMap(col =>
+                            this.data.map(row => row[col])
+                        )
+                    )
+                ];
+
+                // Build series: each ring is a selected column
+                const series = valueColumns.map((col, idx) => {
+                    // Count occurrences of each unique value in this column
+                    const valueCounts = {};
+                    this.data.forEach(row => {
+                        const val = row[col];
+                        valueCounts[val] = (valueCounts[val] || 0) + 1;
+                    });
+                    const pieData = Object.entries(valueCounts).map(([name, count]) => ({
+                        name,
+                        value: count
+                    }));
+
+                    return {
+                        name: col,
+                        type: 'pie',
+                        radius: [
+                            `${minRadius + idx * radiusStep}%`,
+                            `${minRadius + (idx + 1) * radiusStep - 2}%`
+                        ],
+                        center: ['50%', '50%'],
+                        data: pieData,
+                        label: {
+                            show: idx === ringCount - 1, // Only show labels on outer ring
+                            position: 'outside',
+                            formatter: '{b}: {d}%',
+                            color: this.theme === 'dark' ? 'white' : 'black',
+                            fontSize: 13
+                        },
+                        labelLine: {
+                            show: idx === ringCount - 1
+                        },
+                        emphasis: {
+                            scale: true
+                        }
+                    };
+                });
+
+                return {
+                    tooltip: {
+                        trigger: 'item',
+                        formatter: '{a}<br/>{b}: {c} ({d}%)'
+                    },
+                    legend: {
+                        show: true,
+                        orient: 'horizontal',
+                        top: 'bottom',
+                        type: 'scroll',
+                        data: legendData,
+                        textStyle: {
+                            color: this.theme === 'dark' ? 'white' : 'black',
+                        },
+                    },
+                    series
+                };
+            }
             const xAxisData = this.data.map(row => row[this.dateType]);
 
             // Preprocess `this.data` to create a lookup table for each ID and Date/Month
