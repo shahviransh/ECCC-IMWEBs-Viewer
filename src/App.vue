@@ -141,7 +141,7 @@ export default {
 
             const timeout = setTimeout(() => {
               this.uploadMessage = "Still uploading... the folder might be large, please wait a bit longer.";
-            }, 2000); // 30 seconds
+            }, 30000); // 30 seconds
 
             // Use dynamic API base URL
             const response = await axios.post(`${window.API_BASE_URL}/api/upload_folder`, formData, {
