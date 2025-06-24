@@ -6,12 +6,12 @@
 
 <script>
 import { use } from 'echarts/core';
-import { LineChart, ScatterChart, BarChart } from 'echarts/charts';
+import { LineChart, ScatterChart, BarChart, PieChart } from 'echarts/charts';
 import { GridComponent, TooltipComponent, TitleComponent, LegendComponent, DataZoomComponent } from 'echarts/components';
 import { CanvasRenderer } from 'echarts/renderers';
 import VChart from 'vue-echarts';
 
-use([LineChart, BarChart, ScatterChart, GridComponent, TooltipComponent, TitleComponent, DataZoomComponent, LegendComponent, CanvasRenderer]);
+use([LineChart, BarChart, ScatterChart, PieChart, GridComponent, TooltipComponent, TitleComponent, DataZoomComponent, LegendComponent, CanvasRenderer]);
 
 export default {
     name: "GraphDisplay",
