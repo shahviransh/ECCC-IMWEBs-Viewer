@@ -1423,7 +1423,7 @@ def bounds_overlap_or_similar(bounds1, bounds2, tolerance=0.0001):
         return True, merged_bounds
 
     # If completely far apart, return the first bound
-    return False, bounds1
+    return True, bounds1
 
 
 def get_raster_normalized(band):
