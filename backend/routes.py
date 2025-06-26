@@ -69,7 +69,7 @@ def register_routes(app, cache):
             return jsonify({"error": "Missing username or password"}), 400
 
         # Verify username and hashed password
-        if username in ADMIN_USERNAMES or not bcrypt.checkpw(
+        if username not in ADMIN_USERNAMES or not bcrypt.checkpw(
             password.encode(), ADMIN_PASSWORD.encode()
         ):
             return jsonify({"error": "Invalid credentials"}), 401
