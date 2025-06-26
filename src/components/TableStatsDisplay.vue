@@ -22,7 +22,7 @@
             </div>
         </div>
         <!-- Stats Container with Scrollable Body -->
-        <div class="stats-container">
+        <div class="stats-container" v-if="statsColumns && statsColumns.length">
             <table class="styled-table">
                 <thead>
                     <tr>
