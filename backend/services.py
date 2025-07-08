@@ -1178,7 +1178,7 @@ def get_columns_and_time_range(db_path, table_name):
         # Check and query for specific date/time columns (using real column names)
         for date_col, dtype, inter in [
             ("Time", "Time", "daily"),
-            ("Date", "Time", "daily"),
+            ("Date", "Date", "daily"),
             ("Month", "Month", "monthly"),
             ("Year", "Year", "yearly"),
         ]:
