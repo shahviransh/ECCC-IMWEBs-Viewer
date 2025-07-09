@@ -561,6 +561,8 @@ def save_to_file(
         # Classify columns based on their value ranges (example threshold: >100 for secondary y-axis)
         selected_columns = [col for col in dataframe1.columns if col != date_type]
         for column in selected_columns:
+            if dataframe1[column].dtype == "object":
+                continue
             if dataframe1[column].max() > 100:
                 secondary_axis_columns.append(column)
             else:
