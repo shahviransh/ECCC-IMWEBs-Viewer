@@ -372,10 +372,9 @@ def fetch_data_service(data):
             stats_df = calculate_statistics(df, statistics, date_type)
 
         def replace_nan_with_none(records):
-            import math
             for record in records:
                 for key, value in record.items():
-                    if (isinstance(value, float) or isinstance(value, int)) and math.isnan(value):
+                    if (isinstance(value, float) or isinstance(value, int)) and np.isnan(value):
                         record[key] = None
             return records
         
