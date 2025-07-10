@@ -371,9 +371,17 @@ def fetch_data_service(data):
                 }
             stats_df = calculate_statistics(df, statistics, date_type)
 
+        def replace_nan_with_none(records):
+            import math
+            for record in records:
+                for key, value in record.items():
+                    if (isinstance(value, float) or isinstance(value, int)) and math.isnan(value):
+                        record[key] = None
+            return records
+        
         # Return the data and statistics as dictionaries
         return {
-            "data": df.map(round_numeric_values).to_dict(orient="records"),
+            "data": replace_nan_with_none(df.map(round_numeric_values).to_dict(orient="records")),
             "new_feature": new_feature,
             "stats": stats_df.to_dict(orient="records") if stats_df is not None else [],
             "statsColumns": stats_df.columns.tolist() if stats_df is not None else [],
