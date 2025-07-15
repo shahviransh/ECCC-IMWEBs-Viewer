@@ -38,8 +38,7 @@
                                 </span>
                             </div>
                         </div>
-                        <HCaptcha :sitekey="sitekey" :reCaptchaCompat="false"
-                            @verify="onHCaptchaChange" />
+                        <HCaptcha :sitekey="sitekey" :reCaptchaCompat="false" @verify="onHCaptchaChange" />
                         <button type="submit" class="loginButton">Sign in</button>
                         <button type="button" class="contactAdminButton" @click="showContactForm = true">Contact
                             Admin</button>
@@ -60,7 +59,8 @@
                 </div>
                 <div class="formGroup">
                     <label for="email"><b>Email:</b></label>
-                    <input id="email" name="email" type="email" placeholder="Email Address" class="formControl" required />
+                    <input id="email" name="email" type="email" placeholder="Email Address" class="formControl"
+                        required />
                 </div>
                 <div class="formGroup">
                     <label for="message"><b>Message:</b></label>
@@ -79,9 +79,11 @@
     <div v-if="showHelpPopup" class="contactFormOverlay">
         <div class="helpPopup">
             <h3>Help</h3>
-            <p>If you are having trouble with the website, contact admin or use the desktop app with the same functionality and features as the web app.</p>
+            <p>If you are having trouble with the website, contact admin or use the desktop app with the same
+                functionality and features as the web app.</p>
             <p>
-                <a href="https://github.com/shahviransh/ECCC-IMWEBs-Viewer?tab=readme-ov-file#-installation" target="_blank">
+                <a href="https://github.com/shahviransh/ECCC-IMWEBs-Viewer?tab=readme-ov-file#-installation"
+                    target="_blank">
                     Click here and follow installation instructions.
                 </a>
             </p>
@@ -91,6 +93,7 @@
     <div class="logos">
         <img src="../assets/ECCC.png" alt="ECCC Logo" class="ecccLogo" />
         <img src="../assets/UoG.png" alt="University of Guelph Logo" class="uogLogo" />
+        <img src="../assets/IMWEBs-Viewer.png" alt="IMWEBs Viewer" class="uogLogo" />
     </div>
 </template>
 
