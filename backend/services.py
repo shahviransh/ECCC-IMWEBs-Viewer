@@ -155,7 +155,7 @@ def fetch_data_service(data):
                         ):
                             merge_on_columns.append(col)
                     df_test = pd.merge(df, df_temp, on=merge_on_columns, how="inner")
-                    if not merge_on_columns or df.empty:
+                    if df.empty or not merge_on_columns:
                         df = pd.concat([df, df_temp], axis=1)
                     else:
                         df = df_test
