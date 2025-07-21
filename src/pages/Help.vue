@@ -63,7 +63,8 @@
                 </li>
                 <li>This lookup database needs specific tables (e.g., `scenario_2`, `BMP`, `Hydroclimate`) containing
                     columns: <code>Table Name</code>, <code>Table Alias</code>, <code>Column Name</code>,
-                    <code>Column Alias</code>.</li>
+                    <code>Column Alias</code>.
+                </li>
                 <li>If a `lookup.db3` is found and correctly formatted, aliases will be used in dropdowns and displays
                     where possible. Calculations and exports often use the original database names for consistency.</li>
             </ul>
@@ -111,7 +112,8 @@
                     <ul>
                         <li><strong>Desktop App:</strong> Specify the directory path on your computer where exported
                             files will be saved. Defaults to a 'dataExport' folder within the application's internal
-                            data directory (`{IMWEBs-Viewer App Path}/_up_/backend/apppy/_internal/dataExport`). You can change this to folders like Desktop, Downloads, or Documents.</li>
+                            data directory (`{IMWEBs-Viewer App Path}/_up_/backend/apppy/_internal/dataExport`). You can
+                            change this to folders like Desktop, Downloads, or Documents.</li>
                         <li><strong>Web App:</strong> This field is ignored. Exported files will be offered as downloads
                             through your browser.</li>
                     </ul>
@@ -223,7 +225,8 @@
                 <li>Use the <strong>Settings Panel</strong> to filter by IDs, date range, interval, and aggregation
                     method (if needed).</li>
                 <li>Select the desired <strong>Graph Type</strong> from the dropdown in the Export Panel (e.g., Scatter,
-                    Line, Bar, or combinations like Bar & Scatter; <strong>Pie</strong> is available for non-time series data).</li>
+                    Line, Bar, or combinations like Bar & Scatter; <strong>Pie</strong> is available for non-time series
+                    data).</li>
                 <li>If using a combined graph type (e.g., Bar & Scatter), additional dropdowns will appear below the
                     Graph Type selector. Use these to assign specific Y-Axis columns to be displayed as Bars or Scatters
                     (or Lines). *All selected Y-axis columns must be assigned.*</li>
