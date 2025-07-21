@@ -154,7 +154,11 @@ def fetch_data_service(data):
                             table["table"]
                         ):
                             merge_on_columns.append(col)
-                    df = pd.merge(df, df_temp, on=merge_on_columns, how="inner") if merge_on_columns else pd.concat([df, df_temp], axis=1)
+                    df_test = pd.merge(df, df_temp, on=merge_on_columns, how="inner")
+                    if not merge_on_columns or df.empty:
+                        df = pd.concat([df, df_temp], axis=1)
+                    else:
+                        df = df_test
                     # Drop rows with NaN in the required columns
                     df.dropna(inplace=True, how="all")
             except Exception as e:
