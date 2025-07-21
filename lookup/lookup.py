@@ -12,7 +12,7 @@ def get_aliases_from_lookup(lookup_db3_file, lookup_table_name):
     aliases = {}
 
     # Fetch the table names and column names along with their aliases
-    cursor.execute(f"SELECT OUTPUT_ID, COLUMN, UNIT, SHORT_NAME FROM {lookup_table_name}")
+    cursor.execute(f"SELECT OUTPUT_ID, COLUMN, UNIT, SHORT_NAME FROM '{lookup_table_name}'")
     rows = cursor.fetchall()
 
     # Populate the aliases dictionary
