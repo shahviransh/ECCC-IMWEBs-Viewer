@@ -253,7 +253,6 @@ export default {
       } catch {
         localStorage.removeItem("token");
         this.isAuthenticated = false;
-        this.$router.push({ path: "/" }); // Redirect to login page
       }
     },
     async logout() {
