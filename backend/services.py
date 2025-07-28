@@ -33,6 +33,7 @@ os.environ["PROJ_LIB"] = Config.PROJ_LIB
 os.environ["GDAL_DATA"] = Config.GDAL_DATA
 bmp_db_path_global = None
 
+
 def fetch_data_service(data):
     """Fetch data and statistics from the specified databases and tables."""
     try:
@@ -104,7 +105,11 @@ def fetch_data_service(data):
                             fetch_columns.add(col)
 
                 # Remove fetched columns from columns list
-                columns = list(set(columns) - set(fetch_columns)) + [date_type] + ID if columns != "All" else "All"
+                columns = (
+                    list(set(columns) - set(fetch_columns)) + [date_type] + ID
+                    if columns != "All"
+                    else "All"
+                )
 
                 if not fetch_columns:
                     # If there are no common columns, skip the table
@@ -141,9 +146,7 @@ def fetch_data_service(data):
                                 )
 
                     # Identify columns for merging; ignore columns with dash if they represent different data sources
-                    merge_on_columns = [
-                        col for col in df.columns if "ID" in col
-                    ]
+                    merge_on_columns = [col for col in df.columns if "ID" in col]
                     for col in df.columns:
                         if col in df_temp.columns and not col.startswith(
                             table["table"]
@@ -369,13 +372,17 @@ def fetch_data_service(data):
         def replace_nan_with_none(records):
             for record in records:
                 for key, value in record.items():
-                    if (isinstance(value, float) or isinstance(value, int)) and np.isnan(value):
+                    if (
+                        isinstance(value, float) or isinstance(value, int)
+                    ) and np.isnan(value):
                         record[key] = None
             return records
-        
+
         # Return the data and statistics as dictionaries
         return {
-            "data": replace_nan_with_none(df.map(round_numeric_values).to_dict(orient="records")),
+            "data": replace_nan_with_none(
+                df.map(round_numeric_values).to_dict(orient="records")
+            ),
             "new_feature": new_feature,
             "stats": stats_df.to_dict(orient="records") if stats_df is not None else [],
             "statsColumns": stats_df.columns.tolist() if stats_df is not None else [],
@@ -670,7 +677,9 @@ def save_to_file(
                     chart = overlay_chart
                 else:
                     chart.combine(overlay_chart)
-            if not primary_axis_columns or (ID in primary_axis_columns and len(primary_axis_columns) == 1):
+            if not primary_axis_columns or (
+                ID in primary_axis_columns and len(primary_axis_columns) == 1
+            ):
                 # Add dummy series to primary y-axis if no columns are present
                 chart.add_series(
                     {
@@ -679,8 +688,8 @@ def save_to_file(
                         "values": f"Sheet1!$B$2:$B${row_count}",
                         "y2_axis": False,
                     }
-                )        
-            
+                )
+
             # Customize the chart
             chart.set_x_axis(
                 {
@@ -700,13 +709,17 @@ def save_to_file(
 
             # Configure the secondary Y axis only if it's actually needed
             if secondary_axis_columns:
-                chart.set_y2_axis({
-                    "name": "Values (Larger Values)",
-                    "major_gridlines": {"visible": True}
-                    })
+                chart.set_y2_axis(
+                    {
+                        "name": "Values (Larger Values)",
+                        "major_gridlines": {"visible": True},
+                    }
+                )
 
             # Insert the chart into the worksheet
-            worksheet.insert_chart(f"{xl_col_to_name(len(dataframe1.columns) + 1)}2", chart)
+            worksheet.insert_chart(
+                f"{xl_col_to_name(len(dataframe1.columns) + 1)}2", chart
+            )
             workbook.close()
     elif file_format in ["png", "jpg", "jpeg", "svg", "pdf"]:
         # Plot each column as a line on the same figure
@@ -1004,6 +1017,7 @@ def get_files_and_folders(data):
     except Exception as e:
         return {"error": str(e)}
 
+
 def get_season_from_date(date_str):
     """Map date strings to seasons."""
     month = date_str.month
@@ -1292,8 +1306,12 @@ def get_multi_columns_and_time_range(data):
         id_column = [table["id_column"] for table in multi_columns_time_range][
             0
         ]  # Assuming all tables have the same ID column
-        start_date = min(start_dates) if any(elem is not None for elem in start_dates) else None
-        end_date = max(end_dates) if any(elem is not None for elem in end_dates) else None
+        start_date = (
+            min(start_dates) if any(elem is not None for elem in start_dates) else None
+        )
+        end_date = (
+            max(end_dates) if any(elem is not None for elem in end_dates) else None
+        )
 
         # Combine all columns with date_type as first column
         columns = (
@@ -1324,7 +1342,10 @@ def get_multi_columns_and_time_range(data):
         ]
 
         # Intersection of IDs from all tables and filter out None values
-        id_sets = [set(filter(lambda x: x is not None, table["ids"])) for table in multi_columns_time_range]
+        id_sets = [
+            set(filter(lambda x: x is not None, table["ids"]))
+            for table in multi_columns_time_range
+        ]
         ids = set.intersection(*id_sets) if id_sets else set()
 
         return {
@@ -1888,7 +1909,7 @@ def process_geospatial_data(data):
             # Save properties for each shapefile path
             tool_tip[toolTipKey] = properties
         # Handle GeoTIFF files
-        elif file_path.endswith((".tif",".tiff")):
+        elif file_path.endswith((".tif", ".tiff")):
             raster_dataset = gdal.Open(file_path)
             if not raster_dataset:
                 continue

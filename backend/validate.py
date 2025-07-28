@@ -61,7 +61,7 @@ def validate_get_data_args(request_args):
         "end_date": {
             "type": "string",
             "required": True,
-            "regex": r"^\d*|^\d{4}-\d{2}-\d{2}$|^$"
+            "regex": r"^\d*|^\d{4}-\d{2}-\d{2}$|^$",
         },
         "date_type": {
             "type": "string",
@@ -112,7 +112,7 @@ def validate_get_data_args(request_args):
         "spatial_scale": {
             "type": "string",
             "required": False,
-            "allowed": ["subarea", "field", "reach", "subbasin", "unknown"]
+            "allowed": ["subarea", "field", "reach", "subbasin", "unknown"],
         },
         "math_formula": {
             "type": "string",
@@ -222,7 +222,7 @@ def validate_export_data_args(request_args):
         "spatial_scale": {
             "type": "string",
             "required": False,
-            "allowed": ["subarea", "field", "reach", "subbasin", "unknown"]
+            "allowed": ["subarea", "field", "reach", "subbasin", "unknown"],
         },
         "default_crs": {
             "type": "string",
