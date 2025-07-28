@@ -32,8 +32,6 @@ global_dbs_tables_columns = {}
 os.environ["PROJ_LIB"] = Config.PROJ_LIB
 os.environ["GDAL_DATA"] = Config.GDAL_DATA
 bmp_db_path_global = None
-os.makedirs(Config.TEMPDIR, exist_ok=True)
-
 
 def fetch_data_service(data):
     """Fetch data and statistics from the specified databases and tables."""
