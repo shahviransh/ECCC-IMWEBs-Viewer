@@ -1,79 +1,30 @@
-# Stage 1: Base Image with Conda and Python
-FROM continuumio/miniconda3 AS base
+FROM continuumio/miniconda3
 
 # Set working directory
 WORKDIR /app
 
-# Install necessary Linux tools
-RUN apt-get update && apt-get install -y binutils
+# Copy Python dependencies
+COPY backend/requirements.txt .
 
-# Copy Python project files
-COPY backend /app/backend
-COPY backend/requirements.txt /app/backend/requirements.txt
+# Create Conda environment
+RUN conda create -n venv python=3.12 -y && \
+    conda install -n venv -c conda-forge gdal geopandas pyogrio -y
 
-# Activate the Conda environment by modifying the PATH environment variable
-ENV PATH=/opt/conda/bin:$PATH
+# Set environment path so conda env is default
+ENV PATH /opt/conda/envs/venv/bin:$PATH
 
-# Pip install Python dependencies
-RUN conda install -c conda-forge gdal sqlite geopandas pyogrio -y && \
-    conda run -n base pip install --no-cache-dir -r /app/backend/requirements.txt && \
-    conda clean -afy
+# Install pip packages in conda env
+RUN conda run -n venv pip install --no-cache-dir -r requirements.txt
 
-# Package Python backend using PyInstaller
-RUN conda run -n base pyinstaller --collect-all PIL \
-     /app/backend/apppy.py -y \
-    --distpath /app/backend/ \
-    --specpath /app/backend/ \
-    --workpath /app/backend/build \
-    --name apppy \
-    --add-data "/opt/conda/share/proj:share/proj"
+# Copy application code (including subfolders)
+COPY backend /app
 
-# Stage 2: Node.js and Rust for Tauri
-FROM node:20 AS tauri-builder
+# Set default Flask app path
+ENV FLASK_APP=apppy.py
+ENV FLASK_RUN_PORT=5000
 
-# Set working directory
-WORKDIR /app
+# Expose port
+EXPOSE 5000
 
-# Install necessary Linux tools
-RUN apt-get update && apt-get install -y libwebkit2gtk-4.0-dev libwebkit2gtk-4.1-dev \
-    build-essential libssl-dev libgtk-3-dev tree \
-    curl wget file \
-    libappindicator3-dev libgdk-pixbuf2.0-dev \
-    librsvg2-dev libjavascriptcoregtk-4.1-dev libfuse2
-
-# Install Rust and Tauri CLI
-RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
-ENV PATH=/root/.cargo/bin:$PATH
-
-# Install Tauri CLI globally
-RUN npm install -g @tauri-apps/cli
-
-# Copy frontend and Tauri project files
-COPY . /app/
-
-# Install Node.js dependencies
-RUN npm install
-
-# Stage 3: Compilation with Rust
-FROM tauri-builder AS cross-builder
-
-# Copy outputs from Stage 1 (base) and Stage 2 (tauri-builder)
-COPY --from=base /app/backend /app/backend
-COPY --from=tauri-builder /app /app
-COPY --from=base /opt/conda /opt/conda
-COPY --from=base backend/apppy/_internal/* /usr/lib/
-
-# Build Tauri for all targets
-RUN npm run tauri build
-
-# Stage 4: Artifact Collection
-FROM debian:bullseye AS artifact-collector
-
-# Set working directory
-WORKDIR /artifacts
-
-# Copy artifacts from previous stages
-COPY --from=cross-builder /app/src-tauri/target/release/bundle /artifacts/
-COPY --from=base /app/backend/apppy /artifacts/backend/apppy
-
-CMD ["ls" "/artifacts"]
+# Start the app using conda env and use Render’s env vars
+CMD ["conda", "run", "--no-capture-output", "-n", "venv", "flask", "run", "--host=0.0.0.0"]
