@@ -274,6 +274,14 @@
                 <li>Click the <strong>Fetch Map</strong> button. A "Customize Map Style" popup appears.</li>
             </ol>
 
+            <div style="margin-bottom: 1em;">
+                <strong>Important:</strong> For all maps, after clicking <strong>Shapefiles/Rasterfiles</strong>,
+                <u>wait for the
+                    green popup message at the bottom right</u> (from the message box) that says the GeoJSON loaded
+                before fetching the map. This ensures all geospatial data and layers are fully loaded and
+                ready for use.
+            </div>
+
             <h4>Customizing Map Styles (Popup)</h4>
             <ul>
                 <li><strong>Colors & Opacity:</strong> Adjust the default colors and opacity (0.0 to 1.0) for Polygons,
