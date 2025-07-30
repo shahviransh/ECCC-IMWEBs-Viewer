@@ -1097,7 +1097,7 @@ def round_numeric_values(value):
     Round numeric values to 4 decimal places if they are small (less than 0.01),
     otherwise round to 2 decimal places.
     """
-    if isinstance(value, (float, int)):  # Check if the value is a number
+    if isinstance(value, (float, int)):
         if abs(value) < 0.01:  # Small values
             return round(value, 4)
         else:  # Larger values
