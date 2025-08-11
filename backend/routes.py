@@ -123,7 +123,6 @@ def register_routes(app, cache):
             ALLOWED_EXTENSIONS = {
                 "shp",
                 "tif",
-                "geojson",
                 "gpkg",
                 "shx",
                 "dbf",
