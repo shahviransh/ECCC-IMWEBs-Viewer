@@ -9,24 +9,24 @@ jobs:
     # Only run if the commit message includes 'release:app'
     if: contains(github.event.head_commit.message, 'release:app')
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Restore Cache
         id: check_cache
-        uses: actions/cache/restore@v3
+        uses: actions/cache/restore@v6
         with:
           path: backend/apppy/_internal/Jenette_Creek_Watershed
           key: Jenette_Creek_Watershed-v1 # Change "v1" to "v2" manually if you want to refresh the cache
       
       - name: Authenticate with Google Cloud
         if: steps.check_cache.outputs.cache-hit != 'true'
-        uses: google-github-actions/auth@v1
+        uses: google-github-actions/auth@v3
         with:
           credentials_json: ${{ secrets.GCS_KEY }}
 
       - name: "Set up Cloud SDK"
         if: steps.check_cache.outputs.cache-hit != 'true'
-        uses: "google-github-actions/setup-gcloud@v2"
+        uses: "google-github-actions/setup-gcloud@v3"
         with:
           project_id: "augmented-vim-442108-f7"
           version: "latest"
@@ -35,10 +35,10 @@ jobs:
         if: steps.check_cache.outputs.cache-hit != 'true'
         run: |
           mkdir -p backend/apppy/_internal  
-          gsutil -m cp -r gs://eccc-imwebs-viewer/Jenette_Creek_Watershed backend/apppy/_internal/
+          gcloud storage cp -r gs://eccc-imwebs-viewer/Jenette_Creek_Watershed backend/apppy/_internal/
 
       - name: Save to Cache
-        uses: actions/cache/save@v3
+        uses: actions/cache/save@v6
         if: steps.check_cache.outputs.cache-hit != 'true'
         with:
           path: backend/apppy/_internal/Jenette_Creek_Watershed
@@ -64,7 +64,7 @@ jobs:
 
     runs-on: ${{ matrix.platform }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Free Disk Space (Ubuntu)
         if: matrix.platform == 'ubuntu-22.04'
@@ -73,7 +73,7 @@ jobs:
           tool-cache: false
       
       - name: Setup node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7
         with:
           node-version: lts/*
 
@@ -103,10 +103,10 @@ jobs:
         run: |
           echo "VITE_API_BASE_URL=${{secrets.VITE_API_BASE_URL}}" >> .env
 
-      - uses: conda-incubator/setup-miniconda@v3
+      - uses: conda-incubator/setup-miniconda@v4
         with:
           activate-environment: venv
-          auto-activate-base: true
+          auto-activate: true
           channels: conda-forge,defaults
           python-version: 3.12
 
@@ -137,7 +137,7 @@ jobs:
         shell: bash
 
       - name: Restore Cache
-        uses: actions/cache/restore@v3
+        uses: actions/cache/restore@v6
         with:
           path: backend/apppy/_internal/Jenette_Creek_Watershed
           key: Jenette_Creek_Watershed-v1
@@ -147,7 +147,7 @@ jobs:
         if: matrix.platform == 'ubuntu-22.04'
         run: sudo cp -r backend/apppy/_internal/* /usr/lib/
 
-      - uses: tauri-apps/tauri-action@v0
+      - uses: tauri-apps/tauri-action@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
